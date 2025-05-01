@@ -80,10 +80,13 @@ def end_session(X_SECURITY_TOKEN, CST):
         'X-SECURITY-TOKEN': f'{X_SECURITY_TOKEN}',
         'CST': f'{CST}'
     }
-    conn.request("DELETE", "/api/v1/session", payload, headers)
-    res = conn.getresponse()
-    data = res.read()
-    logging.info(f"Ended session: {data.decode('utf-8')}")
+    try:
+        conn.request("DELETE", "/api/v1/session", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        logging.info(f"Successfully ended session: {data.decode('utf-8')}")
+    except Exception as e:
+        logging.error("Unable to properly end_session(): ", e)
 
 def session_details(X_SECURITY_TOKEN, CST, print_answer):
     """Returns the user's session details."""
