@@ -6,6 +6,7 @@ import pandas as pd
 from datetime import datetime
 
 from broker.base_interface import BaseBroker
+from utils import shared_utils
 import utils.broker_utils as br_util
 import config.config as config
 import broker.capital_com.rest_api.account as account
@@ -23,7 +24,10 @@ class CapitalCom(BaseBroker):
         
         try: 
             # Getting secrets
-            self.secrets, self.api_key, self.password, self.email = br_util.load_secrets()
+            self.secrets = shared_utils.load_secrets(desired_keys={'API_KEY_CAP', 'PASSWORD_CAP', 'EMAIL'})
+            self.api_key = self.secrets.get('API_KEY_CAP')
+            self.password = self.secrets.get('PASSWORD_CAP')
+            self.email = self.secrets.get('EMAIL')
             try:
                 # Encrypting password
                 self.enc_pass = session.encrypt_password(self.password, self.api_key)
