@@ -36,13 +36,13 @@ def historical_prices(X_SECURITY_TOKEN, CST,
     Returns:
 
     """
-    logging.info("Inside historical_prices() markets_info.py")
+    
     payload = ''
     headers = {
         'X-SECURITY-TOKEN': X_SECURITY_TOKEN,
         'CST': CST
     }
-    print(f"About to send this string:  /api/v1/prices/{epic}?resolution={resolution}&max={max}&from={from_date}&to={to_date}")
+    
     conn.request("GET", f"/api/v1/prices/{epic}?resolution={resolution}&max={max}&from={from_date}&to={to_date}", payload, headers)
     #conn.request("GET", "/api/v1/prices/SILVER?resolution=MINUTE&max=10&from=2020-02-24T00:00:00&to=2020-02-24T01:00:00", payload, headers)
     res = conn.getresponse()
@@ -109,7 +109,7 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
         current_from_str = current_from.strftime("%Y-%m-%dT%H:%M:%S")
         current_to_str = current_to.strftime("%Y-%m-%dT%H:%M:%S")
         
-        logging.info(f"Fetching chunk from {current_from_str} to {current_to_str}")
+        logging.debug(f"Fetching chunk from {current_from_str} to {current_to_str}")
         
         # Call the original function
         chunk_data = historical_prices(
@@ -126,7 +126,7 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
         # Add data to our collection if the API call was successful
         if "prices" in chunk_data:
             all_prices.extend(chunk_data["prices"])
-            logging.debug(f"Added {len(chunk_data['prices'])} data points from this chunk")
+            logging.info(f"Successfully fetched and added {len(chunk_data['prices'])} data points from this chunk!")
         else:
             logging.warning(f"Failed to get data for period {current_from_str} to {current_to_str}")
             logging.warning(f"API Response: {chunk_data}")
