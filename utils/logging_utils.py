@@ -56,7 +56,7 @@ def setup_logging(
     
     # Create logs directory if it doesn't exist
     if log_to_file:
-        for subdir in sys_config.DIFFERENT_LOG_DIRS:
+        for subdir in config.DIFFERENT_LOG_DIRS:
             full_path = os.path.join(log_dir, subdir)
             if not os.path.exists(full_path):
                 os.makedirs(full_path)
@@ -81,7 +81,7 @@ def setup_logging(
     timestamp = get_timestamp()
     # Add main file handler
     if log_to_file:
-        for subdir in sys_config.DIFFERENT_LOG_DIRS:
+        for subdir in config.DIFFERENT_LOG_DIRS:
             if type is subdir:
                 full_path = os.path.join(log_dir, subdir)
                 log_dir = full_path
