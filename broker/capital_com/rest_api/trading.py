@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 import json
 
-from utils.broker_utils import extract_deal_reference, load_secrets
+from utils.broker_utils import extract_deal_reference
 import config.config as config
 
 
