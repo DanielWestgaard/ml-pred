@@ -126,7 +126,7 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
         # Add data to our collection if the API call was successful
         if "prices" in chunk_data:
             all_prices.extend(chunk_data["prices"])
-            logging.info(f"Added {len(chunk_data['prices'])} data points from this chunk")
+            logging.debug(f"Added {len(chunk_data['prices'])} data points from this chunk")
         else:
             logging.warning(f"Failed to get data for period {current_from_str} to {current_to_str}")
             logging.warning(f"API Response: {chunk_data}")
