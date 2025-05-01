@@ -8,49 +8,6 @@ import json
 import config.config as config
 
 
-def load_secrets_alpaca(file_path="secrets/secrets.txt"):
-    desired_keys={"alpaca_secret_key_paper", "alpaca_api_key_paper"}
-    secrets = {}
-    
-    with open(file_path, "r") as file:
-        for line in file:
-            line = line.strip()
-            if "=" in line:  # Ensure valid format
-                key, value = line.split("=", 1)  # Split at the first '='
-                if key in desired_keys:
-                    secrets[key] = value
-    
-    api_key = secrets.get('alpaca_api_key_paper')
-    secret_key = secrets.get('alpaca_secret_key_paper')
-
-    return secrets, api_key, secret_key
-
-def load_secrets(file_path="secrets/secrets.txt"):
-    """
-    Utility functions to extract the following keys: API_KEY_CAP, PASSWORD_CAP, EMAIL.
-    
-    Returns:
-        secrets{}, API_KEY_CAP, PASSWORD_CAP, EMAIL
-    """
-    desired_keys = {"API_KEY_CAP", "PASSWORD_CAP", "EMAIL"}
-    secrets = {}
-    
-    with open(file_path, "r") as file:
-        for line in file:
-            line = line.strip()
-            if "=" in line:  # Ensure valid format
-                key, value = line.split("=", 1)  # Split at the first '='
-                if key in desired_keys:
-                    secrets[key] = value
-    
-    api_key = secrets.get('API_KEY_CAP')
-    password = secrets.get('PASSWORD_CAP')
-    email = secrets.get('EMAIL')
-    logging.info(f"Loaded credentials. Length: {len(secrets)}")
-
-    return secrets, api_key, password, email
-
-
 # Related to handling
 
 def on_open(ws, subscription_message):
