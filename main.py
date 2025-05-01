@@ -31,8 +31,8 @@ def main():
         #                            max=1000,
         #                            from_date="2025-04-10T12:00:00", to_date="2025-04-10T13:10:00",
         #                            print_answer=True)
-        broker.fetch_and_save_historical_prices(epic="GBPUSD", resolution="MINUTE_5",
-                                                from_date="2024-01-01T00:00:00", to_date="2025-01-01T01:00:00",
+        broker.fetch_and_save_historical_prices(epic="GBPUSD", resolution="MINUTE",
+                                                from_date="2025-04-15T00:00:00", to_date="2025-05-01T01:00:00",
                                                 print_answer=False)
         
         # broker.place_market_order(symbol="GBPUSD", direction="BUY", size="100", stop_level="1.32", profit_level="1.34")
