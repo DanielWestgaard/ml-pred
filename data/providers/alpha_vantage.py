@@ -8,7 +8,12 @@ import utils.shared_utils as shared_utils
 
 class ProviderAlphaVantage(BaseProvider):
     def __init__(self):
-        """Initialize the provider with configuration."""
+        """
+        Initialize the provider with configuration.
+        
+        Note: The api key has reportedly a 25 request limit per day, but this is actually only
+        related to you IP-adress and not the key, so a VPN can help with this.
+        """
         logging.info("Initializing Alpha Vantage Provider")
         self.secrets = shared_utils.load_secrets({"alpha_vantage_free_api_key"})
         self.api_key = self.secrets.get("alpha_vantage_free_api_key")
