@@ -1,4 +1,5 @@
 import logging
+import os
 
 
 def load_secrets(desired_keys:dict, file_path="secrets/secrets.txt"):
@@ -26,3 +27,24 @@ def load_secrets(desired_keys:dict, file_path="secrets/secrets.txt"):
     # logging.debug(f"Content of secrets: {secrets}")
 
     return secrets
+
+def ensure_path_exists(path:str):
+    """
+    Check if the given path exists and create it if it doesn't.
+    
+    Args:
+        path (str): The directory path to check/create
+        
+    Returns:
+        bool: True if path exists or was created successfully, False otherwise
+    """
+    try:
+        # Check if the path already exists
+        if not os.path.exists(path):
+            # Create all directories in the path
+            os.makedirs(path)
+            logging.info(f"Created directory: {path}")
+        return True
+    except Exception as e:
+        logging.error(f"Error creating directory {path}: {e}")
+        return False

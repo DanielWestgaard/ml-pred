@@ -25,8 +25,8 @@ def main():
     
     if args.fetch_data_alpha:
         provider = ProviderAlphaVantage()
-        provider.fetch_and_save_historical_data(symbol="IBM", timeframe="5min",
-                                                  month="2025-03", print_answer=True)
+        provider.fetch_and_save_historical_data(symbol="IBM", timeframe="60min",
+                                                  month="2025-04", print_answer=True, store_answer=True)
     
     if args.fetch_data_capcom:
         provider = ProviderCapitalCom()

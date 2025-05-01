@@ -1,9 +1,11 @@
 import json
 import logging
+import os
 import requests
 
 from data.providers.base_provider import BaseProvider
 import utils.shared_utils as shared_utils
+import config.config as config
 
 
 class ProviderAlphaVantage(BaseProvider):
@@ -18,8 +20,8 @@ class ProviderAlphaVantage(BaseProvider):
         self.secrets = shared_utils.load_secrets({"alpha_vantage_free_api_key"})
         self.api_key = self.secrets.get("alpha_vantage_free_api_key")
     
-    def fetch_and_save_historical_data(self, symbol:str, timeframe:str, 
-                                        month:str, print_answer:bool = False):
+    def fetch_and_save_historical_data(self, symbol:str, timeframe:str, month:str,
+                                       print_answer:bool = False, store_answer:bool = False):
         """
         Fetch historical intraday market data.
         
@@ -43,10 +45,16 @@ class ProviderAlphaVantage(BaseProvider):
                 )
         r = requests.get(url)
         data = r.json()
-
+        
         if print_answer:
             print(json.dumps(data, indent=4))
             
+        if store_answer:
+            output_dir = config.ALPVAN_RESPONSE_JSON_DIR
+            shared_utils.ensure_path_exists(output_dir)
+            output_dir = os.path.join(output_dir, 'response.json')
+            with open(output_dir, 'w') as f:
+                json.dump(data, f, indent=4)
         # Maybe use the same methods from broker/capital_com/rest_api/markets_info.py and fetch_and_save_historical_prices()?
           # Generate filename
           # Convert json response to csv file
