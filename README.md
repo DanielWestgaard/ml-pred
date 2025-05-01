@@ -6,3 +6,5 @@ It's important to note that this will probably not be the very best system, as I
 If this is the first time using the repo, follow these instructions:
 1. Clone the environment (eg.): ``` git clone git@github.com:DanielWestgaard/ml-pred.git ```
 2. Create a virtual environment (in root of project): ``` python3.10 -m venv venv ```
+3. Create secrets path: ``` touch secrets/secrets.txt ```. Then, fill in the following (based on what you will use in the repo):
+  - ...
