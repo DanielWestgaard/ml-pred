@@ -14,7 +14,7 @@ This folder will be solely responsible for engineering data that a ML model will
 ```
 ├── providers                   # Different providers/sources to get/retrieve historical data
 │   ├── base_provider.py        # Interface for different providers
-│   ├── capital_com.py          # Using the broker Capital.com's API to fetch historical data
+│   ├── capital_com.py          # Using the broker Capital.com's API to fetch historical data, very simple
 │   ├── alpha_vantage.py        # Stock Market Data API, 30 days free intraday market data
 │   ├── ...
 │   └── ...
