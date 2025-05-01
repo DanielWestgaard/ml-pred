@@ -1,1 +1,4 @@
 pandas
+cryptography
+websocket
+dateutil
