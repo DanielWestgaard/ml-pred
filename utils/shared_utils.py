@@ -23,6 +23,6 @@ def load_secrets(desired_keys:dict, file_path="secrets/secrets.txt"):
                     secrets[key] = value
     
     logging.info(f"Loaded credentials. Length: {len(secrets)}")
-    logging.debug(f"Content of secrets: {secrets}")
+    # logging.debug(f"Content of secrets: {secrets}")
 
     return secrets
