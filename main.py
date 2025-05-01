@@ -4,6 +4,7 @@ from config import config
 import utils.logging_utils as log_utils
 from broker.capital_com.capitalcom import CapitalCom
 from data.providers.capital_com import ProviderCapitalCom
+from data.providers.alpha_vantage import ProviderAlphaVantage
 
 
 def parse_arguments():
@@ -11,7 +12,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Train hybrid trading strategy models with uncertainty quantification')
     
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
-    parser.add_argument('--fetch-data-capcom', action='store_true', default=True, help='Fetch historical data using Capital.com API.')
+    parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
+    parser.add_argument('--fetch-data-alpha', action='store_true', default=True, help='Fetch historical data using Capital.com API.')
 
     return parser.parse_args()
 
@@ -21,11 +23,17 @@ def main():
     log_utils._is_configured = False
     logger = log_utils.setup_logging(name="blaaa", type="training", log_to_file=False, log_level=config.DEFAULT_LOG_LEVEL)
     
+    if args.fetch_data_alpha:
+        provider = ProviderAlphaVantage()
+        provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE_5",
+                                                  from_date="2024-04-15T00:00:00", to_date="2025-05-01T01:00:00")
+    
     if args.fetch_data_capcom:
         provider = ProviderCapitalCom()
         provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE_5",
                                                   from_date="2024-04-15T00:00:00", to_date="2025-05-01T01:00:00",
                                                   print_answer=False)
+        provider.end_session()
     
     if args.broker_func:
         broker = CapitalCom()
