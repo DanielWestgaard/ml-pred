@@ -46,7 +46,10 @@ class ProviderAlphaVantage(BaseProvider):
 
         if print_answer:
             print(json.dumps(data, indent=4))
-        
+            
+        # Maybe use the same methods from broker/capital_com/rest_api/markets_info.py and fetch_and_save_historical_prices()?
+          # Generate filename
+          # Convert json response to csv file
     
     def convert_market_data_to_csv(self):
         """Convert response from API to .csv-file format."""
