@@ -9,6 +9,7 @@ It's important to note that this will probably not be the very best system, as I
 ├── backtesting/            # Backtest trained models
 ├── live/                   # Deploy trained model on live market data
 ├── storage/                # General storage for data, models, results, etc.
+├── broker/                 # Different broker integrations
 ├── config/                 # Configuration files
 ├── utils/                  # Utility files
 ├── images/                 # Storing images and sources used in documentation

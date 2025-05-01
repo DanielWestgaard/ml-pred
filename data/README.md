@@ -9,3 +9,8 @@ This folder will be solely responsible for engineering data that a ML model will
 - **Feature selection**: Select the very best features with low correlation to each other and high prediction value.
 - **Normalization**: Rescaling numeric data to a standard range (eg. between 0 and 1), to ensure that features contribute equally to distance based algorithms.
 - ...
+
+## Structure
+```
+...
+```
