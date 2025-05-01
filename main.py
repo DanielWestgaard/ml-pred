@@ -24,7 +24,7 @@ def main():
         broker = CapitalCom()
         broker.start_session()
         # broker.session_details(print_answer=True)
-        broker.switch_active_account(print_answer=False)
+        # broker.switch_active_account(print_answer=False)
         # broker.get_account_capital()
         # broker.list_all_accounts(print_answer=True)
         # broker.get_historical_data(epic="GBPUSD", resolution="MINUTE",

@@ -1,4 +1,5 @@
 pandas
 cryptography
 websocket
+websocket-client
 dateutil
