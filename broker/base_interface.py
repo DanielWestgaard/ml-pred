@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 
 
-class BrokerInterface(ABC):
+class BaseBroker(ABC):
     """Abstract interface class for broker implementations."""
     
     @abstractmethod

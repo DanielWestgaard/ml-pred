@@ -5,9 +5,7 @@ from datetime import datetime
 import sys
 import json
 
-import config.constants.system_config as sys_config
-import config.constants.market_config as mark_config
-import broker.capital_com.capitalcom as broker
+import config.config as config
 
 
 def load_secrets_alpaca(file_path="secrets/secrets.txt"):
@@ -214,7 +212,7 @@ def convert_json_to_ohlcv_csv(json_data, output_file):
             timestamp = price['snapshotTimeUTC']
             
             # Calculate mid prices (average of bid and ask) with rounding
-            decimals = mark_config.PRICE_DECIMALS  # Adjust based on the asset's typical price granularity
+            decimals = config.PRICE_DECIMALS  # Adjust based on the asset's typical price granularity
             open_price = round((price['openPrice']['bid'] + price['openPrice']['ask']) / 2, decimals)
             high_price = round((price['highPrice']['bid'] + price['highPrice']['ask']) / 2, decimals)
             low_price = round((price['lowPrice']['bid'] + price['lowPrice']['ask']) / 2, decimals)
