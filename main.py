@@ -31,9 +31,9 @@ def main():
         #                            max=1000,
         #                            from_date="2025-04-10T12:00:00", to_date="2025-04-10T13:10:00",
         #                            print_answer=True)
-        # broker.fetch_and_save_historical_prices(epic="GBPUSD", resolution="MINUTE_5",
-        #                                         from_date="2024-10-01T00:00:00", to_date="2025-01-01T01:00:00",
-        #                                         print_answer=False)
+        broker.fetch_and_save_historical_prices(epic="GBPUSD", resolution="MINUTE_5",
+                                                from_date="2018-01-01T00:00:00", to_date="2025-01-01T01:00:00",
+                                                print_answer=False)
         
         # broker.place_market_order(symbol="GBPUSD", direction="BUY", size="100", stop_level="1.32", profit_level="1.34")
         # broker.all_positions()
@@ -41,7 +41,7 @@ def main():
         # broker.close_all_orders(print_answer=True)
         # broker.all_positions()
         
-        broker.sub_live_market_data(symbol="GBPUSD", timeframe="MINUTE")
+        # broker.sub_live_market_data(symbol="GBPUSD", timeframe="MINUTE")
         
         broker.end_session()
 
