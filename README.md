@@ -1,2 +1,3 @@
 # ml-pred
-A complete prediction and trading system that uses machine learning to predict intraday financial market data.
+The goal of this repository, is to create a complete prediction and trading system that uses machine learning to predict intraday financial market data. I will also have a complete data pipeline, backtesting system of model, and live data functionality.<br>
+It's important to note that this will probably not be the very best system, as I will also use this as a place to learn and take the time I need to really create this system myself.
