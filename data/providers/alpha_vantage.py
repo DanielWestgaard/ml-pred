@@ -21,12 +21,12 @@ class ProviderAlphaVantage(BaseProvider):
     def fetch_and_save_historical_data(self, symbol:str, timeframe:str, 
                                         month:str, print_answer:bool = False):
         """
-        Fetch historical market data.
+        Fetch historical intraday market data.
         
         Inputs:
             symbol: The name of the equity of your choice. Eg. symbol=GBPUSD
             timeframe: Time interval between two consecutive data points in the time series: 1min, 5min, 15min, 30min, 60min
-            
+            month: String format of YYYY-MM
         """
         
         # replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
