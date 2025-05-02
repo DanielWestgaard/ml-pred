@@ -24,14 +24,18 @@ If this is the first time using the repo, follow these instructions:
 2. Create a virtual environment (in root of project): ``` python -m venv venv ```
 3. Create secrets path: ``` mkdir secrets; cd secrets; touch secrets.txt; cd .. ```. Then, fill in the following (based on what you will use in the repo):
     - **For using Capital.com's [API](https://open-api.capital.com/)**: 
-        - Make sure to follow these [getting started steps](https://open-api.capital.com/#section/Getting-started)
-        - Paste in these variables:
+        1. Make sure you're following these [getting started steps](https://open-api.capital.com/#section/Getting-started).
+        2. Paste in these variables in the secrets-file:
         ```
         API_KEY_CAP=
         PASSWORD_CAP=
         EMAIL=
         ```
-        - Fill in the values with from your own properties.
+        3. Fill in the values with from your own properties.
+    - **For using [Alpha Vantage API](https://www.alphavantage.co/documentation/)**:
+        1. Create your own [API token](https://www.alphavantage.co/support/#api-key).
+        2. Paste in this variable in the secrets-file: ```alpha_vantage_free_api_key=```.
+        3. Fill in your own API token for its value.
 4. Install dependencies: ``` pip install -r requirements.txt ```
 ### Recommended, but not needed
 - If you're using VSCode, I highly recommend installing the extensions
