@@ -17,10 +17,13 @@ import broker.capital_com.web_socket.web_socket as web_socket
 
 
 class CapitalCom(BaseBroker):
-    """Base class for broker implementations."""
+    """Used to interact with implemented API endpoints."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """Initialize the broker with configuration."""
+        """
+        Initialize the broker with configuration. Will always try to encrypt the password first,
+        but if that fails it will try to fall back to plain password.
+        """
         
         try: 
             # Getting secrets
@@ -32,14 +35,14 @@ class CapitalCom(BaseBroker):
                 # Encrypting password
                 self.enc_pass = session.encrypt_password(self.password, self.api_key)
             except Exception as e:
-                logging.warning(f"Could not initiate BaseBroker with encrypted password. Error: {e}")
+                logging.warning(f"Could not initiate BaseBroker with encrypted password. Using plain password. Error: {e}")
         except Exception as e:
             logging.warning(f"Could not initiate BaseBroker with secrets. Error: {e}")
             
     # =================== SESSION METHODS ==================
     
     def start_session(self, email=None, password=None, api_key=None, use_encryption=True, print_answer=False):
-        """Starting a session with the broker."""
+        """Starting session with the broker."""
         self.body, self.headers_dict, self.x_security_token, self.cst = session.start_session(email=email or self.email,
                                      password=password or self.enc_pass,
                                      api_key=api_key or self.api_key,

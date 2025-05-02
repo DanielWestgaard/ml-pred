@@ -8,7 +8,7 @@ import json
 import config.config as config
 
 
-# Related to handling
+########## HANDLING ##########
 
 def on_open(ws, subscription_message):
     print("Connection opened")
@@ -80,7 +80,7 @@ def on_close(ws, close_status_code, close_msg):
     print("Connection closed")
 
 
-# Related to API
+########## API ##########
 
 def get_account_id_by_name(json_data : json, account_name):
     """ Retrieves the account ID based on the account name. """

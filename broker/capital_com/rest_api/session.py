@@ -32,14 +32,14 @@ def start_session(email, password, api_key, use_encryption=True, print_answer=Fa
     """
     logging.info("About to start a new session.")
     if use_encryption:
-        logging.info("Using encrypted password to start session.")
+        logging.debug("Using encrypted password to start session.")
         payload = json.dumps({
             "identifier": email,
             "password": password,
             "encryptedPassword": "true"
         })
     else:
-        logging.info("Using unecnrypted password to start session!")
+        logging.warning("Using unecnrypted password to start session!")
         payload = json.dumps({
             "identifier": email,
             "password": password,
