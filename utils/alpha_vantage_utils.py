@@ -6,13 +6,19 @@ import os
 import config.config as config
 import utils.shared_utils as shared_util
 
-import csv
-import json
-import logging
-import os
 
 def convert_market_data_to_csv(json_data, output_file_name:str, output_dir:str = None):
-    """Convert response from Alpha Vantage API to .csv-file format."""
+    """
+    Convert response from Alpha Vantage API to .csv-file format.
+    
+    Args:
+        json_data: json data response from alpha vantage api.
+        output_file_name: name of the file csv conversion is to be saved as.
+        output_dir: optionally provide where you want it stored. Standard is config.ALPVAN_RAW_DATA_DIR
+        
+    returns:
+        output/result path
+    """
     # If json_data is a string, parse it to a dictionary
     if isinstance(json_data, str):
         data = json.loads(json_data)
