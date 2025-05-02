@@ -2,10 +2,13 @@ import json
 import logging
 import os
 import requests
+from datetime import date
 
 from data.providers.base_provider import BaseProvider
 import utils.shared_utils as shared_utils
 import config.config as config
+import utils.data_utils as data_util
+import utils.alpha_vantage_utils as alpha_utils
 
 
 class ProviderAlphaVantage(BaseProvider):
@@ -30,16 +33,28 @@ class ProviderAlphaVantage(BaseProvider):
             timeframe: Time interval between two consecutive data points in the time series: 1min, 5min, 15min, 30min, 60min
             month: String format of YYYY-MM
         """
+        # Fetch the data using Alpha Vantage API
+        json_data = self.fetch_historical_data(symbol=symbol, timeframe=timeframe, month=month, print_answer=print_answer, store_answer=store_answer)
         
-        # replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
-        #       https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&month=2009-01&outputsize=full&apikey=demo
+        # Get an appropriate filename based on specs
+        self.month = self.month + "-01"
+        output_file = data_util.generate_filename(symbol=self.symbol, timeframe=self.timeframe,
+                                                    start_date=self.month, end_date=date.today, is_raw=True)
+        print("output file  ", output_file)
+        
+        # Convert the json data into appropriate csv-format
+        alpha_utils.convert_market_data_to_csv(json_data=json_data)
+        
+    def fetch_historical_data(self, symbol:str, timeframe:str, month:str,
+                                       print_answer:bool = False, store_answer:bool = False):
+        """Only fetch an return market data."""
         url = ("https://www.alphavantage.co/query?"
-                "function=TIME_SERIES_INTRADAY"     # 
+                "function=TIME_SERIES_INTRADAY"     
                 f"&symbol={symbol}"
-                # "&extended_hours=true"              # 
-                f"&interval={timeframe}"
-                f"&apikey={self.api_key}"    
-                f"&month={month}"                   #
+                # "&extended_hours=true"              
+                f"&interval={timeframe}"            # Timeframe
+                f"&apikey={self.api_key}"           # Your API Key
+                f"&month={month}"                   # The start "time" of data. Format YYYY-MM
                 "&outputsize=full"                  # full returns full-length timeseries of 20+ years historical data, compact is only the latest 100 data points
                 # "&adjusted=false"
                 )
@@ -55,14 +70,8 @@ class ProviderAlphaVantage(BaseProvider):
             output_dir = os.path.join(output_dir, 'response.json')
             with open(output_dir, 'w') as f:
                 json.dump(data, f, indent=4)
-        # Maybe use the same methods from broker/capital_com/rest_api/markets_info.py and fetch_and_save_historical_prices()?
-          # Generate filename
-          # Convert json response to csv file
-    
-    def convert_market_data_to_csv(self):
-        """Convert response from API to .csv-file format."""
-        pass
-    
+        return data
+        
     def end_session(self):
         """Assuming all providers will have their own API. Some will need to properly close the session."""
         pass
