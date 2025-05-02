@@ -24,6 +24,7 @@ If this is the first time using the repo, follow these instructions:
 2. Create a virtual environment (in root of project): ``` python3.10 -m venv venv ```
 3. Create secrets path: ``` mkdir secrets; cd secrets; touch secrets.txt; cd .. ```. Then, fill in the following (based on what you will use in the repo):
     - ...
+4. Install dependencies: ``` pip install -r requirements.txt ```
 ### Recommended, but not needed
 - If you're using VSCode, I highly recommend installing the extensions
     - [Rainbow CSV](https://marketplace.visualstudio.com/items/?itemName=mechatroner.rainbow-csv): Prettier view of .csv-files.
