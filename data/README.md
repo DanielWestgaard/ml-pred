@@ -59,4 +59,4 @@ provider.fetch_and_save_historical_data(symbol="NVDA", timeframe="1min",
 #### Useful links:
 - [API documentation](https://www.alphavantage.co/documentation/)
 - [Get free API token](https://www.alphavantage.co/support/#api-key)
-- [Premium API key](https://www.alphavantage.co/premium/) for actually utilizing the providers large datasets.
+- [Premium API key](https://www.alphavantage.co/premium/) for actually utilizing the providers' possibilities large datasets.
