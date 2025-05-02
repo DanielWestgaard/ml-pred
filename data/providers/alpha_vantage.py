@@ -37,13 +37,13 @@ class ProviderAlphaVantage(BaseProvider):
         json_data = self.fetch_historical_data(symbol=symbol, timeframe=timeframe, month=month, print_answer=print_answer, store_answer=store_answer)
         
         # Get an appropriate filename based on specs
-        self.month = self.month + "-01"
-        output_file = data_util.generate_filename(symbol=self.symbol, timeframe=self.timeframe,
-                                                    start_date=self.month, end_date=date.today, is_raw=True)
-        print("output file  ", output_file)
+        # self.month = self.month + "-01"
+        # output_file = data_util.generate_filename(symbol=self.symbol, timeframe=self.timeframe,
+        #                                             start_date=self.month, end_date=date.today, is_raw=True)
+        # print("output file  ", output_file)
         
         # Convert the json data into appropriate csv-format
-        alpha_utils.convert_market_data_to_csv(json_data=json_data)
+        alpha_utils.convert_market_data_to_csv(json_data=json_data, output_file_name="testing.csv")
         
     def fetch_historical_data(self, symbol:str, timeframe:str, month:str,
                                        print_answer:bool = False, store_answer:bool = False):
@@ -51,7 +51,7 @@ class ProviderAlphaVantage(BaseProvider):
         url = ("https://www.alphavantage.co/query?"
                 "function=TIME_SERIES_INTRADAY"     
                 f"&symbol={symbol}"
-                # "&extended_hours=true"              
+                "&extended_hours=true"              
                 f"&interval={timeframe}"            # Timeframe
                 f"&apikey={self.api_key}"           # Your API Key
                 f"&month={month}"                   # The start "time" of data. Format YYYY-MM
@@ -71,6 +71,9 @@ class ProviderAlphaVantage(BaseProvider):
             with open(output_dir, 'w') as f:
                 json.dump(data, f, indent=4)
         return data
+    
+    def convert_market_data_to_csv():
+        pass
         
     def end_session(self):
         """Assuming all providers will have their own API. Some will need to properly close the session."""

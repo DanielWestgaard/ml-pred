@@ -26,13 +26,10 @@ def main():
     logger = log_utils.setup_logging(name="blaaa", type="training", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
     if args.fetch_data_alpha:
-        # provider = ProviderAlphaVantage()
-        # provider.fetch_and_save_historical_data(symbol="IBM", timeframe="60min",
-        #                                           month="2025-04", print_answer=False, store_answer=False)
-        with open('storage/data/alpha_vantage/saved_responses/response.json') as f:
-            d = json.load(f)
-            #print(d)
-        alpha_utils.convert_market_data_to_csv(json_data=d, output_file_name="testing.csv")
+        provider = ProviderAlphaVantage()
+        provider.fetch_and_save_historical_data(symbol="AAPL", timeframe="1min",
+                                                  month="2025-04", print_answer=False, store_answer=True)
+
     
     if args.fetch_data_capcom:
         provider = ProviderCapitalCom()
