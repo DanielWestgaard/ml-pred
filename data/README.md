@@ -42,7 +42,7 @@ provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE_5",
 - [Requirements to use their API](https://open-api.capital.com/#section/Getting-started)
 ### Alpha Vantage
 Different restrictions on free api token, but seems quite good when you have the paid subscription.<br>
-Currently (for this use), intraday can be used for (eg.) "core stocks", but not intraday Forex is not a part of free plan.<br>
+Currently (for this use), intraday can be used for (eg.) "core stocks", but not intraday Forex as it's not a part of free plan.<br>
 This is also why methods like "saving the name of raw datafile" is very proprietary and can be seen as "not finished", as I'm planning to use this provider 
 (or someone else) when this project has come further down.
 #### How to use
