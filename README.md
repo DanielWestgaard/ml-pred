@@ -23,8 +23,8 @@ If this is the first time using the repo, follow these instructions:
 1. Clone the environment (eg.): ``` git clone git@github.com:DanielWestgaard/ml-pred.git ```
 2. Create a virtual environment (in root of project): ``` python -m venv venv ```
 3. Create secrets path: ``` mkdir secrets; cd secrets; touch secrets.txt; cd .. ```. Then, fill in the following (based on what you will use in the repo):
-    - For using Capital.com's (API)[https://open-api.capital.com/]: 
-        - Make sure to follow these (getting started steps)[https://open-api.capital.com/#section/Getting-started]
+    - **For using Capital.com's [API](https://open-api.capital.com/)**: 
+        - Make sure to follow these [getting started steps](https://open-api.capital.com/#section/Getting-started)
         - Paste in these variables:
         ```
         API_KEY_CAP=
