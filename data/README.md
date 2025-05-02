@@ -22,7 +22,8 @@ This folder will be solely responsible for engineering data that a ML model will
 ```
 
 ## About providers/
-Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.
+Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>
+Default behaviour is to store the files under storage/data and under the respective provider.
 ### Capital.com
 Only uses the broker/capitalcom.py implementation to only get historical data. For more information on the broker itself, see broker/ documentation.<br>
 The broker itself has relatively restricted with historical data, especially for 1min intraday timeframe, but useful in early stages. 5min has a little more.
