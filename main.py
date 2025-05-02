@@ -1,3 +1,4 @@
+# When things are getting more complete, this file needs to be cleaned up as it will be the main file for running all other "systems".
 import argparse
 import json
 

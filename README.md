@@ -4,6 +4,7 @@ It's important to note that this will probably not be the very best system, as I
 
 ## Project outline (planned)
 ```
+├── main.py                 # Main orchestrator for running all other "systems"
 ├── data/                   # Data engineering
 ├── model/                  # Model training
 ├── backtesting/            # Backtest trained models
