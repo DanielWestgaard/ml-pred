@@ -95,14 +95,6 @@ def setup_logging(
         main_file_handler.setFormatter(formatter)
         root_logger.addHandler(main_file_handler)
     
-    # Set up trade logger if requested
-    if include_trade_logs and log_to_file:
-        _setup_trade_logger(log_dir, max_file_size, backup_count)
-    
-    # Set up performance logger if requested
-    if include_performance_logs and log_to_file:
-        _setup_performance_logger(log_dir, max_file_size, backup_count)
-    
     # Set the configured flag
     _is_configured = True
     
@@ -114,73 +106,6 @@ def setup_logging(
     sys.excepthook = _log_uncaught_exception
     
     return logger
-
-#
-def _setup_trade_logger(log_dir, max_file_size, backup_count):
-    """Set up a separate logger for trade events."""
-    trade_logger = logging.getLogger("trades")
-    trade_logger.setLevel(logging.INFO)
-    trade_logger.propagate = False  # Don't propagate to root logger
-    
-    trade_log_file = os.path.join(log_dir, "trades", f"trades_{get_timestamp()}.log")
-    
-    # Create a JSON formatter for structured trade logs
-    class JsonFormatter(logging.Formatter):
-        def format(self, record):
-            # If the message is already a dict, use it directly
-            if isinstance(record.msg, dict):
-                log_data = record.msg
-            else:
-                log_data = {
-                    "message": record.getMessage(),
-                }
-            
-            log_data.update({
-                "timestamp": self.formatTime(record, "%Y-%m-%d %H:%M:%S.%f"),
-                "level": record.levelname,
-                "logger": record.name
-            })
-            
-            return json.dumps(log_data)
-    
-    trade_handler = RotatingFileHandler(
-        trade_log_file,
-        maxBytes=max_file_size,
-        backupCount=backup_count
-    )
-    trade_handler.setFormatter(JsonFormatter())
-    trade_logger.addHandler(trade_handler)
-
-def _setup_performance_logger(log_dir, max_file_size, backup_count):
-    """Set up a separate logger for performance metrics."""
-    perf_logger = logging.getLogger("performance")
-    perf_logger.setLevel(logging.INFO)
-    perf_logger.propagate = False  # Don't propagate to root logger
-    
-    perf_log_file = os.path.join(log_dir, "performance", f"performance_{get_timestamp()}.log")
-    
-    class JsonFormatter(logging.Formatter):
-        def format(self, record):
-            if isinstance(record.msg, dict):
-                log_data = record.msg
-            else:
-                log_data = {"message": record.getMessage()}
-            
-            log_data.update({
-                "timestamp": self.formatTime(record, "%Y-%m-%d %H:%M:%S.%f"),
-                "level": record.levelname,
-                "logger": record.name
-            })
-            
-            return json.dumps(log_data)
-    
-    perf_handler = RotatingFileHandler(
-        perf_log_file,
-        maxBytes=max_file_size,
-        backupCount=backup_count
-    )
-    perf_handler.setFormatter(JsonFormatter())
-    perf_logger.addHandler(perf_handler)
 
 def _log_uncaught_exception(exc_type, exc_value, exc_traceback):
     """Handle uncaught exceptions by logging them."""
@@ -209,84 +134,3 @@ def get_logger(name=None):
         setup_logging()
     
     return logging.getLogger(name)
-
-# Trade-specific logging functions
-def log_trade(trade_data):
-    """
-    Log structured trade information to the trade log.
-    
-    Args:
-        trade_data: Dictionary with trade information
-    """
-    trade_logger = logging.getLogger("trades")
-    trade_logger.info(trade_data)
-    
-    # Also log a simplified version to the main log
-    main_logger = get_logger("trades")
-    main_logger.info(f"TRADE: {trade_data['side']} {trade_data['symbol']} "
-                    f"@ {trade_data['price']} Qty: {trade_data['quantity']}")
-
-def log_order(order_data):
-    """
-    Log structured order information to the trade log.
-    
-    Args:
-        order_data: Dictionary with order information
-    """
-    trade_logger = logging.getLogger("trades")
-    
-    order_log = {
-        "event_type": "order",
-        **order_data
-    }
-    
-    trade_logger.info(order_log)
-    
-    # Also log a simplified version to the main log
-    main_logger = get_logger("orders")
-    main_logger.info(f"ORDER: {order_data['side']} {order_data['symbol']} "
-                    f"@ {order_data.get('price', 'MARKET')} Type: {order_data['type']}")
-
-def log_performance(metric_name, value, context=None):
-    """
-    Log performance metrics.
-    
-    Args:
-        metric_name: Name of the performance metric
-        value: Value of the metric
-        context: Additional context information
-    """
-    perf_logger = logging.getLogger("performance")
-    
-    perf_data = {
-        "metric": metric_name,
-        "value": value
-    }
-    
-    if context:
-        perf_data["context"] = context
-    
-    perf_logger.info(perf_data)
-
-def log_error(error, context=None, include_traceback=True):
-    """
-    Enhanced error logging with context and optional traceback.
-    
-    Args:
-        error: Error message or exception object
-        context: Additional context information
-        include_traceback: Whether to include traceback
-    """
-    logger = get_logger("error")
-    
-    if isinstance(error, Exception):
-        error_msg = str(error)
-        exc_info = error if include_traceback else None
-    else:
-        error_msg = error
-        exc_info = None
-    
-    if context:
-        logger.error(f"{error_msg} | Context: {context}", exc_info=exc_info)
-    else:
-        logger.error(error_msg, exc_info=exc_info)
