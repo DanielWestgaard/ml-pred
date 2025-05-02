@@ -1,0 +1,5 @@
+pandas
+cryptography
+websocket
+websocket-client
+requests
