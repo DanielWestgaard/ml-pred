@@ -36,14 +36,11 @@ class ProviderAlphaVantage(BaseProvider):
         # Fetch the data using Alpha Vantage API
         json_data = self.fetch_historical_data(symbol=symbol, timeframe=timeframe, month=month, print_answer=print_answer, store_answer=store_answer)
         
-        # Get an appropriate filename based on specs
-        # self.month = self.month + "-01"
-        # output_file = data_util.generate_filename(symbol=self.symbol, timeframe=self.timeframe,
-        #                                             start_date=self.month, end_date=date.today, is_raw=True)
-        # print("output file  ", output_file)
+        # Extremly simple file naming convention, but will focus on this when I chose to pay for alpha vantage
+        file_name = shared_utils.get_available_filename(directory=config.ALPVAN_RAW_DATA_DIR, filename="testing.csv")
         
         # Convert the json data into appropriate csv-format
-        alpha_utils.convert_market_data_to_csv(json_data=json_data, output_file_name="testing.csv")
+        alpha_utils.convert_market_data_to_csv(json_data=json_data, output_file_name=file_name)
         
     def fetch_historical_data(self, symbol:str, timeframe:str, month:str,
                                        print_answer:bool = False, store_answer:bool = False):

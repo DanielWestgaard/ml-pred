@@ -27,7 +27,7 @@ def main():
     
     if args.fetch_data_alpha:
         provider = ProviderAlphaVantage()
-        provider.fetch_and_save_historical_data(symbol="AAPL", timeframe="1min",
+        provider.fetch_and_save_historical_data(symbol="NVDA", timeframe="1min",
                                                   month="2025-04", print_answer=False, store_answer=True)
 
     

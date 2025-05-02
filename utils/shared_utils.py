@@ -48,3 +48,30 @@ def ensure_path_exists(path:str):
     except Exception as e:
         logging.error(f"Error creating directory {path}: {e}")
         return False
+    
+def get_available_filename(directory:str, filename:str):
+    """
+    Check if a file exists in the given directory. If it does, add an incremental
+    number to the filename until an available filename is found.
+    
+    Args:
+        directory (str): The directory path to check
+        filename (str): The original filename to check
+    
+    Returns:
+        str: An available filename that doesn't exist in the directory
+    """
+    # Get the base name and extension
+    base, ext = os.path.splitext(filename)
+    
+    # Check if the original file exists
+    if not os.path.exists(os.path.join(directory, filename)):
+        return filename
+    
+    # Try with incremental numbers
+    counter = 1
+    while True:
+        new_filename = f"{base}-{counter}{ext}"
+        if not os.path.exists(os.path.join(directory, new_filename)):
+            return new_filename
+        counter += 1
