@@ -49,4 +49,4 @@ class EngineeringPipeline():
         
         # Save Engineered data
         shared_utils.ensure_path_exists(path = self.output_path or config.CAPCOM_PROCESSED_DATA_DIR)
-        
+        self.data.to_csv(os.path.join(config.CAPCOM_PROCESSED_DATA_DIR, 'testing.csv'))
