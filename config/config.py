@@ -27,7 +27,7 @@ BASE_LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 # Capital.com API
 CAPCOM_BASE_STORAGE_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'capital_com')
 CAPCOM_RAW_DATA_DIR = os.path.join(CAPCOM_BASE_STORAGE_DIR, 'raw')
-CAPCOM_PROCESSED_DATA_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'processed')
+CAPCOM_PROCESSED_DATA_DIR = os.path.join(CAPCOM_BASE_STORAGE_DIR, 'processed')
 CAPCOM_RESPONSE_JSON_DIR = os.path.join(CAPCOM_BASE_STORAGE_DIR, 'saved_responses')
 # Alpha Vantage API
 ALPVAN_BASE_STORAGE_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'alpha_vantage')

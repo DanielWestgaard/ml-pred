@@ -31,6 +31,7 @@ def main():
     
     if args.engineer_data:
         data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
+        data_pipeline.run()
     
     if args.fetch_data_alpha:
         provider = ProviderAlphaVantage()

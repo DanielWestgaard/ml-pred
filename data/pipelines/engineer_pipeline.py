@@ -1,19 +1,24 @@
 import logging
+import os
 import pandas as pd
 
 from data.processing.cleaning import DataCleaner
 from utils import data_utils
+from utils import shared_utils
+import config.config as config
 
 
 class EngineeringPipeline():
-    def __init__(self, raw_dataset : str):
+    def __init__(self, raw_dataset : str, output_path : str = None):
         """
         Pipeline and orchestrator for processing and engineering raw datasets
         into data ready to be used for training.
+        Currently only a very simple way of saving processed file: adding a _processed at the end of original name
         
         Args:
             raw_dataset: path to the raw dataset (csv format).
         """
+        self.output_path = output_path
 
         # Loading data
         self.data, self.original_data = data_utils.check_and_return_df(raw_dataset)
@@ -43,4 +48,5 @@ class EngineeringPipeline():
         # Feature Selection
         
         # Save Engineered data
+        shared_utils.ensure_path_exists(path = self.output_path or config.CAPCOM_PROCESSED_DATA_DIR)
         

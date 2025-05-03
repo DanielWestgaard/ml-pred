@@ -16,7 +16,7 @@ class DataCleaner(BaseProcessor):
         """
         
         # Load dataset based on format
-        self.df = data_utils.check_and_return_df(raw_dataset)
+        self.df, self.original_df = data_utils.check_and_return_df(raw_dataset)
         
     def run(self):
         """
@@ -39,7 +39,7 @@ class DataCleaner(BaseProcessor):
         
         # ...
         
-        return self.data
+        return self.df
         
     def _handle_missing_values(self):
         """
@@ -50,10 +50,9 @@ class DataCleaner(BaseProcessor):
         self.df.replace(['', 'NA', 'N/A', 'null', 'Null', 'NULL', 'None', 'NaN'], np.nan, inplace=True)
         
         # Open column
-        if self.df['close'].shift(1) != np.nan:
-            self.df['open'] = self.df['close'].shift(1)
-        else:  # previous close is empty, using interpolate
-            self.df['open'] = self.df.infer_objects(copy=False)  #.interpolate(method='linear')
+        self.df['open'] = self.df['open'].combine_first(self.df['close'].shift(1))  # Prefer previous close
+        self.df['open'] = self.df['open'].interpolate()  # Fill remaining gaps
+
         
         # High: max(open, low)
         
