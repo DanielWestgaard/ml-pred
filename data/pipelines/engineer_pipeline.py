@@ -38,6 +38,8 @@ class EngineeringPipeline():
         
         # Feature Generation
         
+        # Normalization
+        
         # Feature Selection
         
         # Save Engineered data
