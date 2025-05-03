@@ -32,29 +32,30 @@ class DataCleaner(BaseProcessor):
             pd.DataFrame: Cleaned dataset.
         """
         
-    def _handle_missing_values():
+        
+    def _handle_missing_values(data : pd.DataFrame):
         """
         ...
         """
         
-    def _remove_duplicates():
+    def _remove_duplicates(data : pd.DataFrame):
         """Removes duplicates."""
         
-    def _handle_outliers():
+    def _handle_outliers(data : pd.DataFrame):
         """
         ...
         """
         
-    def _timestamp_alignment():
+    def _timestamp_alignment(data : pd.DataFrame):
         """
         Ensures uniform and continuous time intervals (especially in minute/hour data),
         and normalizes to a single timezone.
         """
     
-    def _datatype_consistency():
+    def _datatype_consistency(data : pd.DataFrame):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""
     
-    def _ohlc_validity():
+    def _ohlc_validity(data : pd.DataFrame):
         """
         ...
         """
