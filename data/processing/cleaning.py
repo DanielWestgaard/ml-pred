@@ -36,6 +36,10 @@ class DataCleaner(BaseProcessor):
         
         self._handle_missing_values()
         
+        # ...
+        
+        return self.data
+        
     def _handle_missing_values(self):
         """
         ...
