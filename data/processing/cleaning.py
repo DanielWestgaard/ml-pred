@@ -17,7 +17,7 @@ class DataCleaner(BaseProcessor):
         # Load dataset based on format
         self.data = data_utils.check_and_return_df(raw_dataset)
         
-    def run():
+    def run(self):
         """
         Clean the data.
         
@@ -31,9 +31,10 @@ class DataCleaner(BaseProcessor):
         returns:
             pd.DataFrame: Cleaned dataset.
         """
+        # Standardizing column names to lower case
+        self.data.columns = self.data.columns.str.lower()
         
-        
-    def _handle_missing_values(data : pd.DataFrame):
+    def _handle_missing_values(self):
         """
         ...
         """
