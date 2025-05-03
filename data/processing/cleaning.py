@@ -34,29 +34,31 @@ class DataCleaner(BaseProcessor):
         # Standardizing column names to lower case
         self.data.columns = self.data.columns.str.lower()
         
+        self._handle_missing_values()
+        
     def _handle_missing_values(self):
         """
         ...
         """
         
-    def _remove_duplicates(data : pd.DataFrame):
+    def _remove_duplicates(self):
         """Removes duplicates."""
         
-    def _handle_outliers(data : pd.DataFrame):
+    def _handle_outliers(self):
         """
         ...
         """
         
-    def _timestamp_alignment(data : pd.DataFrame):
+    def _timestamp_alignment(self):
         """
         Ensures uniform and continuous time intervals (especially in minute/hour data),
         and normalizes to a single timezone.
         """
     
-    def _datatype_consistency(data : pd.DataFrame):
+    def _datatype_consistency(self):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""
     
-    def _ohlc_validity(data : pd.DataFrame):
+    def _ohlc_validity(self):
         """
         ...
         """
