@@ -1,5 +1,6 @@
 import logging
 import pandas as pd
+import numpy as np
 
 from data.processing.base_processor import BaseProcessor
 import utils.data_utils as data_utils
@@ -15,7 +16,7 @@ class DataCleaner(BaseProcessor):
         """
         
         # Load dataset based on format
-        self.data = data_utils.check_and_return_df(raw_dataset)
+        self.df = data_utils.check_and_return_df(raw_dataset)
         
     def run(self):
         """
@@ -32,7 +33,7 @@ class DataCleaner(BaseProcessor):
             pd.DataFrame: Cleaned dataset.
         """
         # Standardizing column names to lower case
-        self.data.columns = self.data.columns.str.lower()
+        self.df.columns = self.df.columns.str.lower()
         
         self._handle_missing_values()
         
@@ -44,6 +45,19 @@ class DataCleaner(BaseProcessor):
         """
         ...
         """
+        
+        # Make sure all none is the same "type"
+        self.df.replace(['', 'NA', 'N/A', 'null', 'Null', 'NULL', 'None', 'NaN'], np.nan, inplace=True)
+        
+        # Open column
+        if self.df['close'].shift(1) != np.nan:
+            self.df['open'] = self.df['close'].shift(1)
+        else:  # previous close is empty, using interpolate
+            self.df['open'] = self.df.infer_objects(copy=False)  #.interpolate(method='linear')
+        
+        # High: max(open, low)
+        
+        # Low: min(open.low)
         
     def _remove_duplicates(self):
         """Removes duplicates."""
