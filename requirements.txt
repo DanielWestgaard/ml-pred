@@ -3,3 +3,4 @@ cryptography
 websocket
 websocket-client
 requests
+ipykernel
