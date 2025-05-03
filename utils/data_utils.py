@@ -4,6 +4,7 @@ import re
 import os
 from pathlib import Path
 import pandas as pd
+import sys
 
 import config.config as config
 
@@ -95,3 +96,66 @@ def generate_filename(symbol, timeframe, start_date, end_date, is_raw=True,
     
     return filename
 
+
+def check_input_type(input_data):
+    """
+    Check if the provided input is a string (CSV path), a pandas DataFrame,
+    or something else. If it's a string, also verify it's a CSV file.
+    
+    Parameters:
+    -----------
+    input_data : str or pandas.DataFrame
+        Either a path to a CSV file or a pandas DataFrame
+    
+    Returns:
+    --------
+    str
+        'csv_path' if input is a string pointing to a CSV file,
+        'dataframe' if input is a pandas DataFrame
+    
+    Raises:
+    -------
+    TypeError
+        If input is neither a string nor a pandas DataFrame
+    ValueError
+        If input is a string but not a CSV file path
+    """
+    if isinstance(input_data, str):
+        # Check if the string has a .csv extension
+        if not input_data.lower().endswith('.csv'):
+            logging.error(f"Provided input must be a (string) path to a CSV file (with .csv extension). You provided: {input_data}  ... exiting!")
+            sys.exit()
+        
+        # Check if the file exists
+        if not os.path.isfile(input_data):
+            logging.error(f"CSV file does not exist: {input_data}  ... exiting!")
+            sys.exit()
+        
+        return 'csv_path'
+    elif isinstance(input_data, pd.DataFrame):
+        return 'dataframe'
+    else:
+        logging.error(f"Input must be either a string (CSV path) or a pandas DataFrame. You provided {input_data}  ... exiting!")
+        sys.exit()
+    
+def check_and_return_df(input_data):
+    """
+    Method that checks what kind of input type it is, and returns a DataFrame if it exists.
+    """
+    # Load dataset based on format
+    try:
+        input_type = check_input_type(input_data)
+        
+        if input_type == 'csv_path':
+            # Load data from CSV file
+            data = pd.read_csv(input_data)
+            logging.debug("Provided raw dataset was an existing csv-file.")
+        else:  # input_type == 'dataframe'
+            # Use DataFrame directly
+            data = input_data.copy()
+            logging.debug("Provided raw dataset was a DataFrame.")
+        original_data = data.copy()
+        return data, original_data
+    except (TypeError, ValueError) as e:
+        logging.error(f"Error: {e}")
+        return None

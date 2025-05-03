@@ -15,9 +15,11 @@ def parse_arguments():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description='Train hybrid trading strategy models with uncertainty quantification')
     
-    parser.add_argument('--broker-func', action='store_true', default=True, help='Test all broker functionality')
+    parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
     parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
+    parser.add_argument('--engineer-data', action='store_true', default=True, help='Fetch historical data using Capital.com API.')
+    
 
     return parser.parse_args()
 

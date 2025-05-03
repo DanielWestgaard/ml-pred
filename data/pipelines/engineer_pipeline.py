@@ -1,10 +1,12 @@
+import logging
 import pandas as pd
 
 from data.processing.cleaning import DataCleaner
+from utils import data_utils
 
 
 class EngineeringPipeline():
-    def __init__(self, raw_dataset):
+    def __init__(self, raw_dataset : str):
         """
         Pipeline and orchestrator for processing and engineering raw datasets
         into data ready to be used for training.
@@ -12,12 +14,13 @@ class EngineeringPipeline():
         Args:
             raw_dataset: path to the raw dataset (csv format).
         """
+
         # Loading data
-        self.data = pd.read_csv(raw_dataset)
-        self.original_data = self.data.copy()  # Kepping the original just in case
+        self.data, self.original_data = data_utils.check_and_return_df(raw_dataset)
+        logging.debug("Engineering Pipeline - Successfully loaded data!")
         
         # Initializing processors
-        self.cleaner = DataCleaner()
+        self.cleaner = DataCleaner(raw_dataset=self.data)
         
     
     def run(self):

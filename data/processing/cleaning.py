@@ -1,6 +1,8 @@
+import logging
 import pandas as pd
 
 from data.processing.base_processor import BaseProcessor
+import utils.data_utils as data_utils
 
 
 class DataCleaner(BaseProcessor):
@@ -11,7 +13,9 @@ class DataCleaner(BaseProcessor):
         Args:
             raw_dataset: path to the raw dataset (csv format). Can be either path to csv or already loaded DataFrame.
         """
-        self.data = pd.read_csv(raw_dataset)
+        
+        # Load dataset based on format
+        self.data = data_utils.check_and_return_df(raw_dataset)
         
     def run():
         """
