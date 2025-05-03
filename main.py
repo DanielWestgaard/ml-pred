@@ -8,6 +8,7 @@ from broker.capital_com.capitalcom import CapitalCom
 from data.providers.capital_com import ProviderCapitalCom
 from data.providers.alpha_vantage import ProviderAlphaVantage
 import utils.alpha_vantage_utils as alpha_utils
+from data.pipelines.engineer_pipeline import EngineeringPipeline
 
 
 def parse_arguments():
@@ -25,6 +26,9 @@ def main():
     
     log_utils._is_configured = False
     logger = log_utils.setup_logging(name="blaaa", type="training", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
+    
+    if args.engineer_data:
+        data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
     
     if args.fetch_data_alpha:
         provider = ProviderAlphaVantage()
