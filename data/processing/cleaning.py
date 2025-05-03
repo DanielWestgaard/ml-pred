@@ -21,6 +21,40 @@ class DataCleaner(BaseProcessor):
         """
         Clean the data.
         
+        Currently covers handling missing data, removing duplicates, outlier handling, timestamp alignement,
+        datatype consistency, and OHLC validity.
+        This is non-exhaustive, so I will (hopefully) add and improve these steps later.
+        TODO: 
+            - Corporate Action Adjustments: Adjust for splits and dividends if working with raw price data, 
+              or perhaps using adjusted close prices, or do your own adjustments.
+        
         returns:
             pd.DataFrame: Cleaned dataset.
+        """
+        
+    def _handle_missing_values():
+        """
+        ...
+        """
+        
+    def _remove_duplicates():
+        """Removes duplicates."""
+        
+    def _handle_outliers():
+        """
+        ...
+        """
+        
+    def _timestamp_alignment():
+        """
+        Ensures uniform and continuous time intervals (especially in minute/hour data),
+        and normalizes to a single timezone.
+        """
+    
+    def _datatype_consistency():
+        """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""
+    
+    def _ohlc_validity():
+        """
+        ...
         """
