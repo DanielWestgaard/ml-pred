@@ -32,6 +32,9 @@ Will also use this for planning.
 └── README.md
 ```
 
+## Important notes:
+- Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment()
+
 ## About providers/
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>
 Default behaviour is to store the files under storage/data and under the respective provider.

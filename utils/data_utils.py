@@ -148,7 +148,7 @@ def check_and_return_df(input_data):
         
         if input_type == 'csv_path':
             # Load data from CSV file
-            data = pd.read_csv(input_data)
+            data = pd.read_csv(input_data, index_col=False)
             logging.debug("Provided raw dataset was an existing csv-file.")
         else:  # input_type == 'dataframe'
             # Use DataFrame directly

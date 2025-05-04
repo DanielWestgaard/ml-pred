@@ -36,7 +36,7 @@ class DataCleaner(BaseProcessor):
         self.df.columns = self.df.columns.str.lower()
         
         self._handle_missing_values()
-        
+        self._remove_duplicates()
         # ...
         
         return self.df
@@ -74,18 +74,24 @@ class DataCleaner(BaseProcessor):
         self.df['low'] = self.df['low'].combine_first(self.df[['open', 'close']].min(axis=1))
         self.df['low'] = self.df['low'].interpolate()
         
+        print(self.df.index)
+        
     def _remove_duplicates(self):
         """Removes duplicates."""
-        
-    def _handle_outliers(self):
-        """
-        ...
-        """
+        self.df = self.df.drop_duplicates(subset=['date'])
         
     def _timestamp_alignment(self):
         """
         Ensures uniform and continuous time intervals (especially in minute/hour data),
         and normalizes to a single timezone.
+        
+        Important note! As I understand it, capital.com API uses "snapshotTimeUTC", so that's 
+        what I'll use for this (temporary).
+        """
+        
+    def _handle_outliers(self):
+        """
+        ...
         """
     
     def _datatype_consistency(self):

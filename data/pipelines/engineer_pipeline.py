@@ -21,11 +21,11 @@ class EngineeringPipeline():
         self.output_path = output_path
 
         # Loading data
-        self.data, self.original_data = data_utils.check_and_return_df(raw_dataset)
+        self.df, self.original_df = data_utils.check_and_return_df(raw_dataset)
         logging.debug("Engineering Pipeline - Successfully loaded data!")
         
         # Initializing processors
-        self.cleaner = DataCleaner(raw_dataset=self.data)
+        self.cleaner = DataCleaner(raw_dataset=self.df)
         
     
     def run(self):
@@ -37,7 +37,7 @@ class EngineeringPipeline():
         """
         
         # Clean the data
-        self.cleaner.run()
+        self.df = self.cleaner.run()
         
         # Validate 
         
@@ -49,4 +49,4 @@ class EngineeringPipeline():
         
         # Save Engineered data
         shared_utils.ensure_path_exists(path = self.output_path or config.CAPCOM_PROCESSED_DATA_DIR)
-        self.data.to_csv(os.path.join(config.CAPCOM_PROCESSED_DATA_DIR, 'testing.csv'))
+        self.df.to_csv(os.path.join(config.CAPCOM_PROCESSED_DATA_DIR, 'testing.csv'), index=False)
