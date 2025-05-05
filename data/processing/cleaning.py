@@ -37,7 +37,10 @@ class DataCleaner(BaseProcessor):
         
         self._handle_missing_values()
         self._remove_duplicates()
-        # ...
+        self._timestamp_alignment()
+        self._handle_outliers()
+        self._datatype_consistency()
+        self._ohlc_validity()
         
         return self.df
         
@@ -88,16 +91,20 @@ class DataCleaner(BaseProcessor):
         Important note! As I understand it, capital.com API uses "snapshotTimeUTC", so that's 
         what I'll use for this (temporary).
         """
+        logging.warning("Timestamp alignement not implemented yet.")
         
     def _handle_outliers(self):
         """
         ...
         """
+        logging.warning("Outlier handling not implemented yet.")
     
     def _datatype_consistency(self):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""
+        logging.warning("Datatype consistency not implemented yet.")
     
     def _ohlc_validity(self):
         """
         ...
         """
+        logging.warning("ohlc validity not implemented yet.")
