@@ -11,15 +11,29 @@ This folder will be solely responsible for engineering data that a ML model will
 - ...
 
 ## Structure
+Will also use this for planning.
 ```
 ├── providers                   # Different providers/sources to get/retrieve historical data
 │   ├── base_provider.py        # Interface for different providers
 │   ├── capital_com.py          # Using the broker Capital.com's API to fetch historical data, very simple
-│   ├── alpha_vantage.py        # Stock Market Data API, 30 days free intraday market data
-│   ├── ...
+│   └── alpha_vantage.py        # Stock Market Data API, 30 days free intraday market data
+│
+├── processing/                 # Data transformation
+│   ├── cleaning.py
+│   ├── validation.py           # Don't know if this is relevant but
+│   ├── normalization.py        # Rescaling numeric data to a standard range
+│
+├── features/                   # Feature engineering
 │   └── ...
+│
+├── pipeline/                   # Pipeline orchestration
+│   └── ...
+│
 └── README.md
 ```
+
+## Important notes:
+- Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment()
 
 ## About providers/
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>

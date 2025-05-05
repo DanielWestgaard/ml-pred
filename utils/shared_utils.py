@@ -28,7 +28,7 @@ def load_secrets(desired_keys:dict, file_path="secrets/secrets.txt"):
 
     return secrets
 
-def ensure_path_exists(path:str):
+def ensure_path_exists(path : str):
     """
     Check if the given path exists and create it if it doesn't.
     

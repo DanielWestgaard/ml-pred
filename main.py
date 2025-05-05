@@ -8,15 +8,18 @@ from broker.capital_com.capitalcom import CapitalCom
 from data.providers.capital_com import ProviderCapitalCom
 from data.providers.alpha_vantage import ProviderAlphaVantage
 import utils.alpha_vantage_utils as alpha_utils
+from data.pipelines.engineer_pipeline import EngineeringPipeline
 
 
 def parse_arguments():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description='Train hybrid trading strategy models with uncertainty quantification')
     
-    parser.add_argument('--broker-func', action='store_true', default=True, help='Test all broker functionality')
+    parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
     parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
+    parser.add_argument('--engineer-data', action='store_true', default=True, help='Fetch historical data using Capital.com API.')
+    
 
     return parser.parse_args()
 
@@ -25,6 +28,10 @@ def main():
     
     log_utils._is_configured = False
     logger = log_utils.setup_logging(name="blaaa", type="training", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
+    
+    if args.engineer_data:
+        data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
+        data_pipeline.run()
     
     if args.fetch_data_alpha:
         provider = ProviderAlphaVantage()
