@@ -226,7 +226,7 @@ class DataCleaner(BaseProcessor):
                 # First convert to float to handle any decimals, then to int
                 self.df['volume'] = self.df['volume'].astype(float).round().astype(int)
                 if original_type != self.df['volume'].dtype:
-                    logging.info(f"Converted volume from {original_type} to {self.df['volume'].dtype}")
+                    logging.debug(f"Converted volume from {original_type} to {self.df['volume'].dtype}")
             except Exception as e:
                 logging.error(f"Failed to convert volume to int: {e}")
     
