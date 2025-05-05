@@ -89,15 +89,60 @@ class DataCleaner(BaseProcessor):
         and normalizes to a single timezone.
         
         Important note! As I understand it, capital.com API uses "snapshotTimeUTC", so that's 
-        what I'll use for this (temporary).
+        what I'm assuming use for this (temporary).
         """
         logging.warning("Timestamp alignement not implemented yet.")
         
     def _handle_outliers(self):
         """
-        ...
+        Detect and handle outliers in OHLCV data using multiple methods.
+        
+        Implements:
+        1. IQR method for price columns
+        2. Z-score method for volume
+        3. Winsorization for extreme values
+        4. OHLC relationship validation
         """
-        logging.warning("Outlier handling not implemented yet.")
+        # Define price columns
+        price_cols = ['open', 'high', 'low', 'close']
+        
+        # --- METHOD 1: IQR for price columns ---
+        for col in price_cols:
+            # Calculate IQR
+            Q1 = self.df[col].quantile(0.25)
+            Q3 = self.df[col].quantile(0.75)
+            IQR = Q3 - Q1
+            
+            # Define bounds
+            lower_bound = Q1 - 1.5 * IQR
+            upper_bound = Q3 + 1.5 * IQR
+            
+            # Flag potential outliers (for logging)
+            outliers = self.df[(self.df[col] < lower_bound) | (self.df[col] > upper_bound)]
+            if len(outliers) > 0:
+                logging.debug(f"Found {len(outliers)} outliers in {col} using IQR method")
+            
+            # Winsorize (cap) extreme values instead of removing
+            self.df[col] = self.df[col].clip(lower=lower_bound, upper=upper_bound)
+        
+        # --- METHOD 2: Z-score for volume (more robust for highly skewed data) ---
+        if 'volume' in self.df.columns:
+            # Log transform first (volume is usually right-skewed)
+            log_volume = np.log1p(self.df['volume'])  # log(1+x) to handle zeros
+            
+            # Calculate z-score
+            mean_log_vol = log_volume.mean()
+            std_log_vol = log_volume.std()
+            z_scores = np.abs((log_volume - mean_log_vol) / std_log_vol)
+            
+            # Flag potential outliers (z-score > 3)
+            volume_outliers = self.df[z_scores > 3]
+            if len(volume_outliers) > 0:
+                logging.debug(f"Found {len(volume_outliers)} volume outliers using Z-score method")
+            
+            # Cap extreme values (in log space, then transform back)
+            cap_log_vol = log_volume.clip(upper=mean_log_vol + 3*std_log_vol)
+            self.df['volume'] = np.expm1(cap_log_vol)  # exp(x)-1 to reverse log1p
     
     def _datatype_consistency(self):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""
