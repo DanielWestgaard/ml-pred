@@ -199,7 +199,36 @@ class DataCleaner(BaseProcessor):
     
     def _datatype_consistency(self):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""
-        logging.warning("Datatype consistency not implemented yet.")
+        # Ensure index is datetime if not done in timestamp_alignment
+        if not isinstance(self.df.index, pd.DatetimeIndex):
+            try:
+                self.df.index = pd.to_datetime(self.df.index)
+                logging.debug("Converted index to datetime")
+            except Exception as e:
+                logging.error(f"Failed to convert index to datetime: {e}")
+        
+        # Ensure price columns are float
+        price_cols = ['open', 'high', 'low', 'close']
+        for col in price_cols:
+            if col in self.df.columns:
+                try:
+                    original_type = self.df[col].dtype
+                    self.df[col] = self.df[col].astype(float)
+                    if original_type != self.df[col].dtype:
+                        logging.info(f"Converted {col} from {original_type} to {self.df[col].dtype}")
+                except Exception as e:
+                    logging.error(f"Failed to convert {col} to float: {e}")
+        
+        # Ensure volume is integer
+        if 'volume' in self.df.columns:
+            try:
+                original_type = self.df['volume'].dtype
+                # First convert to float to handle any decimals, then to int
+                self.df['volume'] = self.df['volume'].astype(float).round().astype(int)
+                if original_type != self.df['volume'].dtype:
+                    logging.info(f"Converted volume from {original_type} to {self.df['volume'].dtype}")
+            except Exception as e:
+                logging.error(f"Failed to convert volume to int: {e}")
     
     def _ohlc_validity(self):
         """
