@@ -232,6 +232,50 @@ class DataCleaner(BaseProcessor):
     
     def _ohlc_validity(self):
         """
-        ...
+        Verify and correct OHLC logical relationships:
+        
+        1. High should be the highest value (≥ Open, Close, Low)
+        2. Low should be the lowest value (≤ Open, Close, High)
+        3. Open and Close should be between High and Low
+        4. Volume should be non-negative
         """
-        logging.warning("ohlc validity not implemented yet.")
+        # Count original issues for logging
+        issues_count = 0
+        
+        # Check and fix: High should be ≥ max(Open, Close)
+        high_issues = self.df[self.df['high'] < self.df[['open', 'close']].max(axis=1)]
+        if not high_issues.empty:
+            issues_count += len(high_issues)
+            logging.warning(f"Found {len(high_issues)} records where high < max(open, close) - fixing")
+            self.df['high'] = self.df[['high', 'open', 'close']].max(axis=1)
+        
+        # Check and fix: Low should be ≤ min(Open, Close)
+        low_issues = self.df[self.df['low'] > self.df[['open', 'close']].min(axis=1)]
+        if not low_issues.empty:
+            issues_count += len(low_issues)
+            logging.warning(f"Found {len(low_issues)} records where low > min(open, close) - fixing")
+            self.df['low'] = self.df[['low', 'open', 'close']].min(axis=1)
+        
+        # Ensure volume is non-negative
+        if 'volume' in self.df.columns:
+            volume_issues = self.df[self.df['volume'] < 0]
+            if not volume_issues.empty:
+                issues_count += len(volume_issues)
+                logging.warning(f"Found {len(volume_issues)} records with negative volume - fixing")
+                self.df['volume'] = self.df['volume'].clip(lower=0)
+        
+        # Final verification - check relationship again after fixes
+        remaining_issues = (
+            (self.df['high'] < self.df['low']).sum() +
+            (self.df['high'] < self.df['open']).sum() +
+            (self.df['high'] < self.df['close']).sum() +
+            (self.df['low'] > self.df['open']).sum() +
+            (self.df['low'] > self.df['close']).sum()
+        )
+        
+        if remaining_issues > 0:
+            logging.warning(f"After corrections, {remaining_issues} OHLC relationship issues remain")
+        elif issues_count > 0:
+            logging.info(f"Successfully fixed {issues_count} OHLC relationship issues")
+        else:
+            logging.info("No OHLC relationship issues found!")
