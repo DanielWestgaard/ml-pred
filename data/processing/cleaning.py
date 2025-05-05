@@ -77,21 +77,74 @@ class DataCleaner(BaseProcessor):
         self.df['low'] = self.df['low'].combine_first(self.df[['open', 'close']].min(axis=1))
         self.df['low'] = self.df['low'].interpolate()
         
-        print(self.df.index)
-        
     def _remove_duplicates(self):
         """Removes duplicates."""
         self.df = self.df.drop_duplicates(subset=['date'])
         
     def _timestamp_alignment(self):
         """
-        Ensures uniform and continuous time intervals (especially in minute/hour data),
-        and normalizes to a single timezone.
+        Ensures uniform and continuous time intervals and normalizes to a single timezone.
         
-        Important note! As I understand it, capital.com API uses "snapshotTimeUTC", so that's 
-        what I'm assuming use for this (temporary).
+        Handles:
+        1. Converting timestamp column to datetime
+        2. Setting datetime as index
+        3. Timezone normalization to UTC
+        4. Identifying gaps in time series
         """
-        logging.warning("Timestamp alignement not implemented yet.")
+        # Check if 'date' column exists
+        if 'date' not in self.df.columns:
+            logging.error("No 'date' column found in the dataframe")
+            return
+            
+        # Convert date column to datetime if it's not already
+        if not pd.api.types.is_datetime64_any_dtype(self.df['date']):
+            try:
+                self.df['date'] = pd.to_datetime(self.df['date'])
+            except Exception as e:
+                logging.error(f"Failed to convert date column to datetime: {e}")
+                return
+        
+        # Sort by date
+        self.df = self.df.sort_values('date')        
+        
+        # Check for timezone info in the date column
+        sample_date = self.df['date'].iloc[0]
+        has_tz = hasattr(sample_date, 'tzinfo') and sample_date.tzinfo is not None
+        
+        # If timezone info exists but is not UTC, convert to UTC
+        if has_tz and str(sample_date.tzinfo) != 'UTC':
+            try:
+                self.df['date'] = self.df['date'].dt.tz_convert('UTC')
+                logging.debug("Converted timestamps to UTC")
+            except Exception as e:
+                logging.warning(f"Could not convert timezone to UTC: {e}")
+        
+        # If no timezone info exists, assume UTC
+        elif not has_tz:
+            try:
+                self.df['date'] = self.df['date'].dt.tz_localize('UTC')
+                logging.debug("Localized timestamps to UTC")
+            except Exception as e:
+                logging.warning(f"Could not localize timezone to UTC: {e}")
+
+        # Set date as index if it's not already
+        if self.df.index.name != 'date':
+            self.df = self.df.set_index('date')
+        
+        # Identify frequency of data (daily, hourly, minute, etc.)
+        if len(self.df) > 1:
+            time_diffs = self.df.index.to_series().diff().dropna()
+            common_diff = time_diffs.mode().iloc[0]
+            logging.debug(f"Most common time interval: {common_diff}")
+            
+            # Check for gaps
+            gaps = time_diffs[time_diffs > common_diff * 1.5]
+            if not gaps.empty:
+                logging.warning(f"Found {len(gaps)} gaps in time series")
+                # Optionally fill gaps with NaN and then forward fill
+                # full_idx = pd.date_range(start=self.df.index.min(), end=self.df.index.max(), freq=common_diff)
+                # self.df = self.df.reindex(full_idx)
+                # Then you'd need to handle the NaNs appropriately
         
     def _handle_outliers(self):
         """
