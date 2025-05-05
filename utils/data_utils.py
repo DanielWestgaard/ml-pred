@@ -138,7 +138,7 @@ def check_input_type(input_data):
         logging.error(f"Input must be either a string (CSV path) or a pandas DataFrame. You provided {input_data}  ... exiting!")
         sys.exit()
     
-def check_and_return_df(input_data):
+def check_and_return_df(input_data) -> pd.DataFrame:
     """
     Method that checks what kind of input type it is, and returns a DataFrame if it exists.
     """
