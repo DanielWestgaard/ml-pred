@@ -121,7 +121,21 @@ class DataValidator(BaseProcessor):
                 })
         
     def _validate_price_movement(self):
-        """..."""
+        """Validate price movements for extreme or suspicious patterns."""
+        # Calculate returns
+        self.df['return'] = self.df['close'].pct_change()
+        
+        # Check for extreme returns (potential data errors)
+        extreme_returns = self.df[abs(self.df['return']) > 0.20]  # 20% move
+        if not extreme_returns.empty:
+            self.validation_issues.append({
+                'type': 'Extreme Price Movement',
+                'description': f'Found {len(extreme_returns)} records with >20% price moves',
+                'affected_rows': extreme_returns.index.tolist()
+            })
+            
+        # Remove temporary column
+        self.df = self.df.drop('return', axis=1)
         
     def _validate_data_completeness(self):
         """..."""
