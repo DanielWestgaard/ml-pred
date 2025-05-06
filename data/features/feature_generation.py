@@ -4,7 +4,7 @@ from utils import data_utils
 class FeatureGenerator():
     def __init__(self, dataset):
         """
-        Class focusing on generating features with predictable power,
+        Class focusing on generating features with helpful prediction powers,
         that might help a ML model learn and predict better.
         
         Args:
