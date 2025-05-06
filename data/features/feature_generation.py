@@ -17,6 +17,22 @@ class FeatureGenerator():
         # Load dataset based on format
         self.df, self.original_df = data_utils.check_and_return_df(dataset)
         
-    def run():
+    def run(self):
         """Run feature generation on provided dataset."""
-        pass
+        
+        self._moving_averages()
+        
+        return self.df
+    
+    # =============================================================================
+    # Section: Price Action Features
+    # =============================================================================
+    
+    def _moving_averages(self):
+        """Generating/calculating both simple and exponential moving averages over different time periods."""
+        num_periods = [5, 10, 20, 50, 200]
+        
+        for period in num_periods:
+            self.df[f"sma_{period}"] = self.df["close"].rolling(window=period).mean()
+            self.df[f"ema_{period}"] = self.df["close"].ewm(span=period, adjust=False, min_periods=period).mean()
+        
