@@ -35,6 +35,21 @@ Will also use this for planning.
 ## Important notes:
 - Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment()
 
+## About pipelines/
+...
+
+## About processing/
+All code related to actual processing, like cleaning, validation, normalizing, etc. will be placed here.
+### 1. Cleaning
+...
+### 2. Validation 
+Under progress...
+### 4. Normalization
+NSY...
+
+## About features (?)
+...
+
 ## About providers/
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>
 Default behaviour is to store the files under storage/data and under the respective provider.
