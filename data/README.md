@@ -41,7 +41,13 @@ Will also use this for planning.
 ## About processing/
 All code related to actual processing, like cleaning, validation, normalizing, etc. will be placed here.
 ### 1. Cleaning
-...
+Simple cleaning class that performs the following: 
+- Handles missing values (detailed description in class for the different columns).
+- Removes duplicates (of dates).
+- Timestamp alignement (eg. Timezone normalization to UTC, converting date to datetime, etc.).
+- Handles outliers, first with IQR method, and then with Z-Score.
+- Ensures concistency in datatypes (timestamps, prices as floats, volume as integers).
+- OHLC validity.
 ### 2. Validation 
 Under progress...
 ### 4. Normalization
