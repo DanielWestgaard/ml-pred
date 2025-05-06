@@ -63,8 +63,8 @@ Code related to creating and selecting features with prediction power to help a 
 ### Feature Generation
 Planned features to generate: WIP
 - Price Action Features
-  - ✅ Moving Averages: Simple and exponential moving averages (SMAs/EMAs) over different time periods (5, 10, 20, 50, 200 periods)
-  - Price Momentum: Rate of change (ROC) over various lookback periods
+  - ✅ **Moving Averages**: Simple and exponential moving averages (SMAs/EMAs) over different time periods (5, 10, 20, 50, 200 periods)
+  - **Price Momentum**: Rate of change (ROC) over various lookback periods
   - Volatility Indicators: Average True Range (ATR), Bollinger Band width
   - Support/Resistance: Distance from recent highs/lows
 - Volume-Based Features

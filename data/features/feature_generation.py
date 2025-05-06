@@ -21,6 +21,10 @@ class FeatureGenerator():
         """Run feature generation on provided dataset."""
         
         self._moving_averages()
+        self._price_momentum()
+        self._volatility_indicators
+        
+        #print(self.df)
         
         return self.df
     
@@ -36,3 +40,10 @@ class FeatureGenerator():
             self.df[f"sma_{period}"] = self.df["close"].rolling(window=period).mean()
             self.df[f"ema_{period}"] = self.df["close"].ewm(span=period, adjust=False, min_periods=period).mean()
         
+    def _price_momentum(self):
+        """Rate of change (ROC) over various lookback periods."""
+        self.df["rdc_close"] = self.df["close"].pct_change()  # Am I using this right?
+    
+    def _volatility_indicators(self):
+        """Average True Range (ATR), Bollinger Band width."""
+        pass
