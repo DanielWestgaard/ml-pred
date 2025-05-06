@@ -2,11 +2,11 @@ import logging
 import os
 import pandas as pd
 
-from data.processing.cleaning import DataCleaner
 from utils import data_utils
 from utils import shared_utils
 import config.config as config
-
+from data.processing.cleaning import DataCleaner
+from data.processing.validation import DataValidator
 
 class EngineeringPipeline():
     def __init__(self, raw_dataset : str, output_path : str = None):
@@ -26,7 +26,6 @@ class EngineeringPipeline():
         
         # Initializing processors
         self.cleaner = DataCleaner(raw_dataset=self.df)
-        
     
     def run(self):
         """
@@ -39,7 +38,12 @@ class EngineeringPipeline():
         # Clean the data
         self.df = self.cleaner.run()
         
-        # Validate 
+        # Validate
+        self.validator = DataValidator(self.df)
+        self.validator_results = self.validator.run()
+        self.df = self.validator_results["validated_data"]
+        # Logging results
+        data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
         # Feature Generation
         

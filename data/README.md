@@ -35,6 +35,32 @@ Will also use this for planning.
 ## Important notes:
 - Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment()
 
+## About pipelines/
+...
+
+## About processing/
+All code related to actual processing, like cleaning, validation, normalizing, etc. will be placed here.
+### 1. Cleaning
+Simple cleaning class that performs the following: 
+- **Handles missing values** (detailed description in class for the different columns).
+- **Removes duplicates** (of dates).
+- **Timestamp alignement** (eg. Timezone normalization to UTC, converting date to datetime, etc.).
+- **Handles outliers**, first with IQR method, and then with Z-Score.
+- Ensures **concistency in datatypes** (timestamps, prices as floats, volume as integers).
+- **OHLC validity**.
+### 2. Validation 
+Simple validation class that performs validation of data after cleaning, to verify data integrity and ensure loical consistency. These are the current validations done:
+- **OHLC Relationships**, similar to the one in cleaning, but using this to validate that work.
+- **Timestamps** for integrity and consistency.
+- **Volume** 
+- **Price Movements** for extreme or suspicous patterns.
+- **Data Completeness**
+### 4. Normalization
+NSY...
+
+## About features (?)
+...
+
 ## About providers/
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>
 Default behaviour is to store the files under storage/data and under the respective provider.
