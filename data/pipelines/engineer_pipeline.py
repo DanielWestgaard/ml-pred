@@ -40,7 +40,10 @@ class EngineeringPipeline():
         
         # Validate
         self.validator = DataValidator(self.df)
-        self.df = self.validator.run()
+        self.validator_results = self.validator.run()
+        self.df = self.validator_results["validated_data"]
+        self.is_valid = self.validator_results["is_valid"]
+        self.issues = self.validator_results["issues"]
         
         # Feature Generation
         
