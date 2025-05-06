@@ -58,7 +58,9 @@ Simple validation class that performs validation of data after cleaning, to veri
 ### 4. Normalization
 NSY...
 
-## About features (?)
+## About features/
+Code related to creating and selecting features with prediction power to help a ML model train and predict.
+### Feature Generaation
 ...
 
 ## About providers/
