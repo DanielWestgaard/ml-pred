@@ -44,6 +44,7 @@ class EngineeringPipeline():
         self.df = self.validator_results["validated_data"]
         self.is_valid = self.validator_results["is_valid"]
         self.issues = self.validator_results["issues"]
+        logging.info(f"Validation is_valid: {self.is_valid}. Validation issues: {self.issues}")
         
         # Feature Generation
         

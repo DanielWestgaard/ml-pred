@@ -29,7 +29,8 @@ class DataValidator(BaseProcessor):
         }
     
     def _validate_ohlc_relationships(self):
-        """Verify proper relationships between OHLC prices."""
+        """Verify proper relationships between OHLC prices. Similar to the one in 
+        Cleaning, but this is to validate that work"""
         # High should be the highest value
         high_issues = self.df[self.df['high'] < self.df[['open', 'close']].max(axis=1)]
         if not high_issues.empty:
@@ -59,7 +60,40 @@ class DataValidator(BaseProcessor):
                 })
     
     def _validate_timestamps(self):
-        """..."""
+        """Validate time series integrity and consistency."""
+        # Check for duplicate timestamps
+        duplicates = self.df.index.duplicated()
+        if any(duplicates):
+            self.validation_issues.append({
+                'type': 'Duplicate Timestamps',
+                'description': f'Found {duplicates.sum()} duplicate timestamps',
+                'affected_rows': self.df.index[duplicates].tolist()
+            })
+            
+        # Check for gaps in time series
+        if len(self.df) > 1:
+            # Determine expected frequency
+            time_diffs = self.df.index.to_series().diff().dropna()
+            common_diff = time_diffs.mode().iloc[0]
+            
+            # Identify gaps larger than 1.5x expected frequency
+            gaps = time_diffs[time_diffs > common_diff * 1.5]
+            if not gaps.empty:
+                self.validation_issues.append({
+                    'type': 'Time Series Gaps',
+                    'description': f'Found {len(gaps)} gaps in time series',
+                    'details': {str(idx): str(gap) for idx, gap in gaps.items()}
+                })
+                
+        # Check for future timestamps
+        import datetime
+        future_data = self.df[self.df.index > datetime.datetime.now(self.df.index.tzinfo)]
+        if not future_data.empty:
+            self.validation_issues.append({
+                'type': 'Future Timestamps',
+                'description': f'Found {len(future_data)} records with future timestamps',
+                'affected_rows': future_data.index.tolist()
+            })
         
     def _validate_volume(self):
         """..."""
