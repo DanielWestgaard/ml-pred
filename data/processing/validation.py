@@ -96,7 +96,29 @@ class DataValidator(BaseProcessor):
             })
         
     def _validate_volume(self):
-        """..."""
+        """Validate volume data."""
+        if 'volume' in self.df.columns:
+            # Check for negative volume
+            negative_volume = self.df[self.df['volume'] < 0]
+            if not negative_volume.empty:
+                self.validation_issues.append({
+                    'type': 'Invalid Volume',
+                    'description': f'Found {len(negative_volume)} records with negative volume',
+                    'affected_rows': negative_volume.index.tolist()
+                })
+                
+            # Check for suspiciously high volume (outliers)
+            import numpy as np
+            log_volume = np.log1p(self.df['volume'])
+            mean, std = log_volume.mean(), log_volume.std()
+            high_volume = self.df[log_volume > mean + 5*std]  # 5-sigma events
+            
+            if not high_volume.empty:
+                self.validation_issues.append({
+                    'type': 'Suspicious Volume',
+                    'description': f'Found {len(high_volume)} records with abnormally high volume',
+                    'affected_rows': high_volume.index.tolist()
+                })
         
     def _validate_price_movement(self):
         """..."""
