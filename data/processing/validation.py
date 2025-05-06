@@ -138,5 +138,21 @@ class DataValidator(BaseProcessor):
         self.df = self.df.drop('return', axis=1)
         
     def _validate_data_completeness(self):
-        """..."""
+        """Validate data completeness and required fields."""
+        # Check for minimum required columns
+        required_cols = ['open', 'high', 'low', 'close']
+        missing_cols = [col for col in required_cols if col not in self.df.columns]
+        
+        if missing_cols:
+            self.validation_issues.append({
+                'type': 'Missing Required Columns',
+                'description': f'Missing columns: {", ".join(missing_cols)}'
+            })
+            
+        # Check for minimum data points required for analysis
+        if len(self.df) < 30:  # Example threshold
+            self.validation_issues.append({
+                'type': 'Insufficient Data',
+                'description': f'Only {len(self.df)} data points available, minimum 30 required'
+            })
     
