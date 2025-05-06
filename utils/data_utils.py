@@ -7,6 +7,7 @@ import pandas as pd
 import sys
 
 import config.config as config
+from data.processing.validation import DataValidator
 
 
 def generate_filename(symbol, timeframe, start_date, end_date, is_raw=True, 
@@ -159,3 +160,16 @@ def check_and_return_df(input_data) -> pd.DataFrame:
     except (TypeError, ValueError) as e:
         logging.error(f"Error: {e}")
         return None
+    
+
+def check_validation(validation_results_is_valid : bool, validation_results_issues):
+    """
+    Method specifically designed to check the validation.py's results and gives 
+    a descriptive logging based on the results.
+    """
+    
+    if validation_results_is_valid:
+        logging.info("Validation of cleaned data was valid!")
+    else:
+        logging.warning("Validation of data was not valid!")
+        logging.warning(f"Validation issues: {validation_results_issues}")

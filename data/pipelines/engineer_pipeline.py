@@ -42,9 +42,8 @@ class EngineeringPipeline():
         self.validator = DataValidator(self.df)
         self.validator_results = self.validator.run()
         self.df = self.validator_results["validated_data"]
-        self.is_valid = self.validator_results["is_valid"]
-        self.issues = self.validator_results["issues"]
-        logging.info(f"Validation is_valid: {self.is_valid}. Validation issues: {self.issues}")
+        # Logging results
+        data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
         # Feature Generation
         
