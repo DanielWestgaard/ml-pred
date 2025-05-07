@@ -96,12 +96,13 @@ class FeatureGenerator():
         """Cumulative indicator that relates volume to price changes. Could also be placed under Technical Indicators."""
         obv = [0]
         for i in range(1, len(self.df)):
-            if self.df['close'][i] > self.df['close'][i-1]:
-                obv.append(float(obv[-1] + self.df['volume'][i]))
-            elif self.df['close'][i] < self.df['close'][i-1]:
-                obv.append(float(obv[-1] - self.df['volume'][i]))
+            if self.df['close'].iloc[i] > self.df['close'].iloc[i-1]:
+                obv.append(float(obv[-1] + self.df['volume'].iloc[i]))
+            elif self.df['close'].iloc[i] < self.df['close'].iloc[i-1]:
+                obv.append(float(obv[-1] - self.df['volume'].iloc[i]))
             else:
                 obv.append(float(obv[-1]))
+        
         self.df["obv"] = obv
         
     
