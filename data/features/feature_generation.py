@@ -22,13 +22,13 @@ class FeatureGenerator():
         # Price Action Features
         self._moving_averages()
         self._rate_of_change()
-        self._average_true_range()
-        self._bollinger_bands()
-        self._support_resistance()  # not sure how to do yet
+        self._average_true_range()  # wrong implementation?
+        self._bollinger_bands()  # bad implementation?
+        self._support_resistance()  # not sure how to do, yet
         # Volume-Based Features
+        self._volume_moving_averages()
         
-        
-        #print(self.df)
+        print(self.df)
         
         return self.df
     
@@ -75,7 +75,13 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Volume-Based Features
     # =============================================================================
-    
+    def _volume_moving_averages(self):
+        """Identify unusual volume spikes."""
+        num_periods = [7, 15, 30, 60]
+        
+        for period in num_periods:
+            self.df[f'vma_{period}'] = self.df['volume'].rolling(window=period).mean()
+        
     
     # =============================================================================
     # Section: Technical Indicators
