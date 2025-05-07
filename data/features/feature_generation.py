@@ -29,6 +29,7 @@ class FeatureGenerator():
         self._support_resistance()  # not sure how to do, yet
         # Volume-Based Features
         self._volume_moving_averages()
+        self._volume_rate_of_change()
         # Technical Indicators
         # self._relative_strength_index()  # unsure of impmlementation - also now working
         
@@ -50,7 +51,7 @@ class FeatureGenerator():
         
     def _rate_of_change(self):
         """Price momentum: Rate of change (ROC) over various lookback periods."""
-        self.df["rdc_close"] = self.df["close"].pct_change()  # Am I using this right?
+        self.df["roc_close"] = self.df["close"].pct_change()  # Am I using this right?
     
     def _average_true_range(self, period_atr:int = 14):
         # ATR
@@ -86,6 +87,9 @@ class FeatureGenerator():
         for period in num_periods:
             self.df[f'vma_{period}'] = self.df['volume'].rolling(window=period).mean()
         
+    def _volume_rate_of_change(self):
+        """How rapidly volume is increasing/decreasing."""
+        self.df["vroc"] = self.df["volume"].pct_change()  # Am I using this right?
     
     # =============================================================================
     # Section: Technical Indicators
