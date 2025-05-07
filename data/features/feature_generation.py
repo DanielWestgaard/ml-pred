@@ -36,6 +36,7 @@ class FeatureGenerator():
         self._volume_profile()
         # Technical Indicators
         self._relative_strength_index()  # unsure of impmlementation
+        self._moving_average_convergence_divergence()
         
         print(self.df)
         
@@ -124,7 +125,6 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Technical Indicators
     # =============================================================================
-    
     def _relative_strength_index(self, window:int = 14):
         """Measures momentum and overbought/oversold conditions."""
         
@@ -147,6 +147,17 @@ class FeatureGenerator():
         
         # Add RSI to dataframe
         self.df[f'rsi_{window}'] = rsi
+    
+    def _moving_average_convergence_divergence(self):
+        """Trend-following momentum indicator."""
+        self.df['ema_12'] = self.df['close'].ewm(span=12, adjust=False).mean()
+        self.df['ema_26'] = self.df['close'].ewm(span=26, adjust=False).mean()
+
+        # Calculate MACD (the difference between 12-period EMA and 26-period EMA)
+        self.df['macd'] = self.df['ema_12'] - self.df['ema_26']
+        self.df = self.df.drop(["ema_12", "ema_26"], axis=1)  # Don't need that many ema's
+        # Calculate the 9-period EMA of MACD (Signal Line)
+        #self.df['signal_line'] = self.df['MACD'].ewm(span=9, adjust=False).mean()  # not needed?
     
     # =============================================================================
     # Section: Time-based Features
