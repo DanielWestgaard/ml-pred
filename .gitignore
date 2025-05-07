@@ -3,3 +3,4 @@ secrets/secrets.txt
 __pycache__
 data_exploration.ipynb
 messy_market_data.csv
+storage/data/capital_com/processed/testing.csv
