@@ -35,7 +35,7 @@ class FeatureGenerator():
         self._on_balance_volume()
         self._volume_profile()
         # Technical Indicators
-        # self._relative_strength_index()  # unsure of impmlementation - also now working
+        self._relative_strength_index()  # unsure of impmlementation
         
         print(self.df)
         
@@ -124,39 +124,29 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Technical Indicators
     # =============================================================================
-    def _relative_strength_index(self):
+    
+    def _relative_strength_index(self, window:int = 14):
         """Measures momentum and overbought/oversold conditions."""
         
-        def rsi_calc(self, prices, n=14):
-                deltas = np.diff(prices)
-                seed = deltas[:n+1]
-                up = seed[seed>=0].sum()/n
-                down = -seed[seed<0].sum()/n
-                rs = up/down
-                rsi = np.zeros_like(prices)
-                rsi[:n] = 100. - 100./(1.+rs)
-
-                for i in range(n, len(prices)):
-                    delta = deltas[i-1]  # cause the diff is 1 shorter
-
-                    if delta>0:
-                        upval = delta
-                        downval = 0.
-                    else:
-                        upval = 0.
-                        downval = -delta
-
-                    up = (up*(n-1) + upval)/n
-                    down = (down*(n-1) + downval)/n
-
-                    rs = up/down
-                    rsi[i] = 100. - 100./(1.+rs)
-
-                return rsi
+        # Calculate price changes
+        delta = self.df["close"].diff()
         
-        number = [6, 14, 20]
-        for nr in number:
-            self.df[f"rsi_{nr}"] = rsi_calc(self.df['close'].values, nr)
+        # Separate gains and losses
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+        
+        # Calculate average gain and average loss
+        avg_gain = gain.rolling(window=window).mean()
+        avg_loss = loss.rolling(window=window).mean()
+        
+        # Calculate RS (Relative Strength)
+        rs = avg_gain / avg_loss
+        
+        # Calculate RSI
+        rsi = 100 - (100 / (1 + rs))
+        
+        # Add RSI to dataframe
+        self.df[f'rsi_{window}'] = rsi
     
     # =============================================================================
     # Section: Time-based Features
