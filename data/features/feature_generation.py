@@ -30,6 +30,7 @@ class FeatureGenerator():
         # Volume-Based Features
         self._volume_moving_averages()
         self._volume_rate_of_change()
+        self._on_balance_volume()
         # Technical Indicators
         # self._relative_strength_index()  # unsure of impmlementation - also now working
         
@@ -90,6 +91,19 @@ class FeatureGenerator():
     def _volume_rate_of_change(self):
         """How rapidly volume is increasing/decreasing."""
         self.df["vroc"] = self.df["volume"].pct_change()  # Am I using this right?
+        
+    def _on_balance_volume(self):
+        """Cumulative indicator that relates volume to price changes. Could also be placed under Technical Indicators."""
+        obv = [0]
+        for i in range(1, len(self.df)):
+            if self.df['close'][i] > self.df['close'][i-1]:
+                obv.append(float(obv[-1] + self.df['volume'][i]))
+            elif self.df['close'][i] < self.df['close'][i-1]:
+                obv.append(float(obv[-1] - self.df['volume'][i]))
+            else:
+                obv.append(float(obv[-1]))
+        self.df["obv"] = obv
+        
     
     # =============================================================================
     # Section: Technical Indicators
