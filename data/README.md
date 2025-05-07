@@ -63,17 +63,17 @@ NSY...
 Code related to creating and selecting features with prediction power to help a ML model train and predict.
 ### Feature Generation
 Planned features to generate: WIP
-- Price Action Features
+- <ins>Price Action Features</ins>
   - **Moving Averages**: Simple and exponential moving averages (SMAs/EMAs) over different time periods (5, 10, 20, 50, 200 periods)
   - **Price Momentum**: Rate of change (ROC) over various lookback periods
   - **Volatility Indicators**: Average True Range (ATR), Bollinger Band width
   - **Support/Resistance**: Distance from recent highs/lows
-- Volume-Based Features
-  - Volume Moving Averages: To identify unusual volume spikes
+- <ins>Volume-Based Features</ins>
+  - **Volume Moving Averages**: To identify unusual volume spikes
   - Volume Rate of Change: How rapidly volume is increasing/decreasing
   - On-Balance Volume (OBV): Cumulative indicator that relates volume to price changes
   - Volume Profile: Distribution of volume at different price levels
-- Technical Indicators
+- <ins>Technical Indicators</ins>
   - RSI (Relative Strength Index): Measures momentum and overbought/oversold conditions
   - MACD (Moving Average Convergence Divergence): Trend-following momentum indicator
   - ADX (Average Directional Index): Measures trend strength

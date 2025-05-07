@@ -1,3 +1,5 @@
+import numpy as np
+
 from utils import data_utils
 
 class FeatureGenerator():
@@ -27,6 +29,8 @@ class FeatureGenerator():
         self._support_resistance()  # not sure how to do, yet
         # Volume-Based Features
         self._volume_moving_averages()
+        # Technical Indicators
+        # self._relative_strength_index()  # unsure of impmlementation - also now working
         
         print(self.df)
         
@@ -89,6 +93,36 @@ class FeatureGenerator():
     def _relative_strength_index(self):
         """Measures momentum and overbought/oversold conditions."""
         
+        def rsi_calc(self, prices, n=14):
+                deltas = np.diff(prices)
+                seed = deltas[:n+1]
+                up = seed[seed>=0].sum()/n
+                down = -seed[seed<0].sum()/n
+                rs = up/down
+                rsi = np.zeros_like(prices)
+                rsi[:n] = 100. - 100./(1.+rs)
+
+                for i in range(n, len(prices)):
+                    delta = deltas[i-1]  # cause the diff is 1 shorter
+
+                    if delta>0:
+                        upval = delta
+                        downval = 0.
+                    else:
+                        upval = 0.
+                        downval = -delta
+
+                    up = (up*(n-1) + upval)/n
+                    down = (down*(n-1) + downval)/n
+
+                    rs = up/down
+                    rsi[i] = 100. - 100./(1.+rs)
+
+                return rsi
+        
+        number = [6, 14, 20]
+        for nr in number:
+            self.df[f"rsi_{nr}"] = rsi_calc(self.df['close'].values, nr)
     
     # =============================================================================
     # Section: Time-based Features
