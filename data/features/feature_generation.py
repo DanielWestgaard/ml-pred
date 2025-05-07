@@ -1,4 +1,6 @@
+import pandas as pd
 import numpy as np
+from volprofile import getVPWithOHLC
 
 from utils import data_utils
 
@@ -31,6 +33,7 @@ class FeatureGenerator():
         self._volume_moving_averages()
         self._volume_rate_of_change()
         self._on_balance_volume()
+        self._volume_profile()
         # Technical Indicators
         # self._relative_strength_index()  # unsure of impmlementation - also now working
         
@@ -105,6 +108,18 @@ class FeatureGenerator():
         
         self.df["obv"] = obv
         
+    def _volume_profile(self):
+        """Distribution of volume at different price levels."""
+        vp = getVPWithOHLC(self.df, self.df.shape[0])  # minPrice, maxPrice, and aggregateVolume for each price bin
+        
+        vp.index = self.df.index  # align indexes
+        self.df = pd.concat([self.df, vp], axis=1)  # am I using it properly?
+        # Naming result columns differently
+        self.df["min_price_v"] = self.df["minPrice"]
+        self.df["max_price_v"] = self.df["maxPrice"]
+        self.df["aggregate_volume"] = self.df["aggregateVolume"]
+        # Dropping columns
+        self.df = self.df.drop(["minPrice", "maxPrice", "aggregateVolume"], axis=1)
     
     # =============================================================================
     # Section: Technical Indicators

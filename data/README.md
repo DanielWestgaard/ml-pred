@@ -72,7 +72,7 @@ Planned features to generate: WIP
   - **Volume Moving Averages**: To identify unusual volume spikes
   - **Volume Rate of Change**: How rapidly volume is increasing/decreasing
   - **On-Balance Volume (OBV)**: Cumulative indicator that relates volume to price changes
-  - Volume Profile: Distribution of volume at different price levels
+  - **Volume Profile**: Distribution of volume at different price levels
 - <ins>Technical Indicators</ins>
   - RSI (Relative Strength Index): Measures momentum and overbought/oversold conditions
   - MACD (Moving Average Convergence Divergence): Trend-following momentum indicator
