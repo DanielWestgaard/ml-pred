@@ -33,7 +33,8 @@ Will also use this for planning.
 ```
 
 ## Important notes:
-- Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment()
+- Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment(). Should be improved when using other providers using another timezone.
+- The library pandas_lib could really help with calculating features, but the following error appears on (on any Python version) ``` ImportError: cannot import name 'NaN' from 'numpy' ```. After some reasearch, this appears after numpy version 2.0. Considering I'll use this project and the whole pipeline on other servers/machines one day, I will create my own functions/calculations as to not rely on older libraries.
 
 ## About pipelines/
 ...
@@ -63,10 +64,10 @@ Code related to creating and selecting features with prediction power to help a 
 ### Feature Generation
 Planned features to generate: WIP
 - Price Action Features
-  - ✅ **Moving Averages**: Simple and exponential moving averages (SMAs/EMAs) over different time periods (5, 10, 20, 50, 200 periods)
+  - **Moving Averages**: Simple and exponential moving averages (SMAs/EMAs) over different time periods (5, 10, 20, 50, 200 periods)
   - **Price Momentum**: Rate of change (ROC) over various lookback periods
   - **Volatility Indicators**: Average True Range (ATR), Bollinger Band width
-  - Support/Resistance: Distance from recent highs/lows
+  - **Support/Resistance**: Distance from recent highs/lows
 - Volume-Based Features
   - Volume Moving Averages: To identify unusual volume spikes
   - Volume Rate of Change: How rapidly volume is increasing/decreasing

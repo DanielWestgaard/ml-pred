@@ -1,6 +1,5 @@
 from utils import data_utils
 
-
 class FeatureGenerator():
     def __init__(self, dataset):
         """
@@ -20,9 +19,14 @@ class FeatureGenerator():
     def run(self):
         """Run feature generation on provided dataset."""
         
+        # Price Action Features
         self._moving_averages()
-        self._price_momentum()
-        self._volatility_indicators()
+        self._rate_of_change()
+        self._average_true_range()
+        self._bollinger_bands()
+        self._support_resistance()  # not sure how to do yet
+        # Volume-Based Features
+        
         
         #print(self.df)
         
@@ -40,12 +44,11 @@ class FeatureGenerator():
             self.df[f"sma_{period}"] = self.df["close"].rolling(window=period).mean()
             self.df[f"ema_{period}"] = self.df["close"].ewm(span=period, adjust=False, min_periods=period).mean()
         
-    def _price_momentum(self):
-        """Rate of change (ROC) over various lookback periods."""
+    def _rate_of_change(self):
+        """Price momentum: Rate of change (ROC) over various lookback periods."""
         self.df["rdc_close"] = self.df["close"].pct_change()  # Am I using this right?
     
-    def _volatility_indicators(self, period_atr:int = 14, period_bb:int = 20):
-        """Average True Range (ATR), Bollinger Band width. Very unsure if I've implemented this right?? """
+    def _average_true_range(self, period_atr:int = 14):
         # ATR
         self.df["high_low"] = self.df["high"] - self.df["low"]                          # Current High — Current Low
         self.df["high_prev_close"] = abs(self.df["high"] - self.df["close"].shift(1))   # |Current High — Previous Close|
@@ -56,10 +59,42 @@ class FeatureGenerator():
         # Dropping used columns
         self.df = self.df.drop(columns=["high_low", "high_prev_close", "low_prev_close", "true_range"], axis=1)
 
+    def _bollinger_bands(self, period_bb:int = 20):
         # Bollinger Bands
         # middle band is sma
         self.df["std"] = self.df["close"].rolling(window=period_bb).std()  # rolling standard deviation
         num_std_dev = 2
         self.df['upper_band'] = self.df[f'sma_{period_bb}'] + (num_std_dev * self.df['std'])
         self.df['lower_band'] = self.df[f'sma_{period_bb}'] - (num_std_dev * self.df['std'])
+        
+    def _support_resistance(self):
+        """Distance from recent high/lows."""
+        pass
+    
+        
+    # =============================================================================
+    # Section: Volume-Based Features
+    # =============================================================================
+    
+    
+    # =============================================================================
+    # Section: Technical Indicators
+    # =============================================================================
+    def _relative_strength_index(self):
+        """Measures momentum and overbought/oversold conditions."""
+        
+    
+    # =============================================================================
+    # Section: Time-based Features
+    # =============================================================================
+    
+    
+    # =============================================================================
+    # Section: Market Regime Features
+    # =============================================================================
+    
+    
+    # =============================================================================
+    # Section: Feature Transformations
+    # =============================================================================
         
