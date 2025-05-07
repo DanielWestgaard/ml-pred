@@ -75,7 +75,7 @@ Planned features to generate: WIP
   - **Volume Profile**: Distribution of volume at different price levels
 - <ins>Technical Indicators</ins>
   - **RSI (Relative Strength Index)**: Measures momentum and overbought/oversold conditions
-  - MACD (Moving Average Convergence Divergence): Trend-following momentum indicator
+  - **MACD (Moving Average Convergence Divergence)**: Trend-following momentum indicator
   - ADX (Average Directional Index): Measures trend strength
   - Stochastic Oscillator: Compares current price to range over time period
 - Time-Based Features
