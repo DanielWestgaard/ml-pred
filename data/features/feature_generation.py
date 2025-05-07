@@ -22,7 +22,7 @@ class FeatureGenerator():
         
         self._moving_averages()
         self._price_momentum()
-        self._volatility_indicators
+        self._volatility_indicators()
         
         #print(self.df)
         
@@ -44,6 +44,22 @@ class FeatureGenerator():
         """Rate of change (ROC) over various lookback periods."""
         self.df["rdc_close"] = self.df["close"].pct_change()  # Am I using this right?
     
-    def _volatility_indicators(self):
-        """Average True Range (ATR), Bollinger Band width."""
-        pass
+    def _volatility_indicators(self, period_atr:int = 14, period_bb:int = 20):
+        """Average True Range (ATR), Bollinger Band width. Very unsure if I've implemented this right?? """
+        # ATR
+        self.df["high_low"] = self.df["high"] - self.df["low"]                          # Current High — Current Low
+        self.df["high_prev_close"] = abs(self.df["high"] - self.df["close"].shift(1))   # |Current High — Previous Close|
+        self.df["low_prev_close"] = abs(self.df["low"] - self.df["close"].shift(1))     # |Current Low — Previous Close|
+        self.df["true_range"] = self.df[['high_low', 'high_prev_close', 'low_prev_close']].max(axis=1)
+        
+        self.df["atr"] = self.df["true_range"].rolling(window=period_atr).mean()
+        # Dropping used columns
+        self.df = self.df.drop(columns=["high_low", "high_prev_close", "low_prev_close", "true_range"], axis=1)
+
+        # Bollinger Bands
+        # middle band is sma
+        self.df["std"] = self.df["close"].rolling(window=period_bb).std()  # rolling standard deviation
+        num_std_dev = 2
+        self.df['upper_band'] = self.df[f'sma_{period_bb}'] + (num_std_dev * self.df['std'])
+        self.df['lower_band'] = self.df[f'sma_{period_bb}'] - (num_std_dev * self.df['std'])
+        

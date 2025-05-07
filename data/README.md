@@ -65,7 +65,7 @@ Planned features to generate: WIP
 - Price Action Features
   - ✅ **Moving Averages**: Simple and exponential moving averages (SMAs/EMAs) over different time periods (5, 10, 20, 50, 200 periods)
   - **Price Momentum**: Rate of change (ROC) over various lookback periods
-  - Volatility Indicators: Average True Range (ATR), Bollinger Band width
+  - **Volatility Indicators**: Average True Range (ATR), Bollinger Band width
   - Support/Resistance: Distance from recent highs/lows
 - Volume-Based Features
   - Volume Moving Averages: To identify unusual volume spikes
