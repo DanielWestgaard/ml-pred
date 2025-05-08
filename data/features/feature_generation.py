@@ -241,9 +241,14 @@ class FeatureGenerator():
         pass
     
     def _day_of_week(self):
+        # Unable to access date when it is the index, so thought this would be an okay solution
+        self.df['date'] = self.df.index
+
         self.df["day_of_week"] = self.df["date"].dt.dayofweek
         self.df["sin_day_of_week"] = np.sin(2 * np.pi * self.df["day_of_week"] / 7)
         self.df["cos_day_of_week"] = np.cos(2 * np.pi * self.df["day_of_week"] / 7)
+        # Removing date duplicate again
+        self.df = self.df.drop('date', axis=1)
         
     def _seasonal_decompose(self, period = 160):
         """Not working properly"""
