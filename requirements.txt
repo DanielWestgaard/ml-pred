@@ -4,3 +4,4 @@ websocket
 websocket-client
 requests
 ipykernel
+statsmodels

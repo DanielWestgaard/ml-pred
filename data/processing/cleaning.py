@@ -128,8 +128,8 @@ class DataCleaner(BaseProcessor):
                 logging.warning(f"Could not localize timezone to UTC: {e}")
 
         # Set date as index if it's not already
-        if self.df.index.name != 'date':
-            self.df = self.df.set_index('date')
+        # if self.df.index.name != 'date':
+        #     self.df = self.df.set_index('date')
         
         # Identify frequency of data (daily, hourly, minute, etc.)
         if len(self.df) > 1:

@@ -1,6 +1,8 @@
+import logging
 import pandas as pd
 import numpy as np
 from volprofile import getVPWithOHLC
+from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
 
 from utils import data_utils
 
@@ -29,16 +31,23 @@ class FeatureGenerator():
         self._average_true_range()  # wrong implementation?
         self._bollinger_bands()  # bad implementation?
         self._support_resistance()  # not sure how to do, yet
+        logging.debug("Finished calculating Price Action Features")
         # Volume-Based Features
         self._volume_moving_averages()
         self._volume_rate_of_change()
         self._on_balance_volume()
         self._volume_profile()
+        logging.debug("Finished calculating Volume-Based Features")
         # Technical Indicators
         self._relative_strength_index()  # unsure of impmlementation
         self._moving_average_convergence_divergence()
         self._average_directional_index()  # wrong way to calculate and use??
         self._stochastic_oscillator()
+        logging.debug("Finished calculating Technical Indicators")
+        # Time-based Features
+        self._day_of_week()
+        self._seasonal_decompose()  # not properly working or handling for different timeframes
+        logging.debug("Finished calculating Time-based Features")
         
         print(self.df)
         
@@ -216,7 +225,28 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Time-based Features
     # =============================================================================
+    def _time_of_day(self):
+        pass
     
+    def _time_of_week(self):
+        pass
+    
+    def _time_of_month(self):
+        pass
+    
+    def _day_of_week(self):
+        self.df["day_of_week"] = self.df["date"].dt.dayofweek
+        self.df["sin_day_of_week"] = np.sin(2 * np.pi * self.df["day_of_week"] / 7)
+        self.df["cos_day_of_week"] = np.cos(2 * np.pi * self.df["day_of_week"] / 7)
+        
+    def _seasonal_decompose(self, period = 160):
+        
+        try:
+            self.df["sd"] = seasonal_decompose(self.df["date"], model='additive', period=period, extrapolate_trend=1)
+            self.df["stl"] = STL(self.df["date"], period=period)
+            self.df["stl"] = MSTL(self.df["date"], periods=[24, 160])
+        except Exception as e:
+            logging.warning(f"Error calculating seasonal decompose. Most likely problem with too little data: {e}")
     
     # =============================================================================
     # Section: Market Regime Features
