@@ -6,6 +6,7 @@ from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
 
 from utils import data_utils
 
+
 class FeatureGenerator():
     def __init__(self, dataset):
         """
@@ -48,6 +49,9 @@ class FeatureGenerator():
         self._day_of_week()
         self._seasonal_decompose()  # not properly working or handling for different timeframes
         logging.debug("Finished calculating Time-based Features")
+        # Feature Transformations
+        self._log_returns()  # Is this implemented right?
+        self._normalize_features()
         
         print(self.df)
         
@@ -240,7 +244,7 @@ class FeatureGenerator():
         self.df["cos_day_of_week"] = np.cos(2 * np.pi * self.df["day_of_week"] / 7)
         
     def _seasonal_decompose(self, period = 160):
-        
+        """Not working properly"""
         try:
             self.df["sd"] = seasonal_decompose(self.df["date"], model='additive', period=period, extrapolate_trend=1)
             self.df["stl"] = STL(self.df["date"], period=period)
@@ -251,9 +255,59 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Market Regime Features
     # =============================================================================
-    
+    def _volatility_regimes(self):
+        """How do I implement this?"""
     
     # =============================================================================
     # Section: Feature Transformations
     # =============================================================================
+    def _log_returns(self):
+        """Logarithmic returns: measure the percentage change in the price of an asset over a specific period."""
+        self.df['log_return'] = np.log( self.df['close'] / self.df['close'].shift(1) )
         
+    def _normalize_features(self, columns=None, window=20, exclude=None):  #['open', 'high', 'low', 'close']
+        """
+        Z-score normalize selected features in the DataFrame.
+        
+        Parameters:
+        -----------
+        columns : list or None
+            List of columns to normalize. If None, normalizes all numeric columns.
+        window : int
+            The rolling window to use for calculating mean and standard deviation.
+        exclude : list or None
+            List of columns to exclude from normalization.
+            
+        Returns:
+        --------
+        None. Adds new columns to self.df with '_zscore' suffix.
+        """
+        # If no columns specified, use all numeric columns
+        if columns is None:
+            columns = self.df.select_dtypes(include='number').columns.tolist()
+        
+        # Exclude specified columns
+        if exclude is not None:
+            columns = [col for col in columns if col not in exclude]
+        
+        # Skip columns that already have a z-score version
+        columns = [col for col in columns if f"{col}_zscore" not in self.df.columns]
+        
+        # Apply z-score normalization to each column
+        for col in columns:
+            # Calculate rolling mean and standard deviation
+            rolling_mean = self.df[col].rolling(window=window).mean()
+            rolling_std = self.df[col].rolling(window=window).std()
+            
+            # Calculate z-score with division by zero handling
+            z_score = pd.Series(float('nan'), index=self.df.index)
+            mask = rolling_std != 0
+            
+            # Only calculate where std is not zero
+            z_score[mask] = (self.df[col][mask] - rolling_mean[mask]) / rolling_std[mask]
+            
+            # For cases where std is zero, set z-score to 0
+            z_score[~mask & ~rolling_mean.isna()] = 0
+            
+            # Add to dataframe
+            self.df[f'{col}_zscore'] = z_score

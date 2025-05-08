@@ -84,9 +84,9 @@ Planned features to generate: WIP
 - <ins>Market Regime Features</ins>
   - Volatility regimes: High vs. low volatility periods
   - Trend strength indicators: To identify trending vs. ranging markets
-- Feature Transformations
-  - Log returns: Instead of raw price changes (more normally distributed)
-  - Z-score normalization: Standardizing indicators for better model performance
+- <ins>Feature Transformations</ins>
+  - **Log returns**: Instead of raw price changes (more normally distributed)
+  - **Z-score normalization**: Standardizing indicators for better model performance
   - Fourier transforms: For extracting cyclical components
 
 ## About providers/
