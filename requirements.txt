@@ -5,3 +5,4 @@ websocket-client
 requests
 ipykernel
 statsmodels
+holidays

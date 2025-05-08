@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
 import numpy as np
+import scipy
 from scipy.fft import fft, ifft
 from volprofile import getVPWithOHLC
 from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
@@ -58,7 +59,12 @@ class FeatureGenerator():
         self._seasonal_decompose()  # not properly working or handling for different timeframes
         self._stl_decomposition()
         self._mstl_decomposition()
+        self._holiday_features()
         logging.debug("Finished calculating Time-based Features")
+        # Market Regime Features
+        self._volatility_regimes()
+        self._trend_strength_indicators()
+        self._market_state_indicators()
         # Feature Transformations
         self._log_returns()  # Is this implemented right?
         self._normalize_features()
@@ -535,12 +541,258 @@ class FeatureGenerator():
             
         except Exception as e:
             logging.warning(f"Error calculating MSTL decomposition: {e}")
+            
+    def _holiday_features(self):
+        """
+        Add features for market holidays and special events.
+        Requires holidays package: pip install holidays
+        """
+        try:
+            import holidays
+            
+            # Get date from the index
+            dates = pd.Series(self.df.index.date)
+            
+            # Create a holidays calendar (adjust for your target market)
+            us_holidays = holidays.US(years=range(dates.dt.year.min(), dates.dt.year.max()+1))
+            
+            # Flag for holidays
+            self.df['is_holiday'] = dates.isin(us_holidays).astype(int)
+            
+            # Distance to next holiday (market behavior often changes approaching holidays)
+            next_holiday = np.zeros(len(self.df))
+            for i, date in enumerate(dates):
+                # Find next holiday
+                for days_ahead in range(1, 30):
+                    future_date = date + pd.Timedelta(days=days_ahead)
+                    if future_date in us_holidays:
+                        next_holiday[i] = days_ahead
+                        break
+            self.df['days_to_next_holiday'] = next_holiday
+            
+        except ImportError:
+            logging.warning("holidays package not installed. Run 'pip install holidays'")
+        except Exception as e:
+            logging.warning(f"Error calculating holiday features: {e}")
     
     # =============================================================================
     # Section: Market Regime Features
     # =============================================================================
-    def _volatility_regimes(self):
-        """How do I implement this?"""
+    def _volatility_regimes(self, lookback_short=20, lookback_long=100, n_regimes=3):
+        """
+        Identify volatility regimes (high, medium, low) based on historical volatility.
+        
+        Parameters:
+        -----------
+        lookback_short : int
+            Window for short-term volatility calculation
+        lookback_long : int
+            Window for longer-term volatility context
+        n_regimes : int
+            Number of volatility regimes to identify (typically 2 or 3)
+        """
+        # Calculate rolling volatility (standard deviation of returns)
+        self.df['returns'] = self.df['close'].pct_change()
+        self.df['volatility_short'] = self.df['returns'].rolling(window=lookback_short).std() * np.sqrt(252)  # Annualized
+        self.df['volatility_long'] = self.df['returns'].rolling(window=lookback_long).std() * np.sqrt(252)
+        
+        # Volatility ratio (current vol relative to longer-term vol)
+        self.df['volatility_ratio'] = self.df['volatility_short'] / self.df['volatility_long']
+        
+        # Identify volatility regimes using quantiles
+        if n_regimes == 2:
+            # Simple binary regime (high/low)
+            self.df['volatility_regime'] = np.where(
+                self.df['volatility_short'] > self.df['volatility_short'].rolling(window=lookback_long).quantile(0.5),
+                'high', 'low'
+            )
+        else:
+            # Multi-regime approach (e.g., low/medium/high)
+            # Calculate historical percentiles for current volatility
+            vol_percentile = self.df['volatility_short'].rolling(window=lookback_long).apply(
+                lambda x: pd.Series(x).rank(pct=True).iloc[-1]
+            )
+            
+            # Assign regimes based on percentiles
+            conditions = [
+                (vol_percentile < 0.33),
+                (vol_percentile >= 0.33) & (vol_percentile < 0.66),
+                (vol_percentile >= 0.66)
+            ]
+            choices = ['low', 'medium', 'high']
+            self.df['volatility_regime'] = np.select(conditions, choices, default='medium')
+        
+        # One-hot encode the regime if needed for ML
+        regime_dummies = pd.get_dummies(self.df['volatility_regime'], prefix='vol_regime')
+        self.df = pd.concat([self.df, regime_dummies], axis=1)
+        
+        # Also add a continuous volatility Z-score (how many standard deviations from mean)
+        vol_mean = self.df['volatility_short'].rolling(window=lookback_long).mean()
+        vol_std = self.df['volatility_short'].rolling(window=lookback_long).std()
+        self.df['volatility_zscore'] = (self.df['volatility_short'] - vol_mean) / vol_std
+        
+        # Volatility acceleration/deceleration
+        self.df['volatility_change'] = self.df['volatility_short'].pct_change(5)  # 5-period change rate
+
+    def _trend_strength_indicators(self, lookback=20, adx_threshold=25):
+        """
+        Create indicators to identify trending vs. ranging markets.
+        
+        Parameters:
+        -----------
+        lookback : int
+            Window for trend calculations
+        adx_threshold : int
+            ADX threshold above which market is considered trending (typically 25)
+        """
+        # 1. Directional Movement Trend Strength (simplified ADX-based)
+        # Note: This assumes you've already calculated ADX in your technical indicators
+        if 'adx' in self.df.columns:
+            # Create trend regime based on ADX
+            self.df['adx_trend_regime'] = np.where(self.df['adx'] > adx_threshold, 'trending', 'ranging')
+            
+            # One-hot encode if needed
+            regime_dummies = pd.get_dummies(self.df['adx_trend_regime'], prefix='adx_regime')
+            self.df = pd.concat([self.df, regime_dummies], axis=1)
+        
+        # 2. Price vs Moving Average Trend Indicators
+        # Calculate price position relative to moving averages
+        for period in [20, 50, 200]:
+            # Ensure the SMA exists
+            if f'sma_{period}' not in self.df.columns:
+                self.df[f'sma_{period}'] = self.df['close'].rolling(window=period).mean()
+            
+            # Calculate % distance from moving average
+            self.df[f'dist_from_sma_{period}'] = (self.df['close'] / self.df[f'sma_{period}'] - 1) * 100
+            
+            # Direction of moving average (is it sloping up or down)
+            self.df[f'sma_{period}_slope'] = self.df[f'sma_{period}'].pct_change(5) * 100  # 5-period slope
+        
+        # 3. Moving Average Crossovers for trend identification
+        self.df['ma_cross_50_200'] = np.where(
+            self.df['sma_50'] > self.df['sma_200'], 1, -1  # 1 for bullish, -1 for bearish
+        )
+        
+        # 4. Linear regression indicators for trend strength
+        # Fit linear regression on closing prices
+        self.df['regression_slope'] = np.nan
+        self.df['r_squared'] = np.nan
+        
+        # Calculate for each window
+        for i in range(lookback, len(self.df)):
+            # Get window of prices
+            y = self.df['close'].iloc[i-lookback:i].values
+            x = np.arange(len(y))
+            
+            # Fit linear regression
+            slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(x, y)
+            
+            # Store results
+            self.df.iloc[i, self.df.columns.get_loc('regression_slope')] = slope
+            self.df.iloc[i, self.df.columns.get_loc('r_squared')] = r_value**2
+        
+        # Normalize the slope based on price level (for comparison across different price levels)
+        self.df['norm_regression_slope'] = self.df['regression_slope'] / self.df['close']
+        
+        # 5. Combined trend strength indicator
+        # Calculate a composite trend strength score (0-100)
+        # Higher values indicate stronger trends
+        components = []
+        
+        # Add ADX component (scaled 0-1)
+        if 'adx' in self.df.columns:
+            components.append(self.df['adx'] / 100)
+        
+        # Add r-squared component (already 0-1)
+        components.append(self.df['r_squared'])
+        
+        # Add moving average alignment component
+        ma_alignment = (
+            np.sign(self.df['dist_from_sma_20']) * 
+            np.sign(self.df['dist_from_sma_50']) * 
+            np.sign(self.df['dist_from_sma_200'])
+        )
+        # This will be 1 when all are positive, -1 when all negative, 0 when mixed
+        ma_aligned = (abs(ma_alignment) == 1).astype(float)
+        components.append(ma_aligned)
+        
+        # Average the components and scale to 0-100
+        self.df['trend_strength'] = pd.concat(components, axis=1).mean(axis=1) * 100
+        
+        # 6. Trend regime classification
+        self.df['trend_regime'] = np.where(
+            self.df['trend_strength'] > 70, 'strong_trend',
+            np.where(self.df['trend_strength'] > 40, 'weak_trend', 'ranging')
+        )
+        
+        # One-hot encode the trend regime
+        trend_dummies = pd.get_dummies(self.df['trend_regime'], prefix='trend_regime')
+        self.df = pd.concat([self.df, trend_dummies], axis=1)
+
+    def _market_state_indicators(self, window=20):
+        """
+        Generate overall market state indicators that combine volatility and trend regimes.
+        
+        Parameters:
+        -----------
+        window : int
+            Lookback window for calculations
+        """
+        # Ensure we have both volatility and trend regimes
+        if 'volatility_regime' not in self.df.columns or 'trend_regime' not in self.df.columns:
+            logging.warning("Volatility or trend regimes not calculated. Run those methods first.")
+            return
+        
+        # Combine volatility and trend regimes into a consolidated market state
+        # Create a mapping of volatility regime * trend regime combinations
+        vol_mapping = {'low': 0, 'medium': 1, 'high': 2}
+        trend_mapping = {'ranging': 0, 'weak_trend': 1, 'strong_trend': 2}
+        
+        # Convert string regimes to numeric values if necessary
+        if self.df['volatility_regime'].dtype == 'object':
+            self.df['vol_regime_num'] = self.df['volatility_regime'].map(vol_mapping)
+        
+        if self.df['trend_regime'].dtype == 'object':
+            self.df['trend_regime_num'] = self.df['trend_regime'].map(trend_mapping)
+        
+        # Create a combined market state (9 possible states)
+        # 0: low vol + ranging, 1: low vol + weak trend, ..., 8: high vol + strong trend
+        self.df['market_state'] = self.df['vol_regime_num'] * 3 + self.df['trend_regime_num']
+        
+        # Map numeric states to descriptive labels
+        state_mapping = {
+            0: 'low_vol_ranging',
+            1: 'low_vol_weak_trend',
+            2: 'low_vol_strong_trend',
+            3: 'medium_vol_ranging',
+            4: 'medium_vol_weak_trend',
+            5: 'medium_vol_strong_trend',
+            6: 'high_vol_ranging',
+            7: 'high_vol_weak_trend',
+            8: 'high_vol_strong_trend'
+        }
+        self.df['market_state_desc'] = self.df['market_state'].map(state_mapping)
+        
+        # One-hot encode for ML models
+        state_dummies = pd.get_dummies(self.df['market_state_desc'], prefix='state')
+        self.df = pd.concat([self.df, state_dummies], axis=1)
+        
+        # Calculate state transition probabilities (useful for predicting regime changes)
+        # How stable is the current regime? How likely to switch to another?
+        self.df['state_duration'] = 1  # Initialize counter
+        
+        # Calculate how long we've been in the current state
+        current_state = None
+        duration = 0
+        
+        for i in range(len(self.df)):
+            if self.df['market_state'].iloc[i] != current_state:
+                current_state = self.df['market_state'].iloc[i]
+                duration = 1
+            else:
+                duration += 1
+            
+            self.df.iloc[i, self.df.columns.get_loc('state_duration')] = duration
     
     # =============================================================================
     # Section: Feature Transformations
