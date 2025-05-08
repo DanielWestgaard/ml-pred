@@ -7,7 +7,7 @@ from utils import shared_utils
 import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
-from data.features.feature_generation import FeatureGenerator
+from data.features.generation import FeatureGenerator
 
 
 class EngineeringPipeline():
