@@ -38,6 +38,7 @@ class FeatureGenerator():
         self._relative_strength_index()  # unsure of impmlementation
         self._moving_average_convergence_divergence()
         self._average_directional_index()  # wrong way to calculate and use??
+        self._stochastic_oscillator()
         
         print(self.df)
         
@@ -179,7 +180,39 @@ class FeatureGenerator():
         dx = (abs(plus_di - minus_di) / abs(plus_di + minus_di)) * 100
         adx = ((dx.shift(1) * (lookback - 1)) + dx) / lookback
         self.df["adx_smooth"] = adx.ewm(alpha = 1/lookback).mean()
-    
+        
+    def _stochastic_oscillator(self, period=14):
+        # Create a copy of existing DataFrame to preserve original index
+        # Create new columns for storing values without modifying the index
+        self.df['best_low'] = float('nan')
+        self.df['best_high'] = float('nan')
+        self.df['fast_k'] = float('nan')
+        
+        # Calculate %K values only where we have enough historical data
+        for i in range(period-1, len(self.df)):
+            # Get the window of data for the lookback period
+            window = self.df.iloc[i-period+1:i+1]
+            
+            # Find lowest low and highest high in the window
+            low = window['close'].min()
+            high = window['close'].max()
+            
+            # Store values in dataframe at the original index
+            idx = self.df.index[i]  # Get the actual index value
+            self.df.at[idx, 'best_low'] = low
+            self.df.at[idx, 'best_high'] = high
+            
+            # Calculate Fast %K with check for division by zero
+            if high != low:  # Avoid division by zero
+                self.df.at[idx, 'fast_k'] = 100 * ((self.df.iloc[i]['close'] - low) / (high - low))
+            else:
+                self.df.at[idx, 'fast_k'] = 50  # Default to middle value when high = low
+        
+        # Calculate derivatives using the DataFrame's original index
+        self.df['fast_d'] = self.df['fast_k'].rolling(3).mean().round(2)
+        self.df['slow_k'] = self.df['fast_d']
+        self.df['slow_d'] = self.df['slow_k'].rolling(3).mean().round(2)
+        
     # =============================================================================
     # Section: Time-based Features
     # =============================================================================

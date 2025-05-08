@@ -77,7 +77,7 @@ Planned features to generate: WIP
   - **RSI (Relative Strength Index)**: Measures momentum and overbought/oversold conditions
   - **MACD (Moving Average Convergence Divergence)**: Trend-following momentum indicator
   - **ADX (Average Directional Index)**: Measures trend strength
-  - Stochastic Oscillator: Compares current price to range over time period
+  - **Stochastic Oscillator**: Compares current price to range over time period
 - Time-Based Features
   - Time of day/week/month features: Markets often exhibit cyclical patterns
   - Seasonality components: Extracted using decomposition methods
