@@ -51,8 +51,13 @@ class FeatureGenerator():
         self._commodity_channel_index()
         logging.debug("Finished calculating Technical Indicators")
         # Time-based Features
+        self._time_of_day()
         self._day_of_week()
+        self._time_of_week()
+        self._time_of_month()
         self._seasonal_decompose()  # not properly working or handling for different timeframes
+        self._stl_decomposition()
+        self._mstl_decomposition()
         logging.debug("Finished calculating Time-based Features")
         # Feature Transformations
         self._log_returns()  # Is this implemented right?
@@ -63,6 +68,8 @@ class FeatureGenerator():
         n_features, feature_list = feature_stats.generated_features()
         logging.info(f"Generated {n_features} features.")
         logging.debug(f"Generated features are: {feature_list}")
+        
+        # print(self.df)
         
         return self.df
     
@@ -372,32 +379,162 @@ class FeatureGenerator():
     # Section: Time-based Features
     # =============================================================================
     def _time_of_day(self):
-        pass
+        """Extract time of day features from datetime index."""
+        # Extract hour of day
+        hour = self.df.index.hour
+        
+        # Create cyclical features using sine and cosine transformations
+        # This preserves the cyclical nature (hour 23 is close to hour 0)
+        self.df['hour_sin'] = np.sin(2 * np.pi * hour / 24)
+        self.df['hour_cos'] = np.cos(2 * np.pi * hour / 24)
+        
+        # You can also add a categorical feature for specific trading sessions
+        # For example: Asian, European, and US sessions
+        self.df['session'] = pd.cut(
+            hour, 
+            bins=[-1, 6, 14, 23],
+            labels=['asian_session', 'european_session', 'us_session']
+        )
     
     def _time_of_week(self):
-        pass
+        """Extract time of week features from datetime index."""
+        # Calculate the hour within the week (0-167)
+        day_of_week = self.df.index.dayofweek  # Monday=0, Sunday=6
+        hour_of_day = self.df.index.hour
+        hour_of_week = day_of_week * 24 + hour_of_day
+        
+        # Create cyclical features
+        self.df['hour_of_week_sin'] = np.sin(2 * np.pi * hour_of_week / 168)  # 168 = 7 days * 24 hours
+        self.df['hour_of_week_cos'] = np.cos(2 * np.pi * hour_of_week / 168)
+        
+        # Flag for weekend
+        self.df['is_weekend'] = (day_of_week >= 5).astype(int)
     
     def _time_of_month(self):
-        pass
+        """Extract time of month features from datetime index."""
+        # Extract day of month
+        day = self.df.index.day
+        days_in_month = pd.Series(self.df.index).dt.days_in_month.values
+        
+        # Normalize day to account for different month lengths
+        normalized_day = day / days_in_month
+        
+        # Create cyclical features
+        self.df['month_progress_sin'] = np.sin(2 * np.pi * normalized_day)
+        self.df['month_progress_cos'] = np.cos(2 * np.pi * normalized_day)
+        
+        # Mark start, middle and end of month periods
+        self.df['month_period'] = pd.cut(
+            normalized_day, 
+            bins=[0, 0.33, 0.66, 1],
+            labels=['start_of_month', 'mid_month', 'end_of_month']
+        )
+        
+        # Month of year cyclical features
+        month = self.df.index.month
+        self.df['month_of_year_sin'] = np.sin(2 * np.pi * month / 12)
+        self.df['month_of_year_cos'] = np.cos(2 * np.pi * month / 12)
     
     def _day_of_week(self):
-        # Unable to access date when it is the index, so thought this would be an okay solution
-        self.df['date'] = self.df.index
-
-        self.df["day_of_week"] = self.df["date"].dt.dayofweek
-        self.df["sin_day_of_week"] = np.sin(2 * np.pi * self.df["day_of_week"] / 7)
-        self.df["cos_day_of_week"] = np.cos(2 * np.pi * self.df["day_of_week"] / 7)
-        # Removing date duplicate again
-        self.df = self.df.drop('date', axis=1)
+        """Extract day of week features from datetime index."""
+        day_of_week = self.df.index.dayofweek  # Monday=0, Sunday=6
         
-    def _seasonal_decompose(self, period = 160):
-        """Not working properly"""
+        # Create cyclical features
+        self.df['day_of_week_sin'] = np.sin(2 * np.pi * day_of_week / 7)
+        self.df['day_of_week_cos'] = np.cos(2 * np.pi * day_of_week / 7)
+        
+    def _seasonal_decompose(self, period=160):
+        """
+        Perform seasonal decomposition on the closing price.
+        Adds trend, seasonal, and residual components to the dataframe.
+        """
         try:
-            self.df["sd"] = seasonal_decompose(self.df["date"], model='additive', period=period, extrapolate_trend=1)
-            self.df["stl"] = STL(self.df["date"], period=period)
-            self.df["stl"] = MSTL(self.df["date"], periods=[24, 160])
+            # We need to make sure there are no NaN values
+            close_series = self.df['close'].dropna()
+            
+            # Skip if we don't have enough data
+            if len(close_series) < 2 * period:
+                logging.warning(f"Not enough data for seasonal decomposition (need {2*period}, have {len(close_series)})")
+                return
+            
+            # Perform decomposition
+            result = seasonal_decompose(
+                close_series, 
+                model='additive', 
+                period=period, 
+                extrapolate_trend='freq'
+            )
+            
+            # Add components to the dataframe
+            self.df['seasonal_trend'] = result.trend
+            self.df['seasonal_seasonal'] = result.seasonal
+            self.df['seasonal_residual'] = result.resid
+            
+            # Add a normalized seasonal component (percentage of price)
+            self.df['seasonal_norm'] = self.df['seasonal_seasonal'] / self.df['close']
+            
         except Exception as e:
             logging.warning(f"Error calculating seasonal decompose: {e}")
+            
+    def _stl_decomposition(self, period=160):
+        """
+        Perform STL decomposition on the closing price.
+        STL is more robust to outliers than classical decomposition.
+        """
+        try:
+            # We need to make sure there are no NaN values
+            close_series = self.df['close'].dropna()
+            
+            # Skip if we don't have enough data
+            if len(close_series) < 2 * period:
+                logging.warning(f"Not enough data for STL decomposition (need {2*period}, have {len(close_series)})")
+                return
+            
+            # Perform STL decomposition
+            stl = STL(close_series, period=period, seasonal=13)
+            result = stl.fit()
+            
+            # Add components to the dataframe
+            self.df['stl_trend'] = result.trend
+            self.df['stl_seasonal'] = result.seasonal
+            self.df['stl_residual'] = result.resid
+            
+            # Add seasonal strength metrics
+            self.df['stl_seasonal_strength'] = 1 - (result.resid.var() / (result.seasonal + result.resid).var())
+            self.df['stl_trend_strength'] = 1 - (result.resid.var() / (result.trend + result.resid).var())
+            
+        except Exception as e:
+            logging.warning(f"Error calculating STL decomposition: {e}")
+            
+    def _mstl_decomposition(self, periods=[24, 160]):
+        """
+        Perform MSTL decomposition for multiple seasonality components.
+        Good for data with intraday and multi-day patterns.
+        """
+        try:
+            # We need to make sure there are no NaN values
+            close_series = self.df['close'].dropna()
+            
+            # Skip if we don't have enough data
+            if len(close_series) < 2 * max(periods):
+                logging.warning(f"Not enough data for MSTL decomposition (need {2*max(periods)}, have {len(close_series)})")
+                return
+            
+            # Perform MSTL decomposition
+            mstl = MSTL(close_series, periods=periods)
+            result = mstl.fit()
+            
+            # Add components to the dataframe
+            self.df['mstl_trend'] = result.trend
+            
+            # Add each seasonal component
+            for i, period in enumerate(periods):
+                self.df[f'mstl_seasonal_{period}'] = result.seasonal_[i]
+            
+            self.df['mstl_residual'] = result.resid
+            
+        except Exception as e:
+            logging.warning(f"Error calculating MSTL decomposition: {e}")
     
     # =============================================================================
     # Section: Market Regime Features
