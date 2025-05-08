@@ -40,6 +40,8 @@ class FeatureGenerator():
         self._volume_rate_of_change()
         self._on_balance_volume()
         self._volume_profile()
+        self._vwap()
+        self._money_flow_index()
         logging.debug("Finished calculating Volume-Based Features")
         # Technical Indicators
         self._relative_strength_index()  # unsure of impmlementation
@@ -165,6 +167,40 @@ class FeatureGenerator():
                     ]['volume'].sum()
                     
                     self.df.loc[self.df.index[i], f'vol_bin_{bin_num}'] = bin_volume
+    
+    def _vwap(self, period=1):
+        """Calculate daily Volume Weighted Average Price."""
+        # Assuming you have date info in index or as a column
+        self.df['vwap'] = (self.df['volume'] * (self.df['high'] + self.df['low'] + self.df['close']) / 3).rolling(period).sum() / self.df['volume'].rolling(period).sum()
+        
+    def _money_flow_index(self, period=14):
+        """Calculate Money Flow Index - a volume-weighted RSI."""
+        # Typical price
+        self.df['typical_price'] = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        
+        # Money flow
+        self.df['money_flow'] = self.df['typical_price'] * self.df['volume']
+        
+        # Positive and negative money flow
+        self.df['positive_flow'] = np.where(self.df['typical_price'] > self.df['typical_price'].shift(1), 
+                                            self.df['money_flow'], 0)
+        self.df['negative_flow'] = np.where(self.df['typical_price'] < self.df['typical_price'].shift(1), 
+                                            self.df['money_flow'], 0)
+        
+        # Money flow ratio and index
+        self.df['positive_flow_sum'] = self.df['positive_flow'].rolling(window=period).sum()
+        self.df['negative_flow_sum'] = self.df['negative_flow'].rolling(window=period).sum()
+        
+        # Avoid division by zero
+        self.df['money_ratio'] = np.where(self.df['negative_flow_sum'] != 0,
+                                        self.df['positive_flow_sum'] / self.df['negative_flow_sum'], 0)
+        
+        self.df['mfi'] = 100 - (100 / (1 + self.df['money_ratio']))
+        
+        # Drop intermediate columns
+        self.df = self.df.drop(['typical_price', 'money_flow', 'positive_flow', 
+                            'negative_flow', 'positive_flow_sum', 'negative_flow_sum', 
+                            'money_ratio'], axis=1)
     
     # =============================================================================
     # Section: Technical Indicators
