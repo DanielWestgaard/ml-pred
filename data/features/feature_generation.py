@@ -37,6 +37,7 @@ class FeatureGenerator():
         # Technical Indicators
         self._relative_strength_index()  # unsure of impmlementation
         self._moving_average_convergence_divergence()
+        self._average_directional_index()  # wrong way to calculate and use??
         
         print(self.df)
         
@@ -158,6 +159,26 @@ class FeatureGenerator():
         self.df = self.df.drop(["ema_12", "ema_26"], axis=1)  # Don't need that many ema's
         # Calculate the 9-period EMA of MACD (Signal Line)
         #self.df['signal_line'] = self.df['macd'].ewm(span=9, adjust=False).mean()  # not needed?
+    
+    def _average_directional_index(self, lookback:int = 14):
+        """Measures trend strength."""
+        plus_dm = self.df["high"].diff()
+        minus_dm = self.df["low"].diff()
+        plus_dm[plus_dm < 0] = 0
+        minus_dm[minus_dm > 0] = 0
+        
+        tr1 = pd.DataFrame(self.df["high"] - self.df["low"])
+        tr2 = pd.DataFrame(abs(self.df["high"] - self.df["close"].shift(1)))
+        tr3 = pd.DataFrame(abs(self.df["low"] - self.df["close"].shift(1)))
+        frames = [tr1, tr2, tr3]
+        tr = pd.concat(frames, axis = 1, join = 'inner').max(axis = 1)
+        atr = tr.rolling(lookback).mean()
+        
+        plus_di = 100 * (plus_dm.ewm(alpha = 1/lookback).mean() / atr)
+        minus_di = abs(100 * (minus_dm.ewm(alpha = 1/lookback).mean() / atr))
+        dx = (abs(plus_di - minus_di) / abs(plus_di + minus_di)) * 100
+        adx = ((dx.shift(1) * (lookback - 1)) + dx) / lookback
+        self.df["adx_smooth"] = adx.ewm(alpha = 1/lookback).mean()
     
     # =============================================================================
     # Section: Time-based Features
