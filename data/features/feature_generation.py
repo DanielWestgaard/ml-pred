@@ -67,7 +67,6 @@ class FeatureGenerator():
         self._market_state_indicators()
         # Feature Transformations
         self._log_returns()  # Is this implemented right?
-        self._normalize_features()
         self._fast_fourier_transforms()
         
         feature_stats = FeatureStatistics(self.df)
