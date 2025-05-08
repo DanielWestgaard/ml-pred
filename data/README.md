@@ -80,6 +80,8 @@ Planned features to generate: WIP
   - **MACD (Moving Average Convergence Divergence)**: Trend-following momentum indicator
   - **ADX (Average Directional Index)**: Measures trend strength
   - **Stochastic Oscillator**: Compares current price to range over time period
+  - **Commodity Channel Index**
+  - **Ichimoku Cloud**
 - <ins>Time-Based Features</ins>
   - **Time of day/week/month features**: Markets often exhibit cyclical patterns
   - **Seasonality components**: Extracted using decomposition methods
