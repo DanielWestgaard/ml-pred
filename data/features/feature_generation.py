@@ -2,7 +2,7 @@ import logging
 import pandas as pd
 import numpy as np
 import scipy
-from scipy.fft import fft, ifft
+from scipy.fft import fft, ifft, fftfreq
 from volprofile import getVPWithOHLC
 from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
 
@@ -848,16 +848,59 @@ class FeatureGenerator():
             # Add to dataframe
             self.df[f'{col}_zscore'] = z_score
 
-    def _fast_fourier_transforms(self):
-        "For extracting cyclical components."
-        # self.df["fft"] = fft(self.df["close"])
+    def _fast_fourier_transforms(self, column='close', n_components=5):
+        """
+        Extract cyclical components using Fast Fourier Transform.
         
-        # Number of samplepoints
-        N = len(self.df)
+        Parameters:
+        -----------
+        column : str
+            The column to analyze for cyclical patterns
+        n_components : int
+            Number of dominant frequency components to extract
+        """
+        # Make sure we work with returns to ensure stationarity
+        if 'log_return' not in self.df.columns:
+            self._log_returns()
         
-        # Sample spacing
-        T = 1.0 / 800.0  # ?
-        x = np.linspace(0.0, N*T, N)
-        y = np.sin(50.0 * 2.0*np.pi*x) + 0.5*np.sin(80.0 * 2.0*np.pi*x)
-        self.df["fft"] = fft(y)  # is this how it's used?? - weird reuslts, eg. 1.3549970-0.0000000j
+        # Get returns data without NaNs
+        returns = self.df['log_return'].dropna().values
         
+        # Apply FFT
+        fft_result = fft(returns)
+        
+        # Get the power spectrum (absolute value squared)
+        power = np.abs(fft_result)**2
+        
+        # Get frequencies
+        sample_freq = fftfreq(len(returns))
+        
+        # Exclude the DC component (0 frequency)
+        positive_freq_idx = np.where((sample_freq > 0))[0]
+        freqs = sample_freq[positive_freq_idx]
+        powers = power[positive_freq_idx]
+        
+        # Get indices of the top n_components frequencies
+        top_indices = np.argsort(powers)[-n_components:]
+        
+        # Extract dominant frequencies
+        dominant_freqs = freqs[top_indices]
+        dominant_periods = 1 / dominant_freqs
+        
+        # Create features for each dominant cycle
+        for i, period in enumerate(dominant_periods):
+            # Round to nearest integer for cleaner period values
+            period_int = int(round(period))
+            
+            # Only use reasonable periods (not too short, not too long)
+            if 2 <= period_int <= len(returns) // 3:
+                # Create sine and cosine features to capture the phase of the cycle
+                cycle_sin = np.sin(2 * np.pi * np.arange(len(self.df)) / period_int)
+                cycle_cos = np.cos(2 * np.pi * np.arange(len(self.df)) / period_int)
+                
+                # Add to dataframe
+                self.df[f'fft_sin_{period_int}'] = cycle_sin
+                self.df[f'fft_cos_{period_int}'] = cycle_cos
+        
+        # Store the dominant periods as a separate feature
+        self.df['fft_dominant_periods'] = str(sorted([int(round(p)) for p in dominant_periods]))        
