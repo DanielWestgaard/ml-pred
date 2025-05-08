@@ -205,91 +205,124 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Technical Indicators
     # =============================================================================
-    def _relative_strength_index(self, window:int = 14):
-        """Measures momentum and overbought/oversold conditions."""
-        
-        # Calculate price changes
+    def _relative_strength_index(self, window=14):
+        """Calculate RSI using Wilder's smoothing method."""
         delta = self.df["close"].diff()
-        
-        # Separate gains and losses
         gain = delta.where(delta > 0, 0)
         loss = -delta.where(delta < 0, 0)
         
-        # Calculate average gain and average loss
-        avg_gain = gain.rolling(window=window).mean()
-        avg_loss = loss.rolling(window=window).mean()
+        # First values
+        avg_gain = gain[:window].mean()
+        avg_loss = loss[:window].mean()
         
-        # Calculate RS (Relative Strength)
-        rs = avg_gain / avg_loss
+        # Initialize lists with first values
+        avg_gains = [avg_gain]
+        avg_losses = [avg_loss]
         
-        # Calculate RSI
+        # Apply Wilder's smoothing
+        for i in range(window, len(gain)):
+            avg_gain = ((avg_gains[-1] * (window - 1)) + gain.iloc[i]) / window
+            avg_loss = ((avg_losses[-1] * (window - 1)) + loss.iloc[i]) / window
+            avg_gains.append(avg_gain)
+            avg_losses.append(avg_loss)
+        
+        # Convert to Series with proper index
+        avg_gain_series = pd.Series(avg_gains, index=self.df.index[window-1:])
+        avg_loss_series = pd.Series(avg_losses, index=self.df.index[window-1:])
+        
+        # Calculate RS and RSI
+        rs = avg_gain_series / avg_loss_series
         rsi = 100 - (100 / (1 + rs))
         
-        # Add RSI to dataframe
-        self.df[f'rsi_{window}'] = rsi
+        # Add to dataframe
+        self.df[f'rsi_{window}'] = pd.Series(rsi, index=rsi.index)
     
     def _moving_average_convergence_divergence(self):
         """Trend-following momentum indicator."""
         self.df['ema_12'] = self.df['close'].ewm(span=12, adjust=False).mean()
         self.df['ema_26'] = self.df['close'].ewm(span=26, adjust=False).mean()
 
-        # Calculate MACD (the difference between 12-period EMA and 26-period EMA)
-        self.df['macd'] = self.df['ema_12'] - self.df['ema_26']
-        self.df = self.df.drop(["ema_12", "ema_26"], axis=1)  # Don't need that many ema's
-        # Calculate the 9-period EMA of MACD (Signal Line)
-        #self.df['signal_line'] = self.df['macd'].ewm(span=9, adjust=False).mean()  # not needed?
+        # Calculate MACD line (the difference between 12-period EMA and 26-period EMA)
+        self.df['macd_line'] = self.df['ema_12'] - self.df['ema_26']
+        
+        # Calculate the signal line (9-period EMA of MACD)
+        self.df['macd_signal'] = self.df['macd_line'].ewm(span=9, adjust=False).mean()
+        
+        # Calculate MACD histogram
+        self.df['macd_histogram'] = self.df['macd_line'] - self.df['macd_signal']
+        
+        # Drop intermediate EMAs if not needed
+        self.df = self.df.drop(["ema_12", "ema_26"], axis=1)
     
-    def _average_directional_index(self, lookback:int = 14):
+    def _average_directional_index(self, lookback=14):
         """Measures trend strength."""
-        plus_dm = self.df["high"].diff()
-        minus_dm = self.df["low"].diff()
-        plus_dm[plus_dm < 0] = 0
-        minus_dm[minus_dm > 0] = 0
+        # Calculate +DM and -DM
+        high_diff = self.df["high"].diff()
+        low_diff = self.df["low"].diff()
         
-        tr1 = pd.DataFrame(self.df["high"] - self.df["low"])
-        tr2 = pd.DataFrame(abs(self.df["high"] - self.df["close"].shift(1)))
-        tr3 = pd.DataFrame(abs(self.df["low"] - self.df["close"].shift(1)))
-        frames = [tr1, tr2, tr3]
-        tr = pd.concat(frames, axis = 1, join = 'inner').max(axis = 1)
-        atr = tr.rolling(lookback).mean()
+        # True +DM and -DM conditions
+        up_move = high_diff
+        down_move = -low_diff
         
-        plus_di = 100 * (plus_dm.ewm(alpha = 1/lookback).mean() / atr)
-        minus_di = abs(100 * (minus_dm.ewm(alpha = 1/lookback).mean() / atr))
-        dx = (abs(plus_di - minus_di) / abs(plus_di + minus_di)) * 100
-        adx = ((dx.shift(1) * (lookback - 1)) + dx) / lookback
-        self.df["adx_smooth"] = adx.ewm(alpha = 1/lookback).mean()
+        # +DM is up_move if up_move > down_move and up_move > 0, otherwise 0
+        plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
+        # -DM is down_move if down_move > up_move and down_move > 0, otherwise 0
+        minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0)
         
-    def _stochastic_oscillator(self, period=14):
-        # Create a copy of existing DataFrame to preserve original index
-        # Create new columns for storing values without modifying the index
-        self.df['best_low'] = float('nan')
-        self.df['best_high'] = float('nan')
-        self.df['fast_k'] = float('nan')
+        # Calculate True Range
+        tr1 = self.df["high"] - self.df["low"]
+        tr2 = abs(self.df["high"] - self.df["close"].shift(1))
+        tr3 = abs(self.df["low"] - self.df["close"].shift(1))
+        tr = pd.DataFrame({'tr1': tr1, 'tr2': tr2, 'tr3': tr3}).max(axis=1)
         
-        # Calculate %K values only where we have enough historical data
-        for i in range(period-1, len(self.df)):
-            # Get the window of data for the lookback period
-            window = self.df.iloc[i-period+1:i+1]
-            
-            # Find lowest low and highest high in the window
-            low = window['close'].min()
-            high = window['close'].max()
-            
-            # Store values in dataframe at the original index
-            idx = self.df.index[i]  # Get the actual index value
-            self.df.at[idx, 'best_low'] = low
-            self.df.at[idx, 'best_high'] = high
-            
-            # Calculate Fast %K with check for division by zero
-            if high != low:  # Avoid division by zero
-                self.df.at[idx, 'fast_k'] = 100 * ((self.df.iloc[i]['close'] - low) / (high - low))
-            else:
-                self.df.at[idx, 'fast_k'] = 50  # Default to middle value when high = low
+        # Smoothed TR, +DM, -DM using Wilder's smoothing
+        smoothed_tr = tr.rolling(window=lookback).sum()
+        smoothed_plus_dm = pd.Series(plus_dm).rolling(window=lookback).sum()
+        smoothed_minus_dm = pd.Series(minus_dm).rolling(window=lookback).sum()
         
-        # Calculate derivatives using the DataFrame's original index
-        self.df['fast_d'] = self.df['fast_k'].rolling(3).mean().round(2)
-        self.df['slow_k'] = self.df['fast_d']
-        self.df['slow_d'] = self.df['slow_k'].rolling(3).mean().round(2)
+        # For subsequent calculations after the initial lookback period
+        for i in range(lookback, len(tr)):
+            smoothed_tr.iloc[i] = smoothed_tr.iloc[i-1] - (smoothed_tr.iloc[i-1]/lookback) + tr.iloc[i]
+            smoothed_plus_dm.iloc[i] = smoothed_plus_dm.iloc[i-1] - (smoothed_plus_dm.iloc[i-1]/lookback) + plus_dm[i]
+            smoothed_minus_dm.iloc[i] = smoothed_minus_dm.iloc[i-1] - (smoothed_minus_dm.iloc[i-1]/lookback) + minus_dm[i]
+        
+        # Calculate +DI and -DI
+        plus_di = 100 * (smoothed_plus_dm / smoothed_tr)
+        minus_di = 100 * (smoothed_minus_dm / smoothed_tr)
+        
+        # Calculate DX
+        dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di)
+        
+        # Calculate ADX - smoothed DX
+        adx = dx.rolling(window=lookback).mean()
+        
+        # Add to dataframe
+        self.df["+di"] = plus_di
+        self.df["-di"] = minus_di
+        self.df["adx"] = adx
+        
+    def _stochastic_oscillator(self, k_period=14, d_period=3, slowing=3):
+        """Calculate Stochastic Oscillator."""
+        # Find the lowest low and highest high for the k_period
+        low_min = self.df['low'].rolling(window=k_period).min()
+        high_max = self.df['high'].rolling(window=k_period).max()
+        
+        # Calculate %K (Fast Stochastic)
+        # %K = 100 * (current close - lowest low) / (highest high - lowest low)
+        k_fast = 100 * (self.df['close'] - low_min) / (high_max - low_min)
+        
+        # Handle division by zero
+        k_fast = k_fast.replace([np.inf, -np.inf], np.nan).fillna(50)
+        
+        # Apply slowing period to fast %K 
+        k = k_fast.rolling(window=slowing).mean() if slowing > 1 else k_fast
+        
+        # Calculate %D (signal line) - simple moving average of %K
+        d = k.rolling(window=d_period).mean()
+        
+        # Add to dataframe
+        self.df['stoch_k'] = k
+        self.df['stoch_d'] = d
         
     # =============================================================================
     # Section: Time-based Features
