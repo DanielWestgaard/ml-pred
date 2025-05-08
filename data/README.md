@@ -87,7 +87,7 @@ Planned features to generate: WIP
 - <ins>Feature Transformations</ins>
   - **Log returns**: Instead of raw price changes (more normally distributed)
   - **Z-score normalization**: Standardizing indicators for better model performance
-  - Fourier transforms: For extracting cyclical components
+  - **Fourier transforms**: For extracting cyclical components
 
 ## About providers/
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>
