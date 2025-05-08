@@ -112,7 +112,7 @@ class FeatureGenerator():
         # Distance from recent low
         self.df['distance_from_low'] = (self.df['close'] / self.df['low'].rolling(lookback).min() - 1) * 100
         
-        # You could also add "distance from pivot points" if desired
+        # TODO: add "distance from pivot points"
         
     # =============================================================================
     # Section: Volume-Based Features
@@ -123,36 +123,48 @@ class FeatureGenerator():
         
         for period in num_periods:
             self.df[f'vma_{period}'] = self.df['volume'].rolling(window=period).mean()
-        
+            self.df[f'relative_volume_{period}'] = self.df['volume'] / self.df[f'vma_{period}']
+            
     def _volume_rate_of_change(self):
         """How rapidly volume is increasing/decreasing."""
-        self.df["vroc"] = self.df["volume"].pct_change()  # Am I using this right?
+        lookback_periods = [1, 5, 10, 20]
+        
+        for period in lookback_periods:
+            self.df[f"vroc_{period}"] = (self.df["volume"] / self.df["volume"].shift(period) - 1) * 100
         
     def _on_balance_volume(self):
-        """Cumulative indicator that relates volume to price changes. Could also be placed under Technical Indicators."""
-        obv = [0]
-        for i in range(1, len(self.df)):
-            if self.df['close'].iloc[i] > self.df['close'].iloc[i-1]:
-                obv.append(float(obv[-1] + self.df['volume'].iloc[i]))
-            elif self.df['close'].iloc[i] < self.df['close'].iloc[i-1]:
-                obv.append(float(obv[-1] - self.df['volume'].iloc[i]))
-            else:
-                obv.append(float(obv[-1]))
+        """Cumulative indicator that relates volume to price changes."""
+        # Calculate price direction
+        price_direction = np.sign(self.df['close'].diff())
+        # Set direction to 0 for unchanged prices
+        price_direction[self.df['close'].diff() == 0] = 0
+        # Calculate OBV
+        volume_direction = self.df['volume'] * price_direction
+        self.df['obv'] = volume_direction.cumsum()
         
-        self.df["obv"] = obv
-        
-    def _volume_profile(self):
-        """Distribution of volume at different price levels."""
-        vp = getVPWithOHLC(self.df, self.df.shape[0])  # minPrice, maxPrice, and aggregateVolume for each price bin
-        
-        vp.index = self.df.index  # align indexes
-        self.df = pd.concat([self.df, vp], axis=1)  # am I using it properly?
-        # Naming result columns differently
-        self.df["min_price_v"] = self.df["minPrice"]
-        self.df["max_price_v"] = self.df["maxPrice"]
-        self.df["aggregate_volume"] = self.df["aggregateVolume"]
-        # Dropping columns
-        self.df = self.df.drop(["minPrice", "maxPrice", "aggregateVolume"], axis=1)
+    def _volume_profile(self, num_bins=10, lookback=20):
+        """Calculate rolling volume profile with fixed number of bins."""
+        for i in range(lookback, len(self.df)):
+            window = self.df.iloc[i-lookback:i]
+            price_min = window['low'].min()
+            price_max = window['high'].max()
+            price_range = price_max - price_min
+            
+            if price_range > 0:  # Prevent division by zero
+                bin_size = price_range / num_bins
+                
+                for bin_num in range(num_bins):
+                    bin_low = price_min + bin_num * bin_size
+                    bin_high = bin_low + bin_size
+                    
+                    # Sum volume where price in this bin (approximation)
+                    bin_volume = window.loc[
+                        ((window['low'] >= bin_low) & (window['low'] < bin_high)) |
+                        ((window['high'] >= bin_low) & (window['high'] < bin_high)) |
+                        ((window['low'] <= bin_low) & (window['high'] >= bin_high))
+                    ]['volume'].sum()
+                    
+                    self.df.loc[self.df.index[i], f'vol_bin_{bin_num}'] = bin_volume
     
     # =============================================================================
     # Section: Technical Indicators
