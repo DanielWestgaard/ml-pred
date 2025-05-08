@@ -77,31 +77,42 @@ class FeatureGenerator():
         
     def _rate_of_change(self):
         """Price momentum: Rate of change (ROC) over various lookback periods."""
-        self.df["roc_close"] = self.df["close"].pct_change()  # Am I using this right?
+        lookback_periods = [1, 5, 10, 20, 60]
+        
+        for period in lookback_periods:
+            # Standard ROC formula: [(Close_t / Close_t-n) - 1] * 100
+            self.df[f"roc_{period}"] = (self.df["close"] / self.df["close"].shift(period) - 1) * 100
     
     def _average_true_range(self, period_atr:int = 14):
-        # ATR
+        """Average of true ranges over specified period. ATR measures volatility, taking into account any gaps in the price movement"""
         self.df["high_low"] = self.df["high"] - self.df["low"]                          # Current High — Current Low
         self.df["high_prev_close"] = abs(self.df["high"] - self.df["close"].shift(1))   # |Current High — Previous Close|
         self.df["low_prev_close"] = abs(self.df["low"] - self.df["close"].shift(1))     # |Current Low — Previous Close|
         self.df["true_range"] = self.df[['high_low', 'high_prev_close', 'low_prev_close']].max(axis=1)
         
-        self.df["atr"] = self.df["true_range"].rolling(window=period_atr).mean()
+        self.df["atr"] = self.df["true_range"].ewm(span=period_atr, adjust=False).mean()
         # Dropping used columns
         self.df = self.df.drop(columns=["high_low", "high_prev_close", "low_prev_close", "true_range"], axis=1)
 
     def _bollinger_bands(self, period_bb:int = 20):
-        # Bollinger Bands
+        """statistical chart characterizing the prices and volatility over time."""
         # middle band is sma
         self.df["std"] = self.df["close"].rolling(window=period_bb).std()  # rolling standard deviation
         num_std_dev = 2
         self.df['upper_band'] = self.df[f'sma_{period_bb}'] + (num_std_dev * self.df['std'])
         self.df['lower_band'] = self.df[f'sma_{period_bb}'] - (num_std_dev * self.df['std'])
+        # Add Bollinger Band Width
+        self.df['bb_width'] = (self.df['upper_band'] - self.df['lower_band']) / self.df[f'sma_{period_bb}']
         
-    def _support_resistance(self):
+    def _support_resistance(self, lookback=20):
         """Distance from recent high/lows."""
-        pass
-    
+        # Distance from recent high
+        self.df['distance_from_high'] = (self.df['close'] / self.df['high'].rolling(lookback).max() - 1) * 100
+        
+        # Distance from recent low
+        self.df['distance_from_low'] = (self.df['close'] / self.df['low'].rolling(lookback).min() - 1) * 100
+        
+        # You could also add "distance from pivot points" if desired
         
     # =============================================================================
     # Section: Volume-Based Features
