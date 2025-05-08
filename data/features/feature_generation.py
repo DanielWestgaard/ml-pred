@@ -257,7 +257,7 @@ class FeatureGenerator():
             self.df["stl"] = STL(self.df["date"], period=period)
             self.df["stl"] = MSTL(self.df["date"], periods=[24, 160])
         except Exception as e:
-            logging.warning(f"Error calculating seasonal decompose. Most likely problem with too little data: {e}")
+            logging.warning(f"Error calculating seasonal decompose: {e}")
     
     # =============================================================================
     # Section: Market Regime Features
