@@ -6,6 +6,7 @@ from volprofile import getVPWithOHLC
 from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
 
 from utils import data_utils
+from data.features.statistics import FeatureStatistics
 
 
 class FeatureGenerator():
@@ -55,7 +56,10 @@ class FeatureGenerator():
         self._normalize_features()
         self._fast_fourier_transforms()
         
-        print(self.df)
+        feature_stats = FeatureStatistics(self.df)
+        n_features, feature_list = feature_stats.generated_features()
+        logging.info(f"Generated {n_features} features.")
+        logging.debug(f"Generated features are: {feature_list}")
         
         return self.df
     
