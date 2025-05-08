@@ -48,6 +48,7 @@ class FeatureGenerator():
         self._moving_average_convergence_divergence()
         self._average_directional_index()  # wrong way to calculate and use??
         self._stochastic_oscillator()
+        self._commodity_channel_index()
         logging.debug("Finished calculating Technical Indicators")
         # Time-based Features
         self._day_of_week()
@@ -323,6 +324,49 @@ class FeatureGenerator():
         # Add to dataframe
         self.df['stoch_k'] = k
         self.df['stoch_d'] = d
+        
+    def _commodity_channel_index(self, period=20):
+        """Calculate Commodity Channel Index."""
+        # Typical Price
+        tp = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        
+        # Moving Average of Typical Price
+        ma_tp = tp.rolling(window=period).mean()
+        
+        # Mean Absolute Deviation (MAD)
+        mad = abs(tp - ma_tp).rolling(window=period).mean()
+        
+        # CCI
+        cci = (tp - ma_tp) / (0.015 * mad)
+        
+        self.df['cci'] = cci
+    
+    def _ichimoku_cloud(self, tenkan_period=9, kijun_period=26, senkou_b_period=52, displacement=26):
+        """Calculate Ichimoku Cloud components."""
+        # Tenkan-sen (Conversion Line): (highest high + lowest low) / 2 for the past tenkan_period
+        tenkan_sen = (self.df['high'].rolling(window=tenkan_period).max() + 
+                    self.df['low'].rolling(window=tenkan_period).min()) / 2
+        
+        # Kijun-sen (Base Line): (highest high + lowest low) / 2 for the past kijun_period
+        kijun_sen = (self.df['high'].rolling(window=kijun_period).max() + 
+                    self.df['low'].rolling(window=kijun_period).min()) / 2
+        
+        # Senkou Span A (Leading Span A): (Tenkan-sen + Kijun-sen) / 2 displaced forward displacement periods
+        senkou_span_a = ((tenkan_sen + kijun_sen) / 2).shift(displacement)
+        
+        # Senkou Span B (Leading Span B): (highest high + lowest low) / 2 for the past senkou_b_period, displaced forward displacement periods
+        senkou_span_b = ((self.df['high'].rolling(window=senkou_b_period).max() + 
+                        self.df['low'].rolling(window=senkou_b_period).min()) / 2).shift(displacement)
+        
+        # Chikou Span (Lagging Span): Current closing price, displaced backwards displacement periods
+        chikou_span = self.df['close'].shift(-displacement)
+        
+        # Add to dataframe
+        self.df['ichimoku_tenkan'] = tenkan_sen
+        self.df['ichimoku_kijun'] = kijun_sen
+        self.df['ichimoku_senkou_a'] = senkou_span_a
+        self.df['ichimoku_senkou_b'] = senkou_span_b
+        self.df['ichimoku_chikou'] = chikou_span
         
     # =============================================================================
     # Section: Time-based Features
