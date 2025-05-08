@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
 import numpy as np
+from scipy.fft import fft, ifft
 from volprofile import getVPWithOHLC
 from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
 
@@ -52,6 +53,7 @@ class FeatureGenerator():
         # Feature Transformations
         self._log_returns()  # Is this implemented right?
         self._normalize_features()
+        self._fast_fourier_transforms()
         
         print(self.df)
         
@@ -311,3 +313,17 @@ class FeatureGenerator():
             
             # Add to dataframe
             self.df[f'{col}_zscore'] = z_score
+
+    def _fast_fourier_transforms(self):
+        "For extracting cyclical components."
+        # self.df["fft"] = fft(self.df["close"])
+        
+        # Number of samplepoints
+        N = len(self.df)
+        
+        # Sample spacing
+        T = 1.0 / 800.0  # ?
+        x = np.linspace(0.0, N*T, N)
+        y = np.sin(50.0 * 2.0*np.pi*x) + 0.5*np.sin(80.0 * 2.0*np.pi*x)
+        self.df["fft"] = fft(y)  # is this how it's used?? - weird reuslts, eg. 1.3549970-0.0000000j
+        
