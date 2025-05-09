@@ -62,9 +62,8 @@ NSY...
 ## About features/
 Code related to creating and selecting features with prediction power to help a ML model train and predict.
 ### Feature Generation
-The feature generator generates a lot of features (100+). I have tried to implement and use a lot of the major technical indicators and features types relevant for financial time series. The easiest way to get a quick glance on the features are through ```run()``` in the ```FeatureGenerator``` class<br>
-> [!NOTE]
-> The file does not, currently, have great error handling, and some features are dependant on others to exist to calculate themselves.
+The feature generator generates a lot of features (100+). I have tried to implement and use a lot of the major technical indicators and features types relevant for financial time series. The easiest way to get a quick glance on the features are through ```run()``` in the ```FeatureGenerator``` class.<br>
+To handle errors, but also keep a more simplistic code, have I implemented ```safely_execute()``` that I run/calculate all features through. This way error handling is improved (not the best) and code is still simplistic.
 
 ## About providers/ 
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>
