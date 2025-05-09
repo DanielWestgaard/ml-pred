@@ -75,3 +75,12 @@ def get_available_filename(directory:str, filename:str):
         if not os.path.exists(os.path.join(directory, new_filename)):
             return new_filename
         counter += 1
+        
+
+def time_start():
+    """This method is meant to start a timer."""
+    pass
+
+def time_stop():
+    """This method is meant to stop a started timer."""
+    pass

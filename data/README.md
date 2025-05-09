@@ -19,21 +19,23 @@ Will also use this for planning.
 │   └── alpha_vantage.py        # Stock Market Data API, 30 days free intraday market data
 │
 ├── processing/                 # Data transformation
-│   ├── cleaning.py
-│   ├── validation.py           # Don't know if this is relevant but
-│   ├── normalization.py        # Rescaling numeric data to a standard range
+│   ├── cleaning.py             # Cleaning data (missing values, duplicates, alignement, etc.)
+│   └── validation.py           # Validating cleaned data
 │
 ├── features/                   # Feature engineering
+│   ├── generation.py           # Generating features with simplistic error handling
+│   ├── normalization.py        # Rescaling numeric data to a standard range
 │   └── ...
 │
 ├── pipeline/                   # Pipeline orchestration
-│   └── ...
+│   └── engineer_pipeline.py    # Main orchestrator and pipeline for engineering historical data
 │
 └── README.md
 ```
 
 ## Important notes:
-- Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment()
+- Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment(). Should be improved when using other providers using another timezone.
+- The library pandas_lib could really help with calculating features, but the following error appears on (on any Python version) ``` ImportError: cannot import name 'NaN' from 'numpy' ```. After some reasearch, this appears after numpy version 2.0. Considering I'll use this project and the whole pipeline on other servers/machines one day, I will create my own functions/calculations as to not rely on older libraries.
 
 ## About pipelines/
 ...
@@ -58,10 +60,13 @@ Simple validation class that performs validation of data after cleaning, to veri
 ### 4. Normalization
 NSY...
 
-## About features (?)
-...
+## About features/
+Code related to creating and selecting features with prediction power to help a ML model train and predict.
+### Feature Generation
+The feature generator generates a lot of features (100+). I have tried to implement and use a lot of the major technical indicators and features types relevant for financial time series. The easiest way to get a quick glance on the features are through ```run()``` in the ```FeatureGenerator``` class.<br>
+To handle errors, but also keep a more simplistic code, have I implemented ```safely_execute()``` that I run/calculate all features through. This way error handling is improved (not the best) and code is still simplistic.
 
-## About providers/
+## About providers/ 
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>
 Default behaviour is to store the files under storage/data and under the respective provider.
 ### Capital.com

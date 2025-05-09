@@ -23,7 +23,8 @@ It's important to note that this will probably not be the very best system, as I
 ## Setup repo
 If this is the first time using the repo, follow these instructions:
 1. Clone the environment (eg.): ``` git clone git@github.com:DanielWestgaard/ml-pred.git ```
-2. Create a virtual environment (in root of project): ``` python -m venv venv ```
+2. Create a virtual environment (in root of project): ``` python3.11 -m venv venv ```
+    - Recommended Python version: 3.11
 3. Install dependencies: ``` pip install -r requirements.txt ```
 4. Create secrets path: ``` mkdir secrets; cd secrets; touch secrets.txt; cd .. ```. Then, fill in the following (based on what you will use in the repo):
     - **For using Capital.com's [API](https://open-api.capital.com/)**: 

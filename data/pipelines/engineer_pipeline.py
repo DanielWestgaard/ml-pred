@@ -7,6 +7,8 @@ from utils import shared_utils
 import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
+from data.features.generation import FeatureGenerator
+
 
 class EngineeringPipeline():
     def __init__(self, raw_dataset : str, output_path : str = None):
@@ -46,6 +48,8 @@ class EngineeringPipeline():
         data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
         # Feature Generation
+        self.feature_generator = FeatureGenerator(self.df)
+        self.df = self.feature_generator.run()
         
         # Normalization
         
