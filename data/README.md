@@ -62,38 +62,11 @@ NSY...
 ## About features/
 Code related to creating and selecting features with prediction power to help a ML model train and predict.
 ### Feature Generation
-Planned features to generate: WIP
-- <ins>Price Action Features</ins>
-  - **Moving Averages**: Simple and exponential moving averages (SMAs/EMAs) over different time periods (5, 10, 20, 50, 200 periods)
-  - **Price Momentum**: Rate of change (ROC) over various lookback periods
-  - **Volatility Indicators**: Average True Range (ATR), Bollinger Band width
-  - **Support/Resistance**: Distance from recent highs/lows
-- <ins>Volume-Based Features</ins>
-  - **Volume Moving Averages**: To identify unusual volume spikes
-  - **Volume Rate of Change**: How rapidly volume is increasing/decreasing
-  - **On-Balance Volume (OBV)**: Cumulative indicator that relates volume to price changes
-  - **Volume Profile**: Distribution of volume at different price levels
-  - **Volume-Weighted Average Price**
-  - **Money Flow Index**
-- <ins>Technical Indicators</ins>
-  - **RSI (Relative Strength Index)**: Measures momentum and overbought/oversold conditions
-  - **MACD (Moving Average Convergence Divergence)**: Trend-following momentum indicator
-  - **ADX (Average Directional Index)**: Measures trend strength
-  - **Stochastic Oscillator**: Compares current price to range over time period
-  - **Commodity Channel Index**
-  - **Ichimoku Cloud**
-- <ins>Time-Based Features</ins>
-  - **Time of day/week/month features**: Markets often exhibit cyclical patterns
-  - **Seasonality components**: Extracted using decomposition methods
-- <ins>Market Regime Features</ins>
-  - Volatility regimes: High vs. low volatility periods
-  - Trend strength indicators: To identify trending vs. ranging markets
-- <ins>Feature Transformations</ins>
-  - **Log returns**: Instead of raw price changes (more normally distributed)
-  - **Z-score normalization**: Standardizing indicators for better model performance
-  - **Fourier transforms**: For extracting cyclical components
+The feature generator generates a lot of features (100+). I have tried to implement and use a lot of the major technical indicators and features types relevant for financial time series. The easiest way to get a quick glance on the features are through ```run()``` in the ```FeatureGenerator``` class<br>
+> [!NOTE]
+> The file does not, currently, have great error handling, and some features are dependant on others to exist to calculate themselves.
 
-## About providers/
+## About providers/ 
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>
 Default behaviour is to store the files under storage/data and under the respective provider.
 ### Capital.com
