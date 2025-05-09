@@ -4,6 +4,7 @@ import numpy as np
 import scipy
 from scipy.fft import fft, fftfreq
 from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
+import time
 
 from utils import data_utils
 from data.features.statistics import FeatureStatistics
@@ -117,8 +118,11 @@ class FeatureGenerator():
     def safely_execute(self, method_name, feature_name):
         """Safely execute a feature generation method with proper error handling."""
         try:
+            start = time.time()
             method = getattr(self, method_name)
             method()
+            end = time.time()
+            logging.debug(f"Feature {feature_name} took {end - start} seconds to calculate.")
             return True
         except Exception as e:
             logging.error(f"Error generating {feature_name}: {str(e)}")
