@@ -21,67 +21,114 @@ class FeatureGenerator():
         returns:
             dataset with all generated features 
         """
-    
-        # Load dataset based on format
-        self.df, self.original_df = data_utils.check_and_return_df(dataset)
+        try:
+            # Load dataset based on format
+            self.df, self.original_df = data_utils.check_and_return_df(dataset)
+            
+            # Validate that required columns exist
+            required_columns = ['open', 'high', 'low', 'close', 'volume']
+            missing_columns = [col for col in required_columns if col not in self.df.columns]
+            
+            if missing_columns:
+                raise ValueError(f"Missing required columns: {missing_columns}. Dataset must contain OHLCV data.")
+            
+            # Check for empty dataset
+            if len(self.df) == 0:
+                raise ValueError("Empty dataset provided. Cannot generate features.")
+                
+            # Check for sufficient data (at least 200 rows for long-term features)
+            if len(self.df) < 200:
+                logging.warning(f"Dataset contains only {len(self.df)} rows. Some features requiring longer lookback periods may not be generated properly.")
+                
+            # Check for NaN values in required columns
+            nan_counts = self.df[required_columns].isna().sum()
+            if nan_counts.sum() > 0:
+                logging.warning(f"Dataset contains NaN values: {nan_counts}. Some features may be affected.")
+                
+        except Exception as e:
+            logging.error(f"Error initializing FeatureGenerator: {str(e)}")
+            raise
         
     def run(self):
         """Run feature generation on provided dataset."""
+        generated_features = []
         
-        # Price Action Features
-        self._moving_averages()
-        self._rate_of_change()
-        self._average_true_range()
-        self._bollinger_bands()
-        self._support_resistance()
-        logging.debug("Finished calculating Price Action Features")
-        # Volume-Based Features
-        self._volume_moving_averages()
-        self._volume_rate_of_change()
-        self._on_balance_volume()
-        self._volume_profile()
-        self._vwap()
-        self._money_flow_index()
-        logging.debug("Finished calculating Volume-Based Features")
-        # Technical Indicators
-        self._relative_strength_index()
-        self._moving_average_convergence_divergence()
-        self._average_directional_index()
-        self._stochastic_oscillator()
-        self._commodity_channel_index()
-        logging.debug("Finished calculating Technical Indicators")
-        # Time-based Features
-        self._time_of_day()
-        self._day_of_week()
-        self._time_of_week()
-        self._time_of_month()
-        self._seasonal_decompose()
-        self._stl_decomposition()
-        self._mstl_decomposition()
-        self._holiday_features()
-        logging.debug("Finished calculating Time-based Features")
-        # Market Regime Features
-        self._volatility_regimes()
-        self._trend_strength_indicators()
-        self._market_state_indicators()
-        # Feature Transformations
-        self._log_returns()
-        self._fast_fourier_transforms()
-        
-        feature_stats = FeatureStatistics(self.df)
-        n_features, feature_list = feature_stats.generated_features()
-        logging.info(f"Generated {n_features} features.")
-        logging.debug(f"Generated features are: {feature_list}")
-        
-        # print(self.df)
-        
-        return self.df
+        try:
+            # Price Action Features
+            self.safely_execute("moving_averages", "Moving Averages")
+            self.safely_execute("rate_of_change", "Rate of Change")
+            self.safely_execute("average_true_range", "Average True Range")
+            self.safely_execute("bollinger_bands", "Bollinger Bands")
+            self.safely_execute("support_resistance", "Support and Resistance")
+            logging.debug("Finished calculating Price Action Features")
+            
+            # Volume-Based Features
+            self.safely_execute("volume_moving_averages", "Volume Moving Averages")
+            self.safely_execute("volume_rate_of_change", "Volume Rate of Change")
+            self.safely_execute("on_balance_volume", "On Balance Volume")
+            self.safely_execute("volume_profile", "Volume Profile")
+            self.safely_execute("vwap", "VWAP")
+            self.safely_execute("money_flow_index", "Money Flow Index")
+            logging.debug("Finished calculating Volume-Based Features")
+            
+            # Technical Indicators
+            self.safely_execute("relative_strength_index", "Relative Strength Index")
+            self.safely_execute("moving_average_convergence_divergence", "MACD")
+            self.safely_execute("average_directional_index", "Average Directional Index")
+            self.safely_execute("stochastic_oscillator", "Stochastic Oscillator")
+            self.safely_execute("commodity_channel_index", "Commodity Channel Index")
+            logging.debug("Finished calculating Technical Indicators")
+            
+            # Time-based Features
+            self.safely_execute("time_of_day", "Time of Day")
+            self.safely_execute("day_of_week", "Day of Week")
+            self.safely_execute("time_of_week", "Time of Week")
+            self.safely_execute("time_of_month", "Time of Month")
+            self.safely_execute("seasonal_decompose", "Seasonal Decomposition")
+            self.safely_execute("stl_decomposition", "STL Decomposition")
+            self.safely_execute("mstl_decomposition", "MSTL Decomposition")
+            self.safely_execute("holiday_features", "Holiday Features")
+            logging.debug("Finished calculating Time-based Features")
+            
+            # Market Regime Features
+            self.safely_execute("volatility_regimes", "Volatility Regimes")
+            self.safely_execute("trend_strength_indicators", "Trend Strength Indicators")
+            self.safely_execute("market_state_indicators", "Market State Indicators")
+            
+            # Feature Transformations
+            self.safely_execute("log_returns", "Log Returns")
+            self.safely_execute("fast_fourier_transforms", "Fast Fourier Transforms")
+            
+            try:
+                feature_stats = FeatureStatistics(self.df)
+                n_features, feature_list = feature_stats.generated_features()
+                logging.info(f"Generated {n_features} features.")
+                logging.debug(f"Generated features are: {feature_list}")
+            except Exception as e:
+                logging.error(f"Error calculating feature statistics: {str(e)}")
+                
+        except Exception as e:
+            logging.error(f"Unexpected error during feature generation: {str(e)}")
+            
+        finally:
+            # Always return the DataFrame, even if some features failed to generate
+            return self.df
+    
+    def safely_execute(self, method_name, feature_name):
+        """Safely execute a feature generation method with proper error handling."""
+        try:
+            method = getattr(self, method_name)
+            method()
+            return True
+        except Exception as e:
+            logging.error(f"Error generating {feature_name}: {str(e)}")
+            return False
     
     # =============================================================================
     # Section: Price Action Features
     # =============================================================================
     
-    def _moving_averages(self):
+    def moving_averages(self):
         """Generating/calculating both simple and exponential moving averages over different time periods."""
         num_periods = [5, 10, 20, 50, 200]
         
@@ -89,7 +136,7 @@ class FeatureGenerator():
             self.df[f"sma_{period}"] = self.df["close"].rolling(window=period).mean()
             self.df[f"ema_{period}"] = self.df["close"].ewm(span=period, adjust=False, min_periods=period).mean()
         
-    def _rate_of_change(self):
+    def rate_of_change(self):
         """Price momentum: Rate of change (ROC) over various lookback periods."""
         lookback_periods = [1, 5, 10, 20, 60]
         
@@ -97,7 +144,7 @@ class FeatureGenerator():
             # Standard ROC formula: [(Close_t / Close_t-n) - 1] * 100
             self.df[f"roc_{period}"] = (self.df["close"] / self.df["close"].shift(period) - 1) * 100
     
-    def _average_true_range(self, period_atr:int = 14):
+    def average_true_range(self, period_atr:int = 14):
         """Average of true ranges over specified period. ATR measures volatility, taking into account any gaps in the price movement"""
         self.df["high_low"] = self.df["high"] - self.df["low"]                          # Current High — Current Low
         self.df["high_prev_close"] = abs(self.df["high"] - self.df["close"].shift(1))   # |Current High — Previous Close|
@@ -108,7 +155,7 @@ class FeatureGenerator():
         # Dropping used columns
         self.df = self.df.drop(columns=["high_low", "high_prev_close", "low_prev_close", "true_range"], axis=1)
 
-    def _bollinger_bands(self, period_bb:int = 20):
+    def bollinger_bands(self, period_bb:int = 20):
         """Statistical chart characterizing the prices and volatility over time. Represent standard deviation channels around price"""
         # middle band is sma
         self.df["std"] = self.df["close"].rolling(window=period_bb).std()  # rolling standard deviation
@@ -118,7 +165,7 @@ class FeatureGenerator():
         # Add Bollinger Band Width
         self.df['bb_width'] = (self.df['upper_band'] - self.df['lower_band']) / self.df[f'sma_{period_bb}']
         
-    def _support_resistance(self, lookback=20):
+    def support_resistance(self, lookback=20):
         """Distance from recent high/lows."""
         # Distance from recent high
         self.df['distance_from_high'] = (self.df['close'] / self.df['high'].rolling(lookback).max() - 1) * 100
@@ -131,7 +178,7 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Volume-Based Features
     # =============================================================================
-    def _volume_moving_averages(self):
+    def volume_moving_averages(self):
         """Identify unusual volume spikes."""
         num_periods = [7, 15, 30, 60]
         
@@ -139,14 +186,14 @@ class FeatureGenerator():
             self.df[f'vma_{period}'] = self.df['volume'].rolling(window=period).mean()
             self.df[f'relative_volume_{period}'] = self.df['volume'] / self.df[f'vma_{period}']
             
-    def _volume_rate_of_change(self):
+    def volume_rate_of_change(self):
         """How rapidly volume is increasing/decreasing."""
         lookback_periods = [1, 5, 10, 20]
         
         for period in lookback_periods:
             self.df[f"vroc_{period}"] = (self.df["volume"] / self.df["volume"].shift(period) - 1) * 100
         
-    def _on_balance_volume(self):
+    def on_balance_volume(self):
         """Cumulative indicator that relates volume to price changes."""
         # Calculate price direction
         price_direction = np.sign(self.df['close'].diff())
@@ -156,7 +203,7 @@ class FeatureGenerator():
         volume_direction = self.df['volume'] * price_direction
         self.df['obv'] = volume_direction.cumsum()
         
-    def _volume_profile(self, num_bins=10, lookback=20, key_metrics=True):
+    def volume_profile(self, num_bins=10, lookback=20, key_metrics=True):
         """
         Calculate rolling volume profile with adaptive bins and key metrics.
         
@@ -261,12 +308,12 @@ class FeatureGenerator():
         if 'typical_price' in self.df.columns:
             self.df = self.df.drop(['typical_price'], axis=1)
     
-    def _vwap(self, period=1):
+    def vwap(self, period=1):
         """Calculate daily Volume Weighted Average Price."""
         # Assuming you have date info in index or as a column
         self.df['vwap'] = (self.df['volume'] * (self.df['high'] + self.df['low'] + self.df['close']) / 3).rolling(period).sum() / self.df['volume'].rolling(period).sum()
         
-    def _money_flow_index(self, period=14):
+    def money_flow_index(self, period=14):
         """Calculate Money Flow Index - a volume-weighted RSI."""
         # Typical price
         self.df['typical_price'] = (self.df['high'] + self.df['low'] + self.df['close']) / 3
@@ -298,7 +345,7 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Technical Indicators
     # =============================================================================
-    def _relative_strength_index(self, window=14):
+    def relative_strength_index(self, window=14):
         """Calculate RSI using Wilder's smoothing method."""
         delta = self.df["close"].diff()
         gain = delta.where(delta > 0, 0)
@@ -330,7 +377,7 @@ class FeatureGenerator():
         # Add to dataframe
         self.df[f'rsi_{window}'] = pd.Series(rsi, index=rsi.index)
     
-    def _moving_average_convergence_divergence(self):
+    def moving_average_convergence_divergence(self):
         """Trend-following momentum indicator."""
         self.df['ema_12'] = self.df['close'].ewm(span=12, adjust=False).mean()
         self.df['ema_26'] = self.df['close'].ewm(span=26, adjust=False).mean()
@@ -347,7 +394,7 @@ class FeatureGenerator():
         # Drop intermediate EMAs if not needed
         self.df = self.df.drop(["ema_12", "ema_26"], axis=1)
     
-    def _average_directional_index(self, lookback=14):
+    def average_directional_index(self, lookback=14):
         """Measures trend strength."""
         # Calculate +DM and -DM
         high_diff = self.df["high"].diff()
@@ -394,7 +441,7 @@ class FeatureGenerator():
         self.df["-di"] = minus_di
         self.df["adx"] = adx
         
-    def _stochastic_oscillator(self, k_period=14, d_period=3, slowing=3):
+    def stochastic_oscillator(self, k_period=14, d_period=3, slowing=3):
         """Calculate Stochastic Oscillator."""
         # Find the lowest low and highest high for the k_period
         low_min = self.df['low'].rolling(window=k_period).min()
@@ -417,7 +464,7 @@ class FeatureGenerator():
         self.df['stoch_k'] = k
         self.df['stoch_d'] = d
         
-    def _commodity_channel_index(self, period=20):
+    def commodity_channel_index(self, period=20):
         """Calculate Commodity Channel Index."""
         # Typical Price
         tp = (self.df['high'] + self.df['low'] + self.df['close']) / 3
@@ -433,7 +480,7 @@ class FeatureGenerator():
         
         self.df['cci'] = cci
     
-    def _ichimoku_cloud(self, tenkan_period=9, kijun_period=26, senkou_b_period=52, displacement=26):
+    def ichimoku_cloud(self, tenkan_period=9, kijun_period=26, senkou_b_period=52, displacement=26):
         """Calculate Ichimoku Cloud components."""
         # Tenkan-sen (Conversion Line): (highest high + lowest low) / 2 for the past tenkan_period
         tenkan_sen = (self.df['high'].rolling(window=tenkan_period).max() + 
@@ -463,7 +510,7 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Time-based Features
     # =============================================================================
-    def _time_of_day(self):
+    def time_of_day(self):
         """Extract time of day features from datetime index."""
         # Extract hour of day
         hour = self.df.index.hour
@@ -481,7 +528,7 @@ class FeatureGenerator():
             labels=['asian_session', 'european_session', 'us_session']
         )
     
-    def _time_of_week(self):
+    def time_of_week(self):
         """Extract time of week features from datetime index."""
         # Calculate the hour within the week (0-167)
         day_of_week = self.df.index.dayofweek  # Monday=0, Sunday=6
@@ -495,7 +542,7 @@ class FeatureGenerator():
         # Flag for weekend
         self.df['is_weekend'] = (day_of_week >= 5).astype(int)
     
-    def _time_of_month(self):
+    def time_of_month(self):
         """Extract time of month features from datetime index."""
         # Extract day of month
         day = self.df.index.day
@@ -520,7 +567,7 @@ class FeatureGenerator():
         self.df['month_of_year_sin'] = np.sin(2 * np.pi * month / 12)
         self.df['month_of_year_cos'] = np.cos(2 * np.pi * month / 12)
     
-    def _day_of_week(self):
+    def day_of_week(self):
         """Extract day of week features from datetime index."""
         day_of_week = self.df.index.dayofweek  # Monday=0, Sunday=6
         
@@ -528,7 +575,7 @@ class FeatureGenerator():
         self.df['day_of_week_sin'] = np.sin(2 * np.pi * day_of_week / 7)
         self.df['day_of_week_cos'] = np.cos(2 * np.pi * day_of_week / 7)
         
-    def _seasonal_decompose(self, period=160):
+    def seasonal_decompose(self, period=160):
         """
         Perform seasonal decomposition on the closing price.
         Adds trend, seasonal, and residual components to the dataframe.
@@ -561,7 +608,7 @@ class FeatureGenerator():
         except Exception as e:
             logging.warning(f"Error calculating seasonal decompose: {e}")
             
-    def _stl_decomposition(self, period=160):
+    def stl_decomposition(self, period=160):
         """
         Perform STL decomposition on the closing price.
         STL is more robust to outliers than classical decomposition.
@@ -591,7 +638,7 @@ class FeatureGenerator():
         except Exception as e:
             logging.warning(f"Error calculating STL decomposition: {e}")
             
-    def _mstl_decomposition(self, periods=[24, 160]):
+    def mstl_decomposition(self, periods=[24, 160]):
         """
         Perform MSTL decomposition for multiple seasonality components.
         Good for data with intraday and multi-day patterns.
@@ -621,7 +668,7 @@ class FeatureGenerator():
         except Exception as e:
             logging.warning(f"Error calculating MSTL decomposition: {e}")
             
-    def _holiday_features(self):
+    def holiday_features(self):
         """
         Add features for market holidays and special events.
         Requires holidays package: pip install holidays
@@ -657,7 +704,7 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Market Regime Features
     # =============================================================================
-    def _volatility_regimes(self, lookback_short=20, lookback_long=100, n_regimes=3):
+    def volatility_regimes(self, lookback_short=20, lookback_long=100, n_regimes=3):
         """
         Identify volatility regimes (high, medium, low) based on historical volatility.
         
@@ -713,7 +760,7 @@ class FeatureGenerator():
         # Volatility acceleration/deceleration
         self.df['volatility_change'] = self.df['volatility_short'].pct_change(5)  # 5-period change rate
 
-    def _trend_strength_indicators(self, lookback=20, adx_threshold=25):
+    def trend_strength_indicators(self, lookback=20, adx_threshold=25):
         """
         Create indicators to identify trending vs. ranging markets.
         
@@ -808,7 +855,7 @@ class FeatureGenerator():
         trend_dummies = pd.get_dummies(self.df['trend_regime'], prefix='trend_regime')
         self.df = pd.concat([self.df, trend_dummies], axis=1)
 
-    def _market_state_indicators(self, window=20):
+    def market_state_indicators(self, window=20):
         """
         Generate overall market state indicators that combine volatility and trend regimes.
         Note: This depends on volatility regime existing in the df. TODO: Add better handling for that.
@@ -877,11 +924,11 @@ class FeatureGenerator():
     # =============================================================================
     # Section: Feature Transformations
     # =============================================================================
-    def _log_returns(self):
+    def log_returns(self):
         """Logarithmic returns: measure the percentage change in the price of an asset over a specific period."""
         self.df['log_return'] = np.log( self.df['close'] / self.df['close'].shift(1) )
 
-    def _fast_fourier_transforms(self, column='close', n_components=5):
+    def fast_fourier_transforms(self, column='close', n_components=5):
         """
         Extract cyclical components using Fast Fourier Transform.
         
