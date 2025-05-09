@@ -19,15 +19,16 @@ Will also use this for planning.
 │   └── alpha_vantage.py        # Stock Market Data API, 30 days free intraday market data
 │
 ├── processing/                 # Data transformation
-│   ├── cleaning.py
-│   ├── validation.py           # Don't know if this is relevant but
-│   ├── normalization.py        # Rescaling numeric data to a standard range
+│   ├── cleaning.py             # Cleaning data (missing values, duplicates, alignement, etc.)
+│   └── validation.py           # Validating cleaned data
 │
 ├── features/                   # Feature engineering
+│   ├── generation.py           # Generating features with simplistic error handling
+│   ├── normalization.py        # Rescaling numeric data to a standard range
 │   └── ...
 │
 ├── pipeline/                   # Pipeline orchestration
-│   └── ...
+│   └── engineer_pipeline.py    # Main orchestrator and pipeline for engineering historical data
 │
 └── README.md
 ```
