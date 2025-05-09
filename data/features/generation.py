@@ -116,7 +116,7 @@ class FeatureGenerator():
             return self.df
     
     def safely_execute(self, method_name, feature_name):
-        """Safely execute a feature generation method with proper error handling."""
+        """Safely execute and time a feature generation method with proper error handling."""
         try:
             start = time.time()
             method = getattr(self, method_name)
