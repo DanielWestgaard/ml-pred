@@ -2,8 +2,7 @@ import logging
 import pandas as pd
 import numpy as np
 import scipy
-from scipy.fft import fft, ifft, fftfreq
-from volprofile import getVPWithOHLC
+from scipy.fft import fft, fftfreq
 from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
 
 from utils import data_utils
@@ -32,9 +31,9 @@ class FeatureGenerator():
         # Price Action Features
         self._moving_averages()
         self._rate_of_change()
-        self._average_true_range()  # wrong implementation?
-        self._bollinger_bands()  # bad implementation?
-        self._support_resistance()  # not sure how to do, yet
+        self._average_true_range()
+        self._bollinger_bands()
+        self._support_resistance()
         logging.debug("Finished calculating Price Action Features")
         # Volume-Based Features
         self._volume_moving_averages()
@@ -45,9 +44,9 @@ class FeatureGenerator():
         self._money_flow_index()
         logging.debug("Finished calculating Volume-Based Features")
         # Technical Indicators
-        self._relative_strength_index()  # unsure of impmlementation
+        self._relative_strength_index()
         self._moving_average_convergence_divergence()
-        self._average_directional_index()  # wrong way to calculate and use??
+        self._average_directional_index()
         self._stochastic_oscillator()
         self._commodity_channel_index()
         logging.debug("Finished calculating Technical Indicators")
@@ -56,7 +55,7 @@ class FeatureGenerator():
         self._day_of_week()
         self._time_of_week()
         self._time_of_month()
-        self._seasonal_decompose()  # not properly working or handling for different timeframes
+        self._seasonal_decompose()
         self._stl_decomposition()
         self._mstl_decomposition()
         self._holiday_features()
@@ -66,7 +65,7 @@ class FeatureGenerator():
         self._trend_strength_indicators()
         self._market_state_indicators()
         # Feature Transformations
-        self._log_returns()  # Is this implemented right?
+        self._log_returns()
         self._fast_fourier_transforms()
         
         feature_stats = FeatureStatistics(self.df)
@@ -110,7 +109,7 @@ class FeatureGenerator():
         self.df = self.df.drop(columns=["high_low", "high_prev_close", "low_prev_close", "true_range"], axis=1)
 
     def _bollinger_bands(self, period_bb:int = 20):
-        """statistical chart characterizing the prices and volatility over time."""
+        """Statistical chart characterizing the prices and volatility over time. Represent standard deviation channels around price"""
         # middle band is sma
         self.df["std"] = self.df["close"].rolling(window=period_bb).std()  # rolling standard deviation
         num_std_dev = 2
@@ -157,29 +156,110 @@ class FeatureGenerator():
         volume_direction = self.df['volume'] * price_direction
         self.df['obv'] = volume_direction.cumsum()
         
-    def _volume_profile(self, num_bins=10, lookback=20):
-        """Calculate rolling volume profile with fixed number of bins."""
+    def _volume_profile(self, num_bins=10, lookback=20, key_metrics=True):
+        """
+        Calculate rolling volume profile with adaptive bins and key metrics.
+        
+        Volume Profile shows the distribution of trading volume across price levels,
+        identifying areas of high interest/liquidity in the market.
+        
+        Parameters:
+        -----------
+        num_bins : int
+            Number of price bins to divide the range into
+        lookback : int
+            Number of periods to include in each rolling calculation
+        key_metrics : bool
+            Whether to calculate key volume profile metrics (POC, value area, etc.)
+        """
+        # Pre-allocate arrays for optimization
+        vol_profiles = np.zeros((len(self.df), num_bins))
+        
+        # Vectorized calculation of min/max for each window
+        rolling_min = self.df['low'].rolling(window=lookback).min()
+        rolling_max = self.df['high'].rolling(window=lookback).max()
+        
+        # Calculate VWAP for each period for better volume distribution
+        self.df['typical_price'] = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        
+        # Process each window more efficiently
         for i in range(lookback, len(self.df)):
             window = self.df.iloc[i-lookback:i]
-            price_min = window['low'].min()
-            price_max = window['high'].max()
+            price_min = rolling_min.iloc[i]
+            price_max = rolling_max.iloc[i]
             price_range = price_max - price_min
             
             if price_range > 0:  # Prevent division by zero
                 bin_size = price_range / num_bins
                 
+                # Calculate volume distribution using typical price for better accuracy
+                for j, row in window.iterrows():
+                    # Determine which bin this bar's volume belongs to
+                    bin_idx = min(num_bins - 1, int((row['typical_price'] - price_min) / bin_size))
+                    
+                    # Add time decay - more recent volume has higher weight
+                    time_factor = 1 + 0.1 * (window.index.get_loc(j) / lookback)  # 10% boost for recent data
+                    vol_profiles[i, bin_idx] += row['volume'] * time_factor
+                    
+                # Normalize the volume profile (percentage of total volume)
+                total_vol = np.sum(vol_profiles[i])
+                if total_vol > 0:
+                    vol_profiles[i] = vol_profiles[i] / total_vol * 100
+                
+                # Add to dataframe
                 for bin_num in range(num_bins):
-                    bin_low = price_min + bin_num * bin_size
-                    bin_high = bin_low + bin_size
+                    self.df.loc[self.df.index[i], f'vol_bin_{bin_num}'] = vol_profiles[i, bin_num]
+                
+                # Calculate key volume profile metrics
+                if key_metrics:
+                    # Point of Control (POC) - price level with highest volume
+                    poc_bin = np.argmax(vol_profiles[i])
+                    poc_price = price_min + (poc_bin + 0.5) * bin_size
+                    self.df.loc[self.df.index[i], 'vol_poc'] = poc_price
                     
-                    # Sum volume where price in this bin (approximation)
-                    bin_volume = window.loc[
-                        ((window['low'] >= bin_low) & (window['low'] < bin_high)) |
-                        ((window['high'] >= bin_low) & (window['high'] < bin_high)) |
-                        ((window['low'] <= bin_low) & (window['high'] >= bin_high))
-                    ]['volume'].sum()
+                    # Value Area - price range containing specified volume percentage (typically 70%)
+                    value_area_threshold = 0.7
+                    sorted_bins = np.argsort(vol_profiles[i])[::-1]
+                    cum_vol = 0
+                    value_area_bins = []
                     
-                    self.df.loc[self.df.index[i], f'vol_bin_{bin_num}'] = bin_volume
+                    for bin_idx in sorted_bins:
+                        value_area_bins.append(bin_idx)
+                        cum_vol += vol_profiles[i, bin_idx] / 100
+                        if cum_vol >= value_area_threshold:
+                            break
+                    
+                    value_area_high = price_min + (max(value_area_bins) + 1) * bin_size
+                    value_area_low = price_min + min(value_area_bins) * bin_size
+                    
+                    self.df.loc[self.df.index[i], 'vol_va_high'] = value_area_high
+                    self.df.loc[self.df.index[i], 'vol_va_low'] = value_area_low
+                    self.df.loc[self.df.index[i], 'vol_va_width'] = (value_area_high - value_area_low) / price_range
+        
+        # Calculate features from volume profile for ML
+        if key_metrics and 'vol_poc' in self.df.columns:
+            # Distance of close from POC (shows potential mean reversion)
+            self.df['close_to_poc_pct'] = (self.df['close'] - self.df['vol_poc']) / self.df['vol_poc'] * 100
+            
+            # Is price within value area? (binary feature)
+            self.df['in_value_area'] = ((self.df['close'] >= self.df['vol_va_low']) & 
+                                        (self.df['close'] <= self.df['vol_va_high'])).astype(int)
+            
+            # Volume concentration (high = volume concentrated at few prices, low = distributed)
+            # Calculate entropy of volume distribution
+            entropy = np.zeros(len(self.df))
+            for i in range(lookback, len(self.df)):
+                profile = vol_profiles[i] / 100  # Convert to probability
+                # Filter out zeros to avoid log(0)
+                profile = profile[profile > 0]
+                if len(profile) > 0:
+                    entropy[i] = -np.sum(profile * np.log(profile))
+            
+            self.df['vol_concentration'] = 1 - entropy / np.log(num_bins)  # Normalized 0-1
+        
+        # Clean up
+        if 'typical_price' in self.df.columns:
+            self.df = self.df.drop(['typical_price'], axis=1)
     
     def _vwap(self, period=1):
         """Calculate daily Volume Weighted Average Price."""
@@ -731,6 +811,7 @@ class FeatureGenerator():
     def _market_state_indicators(self, window=20):
         """
         Generate overall market state indicators that combine volatility and trend regimes.
+        Note: This depends on volatility regime existing in the df. TODO: Add better handling for that.
         
         Parameters:
         -----------
