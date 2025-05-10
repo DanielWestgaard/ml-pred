@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
@@ -70,34 +71,38 @@ class DataNormalizer(BaseProcessor):
         preserve_original : bool
             If True, keeps original columns and adds new ones with _norm suffix
         """
-        self.df.select_dtypes(include=['int', 'float'])
+        print(f"adx: {self.df['adx']}")
+        logging.info(f"Length of dataframe: {len(self.df.columns)}")
+        logging.info(f"Columns that are int and float: {self.df.select_dtypes(include=['int', 'float'])}")
         for col in columns:
             if col not in self.df.columns:
                 continue
+            try:
+                # Calculate rolling mean and standard deviation
+                rolling_mean = self.df[col].rolling(window=window).mean()
+                rolling_std = self.df[col].rolling(window=window).std()
                 
-            print(self.df[col])
-            # Calculate rolling mean and standard deviation
-            rolling_mean = self.df[col].rolling(window=window).mean()
-            rolling_std = self.df[col].rolling(window=window).std()
-            
-            # Calculate z-score with division by zero handling
-            z_score = pd.Series(float('nan'), index=self.df.index)
-            mask = rolling_std != 0
-            
-            # Only calculate where std is not zero
-            z_score[mask] = (self.df[col][mask] - rolling_mean[mask]) / rolling_std[mask]
-            
-            # For cases where std is zero, set z-score to 0
-            z_score[~mask & ~rolling_mean.isna()] = 0
-            
-            # Forward fill NaN values from initial window
-            z_score = z_score.fillna(method='bfill')
-            
-            # Add to dataframe
-            if preserve_original:
-                self.df[f'{col}_norm'] = z_score
-            else:
-                self.df[col] = z_score
+                # Calculate z-score with division by zero handling
+                z_score = pd.Series(float('nan'), index=self.df.index)
+                mask = rolling_std != 0
+                
+                # Only calculate where std is not zero
+                z_score[mask] = (self.df[col][mask] - rolling_mean[mask]) / rolling_std[mask]
+                
+                # For cases where std is zero, set z-score to 0
+                z_score[~mask & ~rolling_mean.isna()] = 0
+                
+                # Forward fill NaN values from initial window
+                z_score = z_score.fillna(method='bfill')
+                
+                # Add to dataframe
+                if preserve_original:
+                    self.df[f'{col}_norm'] = z_score
+                else:
+                    self.df[col] = z_score
+            except: 
+                logging.error(f"Failed on {col}")
+                print(self.df[col])
     
     def rolling_minmax(self, columns, window=20, preserve_original=False):
         """
