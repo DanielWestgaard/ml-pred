@@ -6,3 +6,4 @@ requests
 ipykernel
 statsmodels
 holidays
+scikit-learn
