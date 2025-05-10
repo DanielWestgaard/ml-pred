@@ -16,11 +16,11 @@ class DataValidator(BaseProcessor):
     def run(self):
         """Run data validation checks and returns validated results."""
         
-        self._validate_ohlc_relationships()
-        self._validate_timestamps()
-        self._validate_volume()
-        self._validate_price_movement()
-        self._validate_data_completeness()
+        self.validate_ohlc_relationships()
+        self.validate_timestamps()
+        self.validate_volume()
+        self.validate_price_movement()
+        self.validate_data_completeness()
         
         return {
             'is_valid': len(self.validation_issues) == 0,
@@ -28,7 +28,7 @@ class DataValidator(BaseProcessor):
             'validated_data': self.df
         }
     
-    def _validate_ohlc_relationships(self):
+    def validate_ohlc_relationships(self):
         """Verify proper relationships between OHLC prices. Similar to the one in 
         Cleaning, but this is to validate that work"""
         # High should be the highest value
@@ -59,7 +59,7 @@ class DataValidator(BaseProcessor):
                     'affected_rows': invalid_prices.index.tolist()
                 })
     
-    def _validate_timestamps(self):
+    def validate_timestamps(self):
         """Validate time series integrity and consistency."""
         # Check for duplicate timestamps
         duplicates = self.df.index.duplicated()
@@ -95,7 +95,7 @@ class DataValidator(BaseProcessor):
                 'affected_rows': future_data.index.tolist()
             })
         
-    def _validate_volume(self):
+    def validate_volume(self):
         """Validate volume data."""
         if 'volume' in self.df.columns:
             # Check for negative volume
@@ -120,7 +120,7 @@ class DataValidator(BaseProcessor):
                     'affected_rows': high_volume.index.tolist()
                 })
         
-    def _validate_price_movement(self):
+    def validate_price_movement(self):
         """Validate price movements for extreme or suspicious patterns."""
         # Calculate returns
         self.df['return'] = self.df['close'].pct_change()
@@ -137,7 +137,7 @@ class DataValidator(BaseProcessor):
         # Remove temporary column
         self.df = self.df.drop('return', axis=1)
         
-    def _validate_data_completeness(self):
+    def validate_data_completeness(self):
         """Validate data completeness and required fields."""
         # Check for minimum required columns
         required_cols = ['open', 'high', 'low', 'close']
@@ -167,3 +167,19 @@ class FeatureValidator(BaseProcessor):
     def run(self):
         """Run validation of data and features after generation."""
         pass
+    
+    def validate_data_types(self):
+        """Ensure all features have appropriate types (numeric, categorical, etc.)."""
+    
+    def validate_missing_values(self):
+        """Identify and handle NaN values before normalization."""
+    
+    def validate_outliers(self):
+        """Detect extreme values that might skew normalization."""
+    
+    def validate_feature_distribution(self):
+        """Understand how features are distributed to inform transformation choices."""
+    
+    def validate_value_ranges(self):
+        """Confirm features are within expected bounds."""
+        
