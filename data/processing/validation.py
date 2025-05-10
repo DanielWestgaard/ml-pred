@@ -156,3 +156,14 @@ class DataValidator(BaseProcessor):
                 'description': f'Only {len(self.df)} data points available, minimum 30 required'
             })
     
+
+class FeatureValidator(BaseProcessor):
+    def __init__(self, data):
+        """Class for validating newly generated features."""
+        self.validation_issues = []
+        # Load dataset based on format
+        self.df, self.original_df = data_utils.check_and_return_df(data)
+        
+    def run(self):
+        """Run validation of data and features after generation."""
+        pass

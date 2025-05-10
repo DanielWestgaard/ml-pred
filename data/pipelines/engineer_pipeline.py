@@ -8,6 +8,7 @@ import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.generation import FeatureGenerator
+from data.processing.validation import FeatureValidator
 from data.features.normalization import DataNormalizer
 from data.features.selection import FeatureSelector
 
@@ -52,6 +53,13 @@ class EngineeringPipeline():
         # Feature Generation
         self.feature_generator = FeatureGenerator(self.df)
         self.df = self.feature_generator.run()
+        
+        # Validate (again)
+        self.feature_validator = FeatureValidator(self.df)
+        self.validator_results = self.feature_validator.run()
+        self.df = self.validator_results["validated_data"]
+        # Logging results
+        data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
         # Normalization
         self.normalizer = DataNormalizer(self.df)

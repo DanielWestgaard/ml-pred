@@ -57,12 +57,14 @@ Simple cleaning class that performs the following:
 - **OHLC validity**.
 
 ### Validation 
+There are two validation classes in ```validation.py```.<br>
 Simple validation class that performs validation of data after cleaning, to verify data integrity and ensure loical consistency. These are the current validations done:
 - **OHLC Relationships**, similar to the one in cleaning, but using this to validate that work.
 - **Timestamps** for integrity and consistency.
 - **Volume** 
 - **Price Movements** for extreme or suspicous patterns.
 - **Data Completeness**
+The second class is responsible for validating the features after feature generation.
 
 
 ## About features/
