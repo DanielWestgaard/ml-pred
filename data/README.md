@@ -75,7 +75,7 @@ To handle errors, but also keep a more simplistic code, have I implemented ```sa
 > The feature generator creates several categorical features. Some ML Models requires only numerical input, so this should be handled accordingly for the models needs.
 
 ### Normalization
-Simple Normalization class that uses two Normalization Techniques; [Z-Score](https://www.investopedia.com/terms/z/zscore.asp) for Unbounded (no boundaries of certainty) features and [MinMax Scaker](https://medium.com/@iamkamleshrangi/how-min-max-scaler-works-9fbebb9347da) for Bounded (field that has limited scope) features.<br>
+Simple Normalization class that uses **two Normalization Techniques**; [Z-Score](https://www.investopedia.com/terms/z/zscore.asp) for _Unbounded_ (no boundaries of certainty) features and [MinMax Scaker](https://medium.com/@iamkamleshrangi/how-min-max-scaler-works-9fbebb9347da) for _Bounded_ (field that has limited scope) features.<br>
 The ```run()``` has some functionality that excludes some features from normalization:
 - **String Categorical Features**:
   - ```market_state_desc``` (e.g., 'low_vol_ranging', 'high_vol_strong_trend')
