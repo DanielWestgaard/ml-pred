@@ -21,24 +21,37 @@ class DataNormalizer(BaseProcessor):
             preserve_original: If True, keep original features and add normalized ones with suffix
             window: Size of rolling window for normalization statistics
         """
+        # First identify categorical columns to exclude from normalization
+        categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns.tolist()
+        
+        # Also identify binary/regime columns (that might be numeric but shouldn't be normalized)
+        regime_indicators = [col for col in self.df.columns if 
+                            any(x in col for x in ['regime', 'is_', 'in_value_area', 'state'])]
+        exclude_from_normalization = categorical_cols + regime_indicators
+        
         # Group 1: Price data (OHLC) - Z-score normalize
         price_cols = ['open', 'high', 'low', 'close']
-        price_cols_present = [col for col in price_cols if col in self.df.columns]
+        price_cols_present = [col for col in price_cols if col in self.df.columns 
+                            and col not in exclude_from_normalization]
         
         # Group 2: Volume data - Log transform then Z-score
         volume_cols = ['volume'] + [col for col in self.df.columns 
-                                  if 'volume' in col.lower() and 'relative' not in col.lower()]
-        volume_cols = [col for col in volume_cols if col in self.df.columns]
+                                if 'volume' in col.lower() and 'relative' not in col.lower()]
+        volume_cols = [col for col in volume_cols if col in self.df.columns 
+                    and col not in exclude_from_normalization]
         
         # Group 3: Unbounded features - Z-score
         z_score_features = [col for col in self.df.columns if 
-                    any(x in col for x in ['roc_', 'macd', 'vwap', 'log_return', 'distance', 'vol_', 
-                                          'atr', 'bb_width', 'obv', 'cci', 'adx'])]
-        z_score_features.remove("adx_trend_regime")  # labels based on adx result
+                        any(x in col for x in ['roc_', 'macd', 'vwap', 'log_return', 'distance', 'vol_', 
+                                            'atr', 'bb_width', 'obv', 'cci', 'adx'])]
+        z_score_features = [col for col in z_score_features if col not in exclude_from_normalization]
+        
         
         # Group 4: Bounded indicators - Min-Max
         minmax_features = [col for col in self.df.columns if 
-                    any(x in col for x in ['rsi', 'stoch', 'mfi', '_sin_', '_cos_', 'in_value_area'])]
+                        any(x in col for x in ['rsi', 'stoch', 'mfi', '_sin_', '_cos_'])]
+        minmax_features = [col for col in minmax_features if col not in exclude_from_normalization]
+
         
         # Log transform volume first
         for col in volume_cols:
@@ -75,32 +88,29 @@ class DataNormalizer(BaseProcessor):
         for col in columns:
             if col not in self.df.columns:
                 continue
-            try:
-                # Calculate rolling mean and standard deviation
-                rolling_mean = self.df[col].rolling(window=window).mean()
-                rolling_std = self.df[col].rolling(window=window).std()
-                
-                # Calculate z-score with division by zero handling
-                z_score = pd.Series(float('nan'), index=self.df.index)
-                mask = rolling_std != 0
-                
-                # Only calculate where std is not zero
-                z_score[mask] = (self.df[col][mask] - rolling_mean[mask]) / rolling_std[mask]
-                
-                # For cases where std is zero, set z-score to 0
-                z_score[~mask & ~rolling_mean.isna()] = 0
-                
-                # Forward fill NaN values from initial window
-                z_score = z_score.fillna(method='bfill')
-                
-                # Add to dataframe
-                if preserve_original:
-                    self.df[f'{col}_norm'] = z_score
-                else:
-                    self.df[col] = z_score
-            except:
-                logging.error(f"Failed z-score on {col}")
-                print(self.df[col])
+            
+            # Calculate rolling mean and standard deviation
+            rolling_mean = self.df[col].rolling(window=window).mean()
+            rolling_std = self.df[col].rolling(window=window).std()
+            
+            # Calculate z-score with division by zero handling
+            z_score = pd.Series(float('nan'), index=self.df.index)
+            mask = rolling_std != 0
+            
+            # Only calculate where std is not zero
+            z_score[mask] = (self.df[col][mask] - rolling_mean[mask]) / rolling_std[mask]
+            
+            # For cases where std is zero, set z-score to 0
+            z_score[~mask & ~rolling_mean.isna()] = 0
+            
+            # Forward fill NaN values from initial window
+            z_score = z_score.fillna(method='bfill')
+            
+            # Add to dataframe
+            if preserve_original:
+                self.df[f'{col}_norm'] = z_score
+            else:
+                self.df[col] = z_score
     
     def rolling_minmax(self, columns, window=20, preserve_original=False):
         """
