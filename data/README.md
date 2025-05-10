@@ -78,18 +78,18 @@ To handle errors, but also keep a more simplistic code, have I implemented ```sa
 Simple Normalization class that uses two Normalization Techniques; [Z-Score][https://www.investopedia.com/terms/z/zscore.asp] for Unbounded (no boundaries of certainty) features and [MinMax Scaker](https://medium.com/@iamkamleshrangi/how-min-max-scaler-works-9fbebb9347da) for Bounded (field that has limited scope) features.<br>
 The ```run()``` has some functionality that excludes some features from normalization:
 - **String Categorical Features**:
-  - market_state_desc (e.g., 'low_vol_ranging', 'high_vol_strong_trend')
-  - adx_trend_regime (e.g., 'trending', 'ranging')
-  - trend_regime (e.g., 'strong_trend', 'weak_trend', 'ranging')
-  - volatility_regime (e.g., 'high', 'medium', 'low')
-  - session (e.g., 'asian_session', 'european_session', 'us_session')
-  - month_period (e.g., 'start_of_month', 'mid_month', 'end_of_month')
+  - ```market_state_desc``` (e.g., 'low_vol_ranging', 'high_vol_strong_trend')
+  - ```adx_trend_regime``` (e.g., 'trending', 'ranging')
+  - ```trend_regime``` (e.g., 'strong_trend', 'weak_trend', 'ranging')
+  - ```volatility_regime``` (e.g., 'high', 'medium', 'low')
+  - ```session``` (e.g., 'asian_session', 'european_session', 'us_session')
+  - ```month_period``` (e.g., 'start_of_month', 'mid_month', 'end_of_month')
 - **Binary/Integer Features**:
-  - is_holiday, is_weekend
-  - in_value_area
-  - One-hot encoded regime columns with prefixes like vol_regime_, adx_regime_, trend_regime_, state_
+  - ```is_holiday```, ```is_weekend```
+  - ```in_value_area```
+  - One-hot encoded regime columns with prefixes like ```vol_regime_```, ```adx_regime_```, ```trend_regime_```, ```state_```
 - **Ordinal Numeric Codes**:
-  - market_state (0-8 representing different market states)
+  - ```market_state``` (0-8 representing different market states)
 
 
 ## About providers/ 
