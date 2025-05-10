@@ -1,3 +1,4 @@
+from numpy import float64
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
 
@@ -180,7 +181,10 @@ class FeatureValidator(BaseProcessor):
     
     def validate_data_types(self):
         """Ensure all features have appropriate types (numeric, categorical, etc.)."""
-        
+        # self.df['open'] = self.df['open'].astype(float)
+        # for col in self.df.columns:
+        #     print(f"{col} is {self.df[col].dtype}")
+        # print(self.df.dtypes)
     
     def validate_missing_values(self):
         """Identify and handle NaN values before normalization."""

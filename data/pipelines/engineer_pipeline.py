@@ -66,8 +66,8 @@ class EngineeringPipeline():
         self.df = self.normalizer.run()
         
         # Feature Selection
-        # self.selector = FeatureSelector(self.df)
-        # self.df = self.selector.run()
+        self.selector = FeatureSelector(self.df)
+        self.df = self.selector.run()
         
         # Save Engineered data
         shared_utils.ensure_path_exists(path = self.output_path or config.CAPCOM_PROCESSED_DATA_DIR)
