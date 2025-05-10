@@ -110,6 +110,8 @@ class DataNormalizer(BaseProcessor):
             if preserve_original:
                 self.df[f'{col}_norm'] = z_score
             else:
+                if col == 'close':  # preserve original closing value (for placing trades)
+                    self.df['close_og'] = self.df['close']
                 self.df[col] = z_score
     
     def rolling_minmax(self, columns, window=20, preserve_original=False):
