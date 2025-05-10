@@ -55,11 +55,11 @@ class EngineeringPipeline():
         self.df = self.feature_generator.run()
         
         # Validate (again)
-        self.feature_validator = FeatureValidator(self.df)
-        self.validator_results = self.feature_validator.run()
-        self.df = self.validator_results["validated_data"]
-        # Logging results
-        data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
+        # self.feature_validator = FeatureValidator(self.df)
+        # self.validator_results = self.feature_validator.run()
+        # self.df = self.validator_results["validated_data"]
+        # # Logging results
+        # data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
         # Normalization
         self.normalizer = DataNormalizer(self.df)
