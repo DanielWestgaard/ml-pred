@@ -34,6 +34,7 @@ class DataNormalizer(BaseProcessor):
         z_score_features = [col for col in self.df.columns if 
                     any(x in col for x in ['roc_', 'macd', 'vwap', 'log_return', 'distance', 'vol_', 
                                           'atr', 'bb_width', 'obv', 'cci', 'adx'])]
+        z_score_features.remove("adx_trend_regime")  # labels based on adx result
         
         # Group 4: Bounded indicators - Min-Max
         minmax_features = [col for col in self.df.columns if 
@@ -71,9 +72,6 @@ class DataNormalizer(BaseProcessor):
         preserve_original : bool
             If True, keeps original columns and adds new ones with _norm suffix
         """
-        print(f"adx: {self.df['adx']}")
-        logging.info(f"Length of dataframe: {len(self.df.columns)}")
-        logging.info(f"Columns that are int and float: {self.df.select_dtypes(include=['int', 'float'])}")
         for col in columns:
             if col not in self.df.columns:
                 continue
@@ -100,8 +98,8 @@ class DataNormalizer(BaseProcessor):
                     self.df[f'{col}_norm'] = z_score
                 else:
                     self.df[col] = z_score
-            except: 
-                logging.error(f"Failed on {col}")
+            except:
+                logging.error(f"Failed z-score on {col}")
                 print(self.df[col])
     
     def rolling_minmax(self, columns, window=20, preserve_original=False):
