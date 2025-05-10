@@ -21,17 +21,10 @@ class FeatureSelector(BaseProcessor):
         print(len(self.df))
         return self.df
     
-    def _prepare_training_data(self, lookback=30):
-        """Simple method to get x- and y-train."""
-        X, y = [], []
-        for i in range(len(self.df) - lookback):
-            X.append(self.df.iloc[i:i+lookback]['close'].values)
-            y.append(self.df.iloc[i+lookback]['close'])
-        return np.array(X), np.array(y)
-    
-    def testing_selection(self):
+    def testing_selection(self, target_col = 'close'):
         """Temporary testing method for exploring different solutions."""
-        X, y = self._prepare_training_data()
+        X = self.df.drop(columns=[target_col])  # Everything but close
+        y = self.df[target_col]  # close
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
         model = xgb.XGBRegressor()
@@ -46,4 +39,4 @@ class FeatureSelector(BaseProcessor):
         plt.bar([x for x in range(len(importance))], importance)
         plt.show()
         
-        print(f"Model Score: {model.score(X_test, y_test)}")
+        print(f"Model Score: {model.score(X, y)}")
