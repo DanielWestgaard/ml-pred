@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from matplotlib import pyplot as plt
@@ -18,14 +19,13 @@ class FeatureSelector(BaseProcessor):
     def run(self):
         """Run the feature selection process."""
 
-        self.testing_selection()
-        print(len(self.df))
+        self.xgb_regressor()
+        
         return self.df
     
-    def testing_selection(self, target_col = 'close'):
-        """Temporary testing method for exploring different solutions."""
-        X_processed = model_utils.preprocess_features_for_xgboost(self.df, target_col=target_col, enable_categorical=True)
-        # X = self.df.drop(columns=[target_col])  # Everything but close
+    def xgb_regressor(self, target_col = 'close'):
+        """Select features using XGB Regressor."""
+        X_processed = model_utils.preprocess_features_for_xgboost(self.df, target_col=target_col, enable_categorical=False)
         y = self.df[target_col]  # close
         X_train, X_test, y_train, y_test = train_test_split(X_processed, y, test_size=0.2, random_state=42)
 
@@ -33,16 +33,8 @@ class FeatureSelector(BaseProcessor):
             n_estimators=100, 
             max_depth=6,
             tree_method='hist',  # Required for categorical support
-            enable_categorical=True  # Enable native categorical support
         )
         model.fit(X_train, y_train)
-        
-        # Method 2: Traditional encoding approach (works with all XGBoost versions)
-        # X_processed = preprocess_features_for_xgboost(df, target_col=target_column, enable_categorical=False)
-
-        # # Train with traditional approach
-        # model = xgb.XGBRegressor(n_estimators=100, max_depth=6)
-        # model.fit(X_processed.drop(target_column, axis=1), X_processed[target_column])
 
         # Get importance
         importance = model.feature_importances_
@@ -53,4 +45,4 @@ class FeatureSelector(BaseProcessor):
         plt.bar([x for x in range(len(importance))], importance)
         plt.show()
         
-        print(f"Model Score: {model.score(X, y)}")
+        logging.info(f"Model Score: {model.score(X_processed, y)}")

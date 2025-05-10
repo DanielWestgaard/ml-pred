@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import ast
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder
 
 def preprocess_features_for_xgboost(df, target_col=None, enable_categorical=False):
     """
@@ -21,9 +21,24 @@ def preprocess_features_for_xgboost(df, target_col=None, enable_categorical=Fals
     pandas DataFrame
         Processed dataframe ready for XGBoost
     """
+    # First, check for and fix duplicate columns
     df_processed = df.copy()
     
-    # 1. Special handling for fft_dominant_periods (list stored as string)
+    # Check for duplicate columns and fix them
+    duplicate_cols = df_processed.columns[df_processed.columns.duplicated()].tolist()
+    if duplicate_cols:
+        print(f"Warning: Found duplicate columns: {duplicate_cols}")
+        # Rename duplicates with a suffix
+        for col in duplicate_cols:
+            # Get all occurrences of the duplicated column
+            cols = df_processed.columns.get_indexer_for([col])
+            # Rename all but the first occurrence
+            for i, idx in enumerate(cols[1:], 1):
+                new_name = f"{col}_{i}"
+                df_processed.columns.values[idx] = new_name
+                print(f"Renamed duplicate column '{col}' to '{new_name}'")
+    
+    # 1. Handle fft_dominant_periods (list stored as string)
     if 'fft_dominant_periods' in df_processed.columns:
         try:
             # Convert string representation of list to actual values
@@ -56,14 +71,15 @@ def preprocess_features_for_xgboost(df, target_col=None, enable_categorical=Fals
             df_processed['fft_dom_encoded'] = le.fit_transform(df_processed['fft_dominant_periods'])
             df_processed = df_processed.drop('fft_dominant_periods', axis=1)
     
-    # 2. Process remaining categorical features
-    cat_columns = [
-        col for col in df_processed.columns 
-        if col != target_col and (
-            df_processed[col].dtype == 'object' or 
-            df_processed[col].dtype.name == 'category'
-        )
-    ]
+    # 2. Process other categorical features
+    cat_columns = []
+    for col in df_processed.columns:
+        if col == target_col:
+            continue
+        # Check if it's a single column (not duplicated)
+        if isinstance(df_processed[col], pd.Series):
+            if df_processed[col].dtype == 'object' or df_processed[col].dtype.name == 'category':
+                cat_columns.append(col)
     
     if enable_categorical:
         # Option 1: Use XGBoost's native categorical support
@@ -92,9 +108,22 @@ def preprocess_features_for_xgboost(df, target_col=None, enable_categorical=Fals
             df_processed = df_processed.drop(col, axis=1)
     
     # 3. Final check for any remaining non-numeric columns
+    non_numeric_cols = []
     for col in df_processed.columns:
-        if col != target_col and not pd.api.types.is_numeric_dtype(df_processed[col]):
-            print(f"Warning: Dropping non-numeric column {col} with dtype {df_processed[col].dtype}")
-            df_processed = df_processed.drop(col, axis=1)
+        if col == target_col:
+            continue
+        # Check if it's a single column (not duplicated)
+        try:
+            is_numeric = pd.api.types.is_numeric_dtype(df_processed[col])
+            if not is_numeric:
+                non_numeric_cols.append(col)
+        except Exception as e:
+            print(f"Error checking column {col}: {e}")
+            non_numeric_cols.append(col)
+    
+    # Drop non-numeric columns
+    if non_numeric_cols:
+        print(f"Warning: Dropping non-numeric columns: {non_numeric_cols}")
+        df_processed = df_processed.drop(non_numeric_cols, axis=1)
     
     return df_processed
