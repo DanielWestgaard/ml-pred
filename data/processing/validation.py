@@ -166,10 +166,21 @@ class FeatureValidator(BaseProcessor):
         
     def run(self):
         """Run validation of data and features after generation."""
-        pass
+        self.validate_data_types()
+        self.validate_missing_values()
+        self.validate_outliers()
+        self.validate_feature_distribution()
+        self.validate_value_ranges()
+        
+        return {
+            'is_valid': len(self.validation_issues) == 0,
+            'issues': self.validation_issues,
+            'validated_data': self.df
+        }
     
     def validate_data_types(self):
         """Ensure all features have appropriate types (numeric, categorical, etc.)."""
+        
     
     def validate_missing_values(self):
         """Identify and handle NaN values before normalization."""
