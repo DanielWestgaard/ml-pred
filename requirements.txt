@@ -7,3 +7,4 @@ ipykernel
 statsmodels
 holidays
 scikit-learn
+matplotlib

@@ -9,6 +9,7 @@ from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.generation import FeatureGenerator
 from data.features.normalization import DataNormalizer
+from data.features.selection import FeatureSelector
 
 
 class EngineeringPipeline():
@@ -57,6 +58,8 @@ class EngineeringPipeline():
         self.df = self.normalizer.run()
         
         # Feature Selection
+        self.selector = FeatureSelector(self.df)
+        self.df = self.selector.run()
         
         # Save Engineered data
         shared_utils.ensure_path_exists(path = self.output_path or config.CAPCOM_PROCESSED_DATA_DIR)
