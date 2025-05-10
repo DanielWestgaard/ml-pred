@@ -27,10 +27,10 @@ def main():
     args = parse_arguments()
     
     log_utils._is_configured = False
-    logger = log_utils.setup_logging(name="blaaa", type="training", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
+    logger = log_utils.setup_logging(name="blaaa", type="training", log_to_file=False, log_level=config.DEFAULT_LOG_LEVEL)
     
     if args.engineer_data:
-        data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
+        data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv")
         data_pipeline.run()
     
     if args.fetch_data_alpha:
