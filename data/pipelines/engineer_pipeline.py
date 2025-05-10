@@ -8,6 +8,7 @@ import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.generation import FeatureGenerator
+from data.features.normalization import DataNormalizer
 
 
 class EngineeringPipeline():
@@ -52,6 +53,8 @@ class EngineeringPipeline():
         self.df = self.feature_generator.run()
         
         # Normalization
+        self.normalizer = DataNormalizer(self.df)
+        self.df = self.normalizer.run()
         
         # Feature Selection
         
