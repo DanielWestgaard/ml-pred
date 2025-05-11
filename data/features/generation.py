@@ -725,9 +725,14 @@ class FeatureGenerator():
         self.df['returns'] = self.df['close'].pct_change()
         self.df['volatility_short'] = self.df['returns'].rolling(window=lookback_short).std() * np.sqrt(252)  # Annualized
         self.df['volatility_long'] = self.df['returns'].rolling(window=lookback_long).std() * np.sqrt(252)
+        self.df['volatility_long'] = self.df['volatility_long'].replace(0, np.nan)
         
         # Volatility ratio (current vol relative to longer-term vol)
         self.df['volatility_ratio'] = self.df['volatility_short'] / self.df['volatility_long']
+        # Add a small epsilon to avoid division by extremely small numbers
+        epsilon = 1e-8
+        self.df['volatility_ratio'] = self.df['volatility_short'] / (self.df['volatility_long'] + epsilon)
+
         
         # Identify volatility regimes using quantiles
         if n_regimes == 2:
@@ -762,7 +767,7 @@ class FeatureGenerator():
         self.df['volatility_zscore'] = (self.df['volatility_short'] - vol_mean) / vol_std
         
         # Volatility acceleration/deceleration
-        self.df['volatility_change'] = self.df['volatility_short'].pct_change(5)  # 5-period change rate
+        self.df['volatility_change'] = np.log(self.df['volatility_short'] + epsilon).diff(5)
 
     def trend_strength_indicators(self, lookback=20, adx_threshold=25):
         """
