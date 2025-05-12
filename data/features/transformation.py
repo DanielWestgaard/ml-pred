@@ -33,11 +33,22 @@ class FeatureTransformer(BaseProcessor):
         return self.df
     
     def handle_missing_values(self):
-        """Method for handling missing values in features."""
-        pass
+        """
+        Method for handling missing values in features. NaN's should be handled during feature
+        generation. If there are still features with (excessive) missing values, they will be dropped.
+        """
+        # Check if the dataset has any missing feature
+        if self.df.isnull().values.any():
+            self._filter_features()
+        else:
+            logging.debug("Dataset does not contain features with missing values.")
+    
+    def _filter_features(self):
+        """Filter features based on the type and how many missing there are."""
+        logging.debug("Starting to filter features based on missing values...")
     
     def encode_categorical_vars(self):
-        """Converting categorical/textual data into numerical format."""
+        """Converting categorical/textual data into numerical format. Like One-hot encoding, label encoding."""
         pass
     
     def normalize(self, preserve_original=False, window=20):
