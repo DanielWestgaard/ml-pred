@@ -67,13 +67,11 @@ class FeatureTransformer(BaseProcessor):
                                             'atr', 'bb_width', 'obv', 'cci', 'adx'])]
         z_score_features = [col for col in z_score_features if col not in exclude_from_normalization]
         
-        
         # Group 4: Bounded indicators - Min-Max
         minmax_features = [col for col in self.df.columns if 
                         any(x in col for x in ['rsi', 'stoch', 'mfi', '_sin_', '_cos_'])]
         minmax_features = [col for col in minmax_features if col not in exclude_from_normalization]
 
-        
         # Log transform volume first
         for col in volume_cols:
             if preserve_original:
