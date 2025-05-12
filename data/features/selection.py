@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import SelectKBest, mutual_info_regression, mutual_info_classif
 import xgboost as xgb
 
 from data.processing.base_processor import BaseProcessor
@@ -12,36 +13,39 @@ from utils import model_utils
 
 
 class FeatureSelector(BaseProcessor):
-    def __init__(self, data):
+    def __init__(self, data, target_col = 'close'):
         """Class for Selecting the most important features."""
         # Load dataset based on format
         self.df, self.original_df = data_utils.check_and_return_df(data)
+        
+        # Don't know if it is useful to place here. If not so, this is just temporary.
+        self.X_processed = model_utils.preprocess_features_for_xgboost(self.df, target_col=target_col, enable_categorical=False)  #This function
+        # Getting X- and y-train for selection process/-es
+        self.y = self.df[target_col]  # close
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X_processed, self.y, test_size=0.2, random_state=42)
     
     def run(self):
         """Run the feature selection process."""
 
-        self.xgb_regressor()
+        # self.xgb_regressor()
+        self.select_k_best()
         
         return self.df
     
-    def xgb_regressor(self, target_col = 'close', threshold = 0.01):
+    def xgb_regressor(self, threshold = 0.01):
         """Select features using XGB Regressor."""
-        X_processed = model_utils.preprocess_features_for_xgboost(self.df, target_col=target_col, enable_categorical=False)
-        y = self.df[target_col]  # close
-        X_train, X_test, y_train, y_test = train_test_split(X_processed, y, test_size=0.2, random_state=42)
-
         model = xgb.XGBRegressor(
             n_estimators=100, 
             max_depth=6,
             tree_method='hist',  # Required for categorical support
         )
-        model.fit(X_train, y_train)
+        model.fit(self.X_train, self.y_train)
 
         # Get importance
         importance = model.feature_importances_
         importance_df = pd.DataFrame(columns=['feature', 'score'])
         # Summarize feature importance
-        for i, v in enumerate(importance):
+        for i, v in enumerate(importance):  # just for educational purposes - can be removed
             new_row = pd.DataFrame([{'feature': i, 'score': f"{v:.5f}"}])
             importance_df = pd.concat([importance_df, new_row], ignore_index=True)
 
@@ -57,4 +61,16 @@ class FeatureSelector(BaseProcessor):
         plt.bar([x for x in range(len(importance))], importance)
         plt.show()
         
-        logging.info(f"Model Score: {model.score(X_processed, y)}")
+        logging.info(f"Model Score: {model.score(self.X_processed, self.y)}")
+        
+    def select_k_best(self):
+        """Using SelectKBest to select features."""
+        # Using mutual_info_classif for classification problem MI - score between feature and target variable separately
+        # mi_scores = mutual_info_classif(self.df, self.y)
+        # mi_scores = pd.Series(mi_scores, name="MI Scores", index=self.X_processed.columns)
+        # mi_scores = mi_scores.sort_values(ascending=False)
+
+        # print(mi_scores)  # show a few features with their MI scores
+        
+        selector = SelectKBest(score_func=mutual_info_regression, k=5)
+        selector.fit(self.X_processed, self.y)

@@ -7,9 +7,9 @@ from data.processing.base_processor import BaseProcessor
 from utils import data_utils
 
 
-class DataNormalizer(BaseProcessor):
+class DataTransformer(BaseProcessor):
     def __init__(self, data):
-        """Class for normalizing features."""
+        """Class for transforming- (handling nan's, etc.) and normalizing features."""
         # Load dataset based on format
         self.df, self.original_df = data_utils.check_and_return_df(data)
     
@@ -21,6 +21,11 @@ class DataNormalizer(BaseProcessor):
             preserve_original: If True, keep original features and add normalized ones with suffix
             window: Size of rolling window for normalization statistics
         """
+        # TODO: Handle missing feature values
+        self.handle_missing_values()
+        
+        
+        # Normalization
         # First identify categorical columns to exclude from normalization
         categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns.tolist()
         
@@ -71,6 +76,10 @@ class DataNormalizer(BaseProcessor):
                               preserve_original=preserve_original)
         
         return self.df
+    
+    def handle_missing_values (self):
+        """Method for handling missing values in features."""
+        pass
     
     def z_score(self, columns, window=20, preserve_original=False):
         """

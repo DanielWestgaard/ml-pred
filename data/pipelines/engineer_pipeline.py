@@ -9,7 +9,7 @@ from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.generation import FeatureGenerator
 from data.processing.validation import FeatureValidator
-from data.features.normalization import DataNormalizer
+from data.features.transformation import DataTransformer
 from data.features.selection import FeatureSelector
 
 
@@ -62,7 +62,7 @@ class EngineeringPipeline():
         # data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
         # Normalization
-        self.normalizer = DataNormalizer(self.df)
+        self.normalizer = DataTransformer(self.df)
         self.df = self.normalizer.run()
         
         # Feature Selection
