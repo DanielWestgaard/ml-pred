@@ -9,7 +9,7 @@ from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.generation import FeatureGenerator
 from data.processing.validation import FeatureValidator
-from data.features.transformation import DataTransformer
+from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
 
 
@@ -61,13 +61,13 @@ class EngineeringPipeline():
         # # Logging results
         # data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
-        # Normalization
-        self.normalizer = DataTransformer(self.df)
-        self.df = self.normalizer.run()
+        # Transformation, scaling, handle missing values, etc. of newly generated features
+        self.transformation = FeatureTransformer(self.df)
+        self.df = self.transformation.run()
         
         # Feature Selection
-        self.selector = FeatureSelector(self.df)
-        self.df = self.selector.run()
+        # self.selector = FeatureSelector(self.df)
+        # self.df = self.selector.run()
         
         # Save Engineered data
         shared_utils.ensure_path_exists(path = self.output_path or config.CAPCOM_PROCESSED_DATA_DIR)

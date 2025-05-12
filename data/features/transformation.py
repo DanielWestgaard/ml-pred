@@ -7,7 +7,7 @@ from data.processing.base_processor import BaseProcessor
 from utils import data_utils
 
 
-class DataTransformer(BaseProcessor):
+class FeatureTransformer(BaseProcessor):
     def __init__(self, data):
         """Class for transforming- (handling nan's, etc.) and normalizing features."""
         # Load dataset based on format
@@ -15,7 +15,7 @@ class DataTransformer(BaseProcessor):
     
     def run(self, preserve_original=False, window=20):
         """
-        Run feature normalization.
+        Run feature transformation.
         
         Args:
             preserve_original: If True, keep original features and add normalized ones with suffix
@@ -26,7 +26,17 @@ class DataTransformer(BaseProcessor):
         
         
         # Normalization
-        # First identify categorical columns to exclude from normalization
+        self.normalize(preserve_original=preserve_original, window=window)
+        
+        return self.df
+    
+    def handle_missing_values (self):
+        """Method for handling missing values in features."""
+        pass
+    
+    def normalize(self, preserve_original=False, window=20):
+        """Perform normalization"""
+                # First identify categorical columns to exclude from normalization
         categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns.tolist()
         
         # Also identify binary/regime columns (that might be numeric but shouldn't be normalized)
@@ -74,12 +84,6 @@ class DataTransformer(BaseProcessor):
         if minmax_features:
             self.rolling_minmax(columns=minmax_features, window=window,
                               preserve_original=preserve_original)
-        
-        return self.df
-    
-    def handle_missing_values (self):
-        """Method for handling missing values in features."""
-        pass
     
     def z_score(self, columns, window=20, preserve_original=False):
         """
