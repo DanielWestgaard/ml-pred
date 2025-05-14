@@ -39,13 +39,33 @@ class FeatureTransformer(BaseProcessor):
         """
         # Check if the dataset has any missing feature
         if self.df.isnull().values.any():
+            logging.warning("Dataset has features containing Null's. Will drop features.")
+            # Replace blank values with DataFrame.replace() method with nan
+            # self.df = self.df.replace(r'^\s*$', np.nan, regex=True)
             self._filter_features()
         else:
             logging.debug("Dataset does not contain features with missing values.")
     
-    def _filter_features(self):
-        """Filter features based on the type and how many missing there are."""
+    def _filter_features(self, threshold:int = 0.5, filter:bool = False):
+        """
+        Filter features based on the type and how many missing there are.
+        This current 'version' is quite simple. It drops columns that has more nan values
+        than threshold (percentage).
+        """
         logging.debug("Starting to filter features based on missing values...")
+        
+        # Even simpler solution
+        self.df = self.df.dropna(axis=1)
+        
+        print(f"Removed columns: {self.original_df.columns.difference(self.df.columns)}")
+
+        if filter:    
+            # Calculate the percentage of NaN values in each column
+            nan_percentage = self.df.isna().mean()
+            print(nan_percentage)
+            # Alternatively, modify the original DataFrame
+            self.df = self.df.drop(columns=nan_percentage[nan_percentage > threshold].index)
+            print(len(self.df))
     
     def encode_categorical_vars(self):
         """Converting categorical/textual data into numerical format. Like One-hot encoding, label encoding."""
