@@ -46,26 +46,33 @@ class FeatureTransformer(BaseProcessor):
         else:
             logging.debug("Dataset does not contain features with missing values.")
     
-    def _filter_features(self, threshold:int = 0.5, filter:bool = False):
+    def _filter_features(self, threshold:int = 0.5, filter:bool = True):
         """
         Filter features based on the type and how many missing there are.
-        This current 'version' is quite simple. It drops columns that has more nan values
-        than threshold (percentage).
+        This current 'version' is quite simple ...
         """
         logging.debug("Starting to filter features based on missing values...")
-        
-        # Even simpler solution
-        self.df = self.df.dropna(axis=1)
-        
-        print(f"Removed columns: {self.original_df.columns.difference(self.df.columns)}")
+                
+        # Even simpler solution - too simple, removing features that needs "warmup"
+        # self.df = self.df.dropna(axis=1)
 
-        if filter:    
+        if filter:
             # Calculate the percentage of NaN values in each column
             nan_percentage = self.df.isna().mean()
-            print(nan_percentage)
             # Alternatively, modify the original DataFrame
             self.df = self.df.drop(columns=nan_percentage[nan_percentage > threshold].index)
-            print(len(self.df))
+            print(len(self.df.columns))
+            
+        removed = self.original_df.columns.difference(self.df.columns)
+        logging.debug(f"Dropped {len(removed)} columns: {removed}")
+        
+        # Features like sma_5 will have the first 5 values empty (as it needs at least 5 to calculate).
+        # Hence, I should handle for features like that as well, by dropping the first rows for it.
+        # TODO: For features like sma_5 and sma_50, we will only drop the first initial rows where the first nans/nulls occur
+        
+        # TODO: How do we handle features that have null/nan spread across? Dropping these rows (in the middle of df) causes "wholes" which is not good.
+        # Perhaps wimply dropping the feature then?
+        
     
     def encode_categorical_vars(self):
         """Converting categorical/textual data into numerical format. Like One-hot encoding, label encoding."""
