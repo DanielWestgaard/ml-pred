@@ -46,30 +46,43 @@ class FeatureTransformer(BaseProcessor):
         else:
             logging.debug("Dataset does not contain features with missing values.")
     
-    def _filter_features(self, threshold:int = 0.5, filter:bool = True):
+    def _filter_features(self, max_window_size:int = None, threshold:int = 0.5, filter:bool = True):
         """
         Filter features based on the type and how many missing there are.
-        This current 'version' is quite simple ...
+        This current 'version' is relatively simple:
+            - First it drops columns containing NaN's with threshold (percentage) compared to the length
+            - For features needing "warmup" before working (like sma_5, rsi_14), we'll drop the first n
+            rows based on the highest window size found.
         """
         logging.debug("Starting to filter features based on missing values...")
-                
-        # Even simpler solution - too simple, removing features that needs "warmup"
-        # self.df = self.df.dropna(axis=1)
-
+        
+        # Firstly dropping features with many null's
         if filter:
             # Calculate the percentage of NaN values in each column
             nan_percentage = self.df.isna().mean()
             # Alternatively, modify the original DataFrame
             self.df = self.df.drop(columns=nan_percentage[nan_percentage > threshold].index)
-            print(len(self.df.columns))
-            
-        removed = self.original_df.columns.difference(self.df.columns)
-        logging.debug(f"Dropped {len(removed)} columns: {removed}")
-        
-        # Features like sma_5 will have the first 5 values empty (as it needs at least 5 to calculate).
-        # Hence, I should handle for features like that as well, by dropping the first rows for it.
-        # TODO: For features like sma_5 and sma_50, we will only drop the first initial rows where the first nans/nulls occur
-        
+            removed = self.original_df.columns.difference(self.df.columns)
+            logging.debug(f"Dropped {len(removed)} columns that exceeded threshold for NaN's: {removed}")
+
+        # Secondly, drop first rows based on the highest window size
+        if max_window_size is None:
+            high_feature_windows = ["sma_200", "sma_50", "sma_20", "sma_10", "sma_5"]  # highest possible (feature-) window must be first
+            for feature in high_feature_windows:
+                if True in self.df.columns.str.contains(feature):
+                    logging.debug(f"Found {feature} first in df.")
+                    # This approach assumes all features have feature name in "one word"/abbreviation, followed by '_' and the window size
+                    bla = feature.split('_')
+                    try: 
+                        max_window_size = int(bla[1])
+                        logging.debug(f"Successfully extracted highest window size from feature list: {max_window_size}.")
+                        break
+                    except Exception as e: 
+                        logging.error(f"Failed getting window size from feature name in column or converting it to int: {e}")
+        # Actually dropping the first max_window_size of df
+        self.df = self.df.iloc[max_window_size:].reset_index(drop=True)
+        logging.info(f"Data Transformation - _filter_features - Successfully dropped first {max_window_size} rows. Size of df is now {len(self.df)}")
+
         # TODO: How do we handle features that have null/nan spread across? Dropping these rows (in the middle of df) causes "wholes" which is not good.
         # Perhaps wimply dropping the feature then?
         
