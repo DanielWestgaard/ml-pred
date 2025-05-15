@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
@@ -9,7 +9,7 @@ from utils import data_utils
 
 class FeatureTransformer(BaseProcessor):
     def __init__(self, data):
-        """Class for transforming- (handling nan's, etc.) and normalizing features."""
+        """Class for transforming- (handling nan's, encoding categorical variables, etc.) and normalizing features."""
         # Load dataset based on format
         self.df, self.original_df = data_utils.check_and_return_df(data)
     
@@ -21,22 +21,139 @@ class FeatureTransformer(BaseProcessor):
             preserve_original: If True, keep original features and add normalized ones with suffix
             window: Size of rolling window for normalization statistics
         """
-        # TODO: Handle missing feature values
+        # Handle missing feature values
         self.handle_missing_values()
         
+        # TODO: Encode categorical variables/values
+        self.encode_categorical_vars()
         
         # Normalization
         self.normalize(preserve_original=preserve_original, window=window)
         
         return self.df
     
-    def handle_missing_values (self):
-        """Method for handling missing values in features."""
-        pass
+    def handle_missing_values(self):
+        """
+        Method for handling missing values in features:
+        1. Drop columns with excessive missing values (threshold-based)
+        2. Drop initial rows based on the max window size (warmup period)
+        3. Apply forward fill to handle any remaining scattered NaN values
+        """
+        # Check if the dataset has any missing feature
+        if self.df.isnull().values.any():
+            logging.warning("Dataset has features containing empty values. Will drop relevant features.")
+
+            self._filter_features()
+
+            self._handle_scattered_nans()
+        else:
+            logging.debug("Dataset does not contain features with missing values.")
+    
+    def _filter_features(self, max_window_size:int = None, threshold:int = 0.5):
+        """
+        Filter features based on missing values.
+        
+        Parameters:
+            - max_window_size: The feature with highest window size. Meaning minimum number of values needed to calculate.
+            - threshold: Percentage of how many empty values a feature can have before being removed.
+        """
+        logging.debug("Starting to filter features based on missing values...")
+        
+        nan_percentage = self.df.isna().mean()  # Calculate the percentage of NaN values in each column
+        # Firstly dropping features with many missing values
+        self.df = self.df.drop(columns=nan_percentage[nan_percentage > threshold].index)
+        removed = self.original_df.columns.difference(self.df.columns)
+        logging.debug(f"Dropped {len(removed)} columns that exceeded threshold for NaN's: {removed}")
+
+        # Secondly, drop first rows based on the highest window size
+        if max_window_size is None:
+            high_feature_windows = ["sma_200", "sma_50", "sma_20", "sma_10", "sma_5"]  # highest possible (feature-) window must be first
+            for feature in high_feature_windows:
+                if True in self.df.columns.str.contains(feature):
+                    logging.debug(f"Found {feature} first in df.")
+                    # This approach assumes all features have feature name in "one word"/abbreviation, followed by '_' and the window size
+                    bla = feature.split('_')
+                    try:
+                        if len(self.df) > int(bla[1]):
+                            max_window_size = int(bla[1])
+                            logging.debug(f"Successfully extracted highest window size from feature list: {max_window_size}.")
+                            break
+                        else:
+                            logging.debug(f"The matched feature {feature} have a longer window, {int(bla[1])}, than the length of the df, {len(self.df)}. Continuing...")                            
+                    except Exception as e: 
+                        logging.error(f"Failed getting window size from feature name in column or converting it to int: {e}")
+        # Actually dropping the first max_window_size of df
+        self.df = self.df.iloc[max_window_size:]
+        logging.info(f"Data Transformation - _filter_features - Successfully dropped first {max_window_size} rows. Size of df is now {len(self.df)}")
+        
+    def _handle_scattered_nans(self):
+        """
+        Handle any remaining scattered NaN values using forward fill,
+        which is the preferred method for financial time series as it
+        does not introduce lookahead bias.
+        """
+        # Check which columns still have NaNs before imputation
+        cols_with_nans = {col: self.df[col].isnull().sum() for col in self.df.columns 
+                        if self.df[col].isnull().any()}
+        
+        if cols_with_nans:
+            logging.info(f"Applying forward fill to {len(cols_with_nans)} columns with scattered NaNs")
+            
+            # Store the number of NaNs before imputation
+            total_nans_before = self.df.isnull().sum().sum()
+            
+            # Apply forward fill
+            self.df = self.df.fillna(method='ffill')
+            
+            # Count remaining NaNs (if any)
+            remaining_nans = self.df.isnull().sum().sum()
+            filled_nans = total_nans_before - remaining_nans
+            
+            logging.info(f"Forward fill imputed {filled_nans} values")
+            
+            # If there are still NaNs at the beginning of the series (where ffill can't work)
+            if remaining_nans > 0:
+                logging.warning(f"After forward fill, {remaining_nans} NaN values remain")
+                logging.warning("These are likely at the beginning of the series - consider additional treatment")
+                
+                # Optional: List columns that still have NaNs
+                cols_still_with_nans = [col for col in self.df.columns if self.df[col].isnull().any()]
+                if cols_still_with_nans:
+                    logging.debug(f"Columns still containing NaNs: {cols_still_with_nans}")
+                    
+                    # Option 1: Fill beginning NaNs with first valid value (backward fill limited to start)
+                    # This is a common approach for the beginning of a time series
+                    for col in cols_still_with_nans:
+                        # Find first valid index
+                        first_valid_idx = self.df[col].first_valid_index()
+                        if first_valid_idx is not None:
+                            first_valid_value = self.df.loc[first_valid_idx, col]
+                            # Fill NaNs before this index with the first valid value
+                            self.df.loc[:first_valid_idx, col] = self.df.loc[:first_valid_idx, col].fillna(first_valid_value)
+                    
+                    logging.info("Filled beginning NaNs with first valid values")
+    
+    def encode_categorical_vars(self):
+        """Converting categorical/textual data into numerical format. Like One-hot encoding, label encoding."""
+        categorical_columns = self.df.select_dtypes(include=['object']).columns.tolist()
+        logging.debug(f"Categorical columns about to be one-hot encoded: {categorical_columns}")
+        encoder = OneHotEncoder(sparse_output=False)
+
+        one_hot_encoded = encoder.fit_transform(self.df[categorical_columns])
+        print(one_hot_encoded)
+        one_hot_df = pd.DataFrame(
+            one_hot_encoded, 
+            columns=encoder.get_feature_names_out(categorical_columns),
+            index=self.df.index  # Both having date as index
+        )
+        df_encoded = pd.concat([self.df, one_hot_df], axis=1)
+
+        self.df = df_encoded.drop(categorical_columns, axis=1)
+        logging.debug(f"Encoded data : \n{self.df}")
     
     def normalize(self, preserve_original=False, window=20):
         """Perform normalization"""
-                # First identify categorical columns to exclude from normalization
+        # First identify categorical columns to exclude from normalization
         categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns.tolist()
         
         # Also identify binary/regime columns (that might be numeric but shouldn't be normalized)
@@ -61,13 +178,11 @@ class FeatureTransformer(BaseProcessor):
                                             'atr', 'bb_width', 'obv', 'cci', 'adx'])]
         z_score_features = [col for col in z_score_features if col not in exclude_from_normalization]
         
-        
         # Group 4: Bounded indicators - Min-Max
         minmax_features = [col for col in self.df.columns if 
                         any(x in col for x in ['rsi', 'stoch', 'mfi', '_sin_', '_cos_'])]
         minmax_features = [col for col in minmax_features if col not in exclude_from_normalization]
 
-        
         # Log transform volume first
         for col in volume_cols:
             if preserve_original:
