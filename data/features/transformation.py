@@ -24,9 +24,6 @@ class FeatureTransformer(BaseProcessor):
         # Handle missing feature values
         self.handle_missing_values()
         
-        # Encode categorical variables/values
-        self.encode_categorical_vars()
-        
         # Handle duplicates
         self.handle_duplicates()
         
