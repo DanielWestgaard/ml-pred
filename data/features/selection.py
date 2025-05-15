@@ -20,7 +20,7 @@ class FeatureSelector(BaseProcessor):
         
         # Don't know if it is useful to place here. If not so, this is just temporary.
         # Getting X- and y-train for selection process/-es
-        self.X = self.original_df.drop([target_col], axis=1)
+        self.X = model_utils.preprocess_features_for_xgboost(df=self.df, enable_categorical=True)  # self.original_df.drop([target_col], axis=1)
         print(f"X : \n {self.X}")
         self.y = self.df[target_col]  # close
         print(f"y : \n {self.y}")

@@ -24,20 +24,6 @@ def preprocess_features_for_xgboost(df, target_col=None, enable_categorical=Fals
     # First, check for and fix duplicate columns
     df_processed = df.copy()
     
-    # Check for duplicate columns and fix them
-    # duplicate_cols = df_processed.columns[df_processed.columns.duplicated()].tolist()
-    # if duplicate_cols:
-    #     print(f"Warning: Found duplicate columns: {duplicate_cols}")
-    #     # Rename duplicates with a suffix
-    #     for col in duplicate_cols:
-    #         # Get all occurrences of the duplicated column
-    #         cols = df_processed.columns.get_indexer_for([col])
-    #         # Rename all but the first occurrence
-    #         for i, idx in enumerate(cols[1:], 1):
-    #             new_name = f"{col}_{i}"
-    #             df_processed.columns.values[idx] = new_name
-    #             print(f"Renamed duplicate column '{col}' to '{new_name}'")
-    
     # 1. Handle fft_dominant_periods (list stored as string)
     if 'fft_dominant_periods' in df_processed.columns:
         try:
