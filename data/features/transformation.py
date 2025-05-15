@@ -24,8 +24,11 @@ class FeatureTransformer(BaseProcessor):
         # Handle missing feature values
         self.handle_missing_values()
         
-        # TODO: Encode categorical variables/values
+        # Encode categorical variables/values
         self.encode_categorical_vars()
+        
+        # Handle duplicates
+        self.handle_duplicates()
         
         # Normalization
         self.normalize(preserve_original=preserve_original, window=window)
@@ -152,6 +155,22 @@ class FeatureTransformer(BaseProcessor):
             logging.debug(f"Encoded data successfully!")
         except Exception as e:
             logging.error("Unable to one-hot encode dataset!")
+    
+    def handle_duplicates(self):
+        """..."""
+        # Check for duplicate columns and fix them
+        duplicate_cols = self.df.columns[self.df.columns.duplicated()].tolist()
+        if duplicate_cols:
+            logging.warning(f"Found duplicate columns: {duplicate_cols}")
+            # Rename duplicates with a suffix
+            for col in duplicate_cols:
+                # Get all occurrences of the duplicated column
+                cols = self.df.columns.get_indexer_for([col])
+                # Rename all but the first occurrence
+                for i, idx in enumerate(cols[1:], 1):
+                    new_name = f"{col}_{i}"
+                    self.df.columns.values[idx] = new_name
+                    logging.debug(f"Renamed duplicate column '{col}' to '{new_name}'")
     
     def normalize(self, preserve_original=False, window=20):
         """Perform normalization"""
