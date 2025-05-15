@@ -19,16 +19,19 @@ class FeatureSelector(BaseProcessor):
         self.df, self.original_df = data_utils.check_and_return_df(data)
         
         # Don't know if it is useful to place here. If not so, this is just temporary.
-        self.X_processed = model_utils.preprocess_features_for_xgboost(self.df, target_col=target_col, enable_categorical=False)  #This function
+        # self.X_processed = model_utils.preprocess_features_for_xgboost(self.df, target_col=target_col, enable_categorical=False)  #This function
         # Getting X- and y-train for selection process/-es
+        self.X = self.original_df.drop([target_col], axis=1)
+        print(f"X : \n {self.X}")
         self.y = self.df[target_col]  # close
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X_processed, self.y, test_size=0.2, random_state=42)
+        print(f"y : \n {self.y}")
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=42)
     
     def run(self):
         """Run the feature selection process."""
 
-        # self.xgb_regressor()
-        self.select_k_best()
+        self.xgb_regressor()
+        # self.select_k_best()  # Not implemented yet
         
         return self.df
     
