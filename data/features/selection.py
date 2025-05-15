@@ -19,7 +19,6 @@ class FeatureSelector(BaseProcessor):
         self.df, self.original_df = data_utils.check_and_return_df(data)
         
         # Don't know if it is useful to place here. If not so, this is just temporary.
-        # self.X_processed = model_utils.preprocess_features_for_xgboost(self.df, target_col=target_col, enable_categorical=False)  #This function
         # Getting X- and y-train for selection process/-es
         self.X = self.original_df.drop([target_col], axis=1)
         print(f"X : \n {self.X}")
@@ -29,7 +28,9 @@ class FeatureSelector(BaseProcessor):
     
     def run(self):
         """Run the feature selection process."""
-
+        print(list(self.df.select_dtypes(include=['uint8']).columns))
+        print(self.df['adx_regime_ranging'])
+        print()
         self.xgb_regressor()
         # self.select_k_best()  # Not implemented yet
         
@@ -41,9 +42,10 @@ class FeatureSelector(BaseProcessor):
             n_estimators=100, 
             max_depth=6,
             tree_method='hist',  # Required for categorical support
+            enable_categorical=True
         )
         model.fit(self.X_train, self.y_train)
-
+        
         # Get importance
         importance = model.feature_importances_
         importance_df = pd.DataFrame(columns=['feature', 'score'])
@@ -51,20 +53,21 @@ class FeatureSelector(BaseProcessor):
         for i, v in enumerate(importance):  # just for educational purposes - can be removed
             new_row = pd.DataFrame([{'feature': i, 'score': f"{v:.5f}"}])
             importance_df = pd.concat([importance_df, new_row], ignore_index=True)
-
+        
         print(importance_df)
-            
+                
         # Get indices of features above threshold
         important_indices = [i for i, v in enumerate(importance) if v > threshold]
-        
+                
         # Select only important features
         self.df = self.df.iloc[:, important_indices]
         logging.debug(f"Selected {len(self.df.columns)} features above threshold {threshold}: {self.df.columns}")
-        
+                
         plt.bar([x for x in range(len(importance))], importance)
         plt.show()
-        
-        logging.info(f"Model Score: {model.score(self.X_processed, self.y)}")
+                
+        # Change this line from self.X_processed to self.X_test
+        logging.info(f"Model Score: {model.score(self.X_test, self.y_test)}")
         
     def select_k_best(self):
         """Using SelectKBest to select features."""
@@ -76,4 +79,4 @@ class FeatureSelector(BaseProcessor):
         # print(mi_scores)  # show a few features with their MI scores
         
         selector = SelectKBest(score_func=mutual_info_regression, k=5)
-        selector.fit(self.X_processed, self.y)
+        selector.fit(self.X, self.y)
