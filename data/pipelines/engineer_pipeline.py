@@ -54,20 +54,13 @@ class EngineeringPipeline():
         self.feature_generator = FeatureGenerator(self.df)
         self.df = self.feature_generator.run()
         
-        # Validate (again)
-        # self.feature_validator = FeatureValidator(self.df)
-        # self.validator_results = self.feature_validator.run()
-        # self.df = self.validator_results["validated_data"]
-        # # Logging results
-        # data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
-        
         # Transformation, scaling, handle missing values, etc. of newly generated features
         self.transformation = FeatureTransformer(self.df)
         self.df = self.transformation.run()
         
         # Feature Selection
-        # self.selector = FeatureSelector(self.df)
-        # self.df = self.selector.run()
+        self.selector = FeatureSelector(self.df)
+        self.df = self.selector.run()
         
         # Save Engineered data
         shared_utils.ensure_path_exists(path = self.output_path or config.CAPCOM_PROCESSED_DATA_DIR)
