@@ -28,11 +28,8 @@ class FeatureSelector(BaseProcessor):
     
     def run(self):
         """Run the feature selection process."""
-        print(list(self.df.select_dtypes(include=['uint8']).columns))
-        print(self.df['adx_regime_ranging'])
-        print()
-        self.xgb_regressor()
-        # self.select_k_best()  # Not implemented yet
+        # self.xgb_regressor()
+        self.select_k_best()
         
         return self.df
     
