@@ -13,24 +13,57 @@ from utils import model_utils
 
 
 class FeatureSelector(BaseProcessor):
-    def __init__(self, data, target_col = 'close'):
-        """Class for Selecting the most important features."""
+    def __init__(self, data, target_col:str = 'close'):
+        """
+        Class for Selecting the most important features. Focusing on Correlation-based Feature Selection, 
+        Tree-based Feature Importance and Recursive Feature Elimination.
+        """
         # Load dataset based on format
         self.df, self.original_df = data_utils.check_and_return_df(data)
+        self.target_col = target_col
         
-        # Don't know if it is useful to place here. If not so, this is just temporary.
         # Getting X- and y-train for selection process/-es
         self.X = model_utils.preprocess_features_for_xgboost(df=self.df, enable_categorical=True)  # self.original_df.drop([target_col], axis=1)
-        print(f"X : \n {self.X}")
-        self.y = self.df[target_col]  # close
-        print(f"y : \n {self.y}")
+        self.y = self.df[self.target_col]
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=42)
     
     def run(self):
-        """Run the feature selection process."""
-        self.xgb_regressor()
+        """
+        Run the feature selection process.
+        
+        - First use correlation analysis to remove redundant features
+        - Then apply tree-based importance to get an initial feature ranking
+        - Finally use RFE with your actual model to fine-tune the selection
+        """
+        print()
+        print()
+        self.cfs()
+        # self.xgb_regressor()
+        # self.rfe()
         
         return self.df
+    
+    def cfs(self, k:int = 15):
+        """
+        Correlation-based Feature Selection: selects subsets of features that are 
+        highly correlated with the target variable but have low correlation with each other.
+        Link: https://medium.com/@sariq16/correlation-based-feature-selection-in-a-data-science-project-3ca08d2af5c6
+        
+        Params:
+            k: Number of features the method will select - select the top k features.
+        """
+        try: 
+            # Calculate correlation matrix
+            corr_matrix = self.df.corr()
+            corr_with_target = corr_matrix[self.target_col]
+            # Sort correlation values in descending order and select top k features
+            top_k = corr_with_target.abs().sort_values(ascending=False)[:k].index
+            selected_features = self.df[top_k]
+            
+            # Correlation between selected k features
+            selected_corr_matrix = selected_features.corr()
+        except Exception as e:
+            logging.error(f"Unable to perform Correlation-based Feature Selection: {e}")
     
     def xgb_regressor(self, threshold = 0.01):
         """Select features using XGB Regressor."""
@@ -65,3 +98,6 @@ class FeatureSelector(BaseProcessor):
         # Change this line from self.X_processed to self.X_test
         logging.info(f"Model Score: {model.score(self.X_test, self.y_test)}")
         
+    def rfe(self):
+        """Recursive Feature Elimination: ..."""
+        pass
