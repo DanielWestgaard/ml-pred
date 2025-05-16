@@ -28,8 +28,8 @@ class FeatureSelector(BaseProcessor):
     
     def run(self):
         """Run the feature selection process."""
-        # self.xgb_regressor()
-        self.select_k_best()
+        self.xgb_regressor()
+        # self.select_k_best()
         
         return self.df
     
