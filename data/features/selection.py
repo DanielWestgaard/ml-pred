@@ -29,7 +29,6 @@ class FeatureSelector(BaseProcessor):
     def run(self):
         """Run the feature selection process."""
         self.xgb_regressor()
-        # self.select_k_best()
         
         return self.df
     
@@ -66,14 +65,3 @@ class FeatureSelector(BaseProcessor):
         # Change this line from self.X_processed to self.X_test
         logging.info(f"Model Score: {model.score(self.X_test, self.y_test)}")
         
-    def select_k_best(self):
-        """Using SelectKBest to select features."""
-        # Using mutual_info_classif for classification problem MI - score between feature and target variable separately
-        # mi_scores = mutual_info_classif(self.df, self.y)
-        # mi_scores = pd.Series(mi_scores, name="MI Scores", index=self.X_processed.columns)
-        # mi_scores = mi_scores.sort_values(ascending=False)
-
-        # print(mi_scores)  # show a few features with their MI scores
-        
-        selector = SelectKBest(score_func=mutual_info_regression, k=5)
-        selector.fit(self.X, self.y)
