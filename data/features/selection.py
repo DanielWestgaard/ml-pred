@@ -38,13 +38,13 @@ class FeatureSelector(BaseProcessor):
         """
         print()
         print()
-        # self.cfs()
+        self.cfs()
         # self.xgb_regressor()
-        self.rfe()
+        # self.rfe()
         
         return self.df
     
-    def cfs(self, k:int = 15):
+    def cfs(self, k:int = 15, corr_threshold=0.7):
         """
         Correlation-based Feature Selection: selects subsets of features that are 
         highly correlated with the target variable but have low correlation with each other.
@@ -54,17 +54,28 @@ class FeatureSelector(BaseProcessor):
             k: Number of features the method will select - select the top k features.
         """
         try: 
-            # Calculate correlation matrix
+            # First get features most correlated with target
             corr_matrix = self.df.corr()
-            corr_with_target = corr_matrix[self.target_col]
-            # Sort correlation values in descending order and select top k features
-            top_k = corr_with_target.abs().sort_values(ascending=False)[:k].index
-            selected_features = self.df[top_k]
+            corr_with_target = corr_matrix[self.target_col].drop(self.target_col)
             
-            # Correlation between selected k features
-            selected_corr_matrix = selected_features.corr()
+            # Sort and get top k candidates
+            candidates = corr_with_target.abs().sort_values(ascending=False)[:k].index.tolist()
+            
+            # Remove highly correlated features from candidates
+            selected = []
+            for feature in candidates:
+                to_remove = False
+                for selected_feature in selected:
+                    if abs(corr_matrix.loc[feature, selected_feature]) > corr_threshold:
+                        to_remove = True
+                        break
+                if not to_remove:
+                    selected.append(feature)
+            
+            return selected + [self.target_col]  # Return feature names
         except Exception as e:
             logging.error(f"Unable to perform Correlation-based Feature Selection: {e}")
+            return None
     
     def xgb_regressor(self, threshold = 0.01):
         """Select features using XGB Regressor."""
