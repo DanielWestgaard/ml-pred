@@ -38,8 +38,8 @@ class FeatureSelector(BaseProcessor):
         """
         print()
         print()
-        self.cfs()
-        # self.xgb_regressor()
+        # self.cfs()
+        self.xgb_regressor()
         # self.rfe()
         
         return self.df
@@ -83,31 +83,30 @@ class FeatureSelector(BaseProcessor):
             model = xgb.XGBRegressor(
                 n_estimators=100, 
                 max_depth=6,
-                tree_method='hist',  # Required for categorical support
+                tree_method='hist',
                 enable_categorical=True
             )
             model.fit(self.X_train, self.y_train)
             
-            # Get importance
+            # Create importance DataFrame with actual feature names
             importance = model.feature_importances_
-            importance_df = pd.DataFrame(columns=['feature', 'score'])
-            # Summarize feature importance
-            for i, v in enumerate(importance):  # just for educational purposes - can be removed
-                new_row = pd.DataFrame([{'feature': i, 'score': f"{v:.5f}"}])
-                importance_df = pd.concat([importance_df, new_row], ignore_index=True)
+            feature_importance = pd.DataFrame({
+                'feature': self.X.columns,
+                'importance': importance
+            }).sort_values('importance', ascending=False)
             
-            # Get indices of features above threshold
-            important_indices = [i for i, v in enumerate(importance) if v > threshold]
-                    
-            # Select only important features
-            self.df = self.df.iloc[:, important_indices]
-            logging.debug(f"Selected {len(self.df.columns)} features above threshold {threshold}: {self.df.columns}")
-                    
-            plt.bar([x for x in range(len(importance))], importance)
-            plt.show()
-                    
-            # Change this line from self.X_processed to self.X_test
-            logging.info(f"Model Score: {model.score(self.X_test, self.y_test)}")
+            # Filter by threshold
+            selected_features = feature_importance[feature_importance['importance'] > threshold]['feature'].tolist()
+            
+            # Plot importance (consider saving the plot)
+            plt.figure(figsize=(10, 6))
+            plt.bar(feature_importance['feature'], feature_importance['importance'])
+            plt.xticks(rotation=90)
+            plt.tight_layout()
+            # plt.savefig('feature_importance.png')
+            
+            logging.debug(f"Selected {len(selected_features)} features above threshold {threshold}: {selected_features}")
+            return selected_features
         except Exception as e:
             logging.error(f"Unable to use XGB Regression for feature selection: {e}")
         
