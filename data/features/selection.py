@@ -28,7 +28,7 @@ class FeatureSelector(BaseProcessor):
         self.y = self.df[self.target_col]
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=42)
     
-    def run(self):
+    def run(self, methods=['cfs', 'xgb', 'rfe'], k_features=15):
         """
         Run the feature selection process.
         
@@ -36,13 +36,38 @@ class FeatureSelector(BaseProcessor):
         - Then apply tree-based importance to get an initial feature ranking
         - Finally use RFE with your actual model to fine-tune the selection
         """
-        print()
-        print()
-        # self.cfs()
-        # self.xgb_regressor()
-        self.rfe()
+        logging.info("---------- Starting Feature Selection ----------")
         
-        return self.df
+        selected_features = {}
+        
+        if 'cfs' in methods:
+            selected_features['cfs'] = self.cfs(k=k_features)
+        
+        if 'xgb' in methods:
+            selected_features['xgb'] = self.xgb_regressor(threshold=0.01)
+        
+        if 'rfe' in methods:
+            selected_features['rfe'] = self.rfe(n_features_to_select=k_features)
+        
+        # Combine methods - features selected by at least 2 methods
+        if len(methods) > 1:
+            feature_counts = {}
+            for method, features in selected_features.items():
+                for feature in features:
+                    if feature != self.target_col:
+                        feature_counts[feature] = feature_counts.get(feature, 0) + 1
+            
+            final_features = [f for f, count in feature_counts.items() 
+                            if count >= len(methods)//2 + 1]
+            final_features.append(self.target_col)
+        else:
+            final_features = selected_features[methods[0]]
+        
+        logging.info(f"Feature selection concluded with the following features: {final_features}.")
+        
+        # Create final dataframe with selected features
+        self.selected_features = final_features
+        return self.df[final_features]
     
     def cfs(self, k:int = 15, corr_threshold=0.7):
         """
