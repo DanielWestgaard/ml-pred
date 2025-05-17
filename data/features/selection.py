@@ -1,4 +1,5 @@
 import logging
+import os
 import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
@@ -7,10 +8,12 @@ from sklearn.model_selection import train_test_split, TimeSeriesSplit
 from sklearn.feature_selection import SelectKBest, mutual_info_regression, mutual_info_classif, RFE, RFECV
 import xgboost as xgb
 from sklearn.svm import SVR
+import datetime
 
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
 from utils import model_utils
+import config.config as config
 
 
 class FeatureSelector(BaseProcessor):
@@ -27,6 +30,11 @@ class FeatureSelector(BaseProcessor):
         self.X = model_utils.preprocess_features_for_xgboost(df=self.df, enable_categorical=True)  # self.original_df.drop([target_col], axis=1)
         self.y = self.df[self.target_col]
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.2, random_state=42)
+        
+        # Time for saving the files
+        self.current_time = datetime.datetime.now()
+        self.storage_path = os.path.join(config.FE_SEL_BASE_DIR, str(self.current_time))
+        os.mkdir(self.storage_path)
     
     def run(self, methods=['cfs', 'xgb', 'rfe'], k_features=15):
         """
@@ -128,7 +136,7 @@ class FeatureSelector(BaseProcessor):
             plt.bar(feature_importance['feature'], feature_importance['importance'])
             plt.xticks(rotation=90)
             plt.tight_layout()
-            plt.savefig('feature_importance.png')
+            plt.savefig(f'{self.storage_path}/xgb_feature_importance.png')
             
             logging.debug(f"Selected {len(selected_features)} features above threshold {threshold}: {selected_features}")
             return selected_features
@@ -166,7 +174,7 @@ class FeatureSelector(BaseProcessor):
                     selector.cv_results_['mean_test_score'])
             plt.xlabel('Number of features')
             plt.ylabel('Mean test score (neg MSE)')
-            plt.savefig('rfe_cv_scores.png')
+            plt.savefig(f'{self.storage_path}/rfe_cv_scores.png')
             
             logging.info(f"Optimal number of features: {selector.n_features_}")
             return selected_features

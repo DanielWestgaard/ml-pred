@@ -33,6 +33,9 @@ CAPCOM_RESPONSE_JSON_DIR = os.path.join(CAPCOM_BASE_STORAGE_DIR, 'saved_response
 ALPVAN_BASE_STORAGE_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'alpha_vantage')
 ALPVAN_RAW_DATA_DIR = os.path.join(ALPVAN_BASE_STORAGE_DIR, 'raw')
 ALPVAN_RESPONSE_JSON_DIR = os.path.join(ALPVAN_BASE_STORAGE_DIR, 'saved_responses')
+# Data Engineering
+DATA_ENGINEERING_STATS_DIR = os.path.join(BASE_STORAGE_DIR, 'data_engineering_stats')
+FE_SEL_BASE_DIR = os.path.join(DATA_ENGINEERING_STATS_DIR, 'fe_selection')
 
 
 # LOGGING
