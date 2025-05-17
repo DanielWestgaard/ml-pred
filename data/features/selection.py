@@ -3,9 +3,10 @@ import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from matplotlib import pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.feature_selection import SelectKBest, mutual_info_regression, mutual_info_classif
+from sklearn.model_selection import train_test_split, TimeSeriesSplit
+from sklearn.feature_selection import SelectKBest, mutual_info_regression, mutual_info_classif, RFE, RFECV
 import xgboost as xgb
+from sklearn.svm import SVR
 
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
@@ -37,9 +38,9 @@ class FeatureSelector(BaseProcessor):
         """
         print()
         print()
-        self.cfs()
+        # self.cfs()
         # self.xgb_regressor()
-        # self.rfe()
+        self.rfe()
         
         return self.df
     
@@ -83,8 +84,6 @@ class FeatureSelector(BaseProcessor):
             new_row = pd.DataFrame([{'feature': i, 'score': f"{v:.5f}"}])
             importance_df = pd.concat([importance_df, new_row], ignore_index=True)
         
-        print(importance_df)
-                
         # Get indices of features above threshold
         important_indices = [i for i, v in enumerate(importance) if v > threshold]
                 
@@ -99,5 +98,22 @@ class FeatureSelector(BaseProcessor):
         logging.info(f"Model Score: {model.score(self.X_test, self.y_test)}")
         
     def rfe(self):
-        """Recursive Feature Elimination: ..."""
-        pass
+        """
+        Recursive Feature Elimination (Cross Validation): Fits to a model and removes the weakest featues
+        until the specified number of features  is reached.
+        """
+        try:
+            estimator = SVR(kernel="linear")
+            # Time-based cross validation to avoid lookahed bias
+            cv = TimeSeriesSplit(n_splits=5)
+            # RFECV to help determine the optimal number of features rather than fixed feature set
+            selector = RFECV(estimator, step=1, cv=cv, scoring='neg_mean_squared_error')
+            selector = selector.fit(self.X, self.y)
+            # print(selector.support_)
+            # print(selector.ranking_)
+            
+            # Storing the selected features
+            selected_features = self.X.columns[selector.support_]
+            return selected_features
+        except Exception as e:
+            logging.error(f"Unable to perform Recursive Feature Elimination: {e}")
