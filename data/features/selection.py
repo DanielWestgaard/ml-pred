@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from matplotlib import pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
 from sklearn.feature_selection import SelectKBest, mutual_info_regression, mutual_info_classif, RFE, RFECV
 import xgboost as xgb
@@ -91,9 +92,29 @@ class FeatureSelector(BaseProcessor):
             corr_matrix = self.df.corr()
             corr_with_target = corr_matrix[self.target_col].drop(self.target_col)
             
+            plt.figure(figsize=(20, 16))
+            # Generate mask for the upper triangle to show only lower triangle
+            mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
+            # Plot the heatmap
+            sns.heatmap(
+                corr_matrix, 
+                annot=True,           # Show the correlation values
+                mask=mask,            # Apply the mask
+                cmap="coolwarm",      # Color map
+                vmin=-1, vmax=1,      # Value range
+                center=0,             # Center the colormap at 0
+                square=True,          # Make cells square
+                linewidths=0.5,       # Width of cell borders
+                fmt=".2f"             # Format for the annotations
+            )
+            
+            plt.title('Correlation Matrix of Selected Features')
+            plt.tight_layout()
+            plt.savefig(f'{self.storage_path}/cfs_feature_correlation.png')
+            
             # Sort and get top k candidates
             candidates = corr_with_target.abs().sort_values(ascending=False)[:k].index.tolist()
-            
+            print(candidates)
             # Remove highly correlated features from candidates
             selected = []
             for feature in candidates:
