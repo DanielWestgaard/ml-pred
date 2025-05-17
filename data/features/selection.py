@@ -39,8 +39,8 @@ class FeatureSelector(BaseProcessor):
         print()
         print()
         # self.cfs()
-        self.xgb_regressor()
-        # self.rfe()
+        # self.xgb_regressor()
+        self.rfe()
         
         return self.df
     
@@ -103,30 +103,47 @@ class FeatureSelector(BaseProcessor):
             plt.bar(feature_importance['feature'], feature_importance['importance'])
             plt.xticks(rotation=90)
             plt.tight_layout()
-            # plt.savefig('feature_importance.png')
+            plt.savefig('feature_importance.png')
             
             logging.debug(f"Selected {len(selected_features)} features above threshold {threshold}: {selected_features}")
             return selected_features
         except Exception as e:
             logging.error(f"Unable to use XGB Regression for feature selection: {e}")
         
-    def rfe(self):
+    def rfe(self, n_features_to_select=None, step=2):
         """
         Recursive Feature Elimination (Cross Validation): Fits to a model and removes the weakest featues
         until the specified number of features  is reached.
         """
         try:
-            estimator = SVR(kernel="linear")
-            # Time-based cross validation to avoid lookahed bias
-            cv = TimeSeriesSplit(n_splits=5)
-            # RFECV to help determine the optimal number of features rather than fixed feature set
-            selector = RFECV(estimator, step=1, cv=cv, scoring='neg_mean_squared_error')
-            selector = selector.fit(self.X, self.y)
-            # print(selector.support_)
-            # print(selector.ranking_)
+            # For intraday data, gradient boosting might perform better than (simple) SVR
+            estimator = xgb.XGBRegressor(n_estimators=100, max_depth=4)
             
-            # Storing the selected features
-            selected_features = self.X.columns[selector.support_]
+            # Time-based cross validation to avoid lookahead bias
+            cv = TimeSeriesSplit(n_splits=5)
+            
+            selector = RFECV(
+                estimator, 
+                step=step,  # Remove more features per iteration for speed
+                cv=cv, 
+                scoring='neg_mean_squared_error',
+                min_features_to_select=n_features_to_select if n_features_to_select else 5
+            )
+            
+            selector = selector.fit(self.X, self.y)
+            
+            # Get selected features with importance ranking
+            selected_features = self.X.columns[selector.support_].tolist()
+            
+            # Plot the number of features vs CV score
+            plt.figure(figsize=(10, 6))
+            plt.plot(range(1, len(selector.cv_results_['mean_test_score']) + 1), 
+                    selector.cv_results_['mean_test_score'])
+            plt.xlabel('Number of features')
+            plt.ylabel('Mean test score (neg MSE)')
+            plt.savefig('rfe_cv_scores.png')
+            
+            logging.info(f"Optimal number of features: {selector.n_features_}")
             return selected_features
         except Exception as e:
             logging.error(f"Unable to perform Recursive Feature Elimination: {e}")
