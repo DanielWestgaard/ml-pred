@@ -11,6 +11,7 @@ It's important to note that this will probably not be the very best system, as I
 ├── live/                   # Deploy trained model on live market data
 ├── storage/                # General storage for data, models, results, etc.
 ├── broker/                 # Different broker integrations
+├── tests/                  # Testing
 ├── secrets/                # Folder using secrets.txt to store sensitive vars (not saved in repo)
 ├── config/                 # Configuration files
 ├── utils/                  # Utility files
