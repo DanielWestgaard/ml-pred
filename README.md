@@ -18,6 +18,7 @@ It's important to note that this will probably not be the very best system, as I
 ├── images/                 # Storing images and sources used in documentation
 ├── trash/                  # Deprecated files and code no longer needed/in use
 ├── README.md               # General project description
+├── pytest.ini              # Configuration file for pytest (declaring where test dir are)
 └── secrets/                # Sensitive content (must be created individually)
     └── secrets.txt         # Main secret file
 ```
