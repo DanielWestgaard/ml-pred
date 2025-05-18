@@ -64,4 +64,8 @@ class EngineeringPipeline():
         self.df = self.selector.run()
         
         # Save Engineered data
-        data_utils.save_processed_file(filepath=self.raw_data_path, processed_data=self.df)
+        try:
+            data_utils.save_processed_file(filepath=self.raw_data_path, processed_data=self.df)
+        except Exception as e:
+            logging.error(f"Unable to save file 'dynamically', will store as {os.getcwd()}, : {e}")
+            self.df.to_csv('testing.csv', index=True)
