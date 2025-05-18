@@ -15,6 +15,7 @@ It's important to note that this will probably not be the very best system, as I
 ├── config/                 # Configuration files
 ├── utils/                  # Utility files
 ├── images/                 # Storing images and sources used in documentation
+├── trash/                  # Deprecated files and code no longer needed/in use
 ├── README.md               # General project description
 └── secrets/                # Sensitive content (must be created individually)
     └── secrets.txt         # Main secret file

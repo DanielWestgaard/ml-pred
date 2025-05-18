@@ -57,12 +57,14 @@ Simple cleaning class that performs the following:
 - **OHLC validity**.
 
 ### Validation 
+There are two validation classes in ```validation.py```.<br>
 Simple validation class that performs validation of data after cleaning, to verify data integrity and ensure loical consistency. These are the current validations done:
 - **OHLC Relationships**, similar to the one in cleaning, but using this to validate that work.
 - **Timestamps** for integrity and consistency.
 - **Volume** 
 - **Price Movements** for extreme or suspicous patterns.
 - **Data Completeness**
+The second class is responsible for validating the features after feature generation.
 
 
 ## About features/
@@ -74,7 +76,14 @@ To handle errors, but also keep a more simplistic code, have I implemented ```sa
 > [!NOTE]
 > The feature generator creates several categorical features. Some ML Models requires only numerical input, so this should be handled accordingly for the models needs.
 
-### Normalization
+### Transformation - transformation.py
+#### Preparation of features before normalization
+- **Handling missing values**: Some steps to handle missing values, as this can mess up normalization and selection later.
+  1. Dropping whole features (technically columns) that contain more empty values (```Null```, ```NaN```) than the threshold (default is 50%).
+  2. Based on a fixed/static list with feature names, extracts the maximum window size (eg. ```n```) and drops the first ```n``` rows. This can also be fixed (TODO).
+    - **<ins>Note</ins>**: This fix _assumes_ all generated features (that requires past data to calculate _and_ the features manually added in the ```high_feature_windows``` list) starts with the abbreviation or one-word of the feature name, followed by "_" and the window size. Eg. For Simple Moving Average with window size 50: ```sma_50```.
+- ...
+#### Normalization
 Simple Normalization class that uses **two Normalization Techniques**; [Z-Score](https://www.investopedia.com/terms/z/zscore.asp) for _Unbounded_ (no boundaries of certainty) features and [MinMax Scaker](https://medium.com/@iamkamleshrangi/how-min-max-scaler-works-9fbebb9347da) for _Bounded_ (field that has limited scope) features.<br>
 The ```run()``` has some functionality that excludes some features from normalization:
 - **String Categorical Features**:
