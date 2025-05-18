@@ -45,3 +45,8 @@ If this is the first time using the repo, follow these instructions:
 - If you're using VSCode, I highly recommend installing the extensions
     - [Rainbow CSV](https://marketplace.visualstudio.com/items/?itemName=mechatroner.rainbow-csv): Prettier view of .csv-files.
     - [Material Icon Theme](https://marketplace.visualstudio.com/items/?itemName=PKief.material-icon-theme): Helps massively when you have many folders (icon some names).
+
+## Nice to know
+Trying to follow best practice for python, I have...
+- Added readme's to each (important) folder to more granular descriptions and information about the different systems, and also trying to update them with a ```Structure``` paragraph for easier overview short descriptions.
+- Using methods with prefix ```_```before the method name to indicate a "private" method (/helper function). Eg. ```_plot_fs_analysis_cfs```
