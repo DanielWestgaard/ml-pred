@@ -13,6 +13,9 @@ This folder is used for storage of different purposes.
 │   │   ├── raw
 │   │   └── saved_responses
 │   └── ...
+├── data_engineeering_stats/    # Statistics and plots during data engineering pipeline
+│   ├── fe_generation/
+│   └── fe_selection/
 ├── models/                     # Trained models and metadata
 ├── backtesting_results/        # Results from backtesting
 └── README.md                   # Documentation related to storage/
