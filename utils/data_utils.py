@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import pandas as pd
 import sys
+import pandas as pd
 
 import config.config as config
 from data.processing.validation import DataValidator
@@ -173,3 +174,43 @@ def check_validation(validation_results_is_valid : bool, validation_results_issu
     else:
         logging.warning("Validation of data was not valid!")
         logging.warning(f"Validation issues: {validation_results_issues}")
+        
+
+def save_processed_file(filepath, processed_data : pd.DataFrame):
+    """
+    Save a processed version of the file:
+    - Replace 'raw' with 'processed' in the filename (or add 'processed_' if 'raw' isn't found)
+    - Save to ../processed/ directory
+    
+    Args:
+        filepath: Original filepath, e.g. "storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv"
+        
+    Returns:
+        str: Path where the processed file was saved
+    """
+    # Extract filename from filepath
+    filename = os.path.basename(filepath)
+    
+    # Replace "raw" with "processed" in the filename
+    if "raw" in filename:
+        processed_filename = filename.replace("raw", "processed")
+    else:
+        # If "raw" isn't in the filename, add "processed_" prefix
+        processed_filename = "processed_" + filename
+    
+    # Get parent directory of the original file's directory
+    parent_dir = os.path.dirname(os.path.dirname(filepath))
+    
+    # Create the processed directory path
+    processed_dir = os.path.join(parent_dir, "processed")
+    
+    # Ensure the processed directory exists
+    os.makedirs(processed_dir, exist_ok=True)
+    
+    # Create the full output path
+    output_path = os.path.join(processed_dir, processed_filename)
+    
+    # Save the dataframe
+    processed_data.to_csv(output_path, index=True)
+    
+    return output_path
