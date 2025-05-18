@@ -82,7 +82,7 @@ To handle errors, but also keep a more simplistic code, have I implemented ```sa
   1. Dropping whole features (technically columns) that contain more empty values (```Null```, ```NaN```) than the threshold (default is 50%).
   2. Based on a fixed/static list with feature names, extracts the maximum window size (eg. ```n```) and drops the first ```n``` rows. This can also be fixed (TODO).
     - **<ins>Note</ins>**: This fix _assumes_ all generated features (that requires past data to calculate _and_ the features manually added in the ```high_feature_windows``` list) starts with the abbreviation or one-word of the feature name, followed by "_" and the window size. Eg. For Simple Moving Average with window size 50: ```sma_50```.
-- ...
+- **Handles duplicated features**/columns.
 #### Normalization
 Simple Normalization class that uses **two Normalization Techniques**; [Z-Score](https://www.investopedia.com/terms/z/zscore.asp) for _Unbounded_ (no boundaries of certainty) features and [MinMax Scaker](https://medium.com/@iamkamleshrangi/how-min-max-scaler-works-9fbebb9347da) for _Bounded_ (field that has limited scope) features.<br>
 The ```run()``` has some functionality that excludes some features from normalization:
@@ -100,6 +100,11 @@ The ```run()``` has some functionality that excludes some features from normaliz
 - **Ordinal Numeric Codes**:
   - ```market_state``` (0-8 representing different market states)
 
+### Feature Selection - selection.py
+The feature selection file performs _very simple_ Feature Selection, by using different techniques/methods, to then select the features that two or more techniques agree about:
+1. **Correlation-based Feature Selection**: Selects subsets of features that are highly correlated with the target variable (```close```), but have low correlation with each other.
+2. **XGB Regression**: "Ranks" features based on importance, and selects features above ```threshold```-variable.
+3. **Recursive Feature Elimination**: Fits  a model (XGB Regressor) and removes the weakest feature (or features) until the specified number of features is reached.
 
 ## About providers/ 
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>

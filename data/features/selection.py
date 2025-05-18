@@ -180,7 +180,7 @@ class FeatureSelector(BaseProcessor):
     def rfe(self, n_features_to_select=None, step=2):
         """
         Recursive Feature Elimination (Cross Validation): Fits to a model and removes the weakest featues
-        until the specified number of features  is reached.
+        until the specified number of features is reached.
         """
         try:
             # For intraday data, gradient boosting might perform better than (simple) SVR
