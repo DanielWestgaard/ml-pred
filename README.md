@@ -49,4 +49,4 @@ If this is the first time using the repo, follow these instructions:
 ## Nice to know
 Trying to follow best practice for python, I have...
 - Added readme's to each (important) folder to more granular descriptions and information about the different systems, and also trying to update them with a ```Structure``` paragraph for easier overview short descriptions.
-- Using methods with prefix ```_``` before the method name to indicate a "private" method (/helper function). Eg. ```_plot_fs_analysis_cfs```
+- Using methods with prefix ```_``` before the method name to indicate a "private" method (/helper function). Eg. ```_plot_fs_analysis_cfs()```
