@@ -92,26 +92,8 @@ class FeatureSelector(BaseProcessor):
             corr_matrix = self.df.corr()
             corr_with_target = corr_matrix[self.target_col].drop(self.target_col)
             
-            plt.figure(figsize=(20, 16))
-            # Generate mask for the upper triangle to show only lower triangle
-            mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
-            # Plot the heatmap
-            sns.heatmap(
-                corr_matrix, 
-                annot=True,           # Show the correlation values
-                mask=mask,            # Apply the mask
-                cmap="coolwarm",      # Color map
-                vmin=-1, vmax=1,      # Value range
-                center=0,             # Center the colormap at 0
-                square=True,          # Make cells square
-                linewidths=0.5,       # Width of cell borders
-                fmt=".2f"             # Format for the annotations
-            )
-            
-            plt.title('Correlation Matrix of Selected Features')
-            plt.tight_layout()
-            plt.savefig(f'{self.storage_path}/cfs_feature_correlation.png')
-            
+            self._plot_fs_analysis_cfs()
+                        
             # Sort and get top k candidates
             candidates = corr_with_target.abs().sort_values(ascending=False)[:k].index.tolist()
             print(candidates)
@@ -130,6 +112,37 @@ class FeatureSelector(BaseProcessor):
         except Exception as e:
             logging.error(f"Unable to perform Correlation-based Feature Selection: {e}")
             return None
+    
+    def _plot_fs_analysis_cfs(self, top_k=20, corr_threshold=0.7):
+        """Two-part visualization for feature selection"""
+        # 1. Plot correlations with target
+        corr_with_target = self.df.corr()[self.target_col].drop(self.target_col)
+        top_features = corr_with_target.abs().sort_values(ascending=False).head(top_k).index
+        
+        # Create figure with two subplots
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 8))
+        
+        # Plot correlations with target
+        corr_with_target.loc[top_features].sort_values().plot(
+            kind='barh', ax=ax1, cmap='coolwarm')
+        ax1.set_title(f'Top {top_k} Features Correlated with Target')
+        ax1.set_xlabel('Correlation')
+        
+        # Plot correlation matrix between top features
+        corr_matrix = self.df[top_features].corr()
+        sns.heatmap(
+            corr_matrix,
+            ax=ax2,
+            annot=True,
+            cmap="coolwarm",
+            vmin=-1, vmax=1,
+            center=0,
+            fmt=".2f"
+        )
+        ax2.set_title('Correlation Matrix Among Top Features')
+        
+        plt.tight_layout()
+        plt.savefig(f'{self.storage_path}/cfs_feature_correlation.png')
     
     def xgb_regressor(self, threshold = 0.01):
         """Select features using XGB Regressor."""
