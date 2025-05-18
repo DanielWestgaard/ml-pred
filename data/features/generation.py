@@ -7,7 +7,6 @@ from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
 import time
 
 from utils import data_utils
-from data.features.statistics import FeatureStatistics
 
 
 class FeatureGenerator():
@@ -101,8 +100,7 @@ class FeatureGenerator():
             self.safely_execute("fast_fourier_transforms", "Fast Fourier Transforms")
             
             try:
-                feature_stats = FeatureStatistics(self.df)
-                n_features, feature_list = feature_stats.generated_features()
+                n_features, feature_list = self._generated_features()
                 logging.info(f"Generated {n_features} features.")
                 logging.debug(f"Generated features are: {feature_list}")
             except Exception as e:
@@ -127,6 +125,23 @@ class FeatureGenerator():
         except Exception as e:
             logging.error(f"Error generating {feature_name}: {str(e)}")
             return False
+    
+    def _generated_features(self, basic_cols = ['date', 'open', 'high', 'low', 'close', 'volume']):
+        """
+        Function for counting generated features, assuming that's whats in the dataset.
+        
+        Parameters:
+            basic_cols: list of the columns that are not features, but basic columns. Default is date, OHLCV
+            
+        Returns:
+            n_features: Number of features, excluding basic_cols
+            features_list: List of all features.
+        """
+        columns = self.df.columns
+        
+        features_list = [col for col in columns if col not in basic_cols]
+        
+        return len(features_list), features_list
     
     # =============================================================================
     # Section: Price Action Features
