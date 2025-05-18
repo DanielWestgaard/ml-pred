@@ -176,7 +176,7 @@ def check_validation(validation_results_is_valid : bool, validation_results_issu
         logging.warning(f"Validation issues: {validation_results_issues}")
         
 
-def save_processed_file(self, filepath, processed_data : pd.DataFrame):
+def save_processed_file(filepath, processed_data : pd.DataFrame):
     """
     Save a processed version of the file:
     - Replace 'raw' with 'processed' in the filename (or add 'processed_' if 'raw' isn't found)

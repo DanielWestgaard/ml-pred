@@ -24,6 +24,7 @@ class EngineeringPipeline():
             raw_dataset: path to the raw dataset (csv format).
         """
         self.output_path = output_path
+        self.raw_data_path = raw_dataset
 
         # Loading data
         self.df, self.original_df = data_utils.check_and_return_df(raw_dataset)
@@ -63,5 +64,6 @@ class EngineeringPipeline():
         self.df = self.selector.run()
         
         # Save Engineered data
-        shared_utils.ensure_path_exists(path = self.output_path or config.CAPCOM_PROCESSED_DATA_DIR)
-        self.df.to_csv(os.path.join(config.CAPCOM_PROCESSED_DATA_DIR, 'testing.csv'), index=True)  # since df.column["date"] is the index, we include it in the saving
+        # shared_utils.ensure_path_exists(path = self.output_path or config.CAPCOM_PROCESSED_DATA_DIR)
+        # self.df.to_csv(os.path.join(config.CAPCOM_PROCESSED_DATA_DIR, 'testing.csv'), index=True)  # since df.column["date"] is the index, we include it in the saving
+        data_utils.save_processed_file(filepath=self.raw_data_path, processed_data=self.df)
