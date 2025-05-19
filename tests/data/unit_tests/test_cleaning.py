@@ -45,7 +45,7 @@ class TestDataCleaner(unittest.TestCase):
         # Count NaN values before cleaning
         cleaner = DataCleaner(self.df_with_issues)
         nan_count_before = cleaner.df.isna().sum().sum()
-        
+
         # Ensure we have NaNs to test with
         self.assertGreater(nan_count_before, 0, "Test data should have NaN values for this test")
         
@@ -70,7 +70,7 @@ class TestDataCleaner(unittest.TestCase):
         self.assertGreater(duplicate_count_before, 0, "Test data should have duplicate dates for this test")
         
         # Set date as index for the method to work
-        cleaner.df = cleaner.df.set_index('date')
+        # cleaner.df = cleaner.df.set_index('date')
         
         # Run the duplicates handler
         cleaner._remove_duplicates()
