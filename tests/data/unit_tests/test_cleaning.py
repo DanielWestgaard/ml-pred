@@ -129,18 +129,21 @@ class TestDataCleaner(unittest.TestCase):
         # Create data with mixed types
         df = self.clean_df.copy()
         
-        # Mix data types
-        df.loc[10, 'close'] = str(df.loc[10, 'close'])  # Convert to string
+        # Mix data types - use pandas' object type to avoid warnings
+        df['close'] = df['close'].astype('object')  # Convert column to object type first
+        df.loc[10, 'close'] = str(df.loc[10, 'close'])  # Then set string value
+        
+        df['volume'] = df['volume'].astype('object')  # Same for volume
         df.loc[15, 'volume'] = float(df.loc[15, 'volume'])  # Convert to float
         
         cleaner = DataCleaner(df)
         cleaner._datatype_consistency()
         
         # Check that types are corrected
-        self.assertTrue(np.issubdtype(cleaner.df['close'].dtype, np.number), 
-                       "Close column should be numeric")
-        self.assertTrue(np.issubdtype(cleaner.df['volume'].dtype, np.integer), 
-                       "Volume column should be integer")
+        self.assertTrue(np.issubdtype(cleaner.df['close'].dtype, np.number),
+                    "Close column should be numeric")
+        self.assertTrue(np.issubdtype(cleaner.df['volume'].dtype, np.integer),
+                    "Volume column should be integer")
     
     def test_ohlc_validity(self):
         """Test validation of OHLC relationships."""
