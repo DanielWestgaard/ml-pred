@@ -77,6 +77,17 @@ class DataCleaner(BaseProcessor):
         self.df['low'] = self.df['low'].combine_first(self.df[['open', 'close']].min(axis=1))
         self.df['low'] = self.df['low'].interpolate()
         
+        # --- Fill VOLUME ---
+        # Step 1: If price didn't change (high=low), it's likely no trades occurred
+        no_movement_mask = (self.df['high'] == self.df['low'])
+        self.df.loc[no_movement_mask & self.df['volume'].isna(), 'volume'] = 0
+        # Step 2: For other missing values, use interpolation rather than forward fill
+        # Linear interpolation works well for shorter gaps
+        self.df['volume'] = self.df['volume'].interpolate(method='linear')
+        # Step 3: Any remaining NaNs at the beginning can be filled with early known volumes
+        # (avoid forward fill for long sequences)
+        self.df['volume'] = self.df['volume'].bfill().fillna(0)
+        
     def _remove_duplicates(self):
         """Removes duplicates."""
         self.df = self.df.drop_duplicates(subset=['date'])
