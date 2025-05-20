@@ -77,10 +77,15 @@ class TestDataValidator(unittest.TestCase):
         # Create duplicate timestamps
         df = self.clean_df_indexed.copy()
         
-        # Make duplicate timestamps
+        # Convert index to a modifiable list
+        index_list = df.index.tolist()
+        
+        # Create duplicate timestamp
         duplicate_idx = 10
-        df.index = df.index.tolist()  # Convert to Python list for manipulation
-        df.index[duplicate_idx] = df.index[duplicate_idx-1]  # Create duplicate
+        index_list[duplicate_idx] = index_list[duplicate_idx-1]
+        print(df.index)
+        # Assign the modified list back as the new index
+        df.index = index_list
         df.index = pd.DatetimeIndex(df.index)  # Convert back to DatetimeIndex
         
         validator = DataValidator(df)
