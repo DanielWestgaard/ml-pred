@@ -83,7 +83,6 @@ class TestDataValidator(unittest.TestCase):
         # Create duplicate timestamp
         duplicate_idx = 10
         index_list[duplicate_idx] = index_list[duplicate_idx-1]
-        print(df.index)
         # Assign the modified list back as the new index
         df.index = index_list
         df.index = pd.DatetimeIndex(df.index)  # Convert back to DatetimeIndex
@@ -99,12 +98,17 @@ class TestDataValidator(unittest.TestCase):
         """Test timestamp validation with future timestamps."""
         # Create future timestamps
         df = self.clean_df_indexed.copy()
-        
+
+        # Convert index to a modifiable list
+        index_list = df.index.tolist()
+
         # Make future timestamps
         future_idx = 20
         future_date = datetime.now(timezone.utc) + timedelta(days=10)
-        df.index = df.index.tolist()  # Convert to Python list for manipulation
-        df.index[future_idx] = future_date  # Create future timestamp
+        index_list[future_idx] = future_date  # Modify the list, not the index directly
+
+        # Assign the modified list back as the new index
+        df.index = index_list
         df.index = pd.DatetimeIndex(df.index)  # Convert back to DatetimeIndex
         
         validator = DataValidator(df)
