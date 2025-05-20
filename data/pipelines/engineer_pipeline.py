@@ -8,7 +8,6 @@ import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.generation import FeatureGenerator
-from data.processing.validation import FeatureValidator
 from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
 

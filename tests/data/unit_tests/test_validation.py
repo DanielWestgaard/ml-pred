@@ -11,7 +11,7 @@ from unittest.mock import patch, MagicMock
 from tests.utils.test_data_utils import create_sample_ohlcv_data, save_temp_csv, clean_temp_file
 
 # Import the module to test
-from data.processing.validation import DataValidator, FeatureValidator
+from data.processing.validation import DataValidator
 
 
 class TestDataValidator(unittest.TestCase):
@@ -201,39 +201,3 @@ class TestDataValidator(unittest.TestCase):
         # Should indicate invalid data with issues
         self.assertFalse(result['is_valid'])
         self.assertGreater(len(result['issues']), 0)
-
-
-class TestFeatureValidator(unittest.TestCase):
-    
-    def setUp(self):
-        """Set up test data for FeatureValidator."""
-        # Create data with features for testing
-        self.base_df = create_sample_ohlcv_data(rows=100, with_issues=False)
-        self.base_df.set_index('date', inplace=True)
-        
-        # Add some synthetic features
-        self.feature_df = self.base_df.copy()
-        self.feature_df['sma_5'] = self.feature_df['close'].rolling(window=5).mean()
-        self.feature_df['rsi_14'] = np.random.random(len(self.feature_df)) * 100  # Fake RSI
-        self.feature_df['macd_line'] = self.feature_df['close'] - self.feature_df['close'].rolling(window=20).mean()
-        
-        # Add some problematic features
-        self.issue_df = self.feature_df.copy()
-        self.issue_df['sma_5'].iloc[:10] = np.nan  # NaN values at start
-        self.issue_df['outlier_feature'] = 1.0
-        self.issue_df['outlier_feature'].iloc[20:25] = 1000.0  # Extreme outliers
-    
-    def test_initialization(self):
-        """Test initialization of FeatureValidator."""
-        validator = FeatureValidator(self.feature_df)
-        self.assertEqual(len(validator.df), len(self.feature_df))
-        self.assertEqual(len(validator.validation_issues), 0)
-    
-    def test_run_method_clean_features(self):
-        """Test run method with clean feature data."""
-        validator = FeatureValidator(self.feature_df)
-        result = validator.run()
-        
-        # Should indicate valid features
-        self.assertTrue(result['is_valid'])
-        self.assertEqual(len(result['issues']), 0)
