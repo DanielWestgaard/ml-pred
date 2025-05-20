@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from unittest.mock import patch, MagicMock
 
 # Import test utilities
-from tests.utils.test_data_utils import create_sample_ohlcv_data, save_temp_csv, clean_temp_file
+from tests.utils.test_data_utils import create_sample_ohlcv_data
 
 # Import the module to test
 from data.processing.validation import DataValidator

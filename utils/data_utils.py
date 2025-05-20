@@ -8,7 +8,6 @@ import sys
 import pandas as pd
 
 import config.config as config
-from data.processing.validation import DataValidator
 
 
 def generate_filename(symbol, timeframe, start_date, end_date, is_raw=True, 
