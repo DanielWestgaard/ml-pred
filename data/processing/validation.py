@@ -124,7 +124,7 @@ class DataValidator(BaseProcessor):
     def validate_price_movement(self):
         """Validate price movements for extreme or suspicious patterns."""
         # Calculate returns
-        self.df['return'] = self.df['close'].pct_change()
+        self.df['return'] = self.df['close'].pct_change(fill_method=None)
         
         # Check for extreme returns (potential data errors)
         extreme_returns = self.df[abs(self.df['return']) > 0.20]  # 20% move
