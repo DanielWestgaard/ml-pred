@@ -4,7 +4,7 @@ import os
 import tempfile
 from datetime import datetime, timedelta, timezone
 
-def create_sample_ohlcv_data(rows=100, with_issues=False, frequency='1H'):
+def create_sample_ohlcv_data(rows=100, with_issues=False, frequency='1h'):
     """
     Create sample OHLCV data for testing.
     
@@ -23,7 +23,7 @@ def create_sample_ohlcv_data(rows=100, with_issues=False, frequency='1H'):
     """
     # Create date range
     end_date = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
-    start_date = end_date - timedelta(hours=rows if frequency == '1H' else rows * 24)
+    start_date = end_date - timedelta(hours=rows if frequency == '1h' else rows * 24)
     dates = pd.date_range(start=start_date, end=end_date, freq=frequency)
     
     # Base prices (random walk)
