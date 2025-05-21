@@ -107,20 +107,31 @@ class DataValidator(BaseProcessor):
                     'description': f'Found {len(negative_volume)} records with negative volume',
                     'affected_rows': negative_volume.index.tolist()
                 })
-                
-            # Check for suspiciously high volume (outliers)
-            import numpy as np
-            log_volume = np.log1p(self.df['volume'])
-            mean, std = log_volume.mean(), log_volume.std()
-            high_volume = self.df[log_volume > mean + 5*std]  # 5-sigma events
             
-            if not high_volume.empty:
-                self.validation_issues.append({
-                    'type': 'Suspicious Volume',
-                    'description': f'Found {len(high_volume)} records with abnormally high volume',
-                    'affected_rows': high_volume.index.tolist()
-                })
-        
+            # Check for suspiciously high volume (outliers)
+            # Only analyze positive volumes for outlier detection
+            import numpy as np
+            
+            # Filter to only positive volumes for log transformation
+            positive_volume_mask = self.df['volume'] > 0
+            if positive_volume_mask.any():  # Proceed only if we have positive values
+                positive_volumes = self.df.loc[positive_volume_mask, 'volume']
+                log_volume = np.log1p(positive_volumes)
+                
+                # Calculate mean and std on valid volumes only
+                mean, std = log_volume.mean(), log_volume.std()
+                
+                # Identify outliers, but apply back to the original dataframe
+                high_volume_mask = log_volume > mean + 5*std  # 5-sigma events
+                high_volume_indices = positive_volumes.index[high_volume_mask]
+                
+                if len(high_volume_indices) > 0:
+                    self.validation_issues.append({
+                        'type': 'Suspicious Volume',
+                        'description': f'Found {len(high_volume_indices)} records with abnormally high volume',
+                        'affected_rows': high_volume_indices.tolist()
+                    })
+    
     def validate_price_movement(self):
         """Validate price movements for extreme or suspicious patterns."""
         # Calculate returns
