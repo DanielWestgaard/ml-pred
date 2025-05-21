@@ -816,7 +816,7 @@ class FeatureGenerator():
             self.df[f'dist_from_sma_{period}'] = (self.df['close'] / self.df[f'sma_{period}'] - 1) * 100
             
             # Direction of moving average (is it sloping up or down)
-            self.df[f'sma_{period}_slope'] = self.df[f'sma_{period}'].pct_change(5) * 100  # 5-period slope
+            self.df[f'sma_{period}_slope'] = self.df[f'sma_{period}'].pct_change(5, fill_method=None) * 100  # self.df[f'sma_{period}'].pct_change(5) * 100  # 5-period slope
         
         # 3. Moving Average Crossovers for trend identification
         self.df['ma_cross_50_200'] = np.where(

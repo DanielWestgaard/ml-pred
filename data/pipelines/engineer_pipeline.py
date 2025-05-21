@@ -60,7 +60,7 @@ class EngineeringPipeline():
         
         # Feature Selection
         self.selector = FeatureSelector(self.df)
-        self.df = self.selector.run(methods=['cfs'])
+        self.df = self.selector.run()
         
         # Save Engineered data
         try:

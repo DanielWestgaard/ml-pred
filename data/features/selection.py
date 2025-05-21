@@ -37,7 +37,7 @@ class FeatureSelector(BaseProcessor):
         self.storage_path = os.path.join(config.FE_SEL_BASE_DIR, str(self.current_time))
         os.mkdir(self.storage_path)
     
-    def run(self, methods=['cfs', 'xgb', 'rfe'], k_features=15):
+    def run(self, methods=['cfs', 'xgb', 'rfe'], k_features=5):
         """
         Run the feature selection process.
         

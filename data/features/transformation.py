@@ -230,7 +230,7 @@ class FeatureTransformer(BaseProcessor):
             z_score[~mask & ~rolling_mean.isna()] = 0
             
             # Forward fill NaN values from initial window
-            z_score = z_score.fillna(method='bfill')
+            z_score = z_score.bfill()  # z_score.fillna(method='bfill')
             
             # Add to dataframe
             if preserve_original:
@@ -272,7 +272,7 @@ class FeatureTransformer(BaseProcessor):
             scaled[~mask & ~rolling_min.isna()] = 0.5
             
             # Forward fill NaN values from initial window
-            scaled = scaled.fillna(method='bfill')
+            scaled = scaled.bfill()  # scaled.fillna(method='bfill')
             
             # Add to dataframe
             if preserve_original:
