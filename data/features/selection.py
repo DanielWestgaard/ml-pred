@@ -61,6 +61,7 @@ class FeatureSelector(BaseProcessor):
         # Combine methods - features selected by at least 2 methods
         if len(methods) > 1:
             feature_counts = {}
+            logging.info(f"selected features: {selected_features.items()}")
             for method, features in selected_features.items():
                 for feature in features:
                     if feature != self.target_col:
@@ -87,7 +88,8 @@ class FeatureSelector(BaseProcessor):
         Params:
             k: Number of features the method will select - select the top k features.
         """
-        try: 
+        try:
+            # for col in self.df.columns: logging.info(f"hello {col}")
             # First get features most correlated with target
             corr_matrix = self.df.corr()
             corr_with_target = corr_matrix[self.target_col].drop(self.target_col)
