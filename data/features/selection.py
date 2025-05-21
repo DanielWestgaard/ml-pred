@@ -88,17 +88,30 @@ class FeatureSelector(BaseProcessor):
         Params:
             k: Number of features the method will select - select the top k features.
         """
-        try:
-            # for col in self.df.columns: logging.info(f"hello {col}")
-            # First get features most correlated with target
-            corr_matrix = self.df.corr()
+        try:            
+            # Get only numeric columns for correlation analysis
+            numeric_cols = self.df.select_dtypes(include=['number']).columns
+            
+            # Log columns that are being dropped
+            non_numeric_cols = [col for col in self.df.columns if col not in numeric_cols]
+            if non_numeric_cols:
+                logging.warning(f"Dropping non-numeric columns for CFS analysis: {non_numeric_cols}")
+            
+            # Make sure target column is included in numeric_cols
+            if self.target_col not in numeric_cols:
+                logging.error(f"Target column '{self.target_col}' is not numeric. Cannot compute correlations.")
+                # Return a default list containing just the target column to avoid None
+                return [self.target_col]
+            
+            # Calculate correlations using only numeric columns
+            corr_matrix = self.df[numeric_cols].corr()
             corr_with_target = corr_matrix[self.target_col].drop(self.target_col)
             
-            self._plot_fs_analysis_cfs()
-                        
+            self._plot_fs_analysis_cfs(numeric_cols=numeric_cols)
+            
             # Sort and get top k candidates
             candidates = corr_with_target.abs().sort_values(ascending=False)[:k].index.tolist()
-            print(candidates)
+            
             # Remove highly correlated features from candidates
             selected = []
             for feature in candidates:
@@ -110,15 +123,24 @@ class FeatureSelector(BaseProcessor):
                 if not to_remove:
                     selected.append(feature)
             
+            # Make sure to return at least the target column to avoid empty list
+            if not selected:
+                logging.warning("No features selected. Returning just the target column.")
+                return [self.target_col]
+                
             return selected + [self.target_col]  # Return feature names
         except Exception as e:
             logging.error(f"Unable to perform Correlation-based Feature Selection: {e}")
-            return None
+            # Return just the target column as a fallback to avoid None
+            return [self.target_col]
     
-    def _plot_fs_analysis_cfs(self, top_k=20, corr_threshold=0.7):
+    def _plot_fs_analysis_cfs(self, top_k=20, corr_threshold=0.7, numeric_cols=None):
         """Two-part visualization for feature selection"""
+        if numeric_cols is None:
+            numeric_cols = self.df.select_dtypes(include=['number']).columns
+        
         # 1. Plot correlations with target
-        corr_with_target = self.df.corr()[self.target_col].drop(self.target_col)
+        corr_with_target = self.df[numeric_cols].corr()[self.target_col].drop(self.target_col)
         top_features = corr_with_target.abs().sort_values(ascending=False).head(top_k).index
         
         # Create figure with two subplots
