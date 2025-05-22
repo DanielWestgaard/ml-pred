@@ -147,11 +147,37 @@ class TestFeatureTransformer(unittest.TestCase):
         transformer = FeatureTransformer(self.df.copy())
         result_df = transformer.run(preserve_original=False, window=20)
         
-        # Check that columns are preserved but values are replaced
-        self.assertEqual(set(result_df.columns.tolist()), set(original_cols))
+        # Check that all original columns are still present
+        for col in original_cols:
+            self.assertIn(col, result_df.columns, f"Original column '{col}' should still be present")
         
         # Check that close_og is preserved (special case mentioned in code)
-        self.assertIn('close_og', result_df.columns)
+        self.assertIn('close_og', result_df.columns, "close_og should be created when replacing close values")
+        
+        # Check that we have the expected number of columns (original + close_og)
+        expected_cols = set(original_cols) | {'close_og'}  # Union of original cols and close_og
+        self.assertEqual(set(result_df.columns), expected_cols, 
+                        "Should have all original columns plus close_og")
+        
+        # Verify that close column values have been replaced (normalized)
+        # They shouldn't be the same as original close values
+        if 'close' in original_cols:
+            result_close_mean = result_df['close'].mean()
+            # After z-score normalization, mean should be close to 0
+            self.assertAlmostEqual(result_close_mean, 0, delta=0.5, 
+                                msg="Close column should be z-score normalized (mean ≈ 0)")
+            
+            # close_og should preserve the cleaned close values (before normalization)
+            # Note: close_og is created after missing value handling, so it contains clean values
+            self.assertTrue('close_og' in result_df.columns, "close_og should exist")
+            self.assertFalse(result_df['close_og'].isna().any(), 
+                            "close_og should not contain NaN values")
+            
+            # Verify that close_og and normalized close have different distributions
+            # (normalized should have mean≈0, original should have mean≠0)
+            close_og_mean = result_df['close_og'].mean()
+            self.assertNotAlmostEqual(close_og_mean, 0, delta=0.5,
+                                    msg="close_og should preserve non-normalized values")
         
         # Check that NaNs are handled
         self.assertEqual(result_df.isna().sum().sum(), 0)
