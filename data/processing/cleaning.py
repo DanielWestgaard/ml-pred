@@ -102,8 +102,6 @@ class DataCleaner(BaseProcessor):
         3. Timezone normalization to UTC
         4. Identifying and FILLING gaps in time series  # ← IMPROVED
         """
-        # ... existing code for date conversion and timezone handling ...
-        
         # Check if 'date' column exists
         if 'date' not in self.df.columns:
             logging.error("No 'date' column found in the dataframe")
@@ -141,90 +139,115 @@ class DataCleaner(BaseProcessor):
         if self.df.index.name != 'date':
             self.df = self.df.set_index('date')
         
+        # FIXED: Remove any remaining duplicates from the index before reindexing
+        if self.df.index.duplicated().any():
+            logging.warning("Found duplicate index values after setting date as index - removing")
+            self.df = self.df[~self.df.index.duplicated(keep='first')]
+        
         # NEW: Fill time series gaps
         if len(self.df) > 1:
             time_diffs = self.df.index.to_series().diff().dropna()
-            common_diff = time_diffs.mode().iloc[0]
-            logging.debug(f"Most common time interval: {common_diff}")
-            
-            # Check for gaps
-            gaps = time_diffs[time_diffs > common_diff * 1.5]
-            if not gaps.empty:
-                logging.warning(f"Found {len(gaps)} gaps in time series - filling them")
+            if len(time_diffs) > 0:  # Check if we have any time differences
+                common_diff = time_diffs.mode().iloc[0] if not time_diffs.mode().empty else time_diffs.median()
+                logging.debug(f"Most common time interval: {common_diff}")
                 
-                # Create complete time index
-                full_idx = pd.date_range(
-                    start=self.df.index.min(), 
-                    end=self.df.index.max(), 
-                    freq=common_diff
-                )
-                
-                # Reindex to fill gaps
-                self.df = self.df.reindex(full_idx)
-                
-                # Fill the gaps using forward fill for OHLC
-                price_cols = ['open', 'high', 'low', 'close']
-                for col in price_cols:
-                    if col in self.df.columns:
-                        self.df[col] = self.df[col].ffill()
-                
-                # For volume, use 0 for gap periods (no trading)
-                if 'volume' in self.df.columns:
-                    self.df['volume'] = self.df['volume'].fillna(0)
-                
-                logging.info(f"Filled time series gaps. New length: {len(self.df)}")
+                # Check for gaps
+                gaps = time_diffs[time_diffs > common_diff * 1.5]
+                if not gaps.empty:
+                    logging.warning(f"Found {len(gaps)} gaps in time series - filling them")
+                    
+                    # Create complete time index
+                    full_idx = pd.date_range(
+                        start=self.df.index.min(), 
+                        end=self.df.index.max(), 
+                        freq=common_diff
+                    )
+                    
+                    # Reindex to fill gaps
+                    self.df = self.df.reindex(full_idx)
+                    
+                    # Fill the gaps using forward fill for OHLC
+                    price_cols = ['open', 'high', 'low', 'close']
+                    for col in price_cols:
+                        if col in self.df.columns:
+                            self.df[col] = self.df[col].ffill()
+                    
+                    # For volume, use 0 for gap periods (no trading)
+                    if 'volume' in self.df.columns:
+                        self.df['volume'] = self.df['volume'].fillna(0)
+                    
+                    logging.info(f"Filled time series gaps. New length: {len(self.df)}")
 
     def _handle_outliers(self):
         """
         Detect and handle outliers in OHLCV data using multiple methods.
-        IMPROVED: Use consistent thresholds with validation
+        IMPROVED: Use consistent thresholds with validation and better volume handling
         """
         # Define price columns
         price_cols = ['open', 'high', 'low', 'close']
         
         # --- METHOD 1: IQR for price columns ---
         for col in price_cols:
-            # Calculate IQR
-            Q1 = self.df[col].quantile(0.25)
-            Q3 = self.df[col].quantile(0.75)
-            IQR = Q3 - Q1
-            
-            # Define bounds (more aggressive cleaning)
-            lower_bound = Q1 - 2 * IQR  # Slightly more aggressive
-            upper_bound = Q3 + 2 * IQR
-            
-            # Flag potential outliers (for logging)
-            outliers = self.df[(self.df[col] < lower_bound) | (self.df[col] > upper_bound)]
-            if len(outliers) > 0:
-                logging.debug(f"Found {len(outliers)} outliers in {col} using IQR method")
-            
-            # Winsorize (cap) extreme values instead of removing
-            self.df[col] = self.df[col].clip(lower=lower_bound, upper=upper_bound)
+            if col in self.df.columns:
+                # Calculate IQR
+                Q1 = self.df[col].quantile(0.25)
+                Q3 = self.df[col].quantile(0.75)
+                IQR = Q3 - Q1
+                
+                # Define bounds (more aggressive cleaning)
+                lower_bound = Q1 - 2 * IQR  # Slightly more aggressive
+                upper_bound = Q3 + 2 * IQR
+                
+                # Flag potential outliers (for logging)
+                outliers = self.df[(self.df[col] < lower_bound) | (self.df[col] > upper_bound)]
+                if len(outliers) > 0:
+                    logging.debug(f"Found {len(outliers)} outliers in {col} using IQR method")
+                
+                # Winsorize (cap) extreme values instead of removing
+                self.df[col] = self.df[col].clip(lower=lower_bound, upper=upper_bound)
         
-        # --- METHOD 2: Z-score for volume (ALIGNED WITH VALIDATION) ---
+        # --- METHOD 2: Enhanced volume outlier handling ---
         if 'volume' in self.df.columns:
-            # Filter positive volumes
+            # First, handle negative volumes
+            negative_mask = self.df['volume'] < 0
+            if negative_mask.any():
+                logging.debug(f"Found {negative_mask.sum()} negative volume values - setting to 0")
+                self.df.loc[negative_mask, 'volume'] = 0
+            
+            # Filter positive volumes for outlier detection
             positive_mask = self.df['volume'] > 0
             if positive_mask.any():
                 positive_volumes = self.df.loc[positive_mask, 'volume']
-                log_volume = np.log1p(positive_volumes)
                 
-                # Calculate z-score
+                # Method 1: IQR-based capping (more aggressive for extreme outliers)
+                Q1 = positive_volumes.quantile(0.25)
+                Q3 = positive_volumes.quantile(0.75)
+                IQR = Q3 - Q1
+                upper_bound_iqr = Q3 + 3 * IQR  # 3x IQR for volume outliers
+                
+                # Method 2: Log-normal based capping (for less extreme outliers)
+                log_volume = np.log1p(positive_volumes)
                 mean_log_vol = log_volume.mean()
                 std_log_vol = log_volume.std()
                 
-                # Use same threshold as validation (4-sigma for cleaning, 5-sigma for validation)
-                threshold = 4  # Slightly more aggressive than validation
+                # Use more aggressive threshold for cleaning (2-sigma instead of 4)
+                threshold = 2.5  # More aggressive than original
                 upper_bound_log = mean_log_vol + threshold * std_log_vol
+                upper_bound_log_val = np.expm1(upper_bound_log)
                 
-                # Cap extreme values
-                capped_log_volume = log_volume.clip(upper=upper_bound_log)
-                self.df.loc[positive_mask, 'volume'] = np.expm1(capped_log_volume)
+                # Use the more restrictive of the two bounds
+                final_upper_bound = min(upper_bound_iqr, upper_bound_log_val)
                 
-                # Count how many we capped
-                capped_count = (log_volume > upper_bound_log).sum()
-                if capped_count > 0:
-                    logging.debug(f"Capped {capped_count} extreme volume values")
+                # Count outliers before capping
+                outlier_count = (positive_volumes > final_upper_bound).sum()
+                if outlier_count > 0:
+                    logging.debug(f"Capping {outlier_count} extreme volume values")
+                
+                # Apply capping
+                self.df.loc[positive_mask, 'volume'] = self.df.loc[positive_mask, 'volume'].clip(upper=final_upper_bound)
+                
+                # Ensure volume remains integer type
+                self.df['volume'] = self.df['volume'].round().astype('int64')
     
     def _datatype_consistency(self):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""
@@ -253,7 +276,7 @@ class DataCleaner(BaseProcessor):
             try:
                 original_type = self.df['volume'].dtype
                 # First convert to float to handle any decimals, then to int
-                self.df['volume'] = self.df['volume'].astype(float).round().astype(int)
+                self.df['volume'] = self.df['volume'].astype(float).round().astype('int64')
                 if original_type != self.df['volume'].dtype:
                     logging.debug(f"Converted volume from {original_type} to {self.df['volume'].dtype}")
             except Exception as e:

@@ -69,14 +69,11 @@ class TestDataCleaner(unittest.TestCase):
         # Ensure we have duplicates to test with
         self.assertGreater(duplicate_count_before, 0, "Test data should have duplicate dates for this test")
         
-        # Set date as index for the method to work
-        # cleaner.df = cleaner.df.set_index('date')
-        
         # Run the duplicates handler
         cleaner._remove_duplicates()
         
         # Check that duplicates are gone
-        duplicate_count_after = cleaner.df.index.duplicated().sum()
+        duplicate_count_after = cleaner.df['date'].duplicated().sum()
         self.assertEqual(duplicate_count_after, 0, "All duplicate dates should be removed")
     
     def test_timestamp_alignment(self):
@@ -88,6 +85,11 @@ class TestDataCleaner(unittest.TestCase):
         df['date'] = pd.to_datetime(df['date']).dt.tz_localize(None)
         
         cleaner = DataCleaner(df)
+        
+        # FIXED: Remove duplicates first, as the cleaning pipeline does
+        cleaner._remove_duplicates()
+        
+        # Now test timestamp alignment
         cleaner._timestamp_alignment()
         
         # Check that we now have a datetime index
@@ -95,21 +97,30 @@ class TestDataCleaner(unittest.TestCase):
         
         # Check that the index is sorted
         self.assertTrue(cleaner.df.index.is_monotonic_increasing, "Index should be monotonically increasing")
+        
+        # Check that there are no duplicate index values
+        self.assertEqual(cleaner.df.index.duplicated().sum(), 0, "No duplicate index values should remain")
     
     def test_handle_outliers(self):
         """Test outlier handling in OHLCV data."""
         # Create data with price outliers
         df = self.clean_df.copy()
         
-        # Add extreme outliers
+        # Add extreme outliers that should definitely be caught
         extreme_indices = [10, 20, 30]
+        original_close_values = []
+        original_volume_values = []
+        
         for idx in extreme_indices:
+            original_close_values.append(df.loc[idx, 'close'])
+            original_volume_values.append(df.loc[idx, 'volume'])
+            
             df.loc[idx, 'close'] = df.loc[idx, 'close'] * 10  # 10x higher
             df.loc[idx, 'volume'] = df.loc[idx, 'volume'] * 100  # 100x higher
         
         cleaner = DataCleaner(df)
         
-        # Get values before outlier handling
+        # Get extreme values before outlier handling
         extreme_close = df.loc[extreme_indices, 'close'].values
         extreme_volume = df.loc[extreme_indices, 'volume'].values
         
@@ -118,11 +129,22 @@ class TestDataCleaner(unittest.TestCase):
         
         # Check that extreme values are capped
         for i, idx in enumerate(extreme_indices):
-            # Close price should be capped
-            self.assertLess(cleaner.df.loc[idx, 'close'], extreme_close[i])
+            # Close price should be capped (should be less than the extreme value)
+            self.assertLess(cleaner.df.loc[idx, 'close'], extreme_close[i], 
+                           f"Close price at index {idx} should be capped from {extreme_close[i]} to {cleaner.df.loc[idx, 'close']}")
             
-            # Volume should be capped
-            self.assertLess(cleaner.df.loc[idx, 'volume'], extreme_volume[i])
+            # Volume should be capped (should be less than the extreme value)
+            self.assertLess(cleaner.df.loc[idx, 'volume'], extreme_volume[i],
+                           f"Volume at index {idx} should be capped from {extreme_volume[i]} to {cleaner.df.loc[idx, 'volume']}")
+            
+            # But values should still be reasonable (not too close to original)
+            # Close should be somewhere between original and extreme
+            self.assertGreater(cleaner.df.loc[idx, 'close'], original_close_values[i] * 1.1,
+                              "Capped close should be higher than original value")
+            
+            # Volume should be somewhere between original and extreme  
+            self.assertGreater(cleaner.df.loc[idx, 'volume'], original_volume_values[i] * 1.1,
+                              "Capped volume should be higher than original value")
     
     def test_datatype_consistency(self):
         """Test datatype consistency checks."""
@@ -184,3 +206,12 @@ class TestDataCleaner(unittest.TestCase):
         
         # Volume should be non-negative
         self.assertTrue(all(cleaned_df['volume'] >= 0), "Volume should be non-negative")
+        
+        # Data should have datetime index
+        self.assertTrue(isinstance(cleaned_df.index, pd.DatetimeIndex), "Index should be DatetimeIndex")
+        
+        # Index should be sorted
+        self.assertTrue(cleaned_df.index.is_monotonic_increasing, "Index should be monotonically increasing")
+
+if __name__ == '__main__':
+    unittest.main()
