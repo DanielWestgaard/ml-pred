@@ -1,4 +1,5 @@
 from numpy import float64
+import pandas as pd
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
 
@@ -32,36 +33,60 @@ class DataValidator(BaseProcessor):
     def validate_ohlc_relationships(self):
         """Verify proper relationships between OHLC prices. Similar to the one in 
         Cleaning, but this is to validate that work"""
-        # High should be the highest value
-        high_issues = self.df[self.df['high'] < self.df[['open', 'close']].max(axis=1)]
-        if not high_issues.empty:
-            self.validation_issues.append({
-                'type': 'OHLC Relationship',
-                'description': f'Found {len(high_issues)} records where high < max(open, close)',
-                'affected_rows': high_issues.index.tolist()
-            })
-            
-        # Low should be the lowest value 
-        low_issues = self.df[self.df['low'] > self.df[['open', 'close']].min(axis=1)]
-        if not low_issues.empty:
-            self.validation_issues.append({
-                'type': 'OHLC Relationship',
-                'description': f'Found {len(low_issues)} records where low > min(open, close)',
-                'affected_rows': low_issues.index.tolist()
-            })
-            
-        # Check for negative or zero prices
-        for col in ['open', 'high', 'low', 'close']:
-            invalid_prices = self.df[self.df[col] <= 0]
-            if not invalid_prices.empty:
+        
+        # Get available OHLC columns
+        available_ohlc = [col for col in ['open', 'high', 'low', 'close'] if col in self.df.columns]
+        
+        # Only proceed if we have at least some OHLC columns
+        if len(available_ohlc) < 2:
+            return  # Can't validate relationships with insufficient columns
+        
+        # High should be the highest value - only check if relevant columns exist
+        if all(col in self.df.columns for col in ['high', 'open', 'close']):
+            high_issues = self.df[self.df['high'] < self.df[['open', 'close']].max(axis=1)]
+            if not high_issues.empty:
                 self.validation_issues.append({
-                    'type': 'Invalid Prices',
-                    'description': f'Found {len(invalid_prices)} records with {col} <= 0',
-                    'affected_rows': invalid_prices.index.tolist()
+                    'type': 'OHLC Relationship',
+                    'description': f'Found {len(high_issues)} records where high < max(open, close)',
+                    'affected_rows': high_issues.index.tolist()
                 })
+        
+        # Low should be the lowest value - only check if relevant columns exist
+        if all(col in self.df.columns for col in ['low', 'open', 'close']):
+            low_issues = self.df[self.df['low'] > self.df[['open', 'close']].min(axis=1)]
+            if not low_issues.empty:
+                self.validation_issues.append({
+                    'type': 'OHLC Relationship',
+                    'description': f'Found {len(low_issues)} records where low > min(open, close)',
+                    'affected_rows': low_issues.index.tolist()
+                })
+            
+        # Check for negative or zero prices - only for columns that exist
+        price_cols = ['open', 'high', 'low', 'close']
+        for col in price_cols:
+            if col in self.df.columns:
+                invalid_prices = self.df[self.df[col] <= 0]
+                if not invalid_prices.empty:
+                    self.validation_issues.append({
+                        'type': 'Invalid Prices',
+                        'description': f'Found {len(invalid_prices)} records with {col} <= 0',
+                        'affected_rows': invalid_prices.index.tolist()
+                    })
     
     def validate_timestamps(self):
         """Validate time series integrity and consistency."""
+        # Ensure the index is a proper DatetimeIndex
+        if not isinstance(self.df.index, pd.DatetimeIndex):
+            try:
+                # Try to convert the index to datetime
+                self.df.index = pd.to_datetime(self.df.index)
+            except Exception as e:
+                self.validation_issues.append({
+                    'type': 'Invalid Timestamps',
+                    'description': f'Index cannot be converted to datetime: {str(e)}'
+                })
+                return  # Can't proceed with timestamp validation
+        
         # Check for duplicate timestamps
         duplicates = self.df.index.duplicated()
         if any(duplicates):
@@ -73,27 +98,42 @@ class DataValidator(BaseProcessor):
             
         # Check for gaps in time series (MORE LENIENT)
         if len(self.df) > 1:
-            # Determine expected frequency
-            time_diffs = self.df.index.to_series().diff().dropna()
-            common_diff = time_diffs.mode().iloc[0]
-            
-            # Only flag very large gaps (3x expected frequency instead of 1.5x)
-            large_gaps = time_diffs[time_diffs > common_diff * 3]  # More lenient
-            if not large_gaps.empty:
+            try:
+                # Determine expected frequency
+                time_diffs = self.df.index.to_series().diff().dropna()
+                
+                if len(time_diffs) > 0:  # Check if we have any time differences
+                    common_diff = time_diffs.mode().iloc[0] if not time_diffs.mode().empty else time_diffs.median()
+                    
+                    # Only flag very large gaps (3x expected frequency instead of 1.5x)
+                    large_gaps = time_diffs[time_diffs > common_diff * 3]  # More lenient
+                    if not large_gaps.empty:
+                        self.validation_issues.append({
+                            'type': 'Time Series Gaps',
+                            'description': f'Found {len(large_gaps)} large gaps in time series',
+                            'details': {str(idx): str(gap) for idx, gap in large_gaps.items()}
+                        })
+            except Exception as e:
                 self.validation_issues.append({
-                    'type': 'Time Series Gaps',
-                    'description': f'Found {len(large_gaps)} large gaps in time series',
-                    'details': {str(idx): str(gap) for idx, gap in large_gaps.items()}
+                    'type': 'Time Series Analysis Error',
+                    'description': f'Could not analyze time series gaps: {str(e)}'
                 })
                 
         # Check for future timestamps
-        import datetime
-        future_data = self.df[self.df.index > datetime.datetime.now(self.df.index.tzinfo)]
-        if not future_data.empty:
+        try:
+            import datetime
+            current_time = datetime.datetime.now(self.df.index.tzinfo) if self.df.index.tzinfo else datetime.datetime.now()
+            future_data = self.df[self.df.index > current_time]
+            if not future_data.empty:
+                self.validation_issues.append({
+                    'type': 'Future Timestamps',
+                    'description': f'Found {len(future_data)} records with future timestamps',
+                    'affected_rows': future_data.index.tolist()
+                })
+        except Exception as e:
             self.validation_issues.append({
-                'type': 'Future Timestamps',
-                'description': f'Found {len(future_data)} records with future timestamps',
-                'affected_rows': future_data.index.tolist()
+                'type': 'Future Timestamp Check Error',
+                'description': f'Could not check for future timestamps: {str(e)}'
             })
 
     def validate_volume(self):
@@ -134,6 +174,10 @@ class DataValidator(BaseProcessor):
 
     def validate_price_movement(self):
         """Validate price movements for extreme or suspicious patterns."""
+        # Only proceed if 'close' column exists
+        if 'close' not in self.df.columns:
+            return
+        
         # Calculate returns
         self.df['return'] = self.df['close'].pct_change(fill_method=None)
         

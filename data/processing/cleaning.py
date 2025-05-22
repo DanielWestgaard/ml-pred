@@ -62,35 +62,56 @@ class DataCleaner(BaseProcessor):
         self.df.replace(['', 'NA', 'N/A', 'null', 'Null', 'NULL', 'None', 'NaN'], np.nan, inplace=True)
         
         # --- Fill CLOSE ---
-        self.df['close'] = self.df['close'].ffill()  # Step 1: forward-fill
-        self.df['close'] = self.df['close'].interpolate()  # Step 2: fill remaining gaps if any
+        if 'close' in self.df.columns:
+            self.df['close'] = self.df['close'].ffill()  # Step 1: forward-fill
+            self.df['close'] = self.df['close'].interpolate()  # Step 2: fill remaining gaps if any
 
         # --- Fill OPEN ---
-        self.df['open'] = self.df['open'].combine_first(self.df['close'].shift(1))  # Use previous close
-        self.df['open'] = self.df['open'].interpolate()  # Fill any remaining gaps
+        if 'open' in self.df.columns:
+            if 'close' in self.df.columns:
+                self.df['open'] = self.df['open'].combine_first(self.df['close'].shift(1))  # Use previous close
+            self.df['open'] = self.df['open'].interpolate()  # Fill any remaining gaps
         
         # --- Fill HIGH ---
-        self.df['high'] = self.df['high'].combine_first(self.df[['open', 'close']].max(axis=1))
-        self.df['high'] = self.df['high'].interpolate()
+        if 'high' in self.df.columns:
+            # Only use available columns for the fallback calculation
+            available_price_cols = [col for col in ['open', 'close'] if col in self.df.columns]
+            if available_price_cols:
+                self.df['high'] = self.df['high'].combine_first(self.df[available_price_cols].max(axis=1))
+            self.df['high'] = self.df['high'].interpolate()
 
         # --- Fill LOW ---
-        self.df['low'] = self.df['low'].combine_first(self.df[['open', 'close']].min(axis=1))
-        self.df['low'] = self.df['low'].interpolate()
+        if 'low' in self.df.columns:
+            # Only use available columns for the fallback calculation
+            available_price_cols = [col for col in ['open', 'close'] if col in self.df.columns]
+            if available_price_cols:
+                self.df['low'] = self.df['low'].combine_first(self.df[available_price_cols].min(axis=1))
+            self.df['low'] = self.df['low'].interpolate()
         
         # --- Fill VOLUME ---
-        # Step 1: If price didn't change (high=low), it's likely no trades occurred
-        no_movement_mask = (self.df['high'] == self.df['low'])
-        self.df.loc[no_movement_mask & self.df['volume'].isna(), 'volume'] = 0
-        # Step 2: For other missing values, use interpolation rather than forward fill
-        # Linear interpolation works well for shorter gaps
-        self.df['volume'] = self.df['volume'].interpolate(method='linear')
-        # Step 3: Any remaining NaNs at the beginning can be filled with early known volumes
-        # (avoid forward fill for long sequences)
-        self.df['volume'] = self.df['volume'].bfill().fillna(0)
+        if 'volume' in self.df.columns:
+            # Step 1: If price didn't change (high=low), it's likely no trades occurred
+            # Only check this if both high and low columns exist
+            if 'high' in self.df.columns and 'low' in self.df.columns:
+                no_movement_mask = (self.df['high'] == self.df['low'])
+                self.df.loc[no_movement_mask & self.df['volume'].isna(), 'volume'] = 0
+            
+            # Step 2: For other missing values, use interpolation rather than forward fill
+            # Linear interpolation works well for shorter gaps
+            self.df['volume'] = self.df['volume'].interpolate(method='linear')
+            # Step 3: Any remaining NaNs at the beginning can be filled with early known volumes
+            # (avoid forward fill for long sequences)
+            self.df['volume'] = self.df['volume'].bfill().fillna(0)
         
     def _remove_duplicates(self):
         """Removes duplicates."""
-        self.df = self.df.drop_duplicates(subset=['date'])
+        # Check if 'date' column exists for subset-based deduplication
+        if 'date' in self.df.columns:
+            self.df = self.df.drop_duplicates(subset=['date'])
+        else:
+            # If no date column, just remove completely identical rows
+            logging.warning("No 'date' column found for deduplication, removing completely identical rows")
+            self.df = self.df.drop_duplicates()
         
     def _timestamp_alignment(self):
         """
@@ -243,11 +264,12 @@ class DataCleaner(BaseProcessor):
                 if outlier_count > 0:
                     logging.debug(f"Capping {outlier_count} extreme volume values")
                 
-                # Apply capping
-                self.df.loc[positive_mask, 'volume'] = self.df.loc[positive_mask, 'volume'].clip(upper=final_upper_bound)
-                
-                # Ensure volume remains integer type
-                self.df['volume'] = self.df['volume'].round().astype('int64')
+                # Apply capping - explicitly convert to avoid dtype warning
+                capped_volumes = self.df.loc[positive_mask, 'volume'].clip(upper=final_upper_bound)
+                self.df.loc[positive_mask, 'volume'] = capped_volumes.astype('int64')
+
+                # Ensure all volume values are integers
+                self.df['volume'] = self.df['volume'].astype('int64')
     
     def _datatype_consistency(self):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""
@@ -290,25 +312,37 @@ class DataCleaner(BaseProcessor):
         2. Low should be the lowest value (≤ Open, Close, High)
         3. Open and Close should be between High and Low
         4. Volume should be non-negative
+        
+        Only processes columns that exist in the dataframe.
         """
         # Count original issues for logging
         issues_count = 0
         
-        # Check and fix: High should be ≥ max(Open, Close)
-        high_issues = self.df[self.df['high'] < self.df[['open', 'close']].max(axis=1)]
-        if not high_issues.empty:
-            issues_count += len(high_issues)
-            logging.warning(f"Found {len(high_issues)} records where high < max(open, close) - fixing")
-            self.df['high'] = self.df[['high', 'open', 'close']].max(axis=1)
+        # Get available OHLC columns
+        available_ohlc = [col for col in ['open', 'high', 'low', 'close'] if col in self.df.columns]
         
-        # Check and fix: Low should be ≤ min(Open, Close)
-        low_issues = self.df[self.df['low'] > self.df[['open', 'close']].min(axis=1)]
-        if not low_issues.empty:
-            issues_count += len(low_issues)
-            logging.warning(f"Found {len(low_issues)} records where low > min(open, close) - fixing")
-            self.df['low'] = self.df[['low', 'open', 'close']].min(axis=1)
+        # Only proceed if we have at least some OHLC columns
+        if len(available_ohlc) < 2:
+            logging.warning("Insufficient OHLC columns for relationship validation")
+            return
         
-        # Ensure volume is non-negative
+        # Check and fix: High should be ≥ max(Open, Close) - only if all relevant columns exist
+        if all(col in self.df.columns for col in ['high', 'open', 'close']):
+            high_issues = self.df[self.df['high'] < self.df[['open', 'close']].max(axis=1)]
+            if not high_issues.empty:
+                issues_count += len(high_issues)
+                logging.warning(f"Found {len(high_issues)} records where high < max(open, close) - fixing")
+                self.df['high'] = self.df[['high', 'open', 'close']].max(axis=1)
+        
+        # Check and fix: Low should be ≤ min(Open, Close) - only if all relevant columns exist
+        if all(col in self.df.columns for col in ['low', 'open', 'close']):
+            low_issues = self.df[self.df['low'] > self.df[['open', 'close']].min(axis=1)]
+            if not low_issues.empty:
+                issues_count += len(low_issues)
+                logging.warning(f"Found {len(low_issues)} records where low > min(open, close) - fixing")
+                self.df['low'] = self.df[['low', 'open', 'close']].min(axis=1)
+        
+        # Ensure volume is non-negative - only if volume column exists
         if 'volume' in self.df.columns:
             volume_issues = self.df[self.df['volume'] < 0]
             if not volume_issues.empty:
@@ -316,14 +350,23 @@ class DataCleaner(BaseProcessor):
                 logging.warning(f"Found {len(volume_issues)} records with negative volume - fixing")
                 self.df['volume'] = self.df['volume'].clip(lower=0)
         
-        # Final verification - check relationship again after fixes
-        remaining_issues = (
-            (self.df['high'] < self.df['low']).sum() +
-            (self.df['high'] < self.df['open']).sum() +
-            (self.df['high'] < self.df['close']).sum() +
-            (self.df['low'] > self.df['open']).sum() +
-            (self.df['low'] > self.df['close']).sum()
-        )
+        # Final verification - check relationship again after fixes (only for available columns)
+        remaining_issues = 0
+        
+        if all(col in self.df.columns for col in ['high', 'low']):
+            remaining_issues += (self.df['high'] < self.df['low']).sum()
+        
+        if all(col in self.df.columns for col in ['high', 'open']):
+            remaining_issues += (self.df['high'] < self.df['open']).sum()
+        
+        if all(col in self.df.columns for col in ['high', 'close']):
+            remaining_issues += (self.df['high'] < self.df['close']).sum()
+        
+        if all(col in self.df.columns for col in ['low', 'open']):
+            remaining_issues += (self.df['low'] > self.df['open']).sum()
+        
+        if all(col in self.df.columns for col in ['low', 'close']):
+            remaining_issues += (self.df['low'] > self.df['close']).sum()
         
         if remaining_issues > 0:
             logging.warning(f"After corrections, {remaining_issues} OHLC relationship issues remain")
