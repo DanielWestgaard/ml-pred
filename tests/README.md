@@ -9,7 +9,8 @@ This folder is focusing on testing different components of each system.
 │   └── unit_tests/                 # Test individual units (modules, functions, classes) in isolation from the rest of the program/system
 │       ├── test_cleaning.py
 │       ├── test_validation.py
-│       ├── test_generation.py
-│       ├── test_transformation.py
+│       ├── test_generation.py      # Feature generation tests
+│       ├── test_transformation.py  # Feature and column transformation tests
+│       ├── test_selection.py       # Feature selection tests
 └── ...
 ```
