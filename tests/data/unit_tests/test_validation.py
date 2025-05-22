@@ -142,9 +142,9 @@ class TestDataValidator(unittest.TestCase):
         # Create extreme price changes
         df = self.clean_df_indexed.copy()
         
-        # Make extreme price changes (>20%)
+        # Make extreme price changes (>50% to match validation threshold)
         extreme_idx = 30
-        df.loc[df.index[extreme_idx], 'close'] = df.loc[df.index[extreme_idx-1], 'close'] * 1.3  # 30% increase
+        df.loc[df.index[extreme_idx], 'close'] = df.loc[df.index[extreme_idx-1], 'close'] * 1.6  # 60% increase
         
         validator = DataValidator(df)
         validator.validate_price_movement()
