@@ -200,6 +200,7 @@ class FeatureSelector(BaseProcessor):
             return selected_features
         except Exception as e:
             logging.error(f"Unable to use XGB Regression for feature selection: {e}")
+            return None
         
     def rfe(self, n_features_to_select=None, step=2):
         """
@@ -238,3 +239,4 @@ class FeatureSelector(BaseProcessor):
             return selected_features
         except Exception as e:
             logging.error(f"Unable to perform Recursive Feature Elimination: {e}")
+            return None

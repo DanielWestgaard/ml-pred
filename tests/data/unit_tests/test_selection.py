@@ -181,18 +181,20 @@ class TestFeatureSelector(unittest.TestCase):
         with patch('data.features.selection.config.FE_SEL_BASE_DIR', self.temp_dir):
             selector = FeatureSelector(self.df, target_col='close')
             
-            # Patch the selection methods to raise exceptions
-            with patch.object(selector, 'cfs', side_effect=Exception("Test error")):
-                # Should return None but not crash
+            # Test CFS error handling by mocking pandas corr method
+            with patch.object(pd.DataFrame, 'corr', side_effect=Exception("Correlation error")):
                 result = selector.cfs()
-                self.assertIsNone(result)
+                # CFS returns fallback list with target column on error
+                self.assertEqual(result, ['close'])
             
-            with patch.object(selector, 'xgb_regressor', side_effect=Exception("Test error")):
-                # Should return None but not crash
+            # Test XGBoost error handling by mocking XGBRegressor fit
+            with patch('xgboost.XGBRegressor.fit', side_effect=Exception("XGBoost fit error")):
                 result = selector.xgb_regressor()
+                # XGBoost returns None on error
                 self.assertIsNone(result)
             
-            with patch.object(selector, 'rfe', side_effect=Exception("Test error")):
-                # Should return None but not crash
+            # Test RFE error handling by mocking RFECV fit
+            with patch('sklearn.feature_selection.RFECV.fit', side_effect=Exception("RFE fit error")):
                 result = selector.rfe()
+                # RFE returns None on error
                 self.assertIsNone(result)
