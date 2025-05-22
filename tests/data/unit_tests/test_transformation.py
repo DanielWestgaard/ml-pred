@@ -31,7 +31,7 @@ class TestFeatureTransformer(unittest.TestCase):
         # Create some duplicated columns
         dup_col = self.df['close'].copy()
         self.df_with_dups = self.df.copy()
-        self.df_with_dups['close'] = dup_col  # Create a duplicate 'close' column
+        self.df_with_dups.insert(len((self.df.columns)), 'close', dup_col, True)
     
     def test_initialization(self):
         """Test initialization of FeatureTransformer."""
