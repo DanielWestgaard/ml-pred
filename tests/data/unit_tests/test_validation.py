@@ -153,6 +153,22 @@ class TestDataValidator(unittest.TestCase):
         price_issues = [issue for issue in validator.validation_issues 
                         if issue['type'] == 'Extreme Price Movement']
         self.assertGreater(len(price_issues), 0)
+        
+    def test_validate_price_movement_borderline(self):
+        """Test price movement validation with borderline cases."""
+        # Create borderline case (just under threshold)
+        df = self.clean_df_indexed.copy()
+        
+        extreme_idx = 30
+        df.loc[df.index[extreme_idx], 'close'] = df.loc[df.index[extreme_idx-1], 'close'] * 1.49  # 49% increase (should NOT trigger)
+        
+        validator = DataValidator(df)
+        validator.validate_price_movement()
+        
+        # Should NOT have identified this as extreme
+        price_issues = [issue for issue in validator.validation_issues 
+                        if issue['type'] == 'Extreme Price Movement']
+        self.assertEqual(len(price_issues), 0)
     
     def test_validate_data_completeness_missing_columns(self):
         """Test data completeness validation with missing required columns."""
