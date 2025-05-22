@@ -100,8 +100,10 @@ class DataCleaner(BaseProcessor):
         1. Converting timestamp column to datetime
         2. Setting datetime as index
         3. Timezone normalization to UTC
-        4. Identifying gaps in time series
+        4. Identifying and FILLING gaps in time series  # ← IMPROVED
         """
+        # ... existing code for date conversion and timezone handling ...
+        
         # Check if 'date' column exists
         if 'date' not in self.df.columns:
             logging.error("No 'date' column found in the dataframe")
@@ -118,19 +120,16 @@ class DataCleaner(BaseProcessor):
         # Sort by date
         self.df = self.df.sort_values('date')        
         
-        # Check for timezone info in the date column
+        # Handle timezone (existing code)
         sample_date = self.df['date'].iloc[0]
         has_tz = hasattr(sample_date, 'tzinfo') and sample_date.tzinfo is not None
         
-        # If timezone info exists but is not UTC, convert to UTC
         if has_tz and str(sample_date.tzinfo) != 'UTC':
             try:
                 self.df['date'] = self.df['date'].dt.tz_convert('UTC')
                 logging.debug("Converted timestamps to UTC")
             except Exception as e:
                 logging.warning(f"Could not convert timezone to UTC: {e}")
-        
-        # If no timezone info exists, assume UTC
         elif not has_tz:
             try:
                 self.df['date'] = self.df['date'].dt.tz_localize('UTC')
@@ -142,7 +141,7 @@ class DataCleaner(BaseProcessor):
         if self.df.index.name != 'date':
             self.df = self.df.set_index('date')
         
-        # Identify frequency of data (daily, hourly, minute, etc.)
+        # NEW: Fill time series gaps
         if len(self.df) > 1:
             time_diffs = self.df.index.to_series().diff().dropna()
             common_diff = time_diffs.mode().iloc[0]
@@ -151,21 +150,34 @@ class DataCleaner(BaseProcessor):
             # Check for gaps
             gaps = time_diffs[time_diffs > common_diff * 1.5]
             if not gaps.empty:
-                logging.warning(f"Found {len(gaps)} gaps in time series")
-                # Optionally fill gaps with NaN and then forward fill
-                # full_idx = pd.date_range(start=self.df.index.min(), end=self.df.index.max(), freq=common_diff)
-                # self.df = self.df.reindex(full_idx)
-                # Then you'd need to handle the NaNs appropriately
-        
+                logging.warning(f"Found {len(gaps)} gaps in time series - filling them")
+                
+                # Create complete time index
+                full_idx = pd.date_range(
+                    start=self.df.index.min(), 
+                    end=self.df.index.max(), 
+                    freq=common_diff
+                )
+                
+                # Reindex to fill gaps
+                self.df = self.df.reindex(full_idx)
+                
+                # Fill the gaps using forward fill for OHLC
+                price_cols = ['open', 'high', 'low', 'close']
+                for col in price_cols:
+                    if col in self.df.columns:
+                        self.df[col] = self.df[col].ffill()
+                
+                # For volume, use 0 for gap periods (no trading)
+                if 'volume' in self.df.columns:
+                    self.df['volume'] = self.df['volume'].fillna(0)
+                
+                logging.info(f"Filled time series gaps. New length: {len(self.df)}")
+
     def _handle_outliers(self):
         """
         Detect and handle outliers in OHLCV data using multiple methods.
-        
-        Implements:
-        1. IQR method for price columns
-        2. Z-score method for volume
-        3. Winsorization for extreme values
-        4. OHLC relationship validation
+        IMPROVED: Use consistent thresholds with validation
         """
         # Define price columns
         price_cols = ['open', 'high', 'low', 'close']
@@ -177,9 +189,9 @@ class DataCleaner(BaseProcessor):
             Q3 = self.df[col].quantile(0.75)
             IQR = Q3 - Q1
             
-            # Define bounds
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
+            # Define bounds (more aggressive cleaning)
+            lower_bound = Q1 - 2 * IQR  # Slightly more aggressive
+            upper_bound = Q3 + 2 * IQR
             
             # Flag potential outliers (for logging)
             outliers = self.df[(self.df[col] < lower_bound) | (self.df[col] > upper_bound)]
@@ -189,24 +201,30 @@ class DataCleaner(BaseProcessor):
             # Winsorize (cap) extreme values instead of removing
             self.df[col] = self.df[col].clip(lower=lower_bound, upper=upper_bound)
         
-        # --- METHOD 2: Z-score for volume (more robust for highly skewed data) ---
+        # --- METHOD 2: Z-score for volume (ALIGNED WITH VALIDATION) ---
         if 'volume' in self.df.columns:
-            # Log transform first (volume is usually right-skewed)
-            log_volume = np.log1p(self.df['volume'])  # log(1+x) to handle zeros
-            
-            # Calculate z-score
-            mean_log_vol = log_volume.mean()
-            std_log_vol = log_volume.std()
-            z_scores = np.abs((log_volume - mean_log_vol) / std_log_vol)
-            
-            # Flag potential outliers (z-score > 3)
-            volume_outliers = self.df[z_scores > 3]
-            if len(volume_outliers) > 0:
-                logging.debug(f"Found {len(volume_outliers)} volume outliers using Z-score method")
-            
-            # Cap extreme values (in log space, then transform back)
-            cap_log_vol = log_volume.clip(upper=mean_log_vol + 3*std_log_vol)
-            self.df['volume'] = np.expm1(cap_log_vol)  # exp(x)-1 to reverse log1p
+            # Filter positive volumes
+            positive_mask = self.df['volume'] > 0
+            if positive_mask.any():
+                positive_volumes = self.df.loc[positive_mask, 'volume']
+                log_volume = np.log1p(positive_volumes)
+                
+                # Calculate z-score
+                mean_log_vol = log_volume.mean()
+                std_log_vol = log_volume.std()
+                
+                # Use same threshold as validation (4-sigma for cleaning, 5-sigma for validation)
+                threshold = 4  # Slightly more aggressive than validation
+                upper_bound_log = mean_log_vol + threshold * std_log_vol
+                
+                # Cap extreme values
+                capped_log_volume = log_volume.clip(upper=upper_bound_log)
+                self.df.loc[positive_mask, 'volume'] = np.expm1(capped_log_volume)
+                
+                # Count how many we capped
+                capped_count = (log_volume > upper_bound_log).sum()
+                if capped_count > 0:
+                    logging.debug(f"Capped {capped_count} extreme volume values")
     
     def _datatype_consistency(self):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""

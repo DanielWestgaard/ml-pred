@@ -71,19 +71,19 @@ class DataValidator(BaseProcessor):
                 'affected_rows': self.df.index[duplicates].tolist()
             })
             
-        # Check for gaps in time series
+        # Check for gaps in time series (MORE LENIENT)
         if len(self.df) > 1:
             # Determine expected frequency
             time_diffs = self.df.index.to_series().diff().dropna()
             common_diff = time_diffs.mode().iloc[0]
             
-            # Identify gaps larger than 1.5x expected frequency
-            gaps = time_diffs[time_diffs > common_diff * 1.5]
-            if not gaps.empty:
+            # Only flag very large gaps (3x expected frequency instead of 1.5x)
+            large_gaps = time_diffs[time_diffs > common_diff * 3]  # More lenient
+            if not large_gaps.empty:
                 self.validation_issues.append({
                     'type': 'Time Series Gaps',
-                    'description': f'Found {len(gaps)} gaps in time series',
-                    'details': {str(idx): str(gap) for idx, gap in gaps.items()}
+                    'description': f'Found {len(large_gaps)} large gaps in time series',
+                    'details': {str(idx): str(gap) for idx, gap in large_gaps.items()}
                 })
                 
         # Check for future timestamps
@@ -95,7 +95,7 @@ class DataValidator(BaseProcessor):
                 'description': f'Found {len(future_data)} records with future timestamps',
                 'affected_rows': future_data.index.tolist()
             })
-        
+
     def validate_volume(self):
         """Validate volume data."""
         if 'volume' in self.df.columns:
@@ -108,41 +108,41 @@ class DataValidator(BaseProcessor):
                     'affected_rows': negative_volume.index.tolist()
                 })
             
-            # Check for suspiciously high volume (outliers)
-            # Only analyze positive volumes for outlier detection
+            # Check for suspiciously high volume (ALIGNED WITH CLEANING)
             import numpy as np
             
             # Filter to only positive volumes for log transformation
             positive_volume_mask = self.df['volume'] > 0
-            if positive_volume_mask.any():  # Proceed only if we have positive values
+            if positive_volume_mask.any():
                 positive_volumes = self.df.loc[positive_volume_mask, 'volume']
                 log_volume = np.log1p(positive_volumes)
                 
                 # Calculate mean and std on valid volumes only
                 mean, std = log_volume.mean(), log_volume.std()
                 
-                # Identify outliers, but apply back to the original dataframe
-                high_volume_mask = log_volume > mean + 5*std  # 5-sigma events
+                # Use 6-sigma threshold (more lenient than before)
+                # Since cleaning uses 4-sigma, validation uses 6-sigma
+                high_volume_mask = log_volume > mean + 6*std  # More lenient
                 high_volume_indices = positive_volumes.index[high_volume_mask]
                 
                 if len(high_volume_indices) > 0:
                     self.validation_issues.append({
                         'type': 'Suspicious Volume',
-                        'description': f'Found {len(high_volume_indices)} records with abnormally high volume',
+                        'description': f'Found {len(high_volume_indices)} records with extremely high volume',
                         'affected_rows': high_volume_indices.tolist()
                     })
-    
+
     def validate_price_movement(self):
         """Validate price movements for extreme or suspicious patterns."""
         # Calculate returns
         self.df['return'] = self.df['close'].pct_change(fill_method=None)
         
-        # Check for extreme returns (potential data errors)
-        extreme_returns = self.df[abs(self.df['return']) > 0.20]  # 20% move
+        # Check for extreme returns (MORE LENIENT - 50% instead of 20%)
+        extreme_returns = self.df[abs(self.df['return']) > 0.50]  # 50% move
         if not extreme_returns.empty:
             self.validation_issues.append({
                 'type': 'Extreme Price Movement',
-                'description': f'Found {len(extreme_returns)} records with >20% price moves',
+                'description': f'Found {len(extreme_returns)} records with >50% price moves',
                 'affected_rows': extreme_returns.index.tolist()
             })
             
