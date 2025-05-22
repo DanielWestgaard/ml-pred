@@ -103,7 +103,7 @@ class FeatureTransformer(BaseProcessor):
             total_nans_before = self.df.isnull().sum().sum()
             
             # Apply forward fill
-            self.df = self.df.fillna(method='ffill')
+            self.df = self.df.ffill()
             
             # Count remaining NaNs (if any)
             remaining_nans = self.df.isnull().sum().sum()
