@@ -49,17 +49,23 @@ class TestEngineeringPipeline(unittest.TestCase):
         if os.path.exists(self.fe_sel_dir):
             shutil.rmtree(self.fe_sel_dir)
     
-    def _create_mock_ohlcv_df(self, additional_data=None):
+    def _create_mock_ohlcv_df(self, additional_data=None, num_rows=10):
         """Helper method to create mock DataFrame with required OHLCV columns."""
+        # Create enough rows to satisfy train_test_split requirements (needs at least 5 for test_size=0.2)
         base_data = {
-            'open': [100.0],
-            'high': [105.0], 
-            'low': [98.0],
-            'close': [102.0],
-            'volume': [1000]
+            'open': [100.0] * num_rows,
+            'high': [105.0] * num_rows, 
+            'low': [98.0] * num_rows,
+            'close': [102.0] * num_rows,
+            'volume': [1000] * num_rows
         }
         if additional_data:
-            base_data.update(additional_data)
+            # Ensure additional data has the same number of rows
+            for key, value in additional_data.items():
+                if isinstance(value, list) and len(value) == 1:
+                    base_data[key] = value * num_rows
+                else:
+                    base_data[key] = value
         return pd.DataFrame(base_data)
     
     @patch('config.config.FE_SEL_BASE_DIR', MagicMock(return_value='temp_fe_sel'))
