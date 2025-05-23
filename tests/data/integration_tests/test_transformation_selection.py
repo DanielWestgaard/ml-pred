@@ -36,8 +36,11 @@ class TestTransformationSelectionIntegration(unittest.TestCase):
         self.df['volume_scaled'] = self.df['volume'] * 0.5
         
         # Create NaN values
-        self.df['sma_5'].iloc[:5] = np.nan
-        self.df['rsi_14'].iloc[:15] = np.nan
+        # Get column positions and use iloc for everything
+        sma_col = self.df.columns.get_loc('sma_5')
+        rsi_col = self.df.columns.get_loc('rsi_14')
+        self.df.iloc[:5, sma_col] = np.nan
+        self.df.iloc[:15, rsi_col] = np.nan
         
         # Create temporary directory for saving plots
         self.temp_dir = os.path.join(os.getcwd(), 'temp_test_transform_select')
