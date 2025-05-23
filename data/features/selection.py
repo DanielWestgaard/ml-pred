@@ -35,7 +35,8 @@ class FeatureSelector(BaseProcessor):
         # Time for saving the files
         self.current_time = datetime.datetime.now()
         self.storage_path = os.path.join(config.FE_SEL_BASE_DIR, str(self.current_time))
-        os.mkdir(self.storage_path)
+        if not os.path.exists(self.storage_path):
+            os.makedirs(self.storage_path, exist_ok=True)
     
     def run(self, methods=['cfs', 'xgb', 'rfe'], k_features=5):
         """
