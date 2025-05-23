@@ -1,3 +1,4 @@
+# Fixed test_pipeline.py
 import unittest
 import pandas as pd
 import numpy as np
@@ -49,10 +50,23 @@ class TestEngineeringPipeline(unittest.TestCase):
         if os.path.exists(self.fe_sel_dir):
             shutil.rmtree(self.fe_sel_dir)
     
+    def _create_mock_ohlcv_df(self, additional_data=None):
+        """Helper method to create mock DataFrame with required OHLCV columns."""
+        base_data = {
+            'open': [100.0],
+            'high': [105.0], 
+            'low': [98.0],
+            'close': [102.0],
+            'volume': [1000]
+        }
+        if additional_data:
+            base_data.update(additional_data)
+        return pd.DataFrame(base_data)
+    
     @patch('config.config.FE_SEL_BASE_DIR', MagicMock(return_value='temp_fe_sel'))
-    @patch('os.mkdir')
+    @patch('os.makedirs')  # Mock directory creation
     @patch('utils.data_utils.save_processed_file')
-    def test_full_pipeline(self, mock_save, mock_mkdir):
+    def test_full_pipeline(self, mock_save, mock_makedirs):
         """Test the full engineering pipeline from raw data to selected features."""
         # Patch config.FE_SEL_BASE_DIR to use our temporary directory
         config.FE_SEL_BASE_DIR = self.fe_sel_dir
@@ -78,8 +92,8 @@ class TestEngineeringPipeline(unittest.TestCase):
         mock_save.assert_called_once()
     
     @patch('config.config.FE_SEL_BASE_DIR', MagicMock(return_value='temp_fe_sel'))
-    @patch('os.mkdir')
-    def test_pipeline_component_integration(self, mock_mkdir):
+    @patch('os.makedirs')  # Mock directory creation
+    def test_pipeline_component_integration(self, mock_makedirs):
         """Test integration of all pipeline components with mocked methods."""
         # Patch config.FE_SEL_BASE_DIR to use our temporary directory
         config.FE_SEL_BASE_DIR = self.fe_sel_dir
@@ -87,13 +101,12 @@ class TestEngineeringPipeline(unittest.TestCase):
         # Create pipeline
         pipeline = EngineeringPipeline(raw_dataset=self.temp_file_path)
         
-        # Mock the component methods to track calls and return values
-        # FIX: Convert scalar values to lists to create proper DataFrames
-        cleaned_df = pd.DataFrame({'mock': ['cleaned_data']})
-        validated_df = pd.DataFrame({'mock': ['validated_data']})
-        features_df = pd.DataFrame({'mock': ['features_data']})
-        transformed_df = pd.DataFrame({'mock': ['transformed_data']})
-        selected_df = pd.DataFrame({'mock': ['selected_data']})
+        # Create mock DataFrames with required OHLCV columns
+        cleaned_df = self._create_mock_ohlcv_df({'cleaned': ['data']})
+        validated_df = self._create_mock_ohlcv_df({'validated': ['data']})
+        features_df = self._create_mock_ohlcv_df({'features': ['data']})
+        transformed_df = self._create_mock_ohlcv_df({'transformed': ['data']})
+        selected_df = self._create_mock_ohlcv_df({'selected': ['data']})
         
         # Mock component return values
         with patch.object(DataCleaner, 'run', return_value=cleaned_df), \
@@ -112,15 +125,15 @@ class TestEngineeringPipeline(unittest.TestCase):
             result = pipeline.run()
             
             # Verify the result
-            self.assertEqual(result.equals(selected_df), True)
+            self.assertTrue(result.equals(selected_df))
             
             # Verify that all components were called
             mock_save.assert_called_once()
             mock_check.assert_called_once()
     
     @patch('config.config.FE_SEL_BASE_DIR', MagicMock(return_value='temp_fe_sel'))
-    @patch('os.mkdir')
-    def test_pipeline_with_validation_failure(self, mock_mkdir):
+    @patch('os.makedirs')  # Mock directory creation
+    def test_pipeline_with_validation_failure(self, mock_makedirs):
         """Test pipeline behavior when validation fails."""
         # Patch config.FE_SEL_BASE_DIR to use our temporary directory
         config.FE_SEL_BASE_DIR = self.fe_sel_dir
@@ -128,9 +141,9 @@ class TestEngineeringPipeline(unittest.TestCase):
         # Create pipeline
         pipeline = EngineeringPipeline(raw_dataset=self.temp_file_path)
         
-        # Mock component return values with validation failure
-        # Convert scalar values to lists to create proper DataFrames
-        cleaned_df = pd.DataFrame({'mock': ['cleaned_data']})
+        # Create mock DataFrame with required OHLCV columns
+        cleaned_df = self._create_mock_ohlcv_df({'cleaned': ['data']})
+        
         # Validation fails
         validation_result = {
             'is_valid': False,
@@ -151,7 +164,7 @@ class TestEngineeringPipeline(unittest.TestCase):
             result = pipeline.run()
             
             # Pipeline should continue despite validation issues
-            self.assertEqual(result.equals(cleaned_df), True)
+            self.assertTrue(result.equals(cleaned_df))
             
             # Verify that validation was checked
             mock_check.assert_called_once_with(False, [{'type': 'Mock Issue', 'description': 'Test issue'}])
@@ -160,8 +173,8 @@ class TestEngineeringPipeline(unittest.TestCase):
             mock_save.assert_called_once()
     
     @patch('config.config.FE_SEL_BASE_DIR', MagicMock(return_value='temp_fe_sel'))
-    @patch('os.mkdir')
-    def test_pipeline_error_handling(self, mock_mkdir):
+    @patch('os.makedirs')  # Mock directory creation
+    def test_pipeline_error_handling(self, mock_makedirs):
         """Test pipeline error handling."""
         # Patch config.FE_SEL_BASE_DIR to use our temporary directory
         config.FE_SEL_BASE_DIR = self.fe_sel_dir

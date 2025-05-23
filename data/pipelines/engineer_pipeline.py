@@ -68,3 +68,6 @@ class EngineeringPipeline():
         except Exception as e:
             logging.error(f"Unable to save file 'dynamically', will store as {os.getcwd()}, : {e}")
             self.df.to_csv('testing.csv', index=True)
+        
+        # FIX: Return the processed DataFrame
+        return self.df
