@@ -117,12 +117,24 @@ class FeatureSelector(BaseProcessor):
             
             # Remove highly correlated features from candidates
             selected = []
+            duplicate_threshold = 0.95  # Features with >95% correlation to target are considered duplicates
+            
             for feature in candidates:
                 to_remove = False
-                for selected_feature in selected:
-                    if abs(corr_matrix.loc[feature, selected_feature]) > corr_threshold:
-                        to_remove = True
-                        break
+                
+                # Check if feature is essentially a duplicate of the target
+                target_corr = abs(corr_matrix.loc[feature, self.target_col])
+                if target_corr > duplicate_threshold:
+                    logging.debug(f"Excluding {feature} - essentially duplicate of target (correlation: {target_corr:.3f})")
+                    to_remove = True
+                
+                # Check correlation with other selected features
+                if not to_remove:
+                    for selected_feature in selected:
+                        if abs(corr_matrix.loc[feature, selected_feature]) > corr_threshold:
+                            to_remove = True
+                            break
+                
                 if not to_remove:
                     selected.append(feature)
             
