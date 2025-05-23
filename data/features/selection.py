@@ -107,7 +107,10 @@ class FeatureSelector(BaseProcessor):
             corr_matrix = self.df[numeric_cols].corr()
             corr_with_target = corr_matrix[self.target_col].drop(self.target_col)
             
-            self._plot_fs_analysis_cfs(numeric_cols=numeric_cols)
+            try: 
+                self._plot_fs_analysis_cfs(numeric_cols=numeric_cols)
+            except Exception as e:
+                logging.error(f"Unable to plot or save plot of CFS Analysis: {e}")
             
             # Sort and get top k candidates
             candidates = corr_with_target.abs().sort_values(ascending=False)[:k].index.tolist()
@@ -189,12 +192,15 @@ class FeatureSelector(BaseProcessor):
             # Filter by threshold
             selected_features = feature_importance[feature_importance['importance'] > threshold]['feature'].tolist()
             
-            # Plot importance (consider saving the plot)
-            plt.figure(figsize=(10, 6))
-            plt.bar(feature_importance['feature'], feature_importance['importance'])
-            plt.xticks(rotation=90)
-            plt.tight_layout()
-            plt.savefig(f'{self.storage_path}/xgb_feature_importance.png')
+            try:
+                # Plot importance (consider saving the plot)
+                plt.figure(figsize=(10, 6))
+                plt.bar(feature_importance['feature'], feature_importance['importance'])
+                plt.xticks(rotation=90)
+                plt.tight_layout()
+                plt.savefig(f'{self.storage_path}/xgb_feature_importance.png')
+            except Exception as e:
+                logging.error(f"Unable to plot/save plot of XGB Regressor: {e}")
             
             logging.debug(f"Selected {len(selected_features)} features above threshold {threshold}: {selected_features}")
             return selected_features
@@ -227,13 +233,16 @@ class FeatureSelector(BaseProcessor):
             # Get selected features with importance ranking
             selected_features = self.X.columns[selector.support_].tolist()
             
-            # Plot the number of features vs CV score
-            plt.figure(figsize=(10, 6))
-            plt.plot(range(1, len(selector.cv_results_['mean_test_score']) + 1), 
-                    selector.cv_results_['mean_test_score'])
-            plt.xlabel('Number of features')
-            plt.ylabel('Mean test score (neg MSE)')
-            plt.savefig(f'{self.storage_path}/rfe_cv_scores.png')
+            try:
+                # Plot the number of features vs CV score
+                plt.figure(figsize=(10, 6))
+                plt.plot(range(1, len(selector.cv_results_['mean_test_score']) + 1), 
+                        selector.cv_results_['mean_test_score'])
+                plt.xlabel('Number of features')
+                plt.ylabel('Mean test score (neg MSE)')
+                plt.savefig(f'{self.storage_path}/rfe_cv_scores.png')
+            except Exception as e:
+                logging.error(f"Unable to plot/save plot of RFE (-CV): {e}")
             
             logging.info(f"Optimal number of features: {selector.n_features_}")
             return selected_features
