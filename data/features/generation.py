@@ -179,6 +179,8 @@ class FeatureGenerator():
         # middle band is sma
         self.df["std"] = self.df["close"].rolling(window=period_bb).std()  # rolling standard deviation
         num_std_dev = 2
+        if f'sma_{period_bb}' not in self.df.columns:  # if sma_n isn't a generated feature, generate it first
+            self.df[f"sma_{period_bb}"] = self.df["close"].rolling(window=period_bb).mean()
         self.df['upper_band'] = self.df[f'sma_{period_bb}'] + (num_std_dev * self.df['std'])
         self.df['lower_band'] = self.df[f'sma_{period_bb}'] - (num_std_dev * self.df['std'])
         # Add Bollinger Band Width
