@@ -1,4 +1,3 @@
-# Fixed test_pipeline.py
 import unittest
 import pandas as pd
 import numpy as np
