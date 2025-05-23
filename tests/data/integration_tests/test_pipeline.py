@@ -88,11 +88,12 @@ class TestEngineeringPipeline(unittest.TestCase):
         pipeline = EngineeringPipeline(raw_dataset=self.temp_file_path)
         
         # Mock the component methods to track calls and return values
-        cleaned_df = pd.DataFrame({'mock': 'cleaned_data'})
-        validated_df = pd.DataFrame({'mock': 'validated_data'})
-        features_df = pd.DataFrame({'mock': 'features_data'})
-        transformed_df = pd.DataFrame({'mock': 'transformed_data'})
-        selected_df = pd.DataFrame({'mock': 'selected_data'})
+        # FIX: Convert scalar values to lists to create proper DataFrames
+        cleaned_df = pd.DataFrame({'mock': ['cleaned_data']})
+        validated_df = pd.DataFrame({'mock': ['validated_data']})
+        features_df = pd.DataFrame({'mock': ['features_data']})
+        transformed_df = pd.DataFrame({'mock': ['transformed_data']})
+        selected_df = pd.DataFrame({'mock': ['selected_data']})
         
         # Mock component return values
         with patch.object(DataCleaner, 'run', return_value=cleaned_df), \
@@ -128,7 +129,8 @@ class TestEngineeringPipeline(unittest.TestCase):
         pipeline = EngineeringPipeline(raw_dataset=self.temp_file_path)
         
         # Mock component return values with validation failure
-        cleaned_df = pd.DataFrame({'mock': 'cleaned_data'})
+        # Convert scalar values to lists to create proper DataFrames
+        cleaned_df = pd.DataFrame({'mock': ['cleaned_data']})
         # Validation fails
         validation_result = {
             'is_valid': False,
