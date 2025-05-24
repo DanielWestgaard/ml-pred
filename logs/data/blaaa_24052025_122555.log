@@ -1,0 +1,55 @@
+24-05-2025 12:25:55 - INFO - Logging system initialized. Environment: development
+24-05-2025 12:25:55 - INFO - Loaded credentials. Length: 3
+24-05-2025 12:25:56 - INFO - About to start a new session.
+24-05-2025 12:25:56 - DEBUG - Using encrypted password to start session.
+24-05-2025 12:25:56 - INFO - Fetching historical data for GBPUSD from 2025-05-15T00:00:00 to 2025-05-23T01:00:00
+24-05-2025 12:25:56 - INFO - Using chunk size of 15:00:00 for resolution MINUTE
+24-05-2025 12:25:56 - INFO - Processing chunk from 2025-05-15 00:00 to 2025-05-15 15:00
+24-05-2025 12:25:56 - DEBUG - Attempt 1: Fetching from 2025-05-15T00:00:00 to 2025-05-15T15:00:00
+24-05-2025 12:25:59 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:25:59 - INFO - Processing chunk from 2025-05-15 15:00 to 2025-05-16 06:00
+24-05-2025 12:25:59 - DEBUG - Attempt 1: Fetching from 2025-05-15T15:00:00 to 2025-05-16T06:00:00
+24-05-2025 12:25:59 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:25:59 - INFO - Processing chunk from 2025-05-16 06:00 to 2025-05-16 21:00
+24-05-2025 12:25:59 - DEBUG - Attempt 1: Fetching from 2025-05-16T06:00:00 to 2025-05-16T21:00:00
+24-05-2025 12:26:00 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:26:00 - INFO - Processing chunk from 2025-05-16 21:00 to 2025-05-17 12:00
+24-05-2025 12:26:00 - DEBUG - Attempt 1: Fetching from 2025-05-16T21:00:00 to 2025-05-17T12:00:00
+24-05-2025 12:26:00 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:26:00 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:26:00 - INFO - Processing chunk from 2025-05-17 12:00 to 2025-05-18 03:00
+24-05-2025 12:26:00 - DEBUG - Attempt 1: Fetching from 2025-05-17T12:00:00 to 2025-05-18T03:00:00
+24-05-2025 12:26:00 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:26:00 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:26:00 - INFO - Processing chunk from 2025-05-18 03:00 to 2025-05-18 18:00
+24-05-2025 12:26:00 - DEBUG - Attempt 1: Fetching from 2025-05-18T03:00:00 to 2025-05-18T18:00:00
+24-05-2025 12:26:00 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:26:00 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:26:00 - INFO - Processing chunk from 2025-05-18 18:00 to 2025-05-19 09:00
+24-05-2025 12:26:00 - DEBUG - Attempt 1: Fetching from 2025-05-18T18:00:00 to 2025-05-19T09:00:00
+24-05-2025 12:26:11 - INFO - ✓ Successfully fetched 715 data points
+24-05-2025 12:26:11 - INFO - Processing chunk from 2025-05-19 09:00 to 2025-05-20 00:00
+24-05-2025 12:26:11 - DEBUG - Attempt 1: Fetching from 2025-05-19T09:00:00 to 2025-05-20T00:00:00
+24-05-2025 12:26:12 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:26:12 - INFO - Processing chunk from 2025-05-20 00:00 to 2025-05-20 15:00
+24-05-2025 12:26:12 - DEBUG - Attempt 1: Fetching from 2025-05-20T00:00:00 to 2025-05-20T15:00:00
+24-05-2025 12:26:13 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:26:13 - INFO - Processing chunk from 2025-05-20 15:00 to 2025-05-21 06:00
+24-05-2025 12:26:13 - DEBUG - Attempt 1: Fetching from 2025-05-20T15:00:00 to 2025-05-21T06:00:00
+24-05-2025 12:26:13 - INFO - ✓ Successfully fetched 895 data points
+24-05-2025 12:26:13 - INFO - Processing chunk from 2025-05-21 06:00 to 2025-05-21 21:00
+24-05-2025 12:26:13 - DEBUG - Attempt 1: Fetching from 2025-05-21T06:00:00 to 2025-05-21T21:00:00
+24-05-2025 12:26:13 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:26:13 - INFO - Processing chunk from 2025-05-21 21:00 to 2025-05-22 12:00
+24-05-2025 12:26:13 - DEBUG - Attempt 1: Fetching from 2025-05-21T21:00:00 to 2025-05-22T12:00:00
+24-05-2025 12:26:14 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:26:14 - INFO - Processing chunk from 2025-05-22 12:00 to 2025-05-23 01:00
+24-05-2025 12:26:14 - DEBUG - Attempt 1: Fetching from 2025-05-22T12:00:00 to 2025-05-23T01:00:00
+24-05-2025 12:26:14 - INFO - ✓ Successfully fetched 768 data points
+24-05-2025 12:26:14 - INFO - Fetching completed: 10 successful chunks, 3 failed chunks
+24-05-2025 12:26:14 - INFO - Total data points collected: 8659
+24-05-2025 12:26:14 - INFO - Converting 8659 data points to OHLCV format
+24-05-2025 12:26:14 - INFO - Data successfully converted and saved to /Users/dmartinsen/pers-prog/ml-pred/storage/raw_GBPUSD_m_20250515_20250523.csv
+24-05-2025 12:26:14 - INFO - OHLCV data saved to /Users/dmartinsen/pers-prog/ml-pred/storage/raw_GBPUSD_m_20250515_20250523.csv
+24-05-2025 12:26:14 - INFO - Data range: 2025-05-15T00:00:00 to 2025-05-23T01:00:00
+24-05-2025 12:26:14 - INFO - Successfully ended session: {"status":"SUCCESS"}
