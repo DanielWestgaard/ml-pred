@@ -41,7 +41,7 @@ def main():
     if args.fetch_data_capcom:
         provider = ProviderCapitalCom()
         provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE",
-                                                  from_date="2025-01-01T00:00:00", to_date="2025-05-23T01:00:00",
+                                                  from_date="2018-01-01T00:00:00", to_date="2023-05-23T01:00:00",
                                                   print_answer=False)
         provider.end_session()
     
