@@ -87,6 +87,27 @@ class CapitalCom(BaseBroker):
                                                              epic=epic, resolution=resolution, from_date=from_date, to_date=to_date,
                                                              output_file=output_file, print_answer=print_answer, save_raw_data=save_raw_data)
     
+    def fetch_maximum_available_data(self, epic:str, resolution:str, 
+                                    from_date:str, to_date:str,  # format 2022-02-24T00:00:00
+                                    output_file=None,
+                                    X_SECURITY_TOKEN=None, CST=None,
+                                    print_answer=False, save_raw_data=False):
+        """
+        Fetch as much historical data as possible within the given date range.
+        Uses improved chunking and error handling to get maximum available data.
+        """
+        return markets_info.fetch_maximum_available_data(
+            X_SECURITY_TOKEN=X_SECURITY_TOKEN or self.x_security_token, 
+            CST=CST or self.cst,
+            epic=epic, 
+            resolution=resolution, 
+            from_date=from_date, 
+            to_date=to_date,
+            output_file=output_file, 
+            print_answer=print_answer, 
+            save_raw_data=save_raw_data
+        )
+    
     # ==================== ACCOUNT METHODS ====================
     
     def list_all_accounts(self, X_SECURITY_TOKEN=None, CST=None, print_answer=False):
