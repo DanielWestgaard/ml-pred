@@ -16,9 +16,9 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Train hybrid trading strategy models with uncertainty quantification')
     
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
-    parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
-    parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
-    parser.add_argument('--engineer-data', action='store_true', default=True, help='Fetch historical data using Capital.com API.')
+    parser.add_argument('--fetch-data-capcom', action='store_true', default=True, help='Fetch historical data using Capital.com API.')
+    parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Alpha Vantage API.')
+    parser.add_argument('--engineer-data', action='store_true', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
     
 
     return parser.parse_args()
@@ -27,7 +27,7 @@ def main():
     args = parse_arguments()
     
     log_utils._is_configured = False
-    logger = log_utils.setup_logging(name="blaaa", type="training", log_to_file=False, log_level=config.DEFAULT_LOG_LEVEL)
+    logger = log_utils.setup_logging(name="blaaa", type="training", log_to_file=True, log_level=config.DEBUG_LOG_LEVEL)
     
     if args.engineer_data:
         data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
@@ -40,8 +40,8 @@ def main():
     
     if args.fetch_data_capcom:
         provider = ProviderCapitalCom()
-        provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE_5",
-                                                  from_date="2024-04-15T00:00:00", to_date="2025-05-01T01:00:00",
+        provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE",
+                                                  from_date="2025-05-15T00:00:00", to_date="2025-05-23T01:00:00",
                                                   print_answer=False)
         provider.end_session()
     
