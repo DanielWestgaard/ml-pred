@@ -62,24 +62,56 @@ class DataCleaner(BaseProcessor):
         self.df.replace(['', 'NA', 'N/A', 'null', 'Null', 'NULL', 'None', 'NaN'], np.nan, inplace=True)
         
         # --- Fill CLOSE ---
-        self.df['close'] = self.df['close'].ffill()  # Step 1: forward-fill
-        self.df['close'] = self.df['close'].interpolate()  # Step 2: fill remaining gaps if any
+        if 'close' in self.df.columns:
+            self.df['close'] = self.df['close'].ffill()  # Step 1: forward-fill
+            self.df['close'] = self.df['close'].interpolate()  # Step 2: fill remaining gaps if any
 
         # --- Fill OPEN ---
-        self.df['open'] = self.df['open'].combine_first(self.df['close'].shift(1))  # Use previous close
-        self.df['open'] = self.df['open'].interpolate()  # Fill any remaining gaps
+        if 'open' in self.df.columns:
+            if 'close' in self.df.columns:
+                self.df['open'] = self.df['open'].combine_first(self.df['close'].shift(1))  # Use previous close
+            self.df['open'] = self.df['open'].interpolate()  # Fill any remaining gaps
         
         # --- Fill HIGH ---
-        self.df['high'] = self.df['high'].combine_first(self.df[['open', 'close']].max(axis=1))
-        self.df['high'] = self.df['high'].interpolate()
+        if 'high' in self.df.columns:
+            # Only use available columns for the fallback calculation
+            available_price_cols = [col for col in ['open', 'close'] if col in self.df.columns]
+            if available_price_cols:
+                self.df['high'] = self.df['high'].combine_first(self.df[available_price_cols].max(axis=1))
+            self.df['high'] = self.df['high'].interpolate()
 
         # --- Fill LOW ---
-        self.df['low'] = self.df['low'].combine_first(self.df[['open', 'close']].min(axis=1))
-        self.df['low'] = self.df['low'].interpolate()
+        if 'low' in self.df.columns:
+            # Only use available columns for the fallback calculation
+            available_price_cols = [col for col in ['open', 'close'] if col in self.df.columns]
+            if available_price_cols:
+                self.df['low'] = self.df['low'].combine_first(self.df[available_price_cols].min(axis=1))
+            self.df['low'] = self.df['low'].interpolate()
+        
+        # --- Fill VOLUME ---
+        if 'volume' in self.df.columns:
+            # Step 1: If price didn't change (high=low), it's likely no trades occurred
+            # Only check this if both high and low columns exist
+            if 'high' in self.df.columns and 'low' in self.df.columns:
+                no_movement_mask = (self.df['high'] == self.df['low'])
+                self.df.loc[no_movement_mask & self.df['volume'].isna(), 'volume'] = 0
+            
+            # Step 2: For other missing values, use interpolation rather than forward fill
+            # Linear interpolation works well for shorter gaps
+            self.df['volume'] = self.df['volume'].interpolate(method='linear')
+            # Step 3: Any remaining NaNs at the beginning can be filled with early known volumes
+            # (avoid forward fill for long sequences)
+            self.df['volume'] = self.df['volume'].bfill().fillna(0)
         
     def _remove_duplicates(self):
         """Removes duplicates."""
-        self.df = self.df.drop_duplicates(subset=['date'])
+        # Check if 'date' column exists for subset-based deduplication
+        if 'date' in self.df.columns:
+            self.df = self.df.drop_duplicates(subset=['date'])
+        else:
+            # If no date column, just remove completely identical rows
+            logging.warning("No 'date' column found for deduplication, removing completely identical rows")
+            self.df = self.df.drop_duplicates()
         
     def _timestamp_alignment(self):
         """
@@ -89,7 +121,7 @@ class DataCleaner(BaseProcessor):
         1. Converting timestamp column to datetime
         2. Setting datetime as index
         3. Timezone normalization to UTC
-        4. Identifying gaps in time series
+        4. Identifying and FILLING gaps in time series  # ← IMPROVED
         """
         # Check if 'date' column exists
         if 'date' not in self.df.columns:
@@ -107,19 +139,16 @@ class DataCleaner(BaseProcessor):
         # Sort by date
         self.df = self.df.sort_values('date')        
         
-        # Check for timezone info in the date column
+        # Handle timezone (existing code)
         sample_date = self.df['date'].iloc[0]
         has_tz = hasattr(sample_date, 'tzinfo') and sample_date.tzinfo is not None
         
-        # If timezone info exists but is not UTC, convert to UTC
         if has_tz and str(sample_date.tzinfo) != 'UTC':
             try:
                 self.df['date'] = self.df['date'].dt.tz_convert('UTC')
                 logging.debug("Converted timestamps to UTC")
             except Exception as e:
                 logging.warning(f"Could not convert timezone to UTC: {e}")
-        
-        # If no timezone info exists, assume UTC
         elif not has_tz:
             try:
                 self.df['date'] = self.df['date'].dt.tz_localize('UTC')
@@ -131,71 +160,116 @@ class DataCleaner(BaseProcessor):
         if self.df.index.name != 'date':
             self.df = self.df.set_index('date')
         
-        # Identify frequency of data (daily, hourly, minute, etc.)
+        # FIXED: Remove any remaining duplicates from the index before reindexing
+        if self.df.index.duplicated().any():
+            logging.warning("Found duplicate index values after setting date as index - removing")
+            self.df = self.df[~self.df.index.duplicated(keep='first')]
+        
+        # NEW: Fill time series gaps
         if len(self.df) > 1:
             time_diffs = self.df.index.to_series().diff().dropna()
-            common_diff = time_diffs.mode().iloc[0]
-            logging.debug(f"Most common time interval: {common_diff}")
-            
-            # Check for gaps
-            gaps = time_diffs[time_diffs > common_diff * 1.5]
-            if not gaps.empty:
-                logging.warning(f"Found {len(gaps)} gaps in time series")
-                # Optionally fill gaps with NaN and then forward fill
-                # full_idx = pd.date_range(start=self.df.index.min(), end=self.df.index.max(), freq=common_diff)
-                # self.df = self.df.reindex(full_idx)
-                # Then you'd need to handle the NaNs appropriately
-        
+            if len(time_diffs) > 0:  # Check if we have any time differences
+                common_diff = time_diffs.mode().iloc[0] if not time_diffs.mode().empty else time_diffs.median()
+                logging.debug(f"Most common time interval: {common_diff}")
+                
+                # Check for gaps
+                gaps = time_diffs[time_diffs > common_diff * 1.5]
+                if not gaps.empty:
+                    logging.warning(f"Found {len(gaps)} gaps in time series - filling them")
+                    
+                    # Create complete time index
+                    full_idx = pd.date_range(
+                        start=self.df.index.min(), 
+                        end=self.df.index.max(), 
+                        freq=common_diff
+                    )
+                    
+                    # Reindex to fill gaps
+                    self.df = self.df.reindex(full_idx)
+                    
+                    # Fill the gaps using forward fill for OHLC
+                    price_cols = ['open', 'high', 'low', 'close']
+                    for col in price_cols:
+                        if col in self.df.columns:
+                            self.df[col] = self.df[col].ffill()
+                    
+                    # For volume, use 0 for gap periods (no trading)
+                    if 'volume' in self.df.columns:
+                        self.df['volume'] = self.df['volume'].fillna(0)
+                    
+                    logging.info(f"Filled time series gaps. New length: {len(self.df)}")
+
     def _handle_outliers(self):
         """
         Detect and handle outliers in OHLCV data using multiple methods.
-        
-        Implements:
-        1. IQR method for price columns
-        2. Z-score method for volume
-        3. Winsorization for extreme values
-        4. OHLC relationship validation
+        IMPROVED: Use consistent thresholds with validation and better volume handling
         """
         # Define price columns
         price_cols = ['open', 'high', 'low', 'close']
         
         # --- METHOD 1: IQR for price columns ---
         for col in price_cols:
-            # Calculate IQR
-            Q1 = self.df[col].quantile(0.25)
-            Q3 = self.df[col].quantile(0.75)
-            IQR = Q3 - Q1
-            
-            # Define bounds
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
-            
-            # Flag potential outliers (for logging)
-            outliers = self.df[(self.df[col] < lower_bound) | (self.df[col] > upper_bound)]
-            if len(outliers) > 0:
-                logging.debug(f"Found {len(outliers)} outliers in {col} using IQR method")
-            
-            # Winsorize (cap) extreme values instead of removing
-            self.df[col] = self.df[col].clip(lower=lower_bound, upper=upper_bound)
+            if col in self.df.columns:
+                # Calculate IQR
+                Q1 = self.df[col].quantile(0.25)
+                Q3 = self.df[col].quantile(0.75)
+                IQR = Q3 - Q1
+                
+                # Define bounds (more aggressive cleaning)
+                lower_bound = Q1 - 2 * IQR  # Slightly more aggressive
+                upper_bound = Q3 + 2 * IQR
+                
+                # Flag potential outliers (for logging)
+                outliers = self.df[(self.df[col] < lower_bound) | (self.df[col] > upper_bound)]
+                if len(outliers) > 0:
+                    logging.debug(f"Found {len(outliers)} outliers in {col} using IQR method")
+                
+                # Winsorize (cap) extreme values instead of removing
+                self.df[col] = self.df[col].clip(lower=lower_bound, upper=upper_bound)
         
-        # --- METHOD 2: Z-score for volume (more robust for highly skewed data) ---
+        # --- METHOD 2: Enhanced volume outlier handling ---
         if 'volume' in self.df.columns:
-            # Log transform first (volume is usually right-skewed)
-            log_volume = np.log1p(self.df['volume'])  # log(1+x) to handle zeros
+            # First, handle negative volumes
+            negative_mask = self.df['volume'] < 0
+            if negative_mask.any():
+                logging.debug(f"Found {negative_mask.sum()} negative volume values - setting to 0")
+                self.df.loc[negative_mask, 'volume'] = 0
             
-            # Calculate z-score
-            mean_log_vol = log_volume.mean()
-            std_log_vol = log_volume.std()
-            z_scores = np.abs((log_volume - mean_log_vol) / std_log_vol)
-            
-            # Flag potential outliers (z-score > 3)
-            volume_outliers = self.df[z_scores > 3]
-            if len(volume_outliers) > 0:
-                logging.debug(f"Found {len(volume_outliers)} volume outliers using Z-score method")
-            
-            # Cap extreme values (in log space, then transform back)
-            cap_log_vol = log_volume.clip(upper=mean_log_vol + 3*std_log_vol)
-            self.df['volume'] = np.expm1(cap_log_vol)  # exp(x)-1 to reverse log1p
+            # Filter positive volumes for outlier detection
+            positive_mask = self.df['volume'] > 0
+            if positive_mask.any():
+                positive_volumes = self.df.loc[positive_mask, 'volume']
+                
+                # Method 1: IQR-based capping (more aggressive for extreme outliers)
+                Q1 = positive_volumes.quantile(0.25)
+                Q3 = positive_volumes.quantile(0.75)
+                IQR = Q3 - Q1
+                upper_bound_iqr = Q3 + 3 * IQR  # 3x IQR for volume outliers
+                
+                # Method 2: Log-normal based capping (for less extreme outliers)
+                log_volume = np.log1p(positive_volumes)
+                mean_log_vol = log_volume.mean()
+                std_log_vol = log_volume.std()
+                
+                # Use more aggressive threshold for cleaning (2-sigma instead of 4)
+                threshold = 2.5  # More aggressive than original
+                upper_bound_log = mean_log_vol + threshold * std_log_vol
+                upper_bound_log_val = np.expm1(upper_bound_log)
+                
+                # Use the more restrictive of the two bounds
+                final_upper_bound = min(upper_bound_iqr, upper_bound_log_val)
+                
+                # Count outliers before capping
+                outlier_count = (positive_volumes > final_upper_bound).sum()
+                if outlier_count > 0:
+                    logging.debug(f"Capping {outlier_count} extreme volume values")
+                
+                # Apply capping - explicitly convert to avoid dtype warning
+                capped_volumes = self.df.loc[positive_mask, 'volume'].clip(upper=final_upper_bound)
+                self.df.loc[positive_mask, 'volume'] = capped_volumes.astype('int64')
+
+                # Ensure all volume values are integers
+                self.df['volume'] = self.df['volume'].astype('int64')
     
     def _datatype_consistency(self):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""
@@ -224,7 +298,7 @@ class DataCleaner(BaseProcessor):
             try:
                 original_type = self.df['volume'].dtype
                 # First convert to float to handle any decimals, then to int
-                self.df['volume'] = self.df['volume'].astype(float).round().astype(int)
+                self.df['volume'] = self.df['volume'].astype(float).round().astype('int64')
                 if original_type != self.df['volume'].dtype:
                     logging.debug(f"Converted volume from {original_type} to {self.df['volume'].dtype}")
             except Exception as e:
@@ -238,25 +312,37 @@ class DataCleaner(BaseProcessor):
         2. Low should be the lowest value (≤ Open, Close, High)
         3. Open and Close should be between High and Low
         4. Volume should be non-negative
+        
+        Only processes columns that exist in the dataframe.
         """
         # Count original issues for logging
         issues_count = 0
         
-        # Check and fix: High should be ≥ max(Open, Close)
-        high_issues = self.df[self.df['high'] < self.df[['open', 'close']].max(axis=1)]
-        if not high_issues.empty:
-            issues_count += len(high_issues)
-            logging.warning(f"Found {len(high_issues)} records where high < max(open, close) - fixing")
-            self.df['high'] = self.df[['high', 'open', 'close']].max(axis=1)
+        # Get available OHLC columns
+        available_ohlc = [col for col in ['open', 'high', 'low', 'close'] if col in self.df.columns]
         
-        # Check and fix: Low should be ≤ min(Open, Close)
-        low_issues = self.df[self.df['low'] > self.df[['open', 'close']].min(axis=1)]
-        if not low_issues.empty:
-            issues_count += len(low_issues)
-            logging.warning(f"Found {len(low_issues)} records where low > min(open, close) - fixing")
-            self.df['low'] = self.df[['low', 'open', 'close']].min(axis=1)
+        # Only proceed if we have at least some OHLC columns
+        if len(available_ohlc) < 2:
+            logging.warning("Insufficient OHLC columns for relationship validation")
+            return
         
-        # Ensure volume is non-negative
+        # Check and fix: High should be ≥ max(Open, Close) - only if all relevant columns exist
+        if all(col in self.df.columns for col in ['high', 'open', 'close']):
+            high_issues = self.df[self.df['high'] < self.df[['open', 'close']].max(axis=1)]
+            if not high_issues.empty:
+                issues_count += len(high_issues)
+                logging.warning(f"Found {len(high_issues)} records where high < max(open, close) - fixing")
+                self.df['high'] = self.df[['high', 'open', 'close']].max(axis=1)
+        
+        # Check and fix: Low should be ≤ min(Open, Close) - only if all relevant columns exist
+        if all(col in self.df.columns for col in ['low', 'open', 'close']):
+            low_issues = self.df[self.df['low'] > self.df[['open', 'close']].min(axis=1)]
+            if not low_issues.empty:
+                issues_count += len(low_issues)
+                logging.warning(f"Found {len(low_issues)} records where low > min(open, close) - fixing")
+                self.df['low'] = self.df[['low', 'open', 'close']].min(axis=1)
+        
+        # Ensure volume is non-negative - only if volume column exists
         if 'volume' in self.df.columns:
             volume_issues = self.df[self.df['volume'] < 0]
             if not volume_issues.empty:
@@ -264,14 +350,23 @@ class DataCleaner(BaseProcessor):
                 logging.warning(f"Found {len(volume_issues)} records with negative volume - fixing")
                 self.df['volume'] = self.df['volume'].clip(lower=0)
         
-        # Final verification - check relationship again after fixes
-        remaining_issues = (
-            (self.df['high'] < self.df['low']).sum() +
-            (self.df['high'] < self.df['open']).sum() +
-            (self.df['high'] < self.df['close']).sum() +
-            (self.df['low'] > self.df['open']).sum() +
-            (self.df['low'] > self.df['close']).sum()
-        )
+        # Final verification - check relationship again after fixes (only for available columns)
+        remaining_issues = 0
+        
+        if all(col in self.df.columns for col in ['high', 'low']):
+            remaining_issues += (self.df['high'] < self.df['low']).sum()
+        
+        if all(col in self.df.columns for col in ['high', 'open']):
+            remaining_issues += (self.df['high'] < self.df['open']).sum()
+        
+        if all(col in self.df.columns for col in ['high', 'close']):
+            remaining_issues += (self.df['high'] < self.df['close']).sum()
+        
+        if all(col in self.df.columns for col in ['low', 'open']):
+            remaining_issues += (self.df['low'] > self.df['open']).sum()
+        
+        if all(col in self.df.columns for col in ['low', 'close']):
+            remaining_issues += (self.df['low'] > self.df['close']).sum()
         
         if remaining_issues > 0:
             logging.warning(f"After corrections, {remaining_issues} OHLC relationship issues remain")

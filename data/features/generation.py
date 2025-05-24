@@ -179,6 +179,8 @@ class FeatureGenerator():
         # middle band is sma
         self.df["std"] = self.df["close"].rolling(window=period_bb).std()  # rolling standard deviation
         num_std_dev = 2
+        if f'sma_{period_bb}' not in self.df.columns:  # if sma_n isn't a generated feature, generate it first
+            self.df[f"sma_{period_bb}"] = self.df["close"].rolling(window=period_bb).mean()
         self.df['upper_band'] = self.df[f'sma_{period_bb}'] + (num_std_dev * self.df['std'])
         self.df['lower_band'] = self.df[f'sma_{period_bb}'] - (num_std_dev * self.df['std'])
         # Add Bollinger Band Width
@@ -816,7 +818,7 @@ class FeatureGenerator():
             self.df[f'dist_from_sma_{period}'] = (self.df['close'] / self.df[f'sma_{period}'] - 1) * 100
             
             # Direction of moving average (is it sloping up or down)
-            self.df[f'sma_{period}_slope'] = self.df[f'sma_{period}'].pct_change(5) * 100  # 5-period slope
+            self.df[f'sma_{period}_slope'] = self.df[f'sma_{period}'].pct_change(5, fill_method=None) * 100  # self.df[f'sma_{period}'].pct_change(5) * 100  # 5-period slope
         
         # 3. Moving Average Crossovers for trend identification
         self.df['ma_cross_50_200'] = np.where(

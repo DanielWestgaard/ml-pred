@@ -9,3 +9,5 @@ holidays
 scikit-learn
 matplotlib
 xgboost
+pytest
+seaborn

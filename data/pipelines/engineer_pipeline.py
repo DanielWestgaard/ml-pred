@@ -8,7 +8,6 @@ import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.generation import FeatureGenerator
-from data.processing.validation import FeatureValidator
 from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
 
@@ -69,3 +68,6 @@ class EngineeringPipeline():
         except Exception as e:
             logging.error(f"Unable to save file 'dynamically', will store as {os.getcwd()}, : {e}")
             self.df.to_csv('testing.csv', index=True)
+        
+        # FIX: Return the processed DataFrame
+        return self.df

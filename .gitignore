@@ -7,3 +7,5 @@ storage/data/capital_com/processed/testing.csv
 storage/data/capital_com/processed/testing2.csv
 storage/data/capital_com/processed/testing22.csv
 storage/data_engineering_stats/fe_selection
+testing.csv
+storage/data/capital_com/raw/raw_GBPUSD_m_20180101_20230523.csv

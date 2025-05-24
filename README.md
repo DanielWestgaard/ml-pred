@@ -11,12 +11,14 @@ It's important to note that this will probably not be the very best system, as I
 ├── live/                   # Deploy trained model on live market data
 ├── storage/                # General storage for data, models, results, etc.
 ├── broker/                 # Different broker integrations
+├── tests/                  # Testing (currently simple)
 ├── secrets/                # Folder using secrets.txt to store sensitive vars (not saved in repo)
 ├── config/                 # Configuration files
 ├── utils/                  # Utility files
 ├── images/                 # Storing images and sources used in documentation
 ├── trash/                  # Deprecated files and code no longer needed/in use
 ├── README.md               # General project description
+├── pytest.ini              # Configuration file for pytest (declaring where test dir are)
 └── secrets/                # Sensitive content (must be created individually)
     └── secrets.txt         # Main secret file
 ```
@@ -49,4 +51,5 @@ If this is the first time using the repo, follow these instructions:
 ## Nice to know
 Trying to follow best practice for python, I have...
 - Added readme's to each (important) folder to more granular descriptions and information about the different systems, and also trying to update them with a ```Structure``` paragraph for easier overview short descriptions.
-- Using methods with prefix ```_``` before the method name to indicate a "private" method (/helper function). Eg. ```_plot_fs_analysis_cfs()```
+- Using methods with prefix ```_``` before the method name to indicate a "private" method (/helper function). Eg. ```_plot_fs_analysis_cfs()```.
+- I've chosen not to use ```__init.py__``` (in each directory), as modern Python (3.3+) no longer strictly required it for a directory to be recognized as a package. This might change in the future, depending on what libraries/packages I need (and if they require it).

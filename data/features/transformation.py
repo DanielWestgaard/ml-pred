@@ -103,7 +103,7 @@ class FeatureTransformer(BaseProcessor):
             total_nans_before = self.df.isnull().sum().sum()
             
             # Apply forward fill
-            self.df = self.df.fillna(method='ffill')
+            self.df = self.df.ffill()
             
             # Count remaining NaNs (if any)
             remaining_nans = self.df.isnull().sum().sum()
@@ -182,21 +182,25 @@ class FeatureTransformer(BaseProcessor):
         minmax_features = [col for col in minmax_features if col not in exclude_from_normalization]
 
         # Log transform volume first
+        volume_cols_for_zscore = []
         for col in volume_cols:
             if preserve_original:
-                self.df[f"{col}_log"] = np.log1p(self.df[col])  # log(1+x) to handle zeros
+                log_col_name = f"{col}_log"
+                self.df[log_col_name] = np.log1p(self.df[col])  # log(1+x) to handle zeros
+                volume_cols_for_zscore.append(log_col_name)  # Use log-transformed column for z-score
             else:
                 self.df[col] = np.log1p(self.df[col])
+                volume_cols_for_zscore.append(col)  # Use the same column name
         
         # Apply z-score to price, transformed volume, and other unbounded features
-        all_zscore_cols = price_cols_present + volume_cols + z_score_features
+        all_zscore_cols = price_cols_present + volume_cols_for_zscore + z_score_features
         self.z_score(columns=all_zscore_cols, window=window, 
                     preserve_original=preserve_original)
         
         # Apply min-max to bounded features using rolling window
         if minmax_features:
             self.rolling_minmax(columns=minmax_features, window=window,
-                              preserve_original=preserve_original)
+                            preserve_original=preserve_original)
     
     def z_score(self, columns, window=20, preserve_original=False):
         """
@@ -230,7 +234,7 @@ class FeatureTransformer(BaseProcessor):
             z_score[~mask & ~rolling_mean.isna()] = 0
             
             # Forward fill NaN values from initial window
-            z_score = z_score.fillna(method='bfill')
+            z_score = z_score.bfill()  # z_score.fillna(method='bfill')
             
             # Add to dataframe
             if preserve_original:
@@ -272,7 +276,7 @@ class FeatureTransformer(BaseProcessor):
             scaled[~mask & ~rolling_min.isna()] = 0.5
             
             # Forward fill NaN values from initial window
-            scaled = scaled.fillna(method='bfill')
+            scaled = scaled.bfill()  # scaled.fillna(method='bfill')
             
             # Add to dataframe
             if preserve_original:

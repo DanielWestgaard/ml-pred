@@ -35,9 +35,10 @@ class FeatureSelector(BaseProcessor):
         # Time for saving the files
         self.current_time = datetime.datetime.now()
         self.storage_path = os.path.join(config.FE_SEL_BASE_DIR, str(self.current_time))
-        os.mkdir(self.storage_path)
+        if not os.path.exists(self.storage_path):
+            os.makedirs(self.storage_path, exist_ok=True)
     
-    def run(self, methods=['cfs', 'xgb', 'rfe'], k_features=15):
+    def run(self, methods=['cfs', 'xgb', 'rfe'], k_features=5):
         """
         Run the feature selection process.
         
@@ -61,6 +62,7 @@ class FeatureSelector(BaseProcessor):
         # Combine methods - features selected by at least 2 methods
         if len(methods) > 1:
             feature_counts = {}
+            logging.info(f"selected features: {selected_features.items()}")
             for method, features in selected_features.items():
                 for feature in features:
                     if feature != self.target_col:
@@ -87,36 +89,74 @@ class FeatureSelector(BaseProcessor):
         Params:
             k: Number of features the method will select - select the top k features.
         """
-        try: 
-            # First get features most correlated with target
-            corr_matrix = self.df.corr()
+        try:            
+            # Get only numeric columns for correlation analysis
+            numeric_cols = self.df.select_dtypes(include=['number']).columns
+            
+            # Log columns that are being dropped
+            non_numeric_cols = [col for col in self.df.columns if col not in numeric_cols]
+            if non_numeric_cols:
+                logging.warning(f"Dropping non-numeric columns for CFS analysis: {non_numeric_cols}")
+            
+            # Make sure target column is included in numeric_cols
+            if self.target_col not in numeric_cols:
+                logging.error(f"Target column '{self.target_col}' is not numeric. Cannot compute correlations.")
+                # Return a default list containing just the target column to avoid None
+                return [self.target_col]
+            
+            # Calculate correlations using only numeric columns
+            corr_matrix = self.df[numeric_cols].corr()
             corr_with_target = corr_matrix[self.target_col].drop(self.target_col)
             
-            self._plot_fs_analysis_cfs()
-                        
+            try: 
+                self._plot_fs_analysis_cfs(numeric_cols=numeric_cols)
+            except Exception as e:
+                logging.error(f"Unable to plot or save plot of CFS Analysis: {e}")
+            
             # Sort and get top k candidates
             candidates = corr_with_target.abs().sort_values(ascending=False)[:k].index.tolist()
-            print(candidates)
+            
             # Remove highly correlated features from candidates
             selected = []
+            duplicate_threshold = 0.95  # Features with >95% correlation to target are considered duplicates
+            
             for feature in candidates:
                 to_remove = False
-                for selected_feature in selected:
-                    if abs(corr_matrix.loc[feature, selected_feature]) > corr_threshold:
-                        to_remove = True
-                        break
+                
+                # Check if feature is essentially a duplicate of the target
+                target_corr = abs(corr_matrix.loc[feature, self.target_col])
+                if target_corr > duplicate_threshold:
+                    logging.debug(f"Excluding {feature} - essentially duplicate of target (correlation: {target_corr:.3f})")
+                    to_remove = True
+                
+                # Check correlation with other selected features
+                if not to_remove:
+                    for selected_feature in selected:
+                        if abs(corr_matrix.loc[feature, selected_feature]) > corr_threshold:
+                            to_remove = True
+                            break
+                
                 if not to_remove:
                     selected.append(feature)
             
+            # Make sure to return at least the target column to avoid empty list
+            if not selected:
+                logging.warning("No features selected. Returning just the target column.")
+                return [self.target_col]
+                
             return selected + [self.target_col]  # Return feature names
         except Exception as e:
             logging.error(f"Unable to perform Correlation-based Feature Selection: {e}")
-            return None
+            # Return just the target column as a fallback to avoid None
+            return [self.target_col]
     
-    def _plot_fs_analysis_cfs(self, top_k=20, corr_threshold=0.7):
+    def _plot_fs_analysis_cfs(self, top_k=20, corr_threshold=0.7, numeric_cols=None):
         """Two-part visualization for feature selection"""
+        if numeric_cols is None:
+            numeric_cols = self.df.select_dtypes(include=['number']).columns
+        
         # 1. Plot correlations with target
-        corr_with_target = self.df.corr()[self.target_col].drop(self.target_col)
+        corr_with_target = self.df[numeric_cols].corr()[self.target_col].drop(self.target_col)
         top_features = corr_with_target.abs().sort_values(ascending=False).head(top_k).index
         
         # Create figure with two subplots
@@ -165,17 +205,21 @@ class FeatureSelector(BaseProcessor):
             # Filter by threshold
             selected_features = feature_importance[feature_importance['importance'] > threshold]['feature'].tolist()
             
-            # Plot importance (consider saving the plot)
-            plt.figure(figsize=(10, 6))
-            plt.bar(feature_importance['feature'], feature_importance['importance'])
-            plt.xticks(rotation=90)
-            plt.tight_layout()
-            plt.savefig(f'{self.storage_path}/xgb_feature_importance.png')
+            try:
+                # Plot importance (consider saving the plot)
+                plt.figure(figsize=(10, 6))
+                plt.bar(feature_importance['feature'], feature_importance['importance'])
+                plt.xticks(rotation=90)
+                plt.tight_layout()
+                plt.savefig(f'{self.storage_path}/xgb_feature_importance.png')
+            except Exception as e:
+                logging.error(f"Unable to plot/save plot of XGB Regressor: {e}")
             
             logging.debug(f"Selected {len(selected_features)} features above threshold {threshold}: {selected_features}")
             return selected_features
         except Exception as e:
             logging.error(f"Unable to use XGB Regression for feature selection: {e}")
+            return None
         
     def rfe(self, n_features_to_select=None, step=2):
         """
@@ -202,15 +246,19 @@ class FeatureSelector(BaseProcessor):
             # Get selected features with importance ranking
             selected_features = self.X.columns[selector.support_].tolist()
             
-            # Plot the number of features vs CV score
-            plt.figure(figsize=(10, 6))
-            plt.plot(range(1, len(selector.cv_results_['mean_test_score']) + 1), 
-                    selector.cv_results_['mean_test_score'])
-            plt.xlabel('Number of features')
-            plt.ylabel('Mean test score (neg MSE)')
-            plt.savefig(f'{self.storage_path}/rfe_cv_scores.png')
+            try:
+                # Plot the number of features vs CV score
+                plt.figure(figsize=(10, 6))
+                plt.plot(range(1, len(selector.cv_results_['mean_test_score']) + 1), 
+                        selector.cv_results_['mean_test_score'])
+                plt.xlabel('Number of features')
+                plt.ylabel('Mean test score (neg MSE)')
+                plt.savefig(f'{self.storage_path}/rfe_cv_scores.png')
+            except Exception as e:
+                logging.error(f"Unable to plot/save plot of RFE (-CV): {e}")
             
             logging.info(f"Optimal number of features: {selector.n_features_}")
             return selected_features
         except Exception as e:
             logging.error(f"Unable to perform Recursive Feature Elimination: {e}")
+            return None
