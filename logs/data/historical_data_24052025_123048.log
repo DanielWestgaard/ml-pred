@@ -1,0 +1,742 @@
+24-05-2025 12:30:48 - INFO - Logging system initialized. Environment: development
+24-05-2025 12:30:48 - INFO - Loaded credentials. Length: 3
+24-05-2025 12:30:49 - INFO - About to start a new session.
+24-05-2025 12:30:49 - DEBUG - Using encrypted password to start session.
+24-05-2025 12:30:49 - INFO - Fetching historical data for GBPUSD from 2025-01-01T00:00:00 to 2025-05-23T01:00:00
+24-05-2025 12:30:49 - INFO - Using chunk size of 15:00:00 for resolution MINUTE
+24-05-2025 12:30:49 - INFO - Processing chunk from 2025-01-01 00:00 to 2025-01-01 15:00
+24-05-2025 12:30:49 - DEBUG - Attempt 1: Fetching from 2025-01-01T00:00:00 to 2025-01-01T15:00:00
+24-05-2025 12:30:50 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:30:50 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:30:50 - INFO - Processing chunk from 2025-01-01 15:00 to 2025-01-02 06:00
+24-05-2025 12:30:50 - DEBUG - Attempt 1: Fetching from 2025-01-01T15:00:00 to 2025-01-02T06:00:00
+24-05-2025 12:30:55 - INFO - ✓ Successfully fetched 472 data points
+24-05-2025 12:30:55 - INFO - Processing chunk from 2025-01-02 06:00 to 2025-01-02 21:00
+24-05-2025 12:30:55 - DEBUG - Attempt 1: Fetching from 2025-01-02T06:00:00 to 2025-01-02T21:00:00
+24-05-2025 12:30:55 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:30:55 - INFO - Processing chunk from 2025-01-02 21:00 to 2025-01-03 12:00
+24-05-2025 12:30:55 - DEBUG - Attempt 1: Fetching from 2025-01-02T21:00:00 to 2025-01-03T12:00:00
+24-05-2025 12:30:56 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:30:56 - INFO - Processing chunk from 2025-01-03 12:00 to 2025-01-04 03:00
+24-05-2025 12:30:56 - DEBUG - Attempt 1: Fetching from 2025-01-03T12:00:00 to 2025-01-04T03:00:00
+24-05-2025 12:30:56 - INFO - ✓ Successfully fetched 599 data points
+24-05-2025 12:30:56 - INFO - Processing chunk from 2025-01-04 03:00 to 2025-01-04 18:00
+24-05-2025 12:30:56 - DEBUG - Attempt 1: Fetching from 2025-01-04T03:00:00 to 2025-01-04T18:00:00
+24-05-2025 12:30:56 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:30:56 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:30:56 - INFO - Processing chunk from 2025-01-04 18:00 to 2025-01-05 09:00
+24-05-2025 12:30:56 - DEBUG - Attempt 1: Fetching from 2025-01-04T18:00:00 to 2025-01-05T09:00:00
+24-05-2025 12:30:56 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:30:56 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:30:56 - INFO - Processing chunk from 2025-01-05 09:00 to 2025-01-06 00:00
+24-05-2025 12:30:56 - DEBUG - Attempt 1: Fetching from 2025-01-05T09:00:00 to 2025-01-06T00:00:00
+24-05-2025 12:31:06 - INFO - ✓ Successfully fetched 119 data points
+24-05-2025 12:31:06 - INFO - Processing chunk from 2025-01-06 00:00 to 2025-01-06 15:00
+24-05-2025 12:31:06 - DEBUG - Attempt 1: Fetching from 2025-01-06T00:00:00 to 2025-01-06T15:00:00
+24-05-2025 12:31:06 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:06 - INFO - Processing chunk from 2025-01-06 15:00 to 2025-01-07 06:00
+24-05-2025 12:31:06 - DEBUG - Attempt 1: Fetching from 2025-01-06T15:00:00 to 2025-01-07T06:00:00
+24-05-2025 12:31:06 - INFO - ✓ Successfully fetched 895 data points
+24-05-2025 12:31:06 - INFO - Processing chunk from 2025-01-07 06:00 to 2025-01-07 21:00
+24-05-2025 12:31:06 - DEBUG - Attempt 1: Fetching from 2025-01-07T06:00:00 to 2025-01-07T21:00:00
+24-05-2025 12:31:07 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:07 - INFO - Processing chunk from 2025-01-07 21:00 to 2025-01-08 12:00
+24-05-2025 12:31:07 - DEBUG - Attempt 1: Fetching from 2025-01-07T21:00:00 to 2025-01-08T12:00:00
+24-05-2025 12:31:08 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:31:08 - INFO - Processing chunk from 2025-01-08 12:00 to 2025-01-09 03:00
+24-05-2025 12:31:08 - DEBUG - Attempt 1: Fetching from 2025-01-08T12:00:00 to 2025-01-09T03:00:00
+24-05-2025 12:31:08 - INFO - ✓ Successfully fetched 896 data points
+24-05-2025 12:31:08 - INFO - Processing chunk from 2025-01-09 03:00 to 2025-01-09 18:00
+24-05-2025 12:31:08 - DEBUG - Attempt 1: Fetching from 2025-01-09T03:00:00 to 2025-01-09T18:00:00
+24-05-2025 12:31:08 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:08 - INFO - Processing chunk from 2025-01-09 18:00 to 2025-01-10 09:00
+24-05-2025 12:31:08 - DEBUG - Attempt 1: Fetching from 2025-01-09T18:00:00 to 2025-01-10T09:00:00
+24-05-2025 12:31:08 - INFO - ✓ Successfully fetched 887 data points
+24-05-2025 12:31:08 - INFO - Processing chunk from 2025-01-10 09:00 to 2025-01-11 00:00
+24-05-2025 12:31:08 - DEBUG - Attempt 1: Fetching from 2025-01-10T09:00:00 to 2025-01-11T00:00:00
+24-05-2025 12:31:09 - INFO - ✓ Successfully fetched 780 data points
+24-05-2025 12:31:09 - INFO - Processing chunk from 2025-01-11 00:00 to 2025-01-11 15:00
+24-05-2025 12:31:09 - DEBUG - Attempt 1: Fetching from 2025-01-11T00:00:00 to 2025-01-11T15:00:00
+24-05-2025 12:31:09 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:09 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:09 - INFO - Processing chunk from 2025-01-11 15:00 to 2025-01-12 06:00
+24-05-2025 12:31:09 - DEBUG - Attempt 1: Fetching from 2025-01-11T15:00:00 to 2025-01-12T06:00:00
+24-05-2025 12:31:09 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:09 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:09 - INFO - Processing chunk from 2025-01-12 06:00 to 2025-01-12 21:00
+24-05-2025 12:31:09 - DEBUG - Attempt 1: Fetching from 2025-01-12T06:00:00 to 2025-01-12T21:00:00
+24-05-2025 12:31:09 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:09 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:09 - INFO - Processing chunk from 2025-01-12 21:00 to 2025-01-13 12:00
+24-05-2025 12:31:09 - DEBUG - Attempt 1: Fetching from 2025-01-12T21:00:00 to 2025-01-13T12:00:00
+24-05-2025 12:31:19 - INFO - ✓ Successfully fetched 832 data points
+24-05-2025 12:31:19 - INFO - Processing chunk from 2025-01-13 12:00 to 2025-01-14 03:00
+24-05-2025 12:31:19 - DEBUG - Attempt 1: Fetching from 2025-01-13T12:00:00 to 2025-01-14T03:00:00
+24-05-2025 12:31:20 - INFO - ✓ Successfully fetched 894 data points
+24-05-2025 12:31:20 - INFO - Processing chunk from 2025-01-14 03:00 to 2025-01-14 18:00
+24-05-2025 12:31:20 - DEBUG - Attempt 1: Fetching from 2025-01-14T03:00:00 to 2025-01-14T18:00:00
+24-05-2025 12:31:20 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:20 - INFO - Processing chunk from 2025-01-14 18:00 to 2025-01-15 09:00
+24-05-2025 12:31:20 - DEBUG - Attempt 1: Fetching from 2025-01-14T18:00:00 to 2025-01-15T09:00:00
+24-05-2025 12:31:21 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:31:21 - INFO - Processing chunk from 2025-01-15 09:00 to 2025-01-16 00:00
+24-05-2025 12:31:21 - DEBUG - Attempt 1: Fetching from 2025-01-15T09:00:00 to 2025-01-16T00:00:00
+24-05-2025 12:31:21 - INFO - ✓ Successfully fetched 890 data points
+24-05-2025 12:31:21 - INFO - Processing chunk from 2025-01-16 00:00 to 2025-01-16 15:00
+24-05-2025 12:31:21 - DEBUG - Attempt 1: Fetching from 2025-01-16T00:00:00 to 2025-01-16T15:00:00
+24-05-2025 12:31:21 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:21 - INFO - Processing chunk from 2025-01-16 15:00 to 2025-01-17 06:00
+24-05-2025 12:31:21 - DEBUG - Attempt 1: Fetching from 2025-01-16T15:00:00 to 2025-01-17T06:00:00
+24-05-2025 12:31:22 - INFO - ✓ Successfully fetched 886 data points
+24-05-2025 12:31:22 - INFO - Processing chunk from 2025-01-17 06:00 to 2025-01-17 21:00
+24-05-2025 12:31:22 - DEBUG - Attempt 1: Fetching from 2025-01-17T06:00:00 to 2025-01-17T21:00:00
+24-05-2025 12:31:22 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:22 - INFO - Processing chunk from 2025-01-17 21:00 to 2025-01-18 12:00
+24-05-2025 12:31:22 - DEBUG - Attempt 1: Fetching from 2025-01-17T21:00:00 to 2025-01-18T12:00:00
+24-05-2025 12:31:22 - INFO - ✓ Successfully fetched 60 data points
+24-05-2025 12:31:22 - INFO - Processing chunk from 2025-01-18 12:00 to 2025-01-19 03:00
+24-05-2025 12:31:22 - DEBUG - Attempt 1: Fetching from 2025-01-18T12:00:00 to 2025-01-19T03:00:00
+24-05-2025 12:31:22 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:22 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:22 - INFO - Processing chunk from 2025-01-19 03:00 to 2025-01-19 18:00
+24-05-2025 12:31:22 - DEBUG - Attempt 1: Fetching from 2025-01-19T03:00:00 to 2025-01-19T18:00:00
+24-05-2025 12:31:22 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:22 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:22 - INFO - Processing chunk from 2025-01-19 18:00 to 2025-01-20 09:00
+24-05-2025 12:31:22 - DEBUG - Attempt 1: Fetching from 2025-01-19T18:00:00 to 2025-01-20T09:00:00
+24-05-2025 12:31:31 - INFO - ✓ Successfully fetched 644 data points
+24-05-2025 12:31:31 - INFO - Processing chunk from 2025-01-20 09:00 to 2025-01-21 00:00
+24-05-2025 12:31:31 - DEBUG - Attempt 1: Fetching from 2025-01-20T09:00:00 to 2025-01-21T00:00:00
+24-05-2025 12:31:31 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:31:31 - INFO - Processing chunk from 2025-01-21 00:00 to 2025-01-21 15:00
+24-05-2025 12:31:31 - DEBUG - Attempt 1: Fetching from 2025-01-21T00:00:00 to 2025-01-21T15:00:00
+24-05-2025 12:31:32 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:32 - INFO - Processing chunk from 2025-01-21 15:00 to 2025-01-22 06:00
+24-05-2025 12:31:32 - DEBUG - Attempt 1: Fetching from 2025-01-21T15:00:00 to 2025-01-22T06:00:00
+24-05-2025 12:31:32 - INFO - ✓ Successfully fetched 892 data points
+24-05-2025 12:31:32 - INFO - Processing chunk from 2025-01-22 06:00 to 2025-01-22 21:00
+24-05-2025 12:31:32 - DEBUG - Attempt 1: Fetching from 2025-01-22T06:00:00 to 2025-01-22T21:00:00
+24-05-2025 12:31:32 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:32 - INFO - Processing chunk from 2025-01-22 21:00 to 2025-01-23 12:00
+24-05-2025 12:31:32 - DEBUG - Attempt 1: Fetching from 2025-01-22T21:00:00 to 2025-01-23T12:00:00
+24-05-2025 12:31:32 - INFO - ✓ Successfully fetched 892 data points
+24-05-2025 12:31:32 - INFO - Processing chunk from 2025-01-23 12:00 to 2025-01-24 03:00
+24-05-2025 12:31:32 - DEBUG - Attempt 1: Fetching from 2025-01-23T12:00:00 to 2025-01-24T03:00:00
+24-05-2025 12:31:33 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:31:33 - INFO - Processing chunk from 2025-01-24 03:00 to 2025-01-24 18:00
+24-05-2025 12:31:33 - DEBUG - Attempt 1: Fetching from 2025-01-24T03:00:00 to 2025-01-24T18:00:00
+24-05-2025 12:31:33 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:33 - INFO - Processing chunk from 2025-01-24 18:00 to 2025-01-25 09:00
+24-05-2025 12:31:33 - DEBUG - Attempt 1: Fetching from 2025-01-24T18:00:00 to 2025-01-25T09:00:00
+24-05-2025 12:31:33 - INFO - ✓ Successfully fetched 240 data points
+24-05-2025 12:31:33 - INFO - Processing chunk from 2025-01-25 09:00 to 2025-01-26 00:00
+24-05-2025 12:31:33 - DEBUG - Attempt 1: Fetching from 2025-01-25T09:00:00 to 2025-01-26T00:00:00
+24-05-2025 12:31:33 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:33 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:33 - INFO - Processing chunk from 2025-01-26 00:00 to 2025-01-26 15:00
+24-05-2025 12:31:33 - DEBUG - Attempt 1: Fetching from 2025-01-26T00:00:00 to 2025-01-26T15:00:00
+24-05-2025 12:31:33 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:33 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:33 - INFO - Processing chunk from 2025-01-26 15:00 to 2025-01-27 06:00
+24-05-2025 12:31:33 - DEBUG - Attempt 1: Fetching from 2025-01-26T15:00:00 to 2025-01-27T06:00:00
+24-05-2025 12:31:42 - INFO - ✓ Successfully fetched 476 data points
+24-05-2025 12:31:42 - INFO - Processing chunk from 2025-01-27 06:00 to 2025-01-27 21:00
+24-05-2025 12:31:42 - DEBUG - Attempt 1: Fetching from 2025-01-27T06:00:00 to 2025-01-27T21:00:00
+24-05-2025 12:31:43 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:43 - INFO - Processing chunk from 2025-01-27 21:00 to 2025-01-28 12:00
+24-05-2025 12:31:43 - DEBUG - Attempt 1: Fetching from 2025-01-27T21:00:00 to 2025-01-28T12:00:00
+24-05-2025 12:31:43 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:31:43 - INFO - Processing chunk from 2025-01-28 12:00 to 2025-01-29 03:00
+24-05-2025 12:31:43 - DEBUG - Attempt 1: Fetching from 2025-01-28T12:00:00 to 2025-01-29T03:00:00
+24-05-2025 12:31:43 - INFO - ✓ Successfully fetched 886 data points
+24-05-2025 12:31:43 - INFO - Processing chunk from 2025-01-29 03:00 to 2025-01-29 18:00
+24-05-2025 12:31:43 - DEBUG - Attempt 1: Fetching from 2025-01-29T03:00:00 to 2025-01-29T18:00:00
+24-05-2025 12:31:44 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:44 - INFO - Processing chunk from 2025-01-29 18:00 to 2025-01-30 09:00
+24-05-2025 12:31:44 - DEBUG - Attempt 1: Fetching from 2025-01-29T18:00:00 to 2025-01-30T09:00:00
+24-05-2025 12:31:44 - INFO - ✓ Successfully fetched 892 data points
+24-05-2025 12:31:44 - INFO - Processing chunk from 2025-01-30 09:00 to 2025-01-31 00:00
+24-05-2025 12:31:44 - DEBUG - Attempt 1: Fetching from 2025-01-30T09:00:00 to 2025-01-31T00:00:00
+24-05-2025 12:31:44 - INFO - ✓ Successfully fetched 891 data points
+24-05-2025 12:31:44 - INFO - Processing chunk from 2025-01-31 00:00 to 2025-01-31 15:00
+24-05-2025 12:31:44 - DEBUG - Attempt 1: Fetching from 2025-01-31T00:00:00 to 2025-01-31T15:00:00
+24-05-2025 12:31:44 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:44 - INFO - Processing chunk from 2025-01-31 15:00 to 2025-02-01 06:00
+24-05-2025 12:31:44 - DEBUG - Attempt 1: Fetching from 2025-01-31T15:00:00 to 2025-02-01T06:00:00
+24-05-2025 12:31:45 - INFO - ✓ Successfully fetched 420 data points
+24-05-2025 12:31:45 - INFO - Processing chunk from 2025-02-01 06:00 to 2025-02-01 21:00
+24-05-2025 12:31:45 - DEBUG - Attempt 1: Fetching from 2025-02-01T06:00:00 to 2025-02-01T21:00:00
+24-05-2025 12:31:45 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:45 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:45 - INFO - Processing chunk from 2025-02-01 21:00 to 2025-02-02 12:00
+24-05-2025 12:31:45 - DEBUG - Attempt 1: Fetching from 2025-02-01T21:00:00 to 2025-02-02T12:00:00
+24-05-2025 12:31:45 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:45 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:45 - INFO - Processing chunk from 2025-02-02 12:00 to 2025-02-03 03:00
+24-05-2025 12:31:45 - DEBUG - Attempt 1: Fetching from 2025-02-02T12:00:00 to 2025-02-03T03:00:00
+24-05-2025 12:31:54 - INFO - ✓ Successfully fetched 301 data points
+24-05-2025 12:31:54 - INFO - Processing chunk from 2025-02-03 03:00 to 2025-02-03 18:00
+24-05-2025 12:31:54 - DEBUG - Attempt 1: Fetching from 2025-02-03T03:00:00 to 2025-02-03T18:00:00
+24-05-2025 12:31:55 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:55 - INFO - Processing chunk from 2025-02-03 18:00 to 2025-02-04 09:00
+24-05-2025 12:31:55 - DEBUG - Attempt 1: Fetching from 2025-02-03T18:00:00 to 2025-02-04T09:00:00
+24-05-2025 12:31:55 - INFO - ✓ Successfully fetched 895 data points
+24-05-2025 12:31:55 - INFO - Processing chunk from 2025-02-04 09:00 to 2025-02-05 00:00
+24-05-2025 12:31:55 - DEBUG - Attempt 1: Fetching from 2025-02-04T09:00:00 to 2025-02-05T00:00:00
+24-05-2025 12:31:55 - INFO - ✓ Successfully fetched 885 data points
+24-05-2025 12:31:55 - INFO - Processing chunk from 2025-02-05 00:00 to 2025-02-05 15:00
+24-05-2025 12:31:55 - DEBUG - Attempt 1: Fetching from 2025-02-05T00:00:00 to 2025-02-05T15:00:00
+24-05-2025 12:31:56 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:56 - INFO - Processing chunk from 2025-02-05 15:00 to 2025-02-06 06:00
+24-05-2025 12:31:56 - DEBUG - Attempt 1: Fetching from 2025-02-05T15:00:00 to 2025-02-06T06:00:00
+24-05-2025 12:31:56 - INFO - ✓ Successfully fetched 884 data points
+24-05-2025 12:31:56 - INFO - Processing chunk from 2025-02-06 06:00 to 2025-02-06 21:00
+24-05-2025 12:31:56 - DEBUG - Attempt 1: Fetching from 2025-02-06T06:00:00 to 2025-02-06T21:00:00
+24-05-2025 12:31:56 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:31:56 - INFO - Processing chunk from 2025-02-06 21:00 to 2025-02-07 12:00
+24-05-2025 12:31:56 - DEBUG - Attempt 1: Fetching from 2025-02-06T21:00:00 to 2025-02-07T12:00:00
+24-05-2025 12:31:56 - INFO - ✓ Successfully fetched 891 data points
+24-05-2025 12:31:56 - INFO - Processing chunk from 2025-02-07 12:00 to 2025-02-08 03:00
+24-05-2025 12:31:56 - DEBUG - Attempt 1: Fetching from 2025-02-07T12:00:00 to 2025-02-08T03:00:00
+24-05-2025 12:31:57 - INFO - ✓ Successfully fetched 600 data points
+24-05-2025 12:31:57 - INFO - Processing chunk from 2025-02-08 03:00 to 2025-02-08 18:00
+24-05-2025 12:31:57 - DEBUG - Attempt 1: Fetching from 2025-02-08T03:00:00 to 2025-02-08T18:00:00
+24-05-2025 12:31:57 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:57 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:57 - INFO - Processing chunk from 2025-02-08 18:00 to 2025-02-09 09:00
+24-05-2025 12:31:57 - DEBUG - Attempt 1: Fetching from 2025-02-08T18:00:00 to 2025-02-09T09:00:00
+24-05-2025 12:31:57 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:31:57 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:31:57 - INFO - Processing chunk from 2025-02-09 09:00 to 2025-02-10 00:00
+24-05-2025 12:31:57 - DEBUG - Attempt 1: Fetching from 2025-02-09T09:00:00 to 2025-02-10T00:00:00
+24-05-2025 12:32:08 - INFO - ✓ Successfully fetched 114 data points
+24-05-2025 12:32:08 - INFO - Processing chunk from 2025-02-10 00:00 to 2025-02-10 15:00
+24-05-2025 12:32:08 - DEBUG - Attempt 1: Fetching from 2025-02-10T00:00:00 to 2025-02-10T15:00:00
+24-05-2025 12:32:09 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:09 - INFO - Processing chunk from 2025-02-10 15:00 to 2025-02-11 06:00
+24-05-2025 12:32:09 - DEBUG - Attempt 1: Fetching from 2025-02-10T15:00:00 to 2025-02-11T06:00:00
+24-05-2025 12:32:09 - INFO - ✓ Successfully fetched 889 data points
+24-05-2025 12:32:09 - INFO - Processing chunk from 2025-02-11 06:00 to 2025-02-11 21:00
+24-05-2025 12:32:09 - DEBUG - Attempt 1: Fetching from 2025-02-11T06:00:00 to 2025-02-11T21:00:00
+24-05-2025 12:32:09 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:09 - INFO - Processing chunk from 2025-02-11 21:00 to 2025-02-12 12:00
+24-05-2025 12:32:09 - DEBUG - Attempt 1: Fetching from 2025-02-11T21:00:00 to 2025-02-12T12:00:00
+24-05-2025 12:32:10 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:32:10 - INFO - Processing chunk from 2025-02-12 12:00 to 2025-02-13 03:00
+24-05-2025 12:32:10 - DEBUG - Attempt 1: Fetching from 2025-02-12T12:00:00 to 2025-02-13T03:00:00
+24-05-2025 12:32:10 - INFO - ✓ Successfully fetched 896 data points
+24-05-2025 12:32:10 - INFO - Processing chunk from 2025-02-13 03:00 to 2025-02-13 18:00
+24-05-2025 12:32:10 - DEBUG - Attempt 1: Fetching from 2025-02-13T03:00:00 to 2025-02-13T18:00:00
+24-05-2025 12:32:10 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:10 - INFO - Processing chunk from 2025-02-13 18:00 to 2025-02-14 09:00
+24-05-2025 12:32:10 - DEBUG - Attempt 1: Fetching from 2025-02-13T18:00:00 to 2025-02-14T09:00:00
+24-05-2025 12:32:11 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:32:11 - INFO - Processing chunk from 2025-02-14 09:00 to 2025-02-15 00:00
+24-05-2025 12:32:11 - DEBUG - Attempt 1: Fetching from 2025-02-14T09:00:00 to 2025-02-15T00:00:00
+24-05-2025 12:32:11 - INFO - ✓ Successfully fetched 779 data points
+24-05-2025 12:32:11 - INFO - Processing chunk from 2025-02-15 00:00 to 2025-02-15 15:00
+24-05-2025 12:32:11 - DEBUG - Attempt 1: Fetching from 2025-02-15T00:00:00 to 2025-02-15T15:00:00
+24-05-2025 12:32:11 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:32:11 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:32:11 - INFO - Processing chunk from 2025-02-15 15:00 to 2025-02-16 06:00
+24-05-2025 12:32:11 - DEBUG - Attempt 1: Fetching from 2025-02-15T15:00:00 to 2025-02-16T06:00:00
+24-05-2025 12:32:11 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:32:11 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:32:11 - INFO - Processing chunk from 2025-02-16 06:00 to 2025-02-16 21:00
+24-05-2025 12:32:11 - DEBUG - Attempt 1: Fetching from 2025-02-16T06:00:00 to 2025-02-16T21:00:00
+24-05-2025 12:32:11 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:32:11 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:32:11 - INFO - Processing chunk from 2025-02-16 21:00 to 2025-02-17 12:00
+24-05-2025 12:32:11 - DEBUG - Attempt 1: Fetching from 2025-02-16T21:00:00 to 2025-02-17T12:00:00
+24-05-2025 12:32:21 - INFO - ✓ Successfully fetched 832 data points
+24-05-2025 12:32:21 - INFO - Processing chunk from 2025-02-17 12:00 to 2025-02-18 03:00
+24-05-2025 12:32:21 - DEBUG - Attempt 1: Fetching from 2025-02-17T12:00:00 to 2025-02-18T03:00:00
+24-05-2025 12:32:22 - INFO - ✓ Successfully fetched 890 data points
+24-05-2025 12:32:22 - INFO - Processing chunk from 2025-02-18 03:00 to 2025-02-18 18:00
+24-05-2025 12:32:22 - DEBUG - Attempt 1: Fetching from 2025-02-18T03:00:00 to 2025-02-18T18:00:00
+24-05-2025 12:32:22 - INFO - ✓ Successfully fetched 832 data points
+24-05-2025 12:32:22 - INFO - Processing chunk from 2025-02-18 18:00 to 2025-02-19 09:00
+24-05-2025 12:32:22 - DEBUG - Attempt 1: Fetching from 2025-02-18T18:00:00 to 2025-02-19T09:00:00
+24-05-2025 12:32:22 - INFO - ✓ Successfully fetched 895 data points
+24-05-2025 12:32:22 - INFO - Processing chunk from 2025-02-19 09:00 to 2025-02-20 00:00
+24-05-2025 12:32:22 - DEBUG - Attempt 1: Fetching from 2025-02-19T09:00:00 to 2025-02-20T00:00:00
+24-05-2025 12:32:23 - INFO - ✓ Successfully fetched 887 data points
+24-05-2025 12:32:23 - INFO - Processing chunk from 2025-02-20 00:00 to 2025-02-20 15:00
+24-05-2025 12:32:23 - DEBUG - Attempt 1: Fetching from 2025-02-20T00:00:00 to 2025-02-20T15:00:00
+24-05-2025 12:32:23 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:23 - INFO - Processing chunk from 2025-02-20 15:00 to 2025-02-21 06:00
+24-05-2025 12:32:23 - DEBUG - Attempt 1: Fetching from 2025-02-20T15:00:00 to 2025-02-21T06:00:00
+24-05-2025 12:32:23 - INFO - ✓ Successfully fetched 891 data points
+24-05-2025 12:32:23 - INFO - Processing chunk from 2025-02-21 06:00 to 2025-02-21 21:00
+24-05-2025 12:32:23 - DEBUG - Attempt 1: Fetching from 2025-02-21T06:00:00 to 2025-02-21T21:00:00
+24-05-2025 12:32:23 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:23 - INFO - Processing chunk from 2025-02-21 21:00 to 2025-02-22 12:00
+24-05-2025 12:32:23 - DEBUG - Attempt 1: Fetching from 2025-02-21T21:00:00 to 2025-02-22T12:00:00
+24-05-2025 12:32:23 - INFO - ✓ Successfully fetched 60 data points
+24-05-2025 12:32:23 - INFO - Processing chunk from 2025-02-22 12:00 to 2025-02-23 03:00
+24-05-2025 12:32:23 - DEBUG - Attempt 1: Fetching from 2025-02-22T12:00:00 to 2025-02-23T03:00:00
+24-05-2025 12:32:23 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:32:23 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:32:23 - INFO - Processing chunk from 2025-02-23 03:00 to 2025-02-23 18:00
+24-05-2025 12:32:23 - DEBUG - Attempt 1: Fetching from 2025-02-23T03:00:00 to 2025-02-23T18:00:00
+24-05-2025 12:32:24 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:32:24 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:32:24 - INFO - Processing chunk from 2025-02-23 18:00 to 2025-02-24 09:00
+24-05-2025 12:32:24 - DEBUG - Attempt 1: Fetching from 2025-02-23T18:00:00 to 2025-02-24T09:00:00
+24-05-2025 12:32:34 - INFO - ✓ Successfully fetched 653 data points
+24-05-2025 12:32:34 - INFO - Processing chunk from 2025-02-24 09:00 to 2025-02-25 00:00
+24-05-2025 12:32:34 - DEBUG - Attempt 1: Fetching from 2025-02-24T09:00:00 to 2025-02-25T00:00:00
+24-05-2025 12:32:34 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:32:34 - INFO - Processing chunk from 2025-02-25 00:00 to 2025-02-25 15:00
+24-05-2025 12:32:34 - DEBUG - Attempt 1: Fetching from 2025-02-25T00:00:00 to 2025-02-25T15:00:00
+24-05-2025 12:32:35 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:35 - INFO - Processing chunk from 2025-02-25 15:00 to 2025-02-26 06:00
+24-05-2025 12:32:35 - DEBUG - Attempt 1: Fetching from 2025-02-25T15:00:00 to 2025-02-26T06:00:00
+24-05-2025 12:32:35 - INFO - ✓ Successfully fetched 892 data points
+24-05-2025 12:32:35 - INFO - Processing chunk from 2025-02-26 06:00 to 2025-02-26 21:00
+24-05-2025 12:32:35 - DEBUG - Attempt 1: Fetching from 2025-02-26T06:00:00 to 2025-02-26T21:00:00
+24-05-2025 12:32:35 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:35 - INFO - Processing chunk from 2025-02-26 21:00 to 2025-02-27 12:00
+24-05-2025 12:32:35 - DEBUG - Attempt 1: Fetching from 2025-02-26T21:00:00 to 2025-02-27T12:00:00
+24-05-2025 12:32:35 - INFO - ✓ Successfully fetched 887 data points
+24-05-2025 12:32:35 - INFO - Processing chunk from 2025-02-27 12:00 to 2025-02-28 03:00
+24-05-2025 12:32:35 - DEBUG - Attempt 1: Fetching from 2025-02-27T12:00:00 to 2025-02-28T03:00:00
+24-05-2025 12:32:36 - INFO - ✓ Successfully fetched 892 data points
+24-05-2025 12:32:36 - INFO - Processing chunk from 2025-02-28 03:00 to 2025-02-28 18:00
+24-05-2025 12:32:36 - DEBUG - Attempt 1: Fetching from 2025-02-28T03:00:00 to 2025-02-28T18:00:00
+24-05-2025 12:32:36 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:36 - INFO - Processing chunk from 2025-02-28 18:00 to 2025-03-01 09:00
+24-05-2025 12:32:36 - DEBUG - Attempt 1: Fetching from 2025-02-28T18:00:00 to 2025-03-01T09:00:00
+24-05-2025 12:32:36 - INFO - ✓ Successfully fetched 240 data points
+24-05-2025 12:32:36 - INFO - Processing chunk from 2025-03-01 09:00 to 2025-03-02 00:00
+24-05-2025 12:32:36 - DEBUG - Attempt 1: Fetching from 2025-03-01T09:00:00 to 2025-03-02T00:00:00
+24-05-2025 12:32:36 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:32:36 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:32:36 - INFO - Processing chunk from 2025-03-02 00:00 to 2025-03-02 15:00
+24-05-2025 12:32:36 - DEBUG - Attempt 1: Fetching from 2025-03-02T00:00:00 to 2025-03-02T15:00:00
+24-05-2025 12:32:36 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:32:36 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:32:36 - INFO - Processing chunk from 2025-03-02 15:00 to 2025-03-03 06:00
+24-05-2025 12:32:36 - DEBUG - Attempt 1: Fetching from 2025-03-02T15:00:00 to 2025-03-03T06:00:00
+24-05-2025 12:32:46 - INFO - ✓ Successfully fetched 471 data points
+24-05-2025 12:32:46 - INFO - Processing chunk from 2025-03-03 06:00 to 2025-03-03 21:00
+24-05-2025 12:32:46 - DEBUG - Attempt 1: Fetching from 2025-03-03T06:00:00 to 2025-03-03T21:00:00
+24-05-2025 12:32:46 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:46 - INFO - Processing chunk from 2025-03-03 21:00 to 2025-03-04 12:00
+24-05-2025 12:32:46 - DEBUG - Attempt 1: Fetching from 2025-03-03T21:00:00 to 2025-03-04T12:00:00
+24-05-2025 12:32:46 - INFO - ✓ Successfully fetched 889 data points
+24-05-2025 12:32:46 - INFO - Processing chunk from 2025-03-04 12:00 to 2025-03-05 03:00
+24-05-2025 12:32:46 - DEBUG - Attempt 1: Fetching from 2025-03-04T12:00:00 to 2025-03-05T03:00:00
+24-05-2025 12:32:47 - INFO - ✓ Successfully fetched 886 data points
+24-05-2025 12:32:47 - INFO - Processing chunk from 2025-03-05 03:00 to 2025-03-05 18:00
+24-05-2025 12:32:47 - DEBUG - Attempt 1: Fetching from 2025-03-05T03:00:00 to 2025-03-05T18:00:00
+24-05-2025 12:32:47 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:47 - INFO - Processing chunk from 2025-03-05 18:00 to 2025-03-06 09:00
+24-05-2025 12:32:47 - DEBUG - Attempt 1: Fetching from 2025-03-05T18:00:00 to 2025-03-06T09:00:00
+24-05-2025 12:32:47 - INFO - ✓ Successfully fetched 889 data points
+24-05-2025 12:32:47 - INFO - Processing chunk from 2025-03-06 09:00 to 2025-03-07 00:00
+24-05-2025 12:32:47 - DEBUG - Attempt 1: Fetching from 2025-03-06T09:00:00 to 2025-03-07T00:00:00
+24-05-2025 12:32:48 - INFO - ✓ Successfully fetched 885 data points
+24-05-2025 12:32:48 - INFO - Processing chunk from 2025-03-07 00:00 to 2025-03-07 15:00
+24-05-2025 12:32:48 - DEBUG - Attempt 1: Fetching from 2025-03-07T00:00:00 to 2025-03-07T15:00:00
+24-05-2025 12:32:48 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:48 - INFO - Processing chunk from 2025-03-07 15:00 to 2025-03-08 06:00
+24-05-2025 12:32:48 - DEBUG - Attempt 1: Fetching from 2025-03-07T15:00:00 to 2025-03-08T06:00:00
+24-05-2025 12:32:48 - INFO - ✓ Successfully fetched 420 data points
+24-05-2025 12:32:48 - INFO - Processing chunk from 2025-03-08 06:00 to 2025-03-08 21:00
+24-05-2025 12:32:48 - DEBUG - Attempt 1: Fetching from 2025-03-08T06:00:00 to 2025-03-08T21:00:00
+24-05-2025 12:32:48 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:32:48 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:32:48 - INFO - Processing chunk from 2025-03-08 21:00 to 2025-03-09 12:00
+24-05-2025 12:32:48 - DEBUG - Attempt 1: Fetching from 2025-03-08T21:00:00 to 2025-03-09T12:00:00
+24-05-2025 12:32:48 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:32:48 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:32:48 - INFO - Processing chunk from 2025-03-09 12:00 to 2025-03-10 03:00
+24-05-2025 12:32:48 - DEBUG - Attempt 1: Fetching from 2025-03-09T12:00:00 to 2025-03-10T03:00:00
+24-05-2025 12:32:57 - INFO - ✓ Successfully fetched 355 data points
+24-05-2025 12:32:57 - INFO - Processing chunk from 2025-03-10 03:00 to 2025-03-10 18:00
+24-05-2025 12:32:57 - DEBUG - Attempt 1: Fetching from 2025-03-10T03:00:00 to 2025-03-10T18:00:00
+24-05-2025 12:32:58 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:58 - INFO - Processing chunk from 2025-03-10 18:00 to 2025-03-11 09:00
+24-05-2025 12:32:58 - DEBUG - Attempt 1: Fetching from 2025-03-10T18:00:00 to 2025-03-11T09:00:00
+24-05-2025 12:32:58 - INFO - ✓ Successfully fetched 895 data points
+24-05-2025 12:32:58 - INFO - Processing chunk from 2025-03-11 09:00 to 2025-03-12 00:00
+24-05-2025 12:32:58 - DEBUG - Attempt 1: Fetching from 2025-03-11T09:00:00 to 2025-03-12T00:00:00
+24-05-2025 12:32:58 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:32:58 - INFO - Processing chunk from 2025-03-12 00:00 to 2025-03-12 15:00
+24-05-2025 12:32:58 - DEBUG - Attempt 1: Fetching from 2025-03-12T00:00:00 to 2025-03-12T15:00:00
+24-05-2025 12:32:59 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:32:59 - INFO - Processing chunk from 2025-03-12 15:00 to 2025-03-13 06:00
+24-05-2025 12:32:59 - DEBUG - Attempt 1: Fetching from 2025-03-12T15:00:00 to 2025-03-13T06:00:00
+24-05-2025 12:32:59 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:32:59 - INFO - Processing chunk from 2025-03-13 06:00 to 2025-03-13 21:00
+24-05-2025 12:32:59 - DEBUG - Attempt 1: Fetching from 2025-03-13T06:00:00 to 2025-03-13T21:00:00
+24-05-2025 12:32:59 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:32:59 - INFO - Processing chunk from 2025-03-13 21:00 to 2025-03-14 12:00
+24-05-2025 12:32:59 - DEBUG - Attempt 1: Fetching from 2025-03-13T21:00:00 to 2025-03-14T12:00:00
+24-05-2025 12:33:00 - INFO - ✓ Successfully fetched 885 data points
+24-05-2025 12:33:00 - INFO - Processing chunk from 2025-03-14 12:00 to 2025-03-15 03:00
+24-05-2025 12:33:00 - DEBUG - Attempt 1: Fetching from 2025-03-14T12:00:00 to 2025-03-15T03:00:00
+24-05-2025 12:33:00 - INFO - ✓ Successfully fetched 540 data points
+24-05-2025 12:33:00 - INFO - Processing chunk from 2025-03-15 03:00 to 2025-03-15 18:00
+24-05-2025 12:33:00 - DEBUG - Attempt 1: Fetching from 2025-03-15T03:00:00 to 2025-03-15T18:00:00
+24-05-2025 12:33:00 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:00 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:00 - INFO - Processing chunk from 2025-03-15 18:00 to 2025-03-16 09:00
+24-05-2025 12:33:00 - DEBUG - Attempt 1: Fetching from 2025-03-15T18:00:00 to 2025-03-16T09:00:00
+24-05-2025 12:33:00 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:00 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:00 - INFO - Processing chunk from 2025-03-16 09:00 to 2025-03-17 00:00
+24-05-2025 12:33:00 - DEBUG - Attempt 1: Fetching from 2025-03-16T09:00:00 to 2025-03-17T00:00:00
+24-05-2025 12:33:09 - INFO - ✓ Successfully fetched 178 data points
+24-05-2025 12:33:09 - INFO - Processing chunk from 2025-03-17 00:00 to 2025-03-17 15:00
+24-05-2025 12:33:09 - DEBUG - Attempt 1: Fetching from 2025-03-17T00:00:00 to 2025-03-17T15:00:00
+24-05-2025 12:33:09 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:33:09 - INFO - Processing chunk from 2025-03-17 15:00 to 2025-03-18 06:00
+24-05-2025 12:33:09 - DEBUG - Attempt 1: Fetching from 2025-03-17T15:00:00 to 2025-03-18T06:00:00
+24-05-2025 12:33:10 - INFO - ✓ Successfully fetched 885 data points
+24-05-2025 12:33:10 - INFO - Processing chunk from 2025-03-18 06:00 to 2025-03-18 21:00
+24-05-2025 12:33:10 - DEBUG - Attempt 1: Fetching from 2025-03-18T06:00:00 to 2025-03-18T21:00:00
+24-05-2025 12:33:10 - INFO - ✓ Successfully fetched 899 data points
+24-05-2025 12:33:10 - INFO - Processing chunk from 2025-03-18 21:00 to 2025-03-19 12:00
+24-05-2025 12:33:10 - DEBUG - Attempt 1: Fetching from 2025-03-18T21:00:00 to 2025-03-19T12:00:00
+24-05-2025 12:33:10 - INFO - ✓ Successfully fetched 884 data points
+24-05-2025 12:33:10 - INFO - Processing chunk from 2025-03-19 12:00 to 2025-03-20 03:00
+24-05-2025 12:33:10 - DEBUG - Attempt 1: Fetching from 2025-03-19T12:00:00 to 2025-03-20T03:00:00
+24-05-2025 12:33:11 - INFO - ✓ Successfully fetched 892 data points
+24-05-2025 12:33:11 - INFO - Processing chunk from 2025-03-20 03:00 to 2025-03-20 18:00
+24-05-2025 12:33:11 - DEBUG - Attempt 1: Fetching from 2025-03-20T03:00:00 to 2025-03-20T18:00:00
+24-05-2025 12:33:11 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:33:11 - INFO - Processing chunk from 2025-03-20 18:00 to 2025-03-21 09:00
+24-05-2025 12:33:11 - DEBUG - Attempt 1: Fetching from 2025-03-20T18:00:00 to 2025-03-21T09:00:00
+24-05-2025 12:33:11 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:33:11 - INFO - Processing chunk from 2025-03-21 09:00 to 2025-03-22 00:00
+24-05-2025 12:33:11 - DEBUG - Attempt 1: Fetching from 2025-03-21T09:00:00 to 2025-03-22T00:00:00
+24-05-2025 12:33:11 - INFO - ✓ Successfully fetched 719 data points
+24-05-2025 12:33:11 - INFO - Processing chunk from 2025-03-22 00:00 to 2025-03-22 15:00
+24-05-2025 12:33:11 - DEBUG - Attempt 1: Fetching from 2025-03-22T00:00:00 to 2025-03-22T15:00:00
+24-05-2025 12:33:11 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:11 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:11 - INFO - Processing chunk from 2025-03-22 15:00 to 2025-03-23 06:00
+24-05-2025 12:33:11 - DEBUG - Attempt 1: Fetching from 2025-03-22T15:00:00 to 2025-03-23T06:00:00
+24-05-2025 12:33:12 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:12 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:12 - INFO - Processing chunk from 2025-03-23 06:00 to 2025-03-23 21:00
+24-05-2025 12:33:12 - DEBUG - Attempt 1: Fetching from 2025-03-23T06:00:00 to 2025-03-23T21:00:00
+24-05-2025 12:33:23 - INFO - ✓ Successfully fetched 1 data points
+24-05-2025 12:33:23 - INFO - Processing chunk from 2025-03-23 21:00 to 2025-03-24 12:00
+24-05-2025 12:33:23 - DEBUG - Attempt 1: Fetching from 2025-03-23T21:00:00 to 2025-03-24T12:00:00
+24-05-2025 12:33:24 - INFO - ✓ Successfully fetched 899 data points
+24-05-2025 12:33:24 - INFO - Processing chunk from 2025-03-24 12:00 to 2025-03-25 03:00
+24-05-2025 12:33:24 - DEBUG - Attempt 1: Fetching from 2025-03-24T12:00:00 to 2025-03-25T03:00:00
+24-05-2025 12:33:24 - INFO - ✓ Successfully fetched 894 data points
+24-05-2025 12:33:24 - INFO - Processing chunk from 2025-03-25 03:00 to 2025-03-25 18:00
+24-05-2025 12:33:24 - DEBUG - Attempt 1: Fetching from 2025-03-25T03:00:00 to 2025-03-25T18:00:00
+24-05-2025 12:33:24 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:33:24 - INFO - Processing chunk from 2025-03-25 18:00 to 2025-03-26 09:00
+24-05-2025 12:33:24 - DEBUG - Attempt 1: Fetching from 2025-03-25T18:00:00 to 2025-03-26T09:00:00
+24-05-2025 12:33:25 - INFO - ✓ Successfully fetched 887 data points
+24-05-2025 12:33:25 - INFO - Processing chunk from 2025-03-26 09:00 to 2025-03-27 00:00
+24-05-2025 12:33:25 - DEBUG - Attempt 1: Fetching from 2025-03-26T09:00:00 to 2025-03-27T00:00:00
+24-05-2025 12:33:25 - INFO - ✓ Successfully fetched 894 data points
+24-05-2025 12:33:25 - INFO - Processing chunk from 2025-03-27 00:00 to 2025-03-27 15:00
+24-05-2025 12:33:25 - DEBUG - Attempt 1: Fetching from 2025-03-27T00:00:00 to 2025-03-27T15:00:00
+24-05-2025 12:33:25 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:33:25 - INFO - Processing chunk from 2025-03-27 15:00 to 2025-03-28 06:00
+24-05-2025 12:33:25 - DEBUG - Attempt 1: Fetching from 2025-03-27T15:00:00 to 2025-03-28T06:00:00
+24-05-2025 12:33:26 - INFO - ✓ Successfully fetched 880 data points
+24-05-2025 12:33:26 - INFO - Processing chunk from 2025-03-28 06:00 to 2025-03-28 21:00
+24-05-2025 12:33:26 - DEBUG - Attempt 1: Fetching from 2025-03-28T06:00:00 to 2025-03-28T21:00:00
+24-05-2025 12:33:26 - INFO - ✓ Successfully fetched 899 data points
+24-05-2025 12:33:26 - INFO - Processing chunk from 2025-03-28 21:00 to 2025-03-29 12:00
+24-05-2025 12:33:26 - DEBUG - Attempt 1: Fetching from 2025-03-28T21:00:00 to 2025-03-29T12:00:00
+24-05-2025 12:33:26 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:26 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:26 - INFO - Processing chunk from 2025-03-29 12:00 to 2025-03-30 03:00
+24-05-2025 12:33:26 - DEBUG - Attempt 1: Fetching from 2025-03-29T12:00:00 to 2025-03-30T03:00:00
+24-05-2025 12:33:26 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:26 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:26 - INFO - Processing chunk from 2025-03-30 03:00 to 2025-03-30 18:00
+24-05-2025 12:33:26 - DEBUG - Attempt 1: Fetching from 2025-03-30T03:00:00 to 2025-03-30T18:00:00
+24-05-2025 12:33:26 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:26 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:26 - INFO - Processing chunk from 2025-03-30 18:00 to 2025-03-31 09:00
+24-05-2025 12:33:26 - DEBUG - Attempt 1: Fetching from 2025-03-30T18:00:00 to 2025-03-31T09:00:00
+24-05-2025 12:33:36 - INFO - ✓ Successfully fetched 717 data points
+24-05-2025 12:33:36 - INFO - Processing chunk from 2025-03-31 09:00 to 2025-04-01 00:00
+24-05-2025 12:33:36 - DEBUG - Attempt 1: Fetching from 2025-03-31T09:00:00 to 2025-04-01T00:00:00
+24-05-2025 12:33:37 - INFO - ✓ Successfully fetched 887 data points
+24-05-2025 12:33:37 - INFO - Processing chunk from 2025-04-01 00:00 to 2025-04-01 15:00
+24-05-2025 12:33:37 - DEBUG - Attempt 1: Fetching from 2025-04-01T00:00:00 to 2025-04-01T15:00:00
+24-05-2025 12:33:37 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:33:37 - INFO - Processing chunk from 2025-04-01 15:00 to 2025-04-02 06:00
+24-05-2025 12:33:37 - DEBUG - Attempt 1: Fetching from 2025-04-01T15:00:00 to 2025-04-02T06:00:00
+24-05-2025 12:33:37 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:33:37 - INFO - Processing chunk from 2025-04-02 06:00 to 2025-04-02 21:00
+24-05-2025 12:33:37 - DEBUG - Attempt 1: Fetching from 2025-04-02T06:00:00 to 2025-04-02T21:00:00
+24-05-2025 12:33:38 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:33:38 - INFO - Processing chunk from 2025-04-02 21:00 to 2025-04-03 12:00
+24-05-2025 12:33:38 - DEBUG - Attempt 1: Fetching from 2025-04-02T21:00:00 to 2025-04-03T12:00:00
+24-05-2025 12:33:38 - INFO - ✓ Successfully fetched 882 data points
+24-05-2025 12:33:38 - INFO - Processing chunk from 2025-04-03 12:00 to 2025-04-04 03:00
+24-05-2025 12:33:38 - DEBUG - Attempt 1: Fetching from 2025-04-03T12:00:00 to 2025-04-04T03:00:00
+24-05-2025 12:33:38 - INFO - ✓ Successfully fetched 896 data points
+24-05-2025 12:33:38 - INFO - Processing chunk from 2025-04-04 03:00 to 2025-04-04 18:00
+24-05-2025 12:33:38 - DEBUG - Attempt 1: Fetching from 2025-04-04T03:00:00 to 2025-04-04T18:00:00
+24-05-2025 12:33:38 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:33:38 - INFO - Processing chunk from 2025-04-04 18:00 to 2025-04-05 09:00
+24-05-2025 12:33:38 - DEBUG - Attempt 1: Fetching from 2025-04-04T18:00:00 to 2025-04-05T09:00:00
+24-05-2025 12:33:38 - INFO - ✓ Successfully fetched 180 data points
+24-05-2025 12:33:38 - INFO - Processing chunk from 2025-04-05 09:00 to 2025-04-06 00:00
+24-05-2025 12:33:38 - DEBUG - Attempt 1: Fetching from 2025-04-05T09:00:00 to 2025-04-06T00:00:00
+24-05-2025 12:33:39 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:39 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:39 - INFO - Processing chunk from 2025-04-06 00:00 to 2025-04-06 15:00
+24-05-2025 12:33:39 - DEBUG - Attempt 1: Fetching from 2025-04-06T00:00:00 to 2025-04-06T15:00:00
+24-05-2025 12:33:39 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:39 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:39 - INFO - Processing chunk from 2025-04-06 15:00 to 2025-04-07 06:00
+24-05-2025 12:33:39 - DEBUG - Attempt 1: Fetching from 2025-04-06T15:00:00 to 2025-04-07T06:00:00
+24-05-2025 12:33:48 - INFO - ✓ Successfully fetched 531 data points
+24-05-2025 12:33:48 - INFO - Processing chunk from 2025-04-07 06:00 to 2025-04-07 21:00
+24-05-2025 12:33:48 - DEBUG - Attempt 1: Fetching from 2025-04-07T06:00:00 to 2025-04-07T21:00:00
+24-05-2025 12:33:48 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:33:48 - INFO - Processing chunk from 2025-04-07 21:00 to 2025-04-08 12:00
+24-05-2025 12:33:48 - DEBUG - Attempt 1: Fetching from 2025-04-07T21:00:00 to 2025-04-08T12:00:00
+24-05-2025 12:33:49 - INFO - ✓ Successfully fetched 892 data points
+24-05-2025 12:33:49 - INFO - Processing chunk from 2025-04-08 12:00 to 2025-04-09 03:00
+24-05-2025 12:33:49 - DEBUG - Attempt 1: Fetching from 2025-04-08T12:00:00 to 2025-04-09T03:00:00
+24-05-2025 12:33:49 - INFO - ✓ Successfully fetched 876 data points
+24-05-2025 12:33:49 - INFO - Processing chunk from 2025-04-09 03:00 to 2025-04-09 18:00
+24-05-2025 12:33:49 - DEBUG - Attempt 1: Fetching from 2025-04-09T03:00:00 to 2025-04-09T18:00:00
+24-05-2025 12:33:49 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:33:49 - INFO - Processing chunk from 2025-04-09 18:00 to 2025-04-10 09:00
+24-05-2025 12:33:49 - DEBUG - Attempt 1: Fetching from 2025-04-09T18:00:00 to 2025-04-10T09:00:00
+24-05-2025 12:33:50 - INFO - ✓ Successfully fetched 886 data points
+24-05-2025 12:33:50 - INFO - Processing chunk from 2025-04-10 09:00 to 2025-04-11 00:00
+24-05-2025 12:33:50 - DEBUG - Attempt 1: Fetching from 2025-04-10T09:00:00 to 2025-04-11T00:00:00
+24-05-2025 12:33:50 - INFO - ✓ Successfully fetched 887 data points
+24-05-2025 12:33:50 - INFO - Processing chunk from 2025-04-11 00:00 to 2025-04-11 15:00
+24-05-2025 12:33:50 - DEBUG - Attempt 1: Fetching from 2025-04-11T00:00:00 to 2025-04-11T15:00:00
+24-05-2025 12:33:50 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:33:50 - INFO - Processing chunk from 2025-04-11 15:00 to 2025-04-12 06:00
+24-05-2025 12:33:50 - DEBUG - Attempt 1: Fetching from 2025-04-11T15:00:00 to 2025-04-12T06:00:00
+24-05-2025 12:33:50 - INFO - ✓ Successfully fetched 360 data points
+24-05-2025 12:33:50 - INFO - Processing chunk from 2025-04-12 06:00 to 2025-04-12 21:00
+24-05-2025 12:33:50 - DEBUG - Attempt 1: Fetching from 2025-04-12T06:00:00 to 2025-04-12T21:00:00
+24-05-2025 12:33:50 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:50 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:50 - INFO - Processing chunk from 2025-04-12 21:00 to 2025-04-13 12:00
+24-05-2025 12:33:50 - DEBUG - Attempt 1: Fetching from 2025-04-12T21:00:00 to 2025-04-13T12:00:00
+24-05-2025 12:33:51 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:33:51 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:33:51 - INFO - Processing chunk from 2025-04-13 12:00 to 2025-04-14 03:00
+24-05-2025 12:33:51 - DEBUG - Attempt 1: Fetching from 2025-04-13T12:00:00 to 2025-04-14T03:00:00
+24-05-2025 12:34:00 - INFO - ✓ Successfully fetched 359 data points
+24-05-2025 12:34:00 - INFO - Processing chunk from 2025-04-14 03:00 to 2025-04-14 18:00
+24-05-2025 12:34:00 - DEBUG - Attempt 1: Fetching from 2025-04-14T03:00:00 to 2025-04-14T18:00:00
+24-05-2025 12:34:00 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:00 - INFO - Processing chunk from 2025-04-14 18:00 to 2025-04-15 09:00
+24-05-2025 12:34:00 - DEBUG - Attempt 1: Fetching from 2025-04-14T18:00:00 to 2025-04-15T09:00:00
+24-05-2025 12:34:01 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:34:01 - INFO - Processing chunk from 2025-04-15 09:00 to 2025-04-16 00:00
+24-05-2025 12:34:01 - DEBUG - Attempt 1: Fetching from 2025-04-15T09:00:00 to 2025-04-16T00:00:00
+24-05-2025 12:34:01 - INFO - ✓ Successfully fetched 896 data points
+24-05-2025 12:34:01 - INFO - Processing chunk from 2025-04-16 00:00 to 2025-04-16 15:00
+24-05-2025 12:34:01 - DEBUG - Attempt 1: Fetching from 2025-04-16T00:00:00 to 2025-04-16T15:00:00
+24-05-2025 12:34:01 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:01 - INFO - Processing chunk from 2025-04-16 15:00 to 2025-04-17 06:00
+24-05-2025 12:34:01 - DEBUG - Attempt 1: Fetching from 2025-04-16T15:00:00 to 2025-04-17T06:00:00
+24-05-2025 12:34:02 - INFO - ✓ Successfully fetched 890 data points
+24-05-2025 12:34:02 - INFO - Processing chunk from 2025-04-17 06:00 to 2025-04-17 21:00
+24-05-2025 12:34:02 - DEBUG - Attempt 1: Fetching from 2025-04-17T06:00:00 to 2025-04-17T21:00:00
+24-05-2025 12:34:02 - INFO - ✓ Successfully fetched 898 data points
+24-05-2025 12:34:02 - INFO - Processing chunk from 2025-04-17 21:00 to 2025-04-18 12:00
+24-05-2025 12:34:02 - DEBUG - Attempt 1: Fetching from 2025-04-17T21:00:00 to 2025-04-18T12:00:00
+24-05-2025 12:34:02 - INFO - ✓ Successfully fetched 889 data points
+24-05-2025 12:34:02 - INFO - Processing chunk from 2025-04-18 12:00 to 2025-04-19 03:00
+24-05-2025 12:34:02 - DEBUG - Attempt 1: Fetching from 2025-04-18T12:00:00 to 2025-04-19T03:00:00
+24-05-2025 12:34:03 - INFO - ✓ Successfully fetched 540 data points
+24-05-2025 12:34:03 - INFO - Processing chunk from 2025-04-19 03:00 to 2025-04-19 18:00
+24-05-2025 12:34:03 - DEBUG - Attempt 1: Fetching from 2025-04-19T03:00:00 to 2025-04-19T18:00:00
+24-05-2025 12:34:03 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:03 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:03 - INFO - Processing chunk from 2025-04-19 18:00 to 2025-04-20 09:00
+24-05-2025 12:34:03 - DEBUG - Attempt 1: Fetching from 2025-04-19T18:00:00 to 2025-04-20T09:00:00
+24-05-2025 12:34:03 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:03 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:03 - INFO - Processing chunk from 2025-04-20 09:00 to 2025-04-21 00:00
+24-05-2025 12:34:03 - DEBUG - Attempt 1: Fetching from 2025-04-20T09:00:00 to 2025-04-21T00:00:00
+24-05-2025 12:34:14 - INFO - ✓ Successfully fetched 176 data points
+24-05-2025 12:34:14 - INFO - Processing chunk from 2025-04-21 00:00 to 2025-04-21 15:00
+24-05-2025 12:34:14 - DEBUG - Attempt 1: Fetching from 2025-04-21T00:00:00 to 2025-04-21T15:00:00
+24-05-2025 12:34:15 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:15 - INFO - Processing chunk from 2025-04-21 15:00 to 2025-04-22 06:00
+24-05-2025 12:34:15 - DEBUG - Attempt 1: Fetching from 2025-04-21T15:00:00 to 2025-04-22T06:00:00
+24-05-2025 12:34:15 - INFO - ✓ Successfully fetched 894 data points
+24-05-2025 12:34:15 - INFO - Processing chunk from 2025-04-22 06:00 to 2025-04-22 21:00
+24-05-2025 12:34:15 - DEBUG - Attempt 1: Fetching from 2025-04-22T06:00:00 to 2025-04-22T21:00:00
+24-05-2025 12:34:16 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:34:16 - INFO - Processing chunk from 2025-04-22 21:00 to 2025-04-23 12:00
+24-05-2025 12:34:16 - DEBUG - Attempt 1: Fetching from 2025-04-22T21:00:00 to 2025-04-23T12:00:00
+24-05-2025 12:34:16 - INFO - ✓ Successfully fetched 896 data points
+24-05-2025 12:34:16 - INFO - Processing chunk from 2025-04-23 12:00 to 2025-04-24 03:00
+24-05-2025 12:34:16 - DEBUG - Attempt 1: Fetching from 2025-04-23T12:00:00 to 2025-04-24T03:00:00
+24-05-2025 12:34:16 - INFO - ✓ Successfully fetched 895 data points
+24-05-2025 12:34:16 - INFO - Processing chunk from 2025-04-24 03:00 to 2025-04-24 18:00
+24-05-2025 12:34:16 - DEBUG - Attempt 1: Fetching from 2025-04-24T03:00:00 to 2025-04-24T18:00:00
+24-05-2025 12:34:16 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:16 - INFO - Processing chunk from 2025-04-24 18:00 to 2025-04-25 09:00
+24-05-2025 12:34:16 - DEBUG - Attempt 1: Fetching from 2025-04-24T18:00:00 to 2025-04-25T09:00:00
+24-05-2025 12:34:17 - INFO - ✓ Successfully fetched 895 data points
+24-05-2025 12:34:17 - INFO - Processing chunk from 2025-04-25 09:00 to 2025-04-26 00:00
+24-05-2025 12:34:17 - DEBUG - Attempt 1: Fetching from 2025-04-25T09:00:00 to 2025-04-26T00:00:00
+24-05-2025 12:34:17 - INFO - ✓ Successfully fetched 720 data points
+24-05-2025 12:34:17 - INFO - Processing chunk from 2025-04-26 00:00 to 2025-04-26 15:00
+24-05-2025 12:34:17 - DEBUG - Attempt 1: Fetching from 2025-04-26T00:00:00 to 2025-04-26T15:00:00
+24-05-2025 12:34:17 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:17 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:17 - INFO - Processing chunk from 2025-04-26 15:00 to 2025-04-27 06:00
+24-05-2025 12:34:17 - DEBUG - Attempt 1: Fetching from 2025-04-26T15:00:00 to 2025-04-27T06:00:00
+24-05-2025 12:34:17 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:17 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:17 - INFO - Processing chunk from 2025-04-27 06:00 to 2025-04-27 21:00
+24-05-2025 12:34:17 - DEBUG - Attempt 1: Fetching from 2025-04-27T06:00:00 to 2025-04-27T21:00:00
+24-05-2025 12:34:17 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:17 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:17 - INFO - Processing chunk from 2025-04-27 21:00 to 2025-04-28 12:00
+24-05-2025 12:34:17 - DEBUG - Attempt 1: Fetching from 2025-04-27T21:00:00 to 2025-04-28T12:00:00
+24-05-2025 12:34:27 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:34:27 - INFO - Processing chunk from 2025-04-28 12:00 to 2025-04-29 03:00
+24-05-2025 12:34:27 - DEBUG - Attempt 1: Fetching from 2025-04-28T12:00:00 to 2025-04-29T03:00:00
+24-05-2025 12:34:27 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:34:27 - INFO - Processing chunk from 2025-04-29 03:00 to 2025-04-29 18:00
+24-05-2025 12:34:27 - DEBUG - Attempt 1: Fetching from 2025-04-29T03:00:00 to 2025-04-29T18:00:00
+24-05-2025 12:34:28 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:28 - INFO - Processing chunk from 2025-04-29 18:00 to 2025-04-30 09:00
+24-05-2025 12:34:28 - DEBUG - Attempt 1: Fetching from 2025-04-29T18:00:00 to 2025-04-30T09:00:00
+24-05-2025 12:34:28 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:34:28 - INFO - Processing chunk from 2025-04-30 09:00 to 2025-05-01 00:00
+24-05-2025 12:34:28 - DEBUG - Attempt 1: Fetching from 2025-04-30T09:00:00 to 2025-05-01T00:00:00
+24-05-2025 12:34:28 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:34:28 - INFO - Processing chunk from 2025-05-01 00:00 to 2025-05-01 15:00
+24-05-2025 12:34:28 - DEBUG - Attempt 1: Fetching from 2025-05-01T00:00:00 to 2025-05-01T15:00:00
+24-05-2025 12:34:28 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:28 - INFO - Processing chunk from 2025-05-01 15:00 to 2025-05-02 06:00
+24-05-2025 12:34:28 - DEBUG - Attempt 1: Fetching from 2025-05-01T15:00:00 to 2025-05-02T06:00:00
+24-05-2025 12:34:29 - INFO - ✓ Successfully fetched 884 data points
+24-05-2025 12:34:29 - INFO - Processing chunk from 2025-05-02 06:00 to 2025-05-02 21:00
+24-05-2025 12:34:29 - DEBUG - Attempt 1: Fetching from 2025-05-02T06:00:00 to 2025-05-02T21:00:00
+24-05-2025 12:34:29 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:34:29 - INFO - Processing chunk from 2025-05-02 21:00 to 2025-05-03 12:00
+24-05-2025 12:34:29 - DEBUG - Attempt 1: Fetching from 2025-05-02T21:00:00 to 2025-05-03T12:00:00
+24-05-2025 12:34:29 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:29 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:29 - INFO - Processing chunk from 2025-05-03 12:00 to 2025-05-04 03:00
+24-05-2025 12:34:29 - DEBUG - Attempt 1: Fetching from 2025-05-03T12:00:00 to 2025-05-04T03:00:00
+24-05-2025 12:34:29 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:29 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:29 - INFO - Processing chunk from 2025-05-04 03:00 to 2025-05-04 18:00
+24-05-2025 12:34:29 - DEBUG - Attempt 1: Fetching from 2025-05-04T03:00:00 to 2025-05-04T18:00:00
+24-05-2025 12:34:29 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:29 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:29 - INFO - Processing chunk from 2025-05-04 18:00 to 2025-05-05 09:00
+24-05-2025 12:34:29 - DEBUG - Attempt 1: Fetching from 2025-05-04T18:00:00 to 2025-05-05T09:00:00
+24-05-2025 12:34:40 - INFO - ✓ Successfully fetched 703 data points
+24-05-2025 12:34:40 - INFO - Processing chunk from 2025-05-05 09:00 to 2025-05-06 00:00
+24-05-2025 12:34:40 - DEBUG - Attempt 1: Fetching from 2025-05-05T09:00:00 to 2025-05-06T00:00:00
+24-05-2025 12:34:40 - INFO - ✓ Successfully fetched 890 data points
+24-05-2025 12:34:40 - INFO - Processing chunk from 2025-05-06 00:00 to 2025-05-06 15:00
+24-05-2025 12:34:40 - DEBUG - Attempt 1: Fetching from 2025-05-06T00:00:00 to 2025-05-06T15:00:00
+24-05-2025 12:34:41 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:41 - INFO - Processing chunk from 2025-05-06 15:00 to 2025-05-07 06:00
+24-05-2025 12:34:41 - DEBUG - Attempt 1: Fetching from 2025-05-06T15:00:00 to 2025-05-07T06:00:00
+24-05-2025 12:34:41 - INFO - ✓ Successfully fetched 894 data points
+24-05-2025 12:34:41 - INFO - Processing chunk from 2025-05-07 06:00 to 2025-05-07 21:00
+24-05-2025 12:34:41 - DEBUG - Attempt 1: Fetching from 2025-05-07T06:00:00 to 2025-05-07T21:00:00
+24-05-2025 12:34:41 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:34:41 - INFO - Processing chunk from 2025-05-07 21:00 to 2025-05-08 12:00
+24-05-2025 12:34:41 - DEBUG - Attempt 1: Fetching from 2025-05-07T21:00:00 to 2025-05-08T12:00:00
+24-05-2025 12:34:42 - INFO - ✓ Successfully fetched 892 data points
+24-05-2025 12:34:42 - INFO - Processing chunk from 2025-05-08 12:00 to 2025-05-09 03:00
+24-05-2025 12:34:42 - DEBUG - Attempt 1: Fetching from 2025-05-08T12:00:00 to 2025-05-09T03:00:00
+24-05-2025 12:34:42 - INFO - ✓ Successfully fetched 891 data points
+24-05-2025 12:34:42 - INFO - Processing chunk from 2025-05-09 03:00 to 2025-05-09 18:00
+24-05-2025 12:34:42 - DEBUG - Attempt 1: Fetching from 2025-05-09T03:00:00 to 2025-05-09T18:00:00
+24-05-2025 12:34:42 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:42 - INFO - Processing chunk from 2025-05-09 18:00 to 2025-05-10 09:00
+24-05-2025 12:34:42 - DEBUG - Attempt 1: Fetching from 2025-05-09T18:00:00 to 2025-05-10T09:00:00
+24-05-2025 12:34:42 - INFO - ✓ Successfully fetched 179 data points
+24-05-2025 12:34:42 - INFO - Processing chunk from 2025-05-10 09:00 to 2025-05-11 00:00
+24-05-2025 12:34:42 - DEBUG - Attempt 1: Fetching from 2025-05-10T09:00:00 to 2025-05-11T00:00:00
+24-05-2025 12:34:42 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:42 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:42 - INFO - Processing chunk from 2025-05-11 00:00 to 2025-05-11 15:00
+24-05-2025 12:34:42 - DEBUG - Attempt 1: Fetching from 2025-05-11T00:00:00 to 2025-05-11T15:00:00
+24-05-2025 12:34:42 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:42 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:42 - INFO - Processing chunk from 2025-05-11 15:00 to 2025-05-12 06:00
+24-05-2025 12:34:42 - DEBUG - Attempt 1: Fetching from 2025-05-11T15:00:00 to 2025-05-12T06:00:00
+24-05-2025 12:34:49 - INFO - ✓ Successfully fetched 540 data points
+24-05-2025 12:34:49 - INFO - Processing chunk from 2025-05-12 06:00 to 2025-05-12 21:00
+24-05-2025 12:34:49 - DEBUG - Attempt 1: Fetching from 2025-05-12T06:00:00 to 2025-05-12T21:00:00
+24-05-2025 12:34:50 - INFO - ✓ Successfully fetched 900 data points
+24-05-2025 12:34:50 - INFO - Processing chunk from 2025-05-12 21:00 to 2025-05-13 12:00
+24-05-2025 12:34:50 - DEBUG - Attempt 1: Fetching from 2025-05-12T21:00:00 to 2025-05-13T12:00:00
+24-05-2025 12:34:50 - INFO - ✓ Successfully fetched 896 data points
+24-05-2025 12:34:50 - INFO - Processing chunk from 2025-05-13 12:00 to 2025-05-14 03:00
+24-05-2025 12:34:50 - DEBUG - Attempt 1: Fetching from 2025-05-13T12:00:00 to 2025-05-14T03:00:00
+24-05-2025 12:34:51 - INFO - ✓ Successfully fetched 889 data points
+24-05-2025 12:34:51 - INFO - Processing chunk from 2025-05-14 03:00 to 2025-05-14 18:00
+24-05-2025 12:34:51 - DEBUG - Attempt 1: Fetching from 2025-05-14T03:00:00 to 2025-05-14T18:00:00
+24-05-2025 12:34:51 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:51 - INFO - Processing chunk from 2025-05-14 18:00 to 2025-05-15 09:00
+24-05-2025 12:34:51 - DEBUG - Attempt 1: Fetching from 2025-05-14T18:00:00 to 2025-05-15T09:00:00
+24-05-2025 12:34:51 - INFO - ✓ Successfully fetched 888 data points
+24-05-2025 12:34:51 - INFO - Processing chunk from 2025-05-15 09:00 to 2025-05-16 00:00
+24-05-2025 12:34:51 - DEBUG - Attempt 1: Fetching from 2025-05-15T09:00:00 to 2025-05-16T00:00:00
+24-05-2025 12:34:52 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:34:52 - INFO - Processing chunk from 2025-05-16 00:00 to 2025-05-16 15:00
+24-05-2025 12:34:52 - DEBUG - Attempt 1: Fetching from 2025-05-16T00:00:00 to 2025-05-16T15:00:00
+24-05-2025 12:34:52 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:52 - INFO - Processing chunk from 2025-05-16 15:00 to 2025-05-17 06:00
+24-05-2025 12:34:52 - DEBUG - Attempt 1: Fetching from 2025-05-16T15:00:00 to 2025-05-17T06:00:00
+24-05-2025 12:34:52 - INFO - ✓ Successfully fetched 360 data points
+24-05-2025 12:34:52 - INFO - Processing chunk from 2025-05-17 06:00 to 2025-05-17 21:00
+24-05-2025 12:34:52 - DEBUG - Attempt 1: Fetching from 2025-05-17T06:00:00 to 2025-05-17T21:00:00
+24-05-2025 12:34:52 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:52 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:52 - INFO - Processing chunk from 2025-05-17 21:00 to 2025-05-18 12:00
+24-05-2025 12:34:52 - DEBUG - Attempt 1: Fetching from 2025-05-17T21:00:00 to 2025-05-18T12:00:00
+24-05-2025 12:34:52 - ERROR - API Error: {'errorCode': 'error.prices.not-found'}
+24-05-2025 12:34:52 - WARNING - ✗ Failed to get data: error.prices.not-found
+24-05-2025 12:34:52 - INFO - Processing chunk from 2025-05-18 12:00 to 2025-05-19 03:00
+24-05-2025 12:34:52 - DEBUG - Attempt 1: Fetching from 2025-05-18T12:00:00 to 2025-05-19T03:00:00
+24-05-2025 12:34:53 - INFO - ✓ Successfully fetched 355 data points
+24-05-2025 12:34:53 - INFO - Processing chunk from 2025-05-19 03:00 to 2025-05-19 18:00
+24-05-2025 12:34:53 - DEBUG - Attempt 1: Fetching from 2025-05-19T03:00:00 to 2025-05-19T18:00:00
+24-05-2025 12:34:53 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:53 - INFO - Processing chunk from 2025-05-19 18:00 to 2025-05-20 09:00
+24-05-2025 12:34:53 - DEBUG - Attempt 1: Fetching from 2025-05-19T18:00:00 to 2025-05-20T09:00:00
+24-05-2025 12:34:53 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:34:53 - INFO - Processing chunk from 2025-05-20 09:00 to 2025-05-21 00:00
+24-05-2025 12:34:53 - DEBUG - Attempt 1: Fetching from 2025-05-20T09:00:00 to 2025-05-21T00:00:00
+24-05-2025 12:34:54 - INFO - ✓ Successfully fetched 895 data points
+24-05-2025 12:34:54 - INFO - Processing chunk from 2025-05-21 00:00 to 2025-05-21 15:00
+24-05-2025 12:34:54 - DEBUG - Attempt 1: Fetching from 2025-05-21T00:00:00 to 2025-05-21T15:00:00
+24-05-2025 12:34:54 - INFO - ✓ Successfully fetched 901 data points
+24-05-2025 12:34:54 - INFO - Processing chunk from 2025-05-21 15:00 to 2025-05-22 06:00
+24-05-2025 12:34:54 - DEBUG - Attempt 1: Fetching from 2025-05-21T15:00:00 to 2025-05-22T06:00:00
+24-05-2025 12:34:54 - INFO - ✓ Successfully fetched 893 data points
+24-05-2025 12:34:54 - INFO - Processing chunk from 2025-05-22 06:00 to 2025-05-22 21:00
+24-05-2025 12:34:54 - DEBUG - Attempt 1: Fetching from 2025-05-22T06:00:00 to 2025-05-22T21:00:00
+24-05-2025 12:34:55 - INFO - ✓ Successfully fetched 899 data points
+24-05-2025 12:34:55 - INFO - Processing chunk from 2025-05-22 21:00 to 2025-05-23 01:00
+24-05-2025 12:34:55 - DEBUG - Attempt 1: Fetching from 2025-05-22T21:00:00 to 2025-05-23T01:00:00
+24-05-2025 12:34:55 - INFO - ✓ Successfully fetched 229 data points
+24-05-2025 12:34:55 - INFO - Fetching completed: 182 successful chunks, 46 failed chunks
+24-05-2025 12:34:55 - INFO - Total data points collected: 144731
+24-05-2025 12:34:55 - INFO - Converting 144731 data points to OHLCV format
+24-05-2025 12:34:55 - INFO - Data successfully converted and saved to /Users/dmartinsen/pers-prog/ml-pred/storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv
+24-05-2025 12:34:55 - INFO - OHLCV data saved to /Users/dmartinsen/pers-prog/ml-pred/storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv
+24-05-2025 12:34:55 - INFO - Data range: 2025-01-01T22:05:00 to 2025-05-23T01:00:00
