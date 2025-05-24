@@ -15,7 +15,7 @@ This folder will be solely responsible for engineering data that a ML model will
 Will also use this for planning.
 ```
 ├── providers                   # Different providers/sources to get/retrieve historical data
-│   ├── base_provider.py        # Interface for different providers
+│   ├── base_provider.py        # Interface for different providers. I think, currently, almost all files inherits from this - could be moved up "one level" (../)
 │   ├── capital_com.py          # Using the broker Capital.com's API to fetch historical data, very simple
 │   └── alpha_vantage.py        # Stock Market Data API, 30 days free intraday market data
 │
@@ -26,7 +26,7 @@ Will also use this for planning.
 ├── features/                   # Feature engineering
 │   ├── generation.py           # Generating features with simplistic error handling
 │   ├── normalization.py        # Rescaling numeric data to a standard range
-│   └── ...
+│   └── selection.py            # Various techniques (3) to select the "most efficient" features
 │
 ├── pipeline/                   # Pipeline orchestration
 │   └── engineer_pipeline.py    # Main orchestrator and pipeline for engineering historical data
@@ -38,6 +38,8 @@ Will also use this for planning.
 ## Important notes:
 - Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment(). Should be improved when using other providers using another timezone.
 - The library pandas_lib could really help with calculating features, but the following error appears on (on any Python version) ``` ImportError: cannot import name 'NaN' from 'numpy' ```. After some reasearch, this appears after numpy version 2.0. Considering I'll use this project and the whole pipeline on other servers/machines one day, I will create my own functions/calculations as to not rely on older libraries.
+- Fetching historical data using providers/capital_com.py: It uses (naturally) an API that returns both bid and ask prices, but the code will "Calculate mid prices (average of bid and ask) with rounding" so its easier to train. I don't know if that's the best solution, but currently the one in place.
+  - Under the ```broker/``` component, you can see that the actual ```broker/capital_com/rest_api/markets_info.py``` and the function called ```fetch_and_save_historical_prices()```, uses ```convert_json_to_ohlcv_csv``` method from ```utils/broker``` to "calculate" these "new prices" from the actual response.
 
 
 ## About pipelines/
