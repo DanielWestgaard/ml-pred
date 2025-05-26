@@ -9,3 +9,9 @@ The purpose of this is that beating the market is _near_ impossible (considering
 │   └── README.md                           # More through description of the hypothesis
 └── README.md                               # You are here - description about this folder
 ```
+
+## config.yml structure
+This should serve as a template to how configs are added to new hypothesis'.
+```
+...
+```
