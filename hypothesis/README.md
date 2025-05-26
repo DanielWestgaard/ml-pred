@@ -12,6 +12,11 @@ The purpose of this is that beating the market is _near_ impossible (considering
 
 ## config.yml structure
 This should serve as a template to how configs are added to new hypothesis'.
-```
-...
+```yml
+name: <name-of-the-hypothesis>
+
+required_features:
+    - f_1
+    - f_2
+    - ...
 ```
