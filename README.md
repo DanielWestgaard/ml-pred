@@ -7,12 +7,13 @@ It's important to note that this will probably not be the very best system, as I
 ├── main.py                 # Main orchestrator for running all other "systems"
 ├── data/                   # Data engineering
 ├── model/                  # Model training
+├── hypothesis/             # Configuration and documentation to different hypothesis'
 ├── backtesting/            # Backtest trained models
 ├── live/                   # Deploy trained model on live market data
 ├── storage/                # General storage for data, models, results, etc.
 ├── broker/                 # Different broker integrations
 ├── tests/                  # Testing (currently simple)
-├── secrets/                # Folder using secrets.txt to store sensitive vars (not saved in repo)
+├── secrets/                # Folder using secrets.txt to store sensitive vars (not stored in repo)
 ├── config/                 # Configuration files
 ├── utils/                  # Utility files
 ├── images/                 # Storing images and sources used in documentation
