@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import pandas as pd
 
 from utils import data_utils
@@ -13,17 +14,22 @@ from data.features.selection import FeatureSelector
 
 
 class EngineeringPipeline():
-    def __init__(self, raw_dataset : str, output_path : str = None):
+    def __init__(self, raw_dataset:str, output_path:str = None, selected_features:list = None):
         """
         Pipeline and orchestrator for processing and engineering raw datasets
         into data ready to be used for training.
         Currently only a very simple way of saving processed file: adding a _processed at the end of original name
+        Providing the argument selected_features will make Feature Generator only generate those selected features
+        (of they exist). This also makes the pipeline skip the Feature Selection step entirely.
         
         Args:
             raw_dataset: path to the raw dataset (csv format).
+            output_path: potential output path for processed data (csv format).
+            selected_features: Feature Generator only generates those features, and pipeline skips Selesction.
         """
         self.output_path = output_path
         self.raw_data_path = raw_dataset
+        self.selected_features = selected_features
 
         # Loading data
         self.df, self.original_df = data_utils.check_and_return_df(raw_dataset)
@@ -50,6 +56,13 @@ class EngineeringPipeline():
         # Logging results
         data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
+        if self.selected_features is not None:
+            logging.info(f"User provided specific features to be generated: {self.selected_features}")
+            self.skip_selection = True
+        else:
+            logging.info("User did not provide any specific features to be generated - generating all features.")
+            self.skip_selection = False
+        
         # Feature Generation
         self.feature_generator = FeatureGenerator(self.df)
         self.df = self.feature_generator.run()
@@ -59,8 +72,11 @@ class EngineeringPipeline():
         self.df = self.transformation.run()
         
         # Feature Selection
-        self.selector = FeatureSelector(self.df)
-        self.df = self.selector.run()
+        if self.skip_selection:
+            logging.info("As selected features were provided, pipeline will skip Feature Selection.")
+        else:
+            self.selector = FeatureSelector(self.df)
+            self.df = self.selector.run()
         
         # Save Engineered data
         try:

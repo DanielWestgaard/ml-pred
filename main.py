@@ -16,7 +16,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Train hybrid trading strategy models with uncertainty quantification')
     
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
-    parser.add_argument('--fetch-data-capcom', action='store_true', default=True, help='Fetch historical data using Capital.com API.')
+    parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
     parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Alpha Vantage API.')
     parser.add_argument('--engineer-data', action='store_true', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
     
@@ -27,7 +27,7 @@ def main():
     args = parse_arguments()
     
     log_utils._is_configured = False
-    logger = log_utils.setup_logging(name="historical_data", type="data", log_to_file=True, log_level=config.DEBUG_LOG_LEVEL)
+    logger = log_utils.setup_logging(name="historical_data", type="data", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
     if args.engineer_data:
         data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
