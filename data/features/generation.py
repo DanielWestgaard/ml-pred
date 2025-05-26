@@ -10,7 +10,7 @@ from utils import data_utils
 
 
 class FeatureGenerator():
-    def __init__(self, dataset):
+    def __init__(self, dataset, selected_features:list = None):
         """
         Class focusing on generating features with helpful prediction powers,
         that might help a ML model learn and predict better.
@@ -24,6 +24,8 @@ class FeatureGenerator():
         try:
             # Load dataset based on format
             self.df, self.original_df = data_utils.check_and_return_df(dataset)
+            
+            self.selected_features = selected_features
             
             # Validate that required columns exist
             required_columns = ['open', 'high', 'low', 'close', 'volume']
@@ -52,52 +54,60 @@ class FeatureGenerator():
     def run(self):
         """Run feature generation on provided dataset."""
         generated_features = []
-        
+                
         try:
-            # Price Action Features
-            self.safely_execute("moving_averages", "Moving Averages")
-            self.safely_execute("rate_of_change", "Rate of Change")
-            self.safely_execute("average_true_range", "Average True Range")
-            self.safely_execute("bollinger_bands", "Bollinger Bands")
-            self.safely_execute("support_resistance", "Support and Resistance")
-            logging.debug("Finished calculating Price Action Features")
+            if self.selected_features is not None:
+                logging.debug(f"Starting to generate selected features: {self.selected_features}")
+
+                for feature in self.selected_features:
+                    pass
             
-            # Volume-Based Features
-            self.safely_execute("volume_moving_averages", "Volume Moving Averages")
-            self.safely_execute("volume_rate_of_change", "Volume Rate of Change")
-            self.safely_execute("on_balance_volume", "On Balance Volume")
-            self.safely_execute("volume_profile", "Volume Profile")
-            self.safely_execute("vwap", "VWAP")
-            self.safely_execute("money_flow_index", "Money Flow Index")
-            logging.debug("Finished calculating Volume-Based Features")
-            
-            # Technical Indicators
-            self.safely_execute("relative_strength_index", "Relative Strength Index")
-            self.safely_execute("moving_average_convergence_divergence", "MACD")
-            self.safely_execute("average_directional_index", "Average Directional Index")
-            self.safely_execute("stochastic_oscillator", "Stochastic Oscillator")
-            self.safely_execute("commodity_channel_index", "Commodity Channel Index")
-            logging.debug("Finished calculating Technical Indicators")
-            
-            # Time-based Features
-            self.safely_execute("time_of_day", "Time of Day")
-            self.safely_execute("day_of_week", "Day of Week")
-            self.safely_execute("time_of_week", "Time of Week")
-            self.safely_execute("time_of_month", "Time of Month")
-            self.safely_execute("seasonal_decompose", "Seasonal Decomposition")
-            self.safely_execute("stl_decomposition", "STL Decomposition")
-            self.safely_execute("mstl_decomposition", "MSTL Decomposition")
-            self.safely_execute("holiday_features", "Holiday Features")
-            logging.debug("Finished calculating Time-based Features")
-            
-            # Market Regime Features
-            self.safely_execute("volatility_regimes", "Volatility Regimes")
-            self.safely_execute("trend_strength_indicators", "Trend Strength Indicators")
-            self.safely_execute("market_state_indicators", "Market State Indicators")
-            
-            # Feature Transformations
-            self.safely_execute("log_returns", "Log Returns")
-            self.safely_execute("fast_fourier_transforms", "Fast Fourier Transforms")
+            else:
+                logging.debug("Starting to generate all features...")
+                # Price Action Features
+                self.safely_execute("moving_averages", "Moving Averages")
+                self.safely_execute("rate_of_change", "Rate of Change")
+                self.safely_execute("average_true_range", "Average True Range")
+                self.safely_execute("bollinger_bands", "Bollinger Bands")
+                self.safely_execute("support_resistance", "Support and Resistance")
+                logging.debug("Finished calculating Price Action Features")
+                
+                # Volume-Based Features
+                self.safely_execute("volume_moving_averages", "Volume Moving Averages")
+                self.safely_execute("volume_rate_of_change", "Volume Rate of Change")
+                self.safely_execute("on_balance_volume", "On Balance Volume")
+                self.safely_execute("volume_profile", "Volume Profile")
+                self.safely_execute("vwap", "VWAP")
+                self.safely_execute("money_flow_index", "Money Flow Index")
+                logging.debug("Finished calculating Volume-Based Features")
+                
+                # Technical Indicators
+                self.safely_execute("relative_strength_index", "Relative Strength Index")
+                self.safely_execute("moving_average_convergence_divergence", "MACD")
+                self.safely_execute("average_directional_index", "Average Directional Index")
+                self.safely_execute("stochastic_oscillator", "Stochastic Oscillator")
+                self.safely_execute("commodity_channel_index", "Commodity Channel Index")
+                logging.debug("Finished calculating Technical Indicators")
+                
+                # Time-based Features
+                self.safely_execute("time_of_day", "Time of Day")
+                self.safely_execute("day_of_week", "Day of Week")
+                self.safely_execute("time_of_week", "Time of Week")
+                self.safely_execute("time_of_month", "Time of Month")
+                self.safely_execute("seasonal_decompose", "Seasonal Decomposition")
+                self.safely_execute("stl_decomposition", "STL Decomposition")
+                self.safely_execute("mstl_decomposition", "MSTL Decomposition")
+                self.safely_execute("holiday_features", "Holiday Features")
+                logging.debug("Finished calculating Time-based Features")
+                
+                # Market Regime Features
+                self.safely_execute("volatility_regimes", "Volatility Regimes")
+                self.safely_execute("trend_strength_indicators", "Trend Strength Indicators")
+                self.safely_execute("market_state_indicators", "Market State Indicators")
+                
+                # Feature Transformations
+                self.safely_execute("log_returns", "Log Returns")
+                self.safely_execute("fast_fourier_transforms", "Fast Fourier Transforms")
             
             try:
                 n_features, feature_list = self._generated_features()
