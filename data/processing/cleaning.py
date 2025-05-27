@@ -32,6 +32,7 @@ class DataCleaner(BaseProcessor):
         returns:
             pd.DataFrame: Cleaned dataset.
         """
+        logging.info("---------- Running Data Cleaner ----------")
         # Standardizing column names to lower case
         self.df.columns = self.df.columns.str.lower()
         

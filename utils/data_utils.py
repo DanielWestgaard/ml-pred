@@ -150,15 +150,15 @@ def check_and_return_df(input_data) -> pd.DataFrame:
         if input_type == 'csv_path':
             # Load data from CSV file
             data = pd.read_csv(input_data, index_col=False)
-            logging.debug("Provided raw dataset was an existing csv-file.")
+            # logging.debug("Provided raw dataset was an existing csv-file.")
         else:  # input_type == 'dataframe'
             # Use DataFrame directly
             data = input_data.copy()
-            logging.debug("Provided raw dataset was a DataFrame.")
+            # logging.debug("Provided raw dataset was a DataFrame.")
         original_data = data.copy()
         return data, original_data
     except (TypeError, ValueError) as e:
-        logging.error(f"Error: {e}")
+        logging.error(f"Error checking/loading df: {e}")
         return None
     
 
@@ -187,6 +187,8 @@ def save_processed_file(filepath, processed_data : pd.DataFrame):
     Returns:
         str: Path where the processed file was saved
     """
+    logging.info("Saving processed file ...")
+    
     # Extract filename from filepath
     filename = os.path.basename(filepath)
     
@@ -211,5 +213,7 @@ def save_processed_file(filepath, processed_data : pd.DataFrame):
     
     # Save the dataframe
     processed_data.to_csv(output_path, index=True)
+    
+    logging.info("Successfully saved file!")
     
     return output_path

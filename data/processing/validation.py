@@ -2,6 +2,7 @@ from numpy import float64
 import pandas as pd
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
+import logging
 
 class DataValidator(BaseProcessor):
     def __init__(self, clean_dataset):
@@ -17,6 +18,7 @@ class DataValidator(BaseProcessor):
         
     def run(self):
         """Run data validation checks and returns validated results."""
+        logging.info("---------- Running Data Validator ----------")
         
         self.validate_ohlc_relationships()
         self.validate_timestamps()

@@ -11,3 +11,4 @@ matplotlib
 xgboost
 pytest
 seaborn
+pyyaml

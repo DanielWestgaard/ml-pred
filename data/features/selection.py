@@ -46,7 +46,7 @@ class FeatureSelector(BaseProcessor):
         - Then apply tree-based importance to get an initial feature ranking
         - Finally use RFE with your actual model to fine-tune the selection
         """
-        logging.info("---------- Starting Feature Selection ----------")
+        logging.info("---------- Running Feature Selection ----------")
         
         selected_features = {}
         
