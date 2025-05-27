@@ -37,11 +37,11 @@ If this is the first time using the repo, follow these instructions:
     - **For using Capital.com's [API](https://open-api.capital.com/)**: 
         1. Make sure you're following these [getting started steps](https://open-api.capital.com/#section/Getting-started).
         2. Paste in these variables in the secrets-file:
-        ```
-        API_KEY_CAP=
-        PASSWORD_CAP=
-        EMAIL=
-        ```
+            ```
+            API_KEY_CAP=
+            PASSWORD_CAP=
+            EMAIL=
+            ```
         3. Fill in the values with from your own properties.
     - **For using [Alpha Vantage API](https://www.alphavantage.co/documentation/)**:
         1. Create your own [API token](https://www.alphavantage.co/support/#api-key).
