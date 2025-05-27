@@ -1,6 +1,7 @@
 # ml-pred 🚀
 The goal of this repository is to **explore possible ways to profit off the financial market**. In this current status of the repo, I'm **focusing on exploring different hypotheses** to find possible inefficiencies or micro-opportunities. Things that the "bigger institutions" might not prioritize because it is "so small" and not worth their time and resources.<br>
 In previous tries, I've explored the challenge of "**beating the market**". However, after many months, being a beginner and much reading on the topic, this is **not feasible** for a lone (beginner) developer. There are far too many institutions, competition and manipulation in the market for _me_ to be able to pull that off. Hence, I've **narrowed down my goal** to not fight or beat _them_, but **understand them and use _my_ strengths**: Under the radar (physically, and in the market), agile (big corps can't change as quick as lone me), "fail fast"-mindset, and most importantly: "**Big firms have to deploy large amounts of capital efficiently. They ignore things that can’t scale to billions in value. This gives me space.**"
+![Curent approach](images/current_approach_2025-05-27.png)
 > [!NOTE]
 > It's important know that this will probably not be the very best system, as I will also use this as a place to learn and take the time I need to really create and understand the different concepts of such a system myself.
 
