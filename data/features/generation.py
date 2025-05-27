@@ -60,7 +60,10 @@ class FeatureGenerator():
                 logging.debug(f"Starting to generate selected features: {self.selected_features}")
 
                 for feature in self.selected_features:
-                    pass
+                    try:
+                        self.safely_execute(feature, feature)
+                    except Exception as e:
+                        logging.error(f"Unable to execute {feature}, make sure the feature name matches excactly with the one implemented: {e}")
             
             else:
                 logging.debug("Starting to generate all features...")
