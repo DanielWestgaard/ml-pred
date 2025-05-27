@@ -29,6 +29,7 @@ If this is the first time using the repo, follow these instructions:
 1. Clone the environment (eg.): ``` git clone git@github.com:DanielWestgaard/ml-pred.git ```
 2. Create a virtual environment (in root of project): ``` python3.11 -m venv venv ```
     - Recommended Python version: 3.11
+    - Make sure to activate it: ```source venv/bin/activate```
 3. Install dependencies: ``` pip install -r requirements.txt ```
 4. Create secrets path: ``` mkdir secrets; cd secrets; touch secrets.txt; cd .. ```. Then, fill in the following (based on what you will use in the repo):
     - **For using Capital.com's [API](https://open-api.capital.com/)**: 
@@ -48,6 +49,18 @@ If this is the first time using the repo, follow these instructions:
 - If you're using VSCode, I highly recommend installing the extensions
     - [Rainbow CSV](https://marketplace.visualstudio.com/items/?itemName=mechatroner.rainbow-csv): Prettier view of .csv-files.
     - [Material Icon Theme](https://marketplace.visualstudio.com/items/?itemName=PKief.material-icon-theme): Helps massively when you have many folders (icon some names).
+
+## Running ```main.py```
+```main.py``` is the main orchestrator of this whole project. If you want to run entire componentes, or test out smaller stuff, this is where you do it from.<br>
+Make sure you've activated your venv, before running ```python main.py```.<br>
+All other components will have an argument you can run ```main``` with. Eg. ```python main.py --fetch-data-capcom```.
+### Current functionality
+> [!NOTE] 
+> For a more thorough explanation of the different components, see the README's under its respective folder.
+- **Test broker functionality**: ...
+- **Fetch historical market data using Capital.com**: ...
+- **Run Data Processing and Engineering Pipeline**: ...
+- **Run Data Pipeline with a Hypothesis**: ```python main.py --engineer-data --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"```
 
 ## Nice to know
 Trying to follow best practice for python, I have...

@@ -30,31 +30,31 @@ def main():
     args = parse_arguments()
     
     log_utils._is_configured = False
-    logger = log_utils.setup_logging(name="historical_data", type="data", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
+    logging = log_utils.setup_logging(name="historical_data", type="data", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
     if args.engineer_data:
         data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
         
         if args.hypothesis:
-            logger.info("Trying to run dat engineering with hypothesis config file.")
+            logging.info("Trying to run data engineering with hypothesis config file.")
             # Load YAML file
             try:
                 with open(args.hypothesis, 'r') as file:
                     config_h = yaml.safe_load(file)
             except FileNotFoundError:
-                logger.error(f"Error: Config file '{args.hypothesis}' not found!")
+                logging.error(f"Error: Config file '{args.hypothesis}' not found!")
                 sys.exit(1)
             except yaml.YAMLError as e:
-                logger.error(f"Error parsing YAML file: {e}")
+                logging.error(f"Error parsing YAML file: {e}")
                 sys.exit(1)
             
             # Extract values
             hypothesis_name = config_h['hypothesis']['name']
             features = config_h['required_features']
             
-            print(f"Hypothesis: {hypothesis_name}")
-            print(f"Features: {features}")
-        
+            logging.info(f"---------- Hypothesis: {hypothesis_name} ----------")
+            logging.info(f"Features: {features}")
+        sys.exit()
         data_pipeline.run()
     
     if args.fetch_data_alpha:
