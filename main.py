@@ -32,9 +32,7 @@ def main():
     log_utils._is_configured = False
     logging = log_utils.setup_logging(name="historical_data", type="data", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
-    if args.engineer_data:
-        data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
-        
+    if args.engineer_data:        
         if args.hypothesis:
             logging.info("Trying to run data engineering with hypothesis config file.")
             # Load YAML file
@@ -54,7 +52,12 @@ def main():
             
             logging.info(f"---------- Hypothesis: {hypothesis_name} ----------")
             logging.info(f"Features: {features}")
-        sys.exit()
+            
+            data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv", 
+                                                selected_features=features)
+        else:
+            data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
+        
         data_pipeline.run()
     
     if args.fetch_data_alpha:

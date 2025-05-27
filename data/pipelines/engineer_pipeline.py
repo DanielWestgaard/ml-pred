@@ -56,15 +56,16 @@ class EngineeringPipeline():
         # Logging results
         data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
+        # Feature Generation
         if self.selected_features is not None:
             logging.info(f"User provided specific features to be generated: {self.selected_features}")
             self.skip_selection = True
+            self.feature_generator = FeatureGenerator(self.df, selected_features=self.selected_features)
         else:
             logging.info("User did not provide any specific features to be generated - generating all features.")
             self.skip_selection = False
+            self.feature_generator = FeatureGenerator(self.df)
         
-        # Feature Generation
-        self.feature_generator = FeatureGenerator(self.df)
         self.df = self.feature_generator.run()
         
         # Transformation, scaling, handle missing values, etc. of newly generated features
