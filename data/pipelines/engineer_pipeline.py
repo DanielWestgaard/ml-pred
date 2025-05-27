@@ -45,6 +45,7 @@ class EngineeringPipeline():
         returns:
             pd.DataFrame: Engineered data ready to use for training.
         """
+        logging.info("---------- Running Data Pipeline ----------")
         
         # Clean the data
         self.df = self.cleaner.run()
@@ -58,11 +59,11 @@ class EngineeringPipeline():
         
         # Feature Generation
         if self.selected_features is not None:
-            logging.info(f"User provided specific features to be generated: {self.selected_features}")
+            logging.debug(f"User provided specific features to be generated: {self.selected_features}")
             self.skip_selection = True
             self.feature_generator = FeatureGenerator(self.df, selected_features=self.selected_features)
         else:
-            logging.info("User did not provide any specific features to be generated - generating all features.")
+            logging.debug("User did not provide any specific features to be generated - generating all features.")
             self.skip_selection = False
             self.feature_generator = FeatureGenerator(self.df)
         
@@ -79,12 +80,16 @@ class EngineeringPipeline():
             self.selector = FeatureSelector(self.df)
             self.df = self.selector.run()
         
+        logging.info("---------- Data Pipeline finished all 'data steps'! ----------")
+        
         # Save Engineered data
         try:
             data_utils.save_processed_file(filepath=self.raw_data_path, processed_data=self.df)
         except Exception as e:
             logging.error(f"Unable to save file 'dynamically', will store as {os.getcwd()}, : {e}")
             self.df.to_csv('testing.csv', index=True)
+        
+        logging.info("---------- Data Pipeline Finished ----------")
         
         # FIX: Return the processed DataFrame
         return self.df

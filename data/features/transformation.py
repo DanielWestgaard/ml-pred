@@ -21,6 +21,8 @@ class FeatureTransformer(BaseProcessor):
             preserve_original: If True, keep original features and add normalized ones with suffix
             window: Size of rolling window for normalization statistics
         """
+        logging.info("---------- Running Feature Transformer ----------")
+        
         # Handle missing feature values
         self.handle_missing_values()
         

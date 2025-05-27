@@ -53,6 +53,7 @@ class FeatureGenerator():
         
     def run(self):
         """Run feature generation on provided dataset."""
+        logging.info("---------- Running Feature Generator ----------")
         generated_features = []
                 
         try:
