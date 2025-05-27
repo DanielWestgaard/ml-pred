@@ -1,6 +1,8 @@
 # When things are getting more complete, this file needs to be cleaned up as it will be the main file for running all other "systems".
 import argparse
 import json
+import sys
+import yaml
 
 from config import config
 import utils.logging_utils as log_utils
@@ -19,6 +21,7 @@ def parse_arguments():
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
     parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Alpha Vantage API.')
     parser.add_argument('--engineer-data', action='store_true', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
+    parser.add_argument('--hypothesis', '-hyp', default=False, help='Run data engineering pipeline with hypoethesis: Provide path to the config.yml file.')
     
 
     return parser.parse_args()
@@ -31,6 +34,27 @@ def main():
     
     if args.engineer_data:
         data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
+        
+        if args.hypothesis:
+            logger.info("Trying to run dat engineering with hypothesis config file.")
+            # Load YAML file
+            try:
+                with open(args.hypothesis, 'r') as file:
+                    config_h = yaml.safe_load(file)
+            except FileNotFoundError:
+                logger.error(f"Error: Config file '{args.hypothesis}' not found!")
+                sys.exit(1)
+            except yaml.YAMLError as e:
+                logger.error(f"Error parsing YAML file: {e}")
+                sys.exit(1)
+            
+            # Extract values
+            hypothesis_name = config_h['hypothesis']['name']
+            features = config_h['required_features']
+            
+            print(f"Hypothesis: {hypothesis_name}")
+            print(f"Features: {features}")
+        
         data_pipeline.run()
     
     if args.fetch_data_alpha:
