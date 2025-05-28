@@ -11,12 +11,12 @@ The purpose of this is that beating the market is _near_ impossible (considering
 ```
 
 ## config.yml structure
-This should serve as a template to how configs are added to new hypothesis'.
+This should serve as an example template to how features are selected to new hypothesis'.
 ```yml
 name: <name-of-the-hypothesis>
 
 required_features:
-    - f_1
-    - f_2
-    - ...
+  moving_averages: [5, 20, 50]  # Only these periods
+  time_of_day: []  # All "features" from the function
+  volatility_features: ['atr', 'volatility_regime'] # Only these features from the function
 ```

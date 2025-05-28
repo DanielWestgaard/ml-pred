@@ -2,8 +2,10 @@ hypothesis:
     name: 1_session_based_tod_anomalies
 
 required_features:
-    - time_of_day  # Looking at the FG file, this function creates TOD and session features
-    - volatility_regimes
-    - time_of_week
-    - day_of_week
-    - time_of_month  # Some FX pairs behave differently on Fridays and Mondays
+    # time_features: ['hour_sin', 'hour_cos', 'session']
+    time_of_day: []  # all features
+    time_of_week: []
+    time_of_month: []
+    day_of_week: []
+    average_true_range: []
+    volatility_regimes: []
