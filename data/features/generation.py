@@ -550,7 +550,7 @@ class FeatureGenerator():
         """Extract time of day features from datetime index."""
         # Extract hour of day
         hour = self.df.index.hour
-        print("BLABLABLA")
+        
         all_features, values = data_utils.check_feature_specification(self.selected_features, 'time_of_day')
         
         # Create cyclical features using sine and cosine transformations

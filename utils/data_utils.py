@@ -240,17 +240,17 @@ def check_feature_specification(selected_features : list, method : str):
         - values of feature: list of the features values, selected_features[method]. Eg. selected_features['time_of_day']
             If the selected_features is empty, method returns None. If it exists, we just return that list.
     """
-    logging.debug(f"Inside check_feature_specification() to determine how to generate hypotheses feature: {method}")
+    logging.debug(f"----- Inside check_feature_specification() to determine how to generate hypotheses feature: {method} -----")
     # First, check if the whole list is full or empty.
     if selected_features is None:  # List is empty ->  All features are to be generated
-        print(f"selected_features (the whole list) is empty. All features are to be generated of method {method}")
+        logging.debug(f"selected_features (the whole list) is empty. All features are to be generated of method {method}")
         return True, None
     else:  # List has specified features to generate
         # As the method has been (manually) called, I'm ASSUMING this feature is in the list (so won't check)
         values = selected_features[method]
         if not values:  # List of feature values is empty -> Not (granularly) specified features, meaning all features in that feature method will be generated
-            print(f"List of feature ({method}) values is empty: {values}. Will still generate all features.")
+            logging.debug(f"List of feature ({method}) values is empty: {values}. Will still generate all features.")
             return True, values
         else:  # Not all features are to be generated, but specified ones
-            print(f"List of feature ({method}) values contains values: {values}. Will only generate those.")
+            logging.debug(f"List of feature ({method}) values contains values: {values}. Will only generate those.")
             return False, values
