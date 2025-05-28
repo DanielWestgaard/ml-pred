@@ -217,3 +217,16 @@ def save_processed_file(filepath, processed_data : pd.DataFrame):
     logging.info("Successfully saved file!")
     
     return output_path
+
+
+def check_feature_specification():
+    """
+    This is a method to determine the scope of feature selection, meant to be used in Feature generation methods.
+    
+    1. Is the method being ran with or without a hypothesis (meaning is the selected_features, names, array empty)?
+    2. If yes, (assuming the method is called because it is in the list) has 'this' feature (eg. time_of_day) specified
+    excactly what (granular) features it wants to be generated (eg. hour_sin, hour_cos)? Or is the list empty - Meaning all
+    features of the will be generated anyway (in that method).
+    3. If yes, and the feature name has specific feature values, only those will be generated.
+    """
+    pass
