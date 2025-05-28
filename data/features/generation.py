@@ -556,16 +556,13 @@ class FeatureGenerator():
         # Create cyclical features using sine and cosine transformations
         # This preserves the cyclical nature (hour 23 is close to hour 0)
         if all_features or not all_features and 'hour_sin' in values:
-            print("yep")
             self.df['hour_sin'] = np.sin(2 * np.pi * hour / 24)
         if all_features or not all_features and 'hour_cos' in values:
-            print("yep")
             self.df['hour_cos'] = np.cos(2 * np.pi * hour / 24)
         
         # You can also add a categorical feature for specific trading sessions
         # For example: Asian, European, and US sessions
         if all_features or not all_features and 'session' in values:
-            print("yep")
             self.df['session'] = pd.cut(
                 hour, 
                 bins=[-1, 6, 14, 23],

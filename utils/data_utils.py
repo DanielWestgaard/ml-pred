@@ -221,16 +221,22 @@ def save_processed_file(filepath, processed_data : pd.DataFrame):
 
 def check_feature_specification(selected_features : list, method : str):
     """
-    This is a method to determine the scope of feature selection, meant to be used in Feature generation methods.
+    This is a method to determine the scope of feature selection, and is meant to be used in feature generation methods.
+    This is what I mean with the weird wording: { feature_name_1: [feature_value_1, feature_value_2], feature_name_2: []}
     
-    1. Is the method being ran with or without a hypothesis (meaning is the selected_features, names, array empty)?
-    2. If yes, (assuming the method is called because it is in the list) has 'this' feature (eg. time_of_day) specified
-    excactly what (granular) features it wants to be generated (eg. hour_sin, hour_cos)? Or is the list empty - Meaning all
-    features of the will be generated anyway (in that method).
-    3. If yes, and the feature name has specific feature values, only those will be generated.
+    The approach is as follows:
+        - Is the method being ran with or without a hypothesis (meaning is the selected_features array empty)?
+            - If the list is empty, this function returns True (as it is no hypotheis ran) and None (since the method naturally has no specified feature values).
+            - If the list has values (we're assuming the method is called because it is in the list): Does 'this' feature (eg. time_of_day) have specified
+            excactly what (granular) features it wants to be generated (eg. hour_sin, hour_cos)? Or is the list empty - Meaning all features of the will be
+            generated anyway (in that method).
+                - If the feature values (eg. time_of_day) does not have feature names (eg. hour_sin, hour_cos), function returns True (as all features of the method
+                then is meant to be generated), and the feature values (selected_features[method]) (though this will be an empty list: '[]').
+                - If the feature values (eg. time_of_day) has feature names (eg. hour_sin, hour_cos), function returns False (as not all features of the method will
+                be generated), and the these values (selected_features[method]). Meaning only those feature names will be generated.
     
     Args:
-        - selected_features: The whole list of key-value pairs. Eg. Looks like this: { time_of_day: ['hour_sin', 'hour_cos'], 'time_of_week': [] }
+        - selected_features: The whole list of key-value pairs. Eg. Looks like this: { time_of_day: ['hour_sin', 'hour_cos'], 'time_of_week': [], 'moving_average': [] }
         - method: The feature/method you are using/calculating the feature/featuers of. Eg. 'time_of_day' or 'moving_averages'
     
     Returns:
