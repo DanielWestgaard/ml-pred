@@ -550,18 +550,8 @@ class FeatureGenerator():
         """Extract time of day features from datetime index."""
         # Extract hour of day
         hour = self.df.index.hour
-        print("he")
-        if self.selected_features is None:  # provided list of specific features and list of the feature is empty
-            all_features = True  # var to specify wether all features are to be generated
-            print("list is empty")
-        else:  # list has specified features to generate, and method has been called so ASSUMING this feature is in the list
-            values = self.selected_features['time_of_day']  # Having this in the first if test will fail, so must have it here
-            if not values:  # empty -> not specified, so still generating all features
-                all_features = True
-                print(f"list provided: {values}")
-            else:
-                all_features = False
-                print(f"list provided: {values}")
+        print("BLABLABLA")
+        all_features, values = data_utils.check_feature_specification(self.selected_features, 'time_of_day')
         
         # Create cyclical features using sine and cosine transformations
         # This preserves the cyclical nature (hour 23 is close to hour 0)
