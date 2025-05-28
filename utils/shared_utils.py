@@ -1,5 +1,7 @@
 import logging
 import os
+import sys
+import yaml
 
 
 def load_secrets(desired_keys:dict, file_path="secrets/secrets.txt"):
@@ -76,3 +78,32 @@ def get_available_filename(directory:str, filename:str):
             return new_filename
         counter += 1
         
+def handle_hypothesis_source(config):
+    """
+    Function for checking provided config.yml source for hypothesis, and returning the name and features.
+    
+    Args:
+        config: Path for the config.yml, specifying hypothesis and selected features.
+    
+    returns:
+        hypothesis_name, features object
+    """
+    # Load YAML file
+    try:
+        with open(config, 'r') as file:
+            config_h = yaml.safe_load(file)
+    except FileNotFoundError:
+        logging.error(f"Error: Config file '{config}' not found!")
+        sys.exit(1)
+    except yaml.YAMLError as e:
+        logging.error(f"Error parsing YAML file: {e}")
+        sys.exit(1)
+    
+    # Extract values
+    hypothesis_name = config_h['hypothesis']['name']
+    features = config_h['required_features']
+    
+    logging.info(f"Hypothesis: {hypothesis_name}")
+    logging.debug(f"Features: {features}")
+    
+    return hypothesis_name, features
