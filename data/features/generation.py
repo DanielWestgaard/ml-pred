@@ -60,11 +60,12 @@ class FeatureGenerator():
             if self.selected_features is not None:
                 logging.debug(f"Starting to generate selected features: {self.selected_features}")
 
-                for feature in self.selected_features:
+                for feature_name, feature_value in self.selected_features.items():
                     try:
-                        self.safely_execute(feature, feature)
+                        # print(f"{feature_name} : {feature_value}")
+                        self.safely_execute(feature_name, feature_name)
                     except Exception as e:
-                        logging.error(f"Unable to execute {feature}, make sure the feature name matches excactly with the one implemented: {e}")
+                        logging.error(f"Unable to execute {feature_name}, make sure the feature name matches excactly with the one implemented: {e}")
             
             else:
                 logging.debug("Starting to generate all features...")
@@ -549,19 +550,37 @@ class FeatureGenerator():
         """Extract time of day features from datetime index."""
         # Extract hour of day
         hour = self.df.index.hour
+        print("he")
+        if self.selected_features is None:  # provided list of specific features and list of the feature is empty
+            all_features = True  # var to specify wether all features are to be generated
+            print("list is empty")
+        else:  # list has specified features to generate, and method has been called so ASSUMING this feature is in the list
+            values = self.selected_features['time_of_day']  # Having this in the first if test will fail, so must have it here
+            if not values:  # empty -> not specified, so still generating all features
+                all_features = True
+                print(f"list provided: {values}")
+            else:
+                all_features = False
+                print(f"list provided: {values}")
         
         # Create cyclical features using sine and cosine transformations
         # This preserves the cyclical nature (hour 23 is close to hour 0)
-        self.df['hour_sin'] = np.sin(2 * np.pi * hour / 24)
-        self.df['hour_cos'] = np.cos(2 * np.pi * hour / 24)
+        if all_features or not all_features and 'hour_sin' in values:
+            print("yep")
+            self.df['hour_sin'] = np.sin(2 * np.pi * hour / 24)
+        if all_features or not all_features and 'hour_cos' in values:
+            print("yep")
+            self.df['hour_cos'] = np.cos(2 * np.pi * hour / 24)
         
         # You can also add a categorical feature for specific trading sessions
         # For example: Asian, European, and US sessions
-        self.df['session'] = pd.cut(
-            hour, 
-            bins=[-1, 6, 14, 23],
-            labels=['asian_session', 'european_session', 'us_session']
-        )
+        if all_features or not all_features and 'session' in values:
+            print("yep")
+            self.df['session'] = pd.cut(
+                hour, 
+                bins=[-1, 6, 14, 23],
+                labels=['asian_session', 'european_session', 'us_session']
+            )
     
     def time_of_week(self):
         """Extract time of week features from datetime index."""
