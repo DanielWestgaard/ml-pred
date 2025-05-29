@@ -9,3 +9,4 @@ required_features:
     day_of_week: []
     average_true_range: []
     volatility_regimes: []
+    fx_activity_profile: []

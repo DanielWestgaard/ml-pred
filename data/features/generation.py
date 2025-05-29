@@ -82,6 +82,7 @@ class FeatureGenerator():
                 self.safely_execute("volume_rate_of_change", "Volume Rate of Change")
                 self.safely_execute("on_balance_volume", "On Balance Volume")
                 self.safely_execute("volume_profile", "Volume Profile")
+                self.safely_execute("fx_activity_profile", "Activity Profile (tick volume)")  # This is only meant for Forex pairs, but maybe selection will sort this out anyways?
                 self.safely_execute("vwap", "VWAP")
                 self.safely_execute("money_flow_index", "Money Flow Index")
                 logging.debug("Finished calculating Volume-Based Features")
@@ -343,6 +344,12 @@ class FeatureGenerator():
         # Clean up
         if 'typical_price' in self.df.columns:
             self.df = self.df.drop(['typical_price'], axis=1)
+    
+    # FX doesn't have traditional volume, so you might use tick volume or spread-based proxies
+    def fx_activity_profile(self, lookback=20):
+        """Create activity profile using price movement and spread changes"""
+        # Use high-low range as activity proxy
+        self.df['activity'] = (self.df['high'] - self.df['low']) / self.df['close']
     
     def vwap(self, period=1):
         """Calculate daily Volume Weighted Average Price."""
