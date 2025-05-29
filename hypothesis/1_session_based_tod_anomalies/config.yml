@@ -10,3 +10,5 @@ required_features:
     volatility_regimes: []
     fx_activity_profile: []
     fx_trading_sessions: []
+    session_timing_features: []
+    session_transition_features: []

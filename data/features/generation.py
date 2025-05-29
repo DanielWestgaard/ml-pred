@@ -101,6 +101,8 @@ class FeatureGenerator():
                 self.safely_execute("time_of_week", "Time of Week")
                 self.safely_execute("time_of_month", "Time of Month")
                 self.safely_execute("fx_trading_sessions", "Trading Sessions")  # Also meant for Forex
+                self.safely_execute("session_timing_features", "Session timing features")
+                self.safely_execute("session_transition_features", "Session Transition Features")
                 self.safely_execute("seasonal_decompose", "Seasonal Decomposition")
                 self.safely_execute("stl_decomposition", "STL Decomposition")
                 self.safely_execute("mstl_decomposition", "MSTL Decomposition")
@@ -656,7 +658,94 @@ class FeatureGenerator():
             'off_hours': 0.2
         }
         self.df['session_intensity'] = self.df['primary_session'].map(session_intensity)
+    
+    def session_timing_features(self):
+        """Add granular timing features within sessions"""
+        hour = self.df.index.hour
+        minute = self.df.index.minute
         
+        # Minutes since session start/end
+        def minutes_since_session_start(row):
+            hour, minute = row.name.hour, row.name.minute
+            current_minutes = hour * 60 + minute
+            
+            # London session start: 7:00 GMT
+            if hour >= 7 and hour < 16:
+                london_start = 7 * 60  # 7:00 in minutes
+                return current_minutes - london_start
+            
+            # NY session start: 12:00 GMT  
+            elif hour >= 12 and hour < 21:
+                ny_start = 12 * 60  # 12:00 in minutes
+                return current_minutes - ny_start
+                
+            # Asian session (wraps around midnight)
+            elif hour >= 22 or hour < 8:
+                if hour >= 22:
+                    asian_start = 22 * 60  # 22:00 in minutes
+                    return current_minutes - asian_start
+                else:
+                    # After midnight
+                    asian_start = 22 * 60  # Previous day 22:00
+                    return (current_minutes + 24*60) - asian_start
+            
+            return 0
+        
+        self.df['minutes_since_session_start'] = self.df.apply(minutes_since_session_start, axis=1)
+        
+        # Session progress (0-1, how far through the session)
+        session_lengths = {
+            'london_primary': 9 * 60,      # 9 hours
+            'ny_primary': 9 * 60,          # 9 hours  
+            'asian_primary': 10 * 60,      # 10 hours
+            'london_ny_overlap': 4 * 60,   # 4 hours
+            'off_hours': 1 * 60            # 1 hour (arbitrary)
+        }
+        
+        self.df['session_progress'] = self.df.apply(
+            lambda row: min(1.0, row['minutes_since_session_start'] / 
+                          session_lengths.get(row['primary_session'], 60)), axis=1
+        )
+        
+        # Cyclical session progress
+        progress = self.df['session_progress']
+        self.df['session_progress_sin'] = np.sin(2 * np.pi * progress)
+        self.df['session_progress_cos'] = np.cos(2 * np.pi * progress)
+    
+    def session_transition_features(self):
+        """Features for session handoffs and transitions"""
+        hour = self.df.index.hour
+        minute = self.df.index.minute
+        
+        # Minutes until next major session
+        def minutes_to_next_session(row):
+            hour, minute = row.name.hour, row.name.minute
+            current_minutes = hour * 60 + minute
+            
+            # Next session start times (in minutes from midnight)
+            session_starts = [7*60, 12*60, 16*60, 21*60, 22*60, (7+24)*60]  # Include next day London
+            
+            for start_time in session_starts:
+                if start_time > current_minutes:
+                    return start_time - current_minutes
+            
+            # If past all sessions today, next is tomorrow's London
+            return (7*60 + 24*60) - current_minutes
+        
+        self.df['minutes_to_next_session'] = self.df.apply(minutes_to_next_session, axis=1)
+        
+        # Session transition flags (30 minutes before/after session starts)
+        transition_window = 30  # minutes
+        self.df['session_transition'] = (
+            (self.df['minutes_to_next_session'] <= transition_window) |
+            (self.df['minutes_since_session_start'] <= transition_window)
+        ).astype(int)
+        
+        # Specific transition periods
+        self.df['pre_london'] = ((hour == 6) & (minute >= 30) | (hour == 7) & (minute < 30)).astype(int)
+        self.df['pre_ny'] = ((hour == 11) & (minute >= 30) | (hour == 12) & (minute < 30)).astype(int)
+        self.df['london_close'] = ((hour == 15) & (minute >= 30) | (hour == 16) & (minute < 30)).astype(int)
+    
     def seasonal_decompose(self, period=160):
         """
         Perform seasonal decomposition on the closing price.
