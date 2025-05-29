@@ -2,11 +2,11 @@ hypothesis:
     name: 1_session_based_tod_anomalies
 
 required_features:
-    # time_features: ['hour_sin', 'hour_cos', 'session']
-    time_of_day: ['hour_sin', 'hour_cos']  # all features
+    time_of_day: []  # all features
     time_of_week: []
     time_of_month: []
     day_of_week: []
     average_true_range: []
     volatility_regimes: []
     fx_activity_profile: []
+    fx_trading_sessions: []

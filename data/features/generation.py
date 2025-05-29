@@ -100,6 +100,7 @@ class FeatureGenerator():
                 self.safely_execute("day_of_week", "Day of Week")
                 self.safely_execute("time_of_week", "Time of Week")
                 self.safely_execute("time_of_month", "Time of Month")
+                self.safely_execute("fx_trading_sessions", "Trading Sessions")  # Also meant for Forex
                 self.safely_execute("seasonal_decompose", "Seasonal Decomposition")
                 self.safely_execute("stl_decomposition", "STL Decomposition")
                 self.safely_execute("mstl_decomposition", "MSTL Decomposition")
@@ -566,15 +567,6 @@ class FeatureGenerator():
             self.df['hour_sin'] = np.sin(2 * np.pi * hour / 24)
         if all_features or not all_features and 'hour_cos' in values:
             self.df['hour_cos'] = np.cos(2 * np.pi * hour / 24)
-        
-        # You can also add a categorical feature for specific trading sessions
-        # For example: Asian, European, and US sessions
-        if all_features or not all_features and 'session' in values:
-            self.df['session'] = pd.cut(
-                hour, 
-                bins=[-1, 6, 14, 23],
-                labels=['asian_session', 'european_session', 'us_session']
-            )
     
     def time_of_week(self):
         """Extract time of week features from datetime index."""
@@ -622,6 +614,48 @@ class FeatureGenerator():
         # Create cyclical features
         self.df['day_of_week_sin'] = np.sin(2 * np.pi * day_of_week / 7)
         self.df['day_of_week_cos'] = np.cos(2 * np.pi * day_of_week / 7)
+    
+    def fx_trading_sessions(self):
+        """
+        Create proper FX trading session features with overlaps.
+        Sessions based on GMT/UTC time zones (adjust for your data's timezone).
+        """
+        hour = self.df.index.hour
+        
+        # Define FX sessions (in GMT/UTC)
+        # Asian: 22:00-08:00 GMT (Tokyo: 7am-5pm JST)
+        # London: 07:00-16:00 GMT (London: 8am-5pm GMT)
+        # New York: 12:00-21:00 GMT (NY: 8am-5pm EST)
+        
+        # Individual session indicators
+        self.df['asian_session'] = ((hour >= 22) | (hour < 8)).astype(int)
+        self.df['london_session'] = ((hour >= 7) & (hour < 16)).astype(int)
+        self.df['ny_session'] = ((hour >= 12) & (hour < 21)).astype(int)
+        
+        # Session overlaps (where the magic happens)
+        self.df['asian_london_overlap'] = ((hour >= 7) & (hour < 8)).astype(int)
+        self.df['london_ny_overlap'] = ((hour >= 12) & (hour < 16)).astype(int)
+        
+        # Primary session (highest priority)
+        conditions = [
+            (hour >= 12) & (hour < 16),  # London-NY overlap (highest volume)
+            (hour >= 7) & (hour < 12),   # London only
+            (hour >= 16) & (hour < 21),  # NY only  
+            ((hour >= 22) | (hour < 7)), # Asian only
+            True  # Other times (low volume)
+        ]
+        choices = ['london_ny_overlap', 'london_primary', 'ny_primary', 'asian_primary', 'off_hours']
+        self.df['primary_session'] = np.select(conditions, choices)
+        
+        # Session intensity (0-1 scale based on typical volume)
+        session_intensity = {
+            'london_ny_overlap': 1.0,
+            'london_primary': 0.8,
+            'ny_primary': 0.7,
+            'asian_primary': 0.6,
+            'off_hours': 0.2
+        }
+        self.df['session_intensity'] = self.df['primary_session'].map(session_intensity)
         
     def seasonal_decompose(self, period=160):
         """
