@@ -613,9 +613,23 @@ class FeatureGenerator():
         """Extract day of week features from datetime index."""
         day_of_week = self.df.index.dayofweek  # Monday=0, Sunday=6
         
-        # Create cyclical features
+        # Standard cyclical features
         self.df['day_of_week_sin'] = np.sin(2 * np.pi * day_of_week / 7)
         self.df['day_of_week_cos'] = np.cos(2 * np.pi * day_of_week / 7)
+        
+        # FX-specific day flags
+        self.df['is_monday'] = (day_of_week == 0).astype(int)  # Gap trading
+        self.df['is_friday'] = (day_of_week == 4).astype(int)  # Position unwinding
+        self.df['is_midweek'] = (day_of_week.isin([1, 2, 3])).astype(int)  # Trend days
+        
+        # Weekend proximity
+        self.df['friday_afternoon'] = (
+            (day_of_week == 4) & (self.df.index.hour >= 15)
+        ).astype(int)
+        
+        self.df['sunday_evening'] = (
+            (day_of_week == 6) & (self.df.index.hour >= 20)
+        ).astype(int)
     
     def fx_trading_sessions(self):
         """
