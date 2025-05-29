@@ -60,11 +60,12 @@ class FeatureGenerator():
             if self.selected_features is not None:
                 logging.debug(f"Starting to generate selected features: {self.selected_features}")
 
-                for feature in self.selected_features:
+                for feature_name, feature_value in self.selected_features.items():
                     try:
-                        self.safely_execute(feature, feature)
+                        # print(f"{feature_name} : {feature_value}")
+                        self.safely_execute(feature_name, feature_name)
                     except Exception as e:
-                        logging.error(f"Unable to execute {feature}, make sure the feature name matches excactly with the one implemented: {e}")
+                        logging.error(f"Unable to execute {feature_name}, make sure the feature name matches excactly with the one implemented: {e}")
             
             else:
                 logging.debug("Starting to generate all features...")
@@ -81,6 +82,7 @@ class FeatureGenerator():
                 self.safely_execute("volume_rate_of_change", "Volume Rate of Change")
                 self.safely_execute("on_balance_volume", "On Balance Volume")
                 self.safely_execute("volume_profile", "Volume Profile")
+                self.safely_execute("fx_activity_profile", "Activity Profile (tick volume)")  # This is only meant for Forex pairs, but maybe selection will sort this out anyways?
                 self.safely_execute("vwap", "VWAP")
                 self.safely_execute("money_flow_index", "Money Flow Index")
                 logging.debug("Finished calculating Volume-Based Features")
@@ -98,6 +100,9 @@ class FeatureGenerator():
                 self.safely_execute("day_of_week", "Day of Week")
                 self.safely_execute("time_of_week", "Time of Week")
                 self.safely_execute("time_of_month", "Time of Month")
+                self.safely_execute("fx_trading_sessions", "Trading Sessions")  # Also meant for Forex
+                self.safely_execute("session_timing_features", "Session timing features")
+                self.safely_execute("session_transition_features", "Session Transition Features")
                 self.safely_execute("seasonal_decompose", "Seasonal Decomposition")
                 self.safely_execute("stl_decomposition", "STL Decomposition")
                 self.safely_execute("mstl_decomposition", "MSTL Decomposition")
@@ -343,6 +348,12 @@ class FeatureGenerator():
         if 'typical_price' in self.df.columns:
             self.df = self.df.drop(['typical_price'], axis=1)
     
+    # FX doesn't have traditional volume, so you might use tick volume or spread-based proxies
+    def fx_activity_profile(self, lookback=20):
+        """Create activity profile using price movement and spread changes"""
+        # Use high-low range as activity proxy
+        self.df['activity'] = (self.df['high'] - self.df['low']) / self.df['close']
+    
     def vwap(self, period=1):
         """Calculate daily Volume Weighted Average Price."""
         # Assuming you have date info in index or as a column
@@ -550,18 +561,14 @@ class FeatureGenerator():
         # Extract hour of day
         hour = self.df.index.hour
         
+        all_features, values = data_utils.check_feature_specification(self.selected_features, 'time_of_day')
+        
         # Create cyclical features using sine and cosine transformations
         # This preserves the cyclical nature (hour 23 is close to hour 0)
-        self.df['hour_sin'] = np.sin(2 * np.pi * hour / 24)
-        self.df['hour_cos'] = np.cos(2 * np.pi * hour / 24)
-        
-        # You can also add a categorical feature for specific trading sessions
-        # For example: Asian, European, and US sessions
-        self.df['session'] = pd.cut(
-            hour, 
-            bins=[-1, 6, 14, 23],
-            labels=['asian_session', 'european_session', 'us_session']
-        )
+        if all_features or not all_features and 'hour_sin' in values:
+            self.df['hour_sin'] = np.sin(2 * np.pi * hour / 24)
+        if all_features or not all_features and 'hour_cos' in values:
+            self.df['hour_cos'] = np.cos(2 * np.pi * hour / 24)
     
     def time_of_week(self):
         """Extract time of week features from datetime index."""
@@ -606,10 +613,153 @@ class FeatureGenerator():
         """Extract day of week features from datetime index."""
         day_of_week = self.df.index.dayofweek  # Monday=0, Sunday=6
         
-        # Create cyclical features
+        # Standard cyclical features
         self.df['day_of_week_sin'] = np.sin(2 * np.pi * day_of_week / 7)
         self.df['day_of_week_cos'] = np.cos(2 * np.pi * day_of_week / 7)
         
+        # FX-specific day flags
+        self.df['is_monday'] = (day_of_week == 0).astype(int)  # Gap trading
+        self.df['is_friday'] = (day_of_week == 4).astype(int)  # Position unwinding
+        self.df['is_midweek'] = (day_of_week.isin([1, 2, 3])).astype(int)  # Trend days
+        
+        # Weekend proximity
+        self.df['friday_afternoon'] = (
+            (day_of_week == 4) & (self.df.index.hour >= 15)
+        ).astype(int)
+        
+        self.df['sunday_evening'] = (
+            (day_of_week == 6) & (self.df.index.hour >= 20)
+        ).astype(int)
+    
+    def fx_trading_sessions(self):
+        """
+        Create proper FX trading session features with overlaps.
+        Sessions based on GMT/UTC time zones (adjust for your data's timezone).
+        """
+        hour = self.df.index.hour
+        
+        # Define FX sessions (in GMT/UTC)
+        # Asian: 22:00-08:00 GMT (Tokyo: 7am-5pm JST)
+        # London: 07:00-16:00 GMT (London: 8am-5pm GMT)
+        # New York: 12:00-21:00 GMT (NY: 8am-5pm EST)
+        
+        # Individual session indicators
+        self.df['asian_session'] = ((hour >= 22) | (hour < 8)).astype(int)
+        self.df['london_session'] = ((hour >= 7) & (hour < 16)).astype(int)
+        self.df['ny_session'] = ((hour >= 12) & (hour < 21)).astype(int)
+        
+        # Session overlaps (where the magic happens)
+        self.df['asian_london_overlap'] = ((hour >= 7) & (hour < 8)).astype(int)
+        self.df['london_ny_overlap'] = ((hour >= 12) & (hour < 16)).astype(int)
+        
+        # Primary session (highest priority)
+        conditions = [
+            (hour >= 12) & (hour < 16),  # London-NY overlap (highest volume)
+            (hour >= 7) & (hour < 12),   # London only
+            (hour >= 16) & (hour < 21),  # NY only  
+            ((hour >= 22) | (hour < 7)), # Asian only
+            True  # Other times (low volume)
+        ]
+        choices = ['london_ny_overlap', 'london_primary', 'ny_primary', 'asian_primary', 'off_hours']
+        self.df['primary_session'] = np.select(conditions, choices)
+        
+        # Session intensity (0-1 scale based on typical volume)
+        session_intensity = {
+            'london_ny_overlap': 1.0,
+            'london_primary': 0.8,
+            'ny_primary': 0.7,
+            'asian_primary': 0.6,
+            'off_hours': 0.2
+        }
+        self.df['session_intensity'] = self.df['primary_session'].map(session_intensity)
+    
+    def session_timing_features(self):
+        """Add granular timing features within sessions"""
+        hour = self.df.index.hour
+        minute = self.df.index.minute
+        
+        # Minutes since session start/end
+        def minutes_since_session_start(row):
+            hour, minute = row.name.hour, row.name.minute
+            current_minutes = hour * 60 + minute
+            
+            # London session start: 7:00 GMT
+            if hour >= 7 and hour < 16:
+                london_start = 7 * 60  # 7:00 in minutes
+                return current_minutes - london_start
+            
+            # NY session start: 12:00 GMT  
+            elif hour >= 12 and hour < 21:
+                ny_start = 12 * 60  # 12:00 in minutes
+                return current_minutes - ny_start
+                
+            # Asian session (wraps around midnight)
+            elif hour >= 22 or hour < 8:
+                if hour >= 22:
+                    asian_start = 22 * 60  # 22:00 in minutes
+                    return current_minutes - asian_start
+                else:
+                    # After midnight
+                    asian_start = 22 * 60  # Previous day 22:00
+                    return (current_minutes + 24*60) - asian_start
+            
+            return 0
+        
+        self.df['minutes_since_session_start'] = self.df.apply(minutes_since_session_start, axis=1)
+        
+        # Session progress (0-1, how far through the session)
+        session_lengths = {
+            'london_primary': 9 * 60,      # 9 hours
+            'ny_primary': 9 * 60,          # 9 hours  
+            'asian_primary': 10 * 60,      # 10 hours
+            'london_ny_overlap': 4 * 60,   # 4 hours
+            'off_hours': 1 * 60            # 1 hour (arbitrary)
+        }
+        
+        self.df['session_progress'] = self.df.apply(
+            lambda row: min(1.0, row['minutes_since_session_start'] / 
+                          session_lengths.get(row['primary_session'], 60)), axis=1
+        )
+        
+        # Cyclical session progress
+        progress = self.df['session_progress']
+        self.df['session_progress_sin'] = np.sin(2 * np.pi * progress)
+        self.df['session_progress_cos'] = np.cos(2 * np.pi * progress)
+    
+    def session_transition_features(self):
+        """Features for session handoffs and transitions"""
+        hour = self.df.index.hour
+        minute = self.df.index.minute
+        
+        # Minutes until next major session
+        def minutes_to_next_session(row):
+            hour, minute = row.name.hour, row.name.minute
+            current_minutes = hour * 60 + minute
+            
+            # Next session start times (in minutes from midnight)
+            session_starts = [7*60, 12*60, 16*60, 21*60, 22*60, (7+24)*60]  # Include next day London
+            
+            for start_time in session_starts:
+                if start_time > current_minutes:
+                    return start_time - current_minutes
+            
+            # If past all sessions today, next is tomorrow's London
+            return (7*60 + 24*60) - current_minutes
+        
+        self.df['minutes_to_next_session'] = self.df.apply(minutes_to_next_session, axis=1)
+        
+        # Session transition flags (30 minutes before/after session starts)
+        transition_window = 30  # minutes
+        self.df['session_transition'] = (
+            (self.df['minutes_to_next_session'] <= transition_window) |
+            (self.df['minutes_since_session_start'] <= transition_window)
+        ).astype(int)
+        
+        # Specific transition periods
+        self.df['pre_london'] = ((hour == 6) & (minute >= 30) | (hour == 7) & (minute < 30)).astype(int)
+        self.df['pre_ny'] = ((hour == 11) & (minute >= 30) | (hour == 12) & (minute < 30)).astype(int)
+        self.df['london_close'] = ((hour == 15) & (minute >= 30) | (hour == 16) & (minute < 30)).astype(int)
+    
     def seasonal_decompose(self, period=160):
         """
         Perform seasonal decomposition on the closing price.

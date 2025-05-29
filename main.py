@@ -11,6 +11,7 @@ from data.providers.capital_com import ProviderCapitalCom
 from data.providers.alpha_vantage import ProviderAlphaVantage
 import utils.alpha_vantage_utils as alpha_utils
 from data.pipelines.engineer_pipeline import EngineeringPipeline
+from utils import shared_utils
 
 
 def parse_arguments():
@@ -35,23 +36,7 @@ def main():
     if args.engineer_data:        
         if args.hypothesis:
             logging.info("Trying to run data engineering with hypothesis config file.")
-            # Load YAML file
-            try:
-                with open(args.hypothesis, 'r') as file:
-                    config_h = yaml.safe_load(file)
-            except FileNotFoundError:
-                logging.error(f"Error: Config file '{args.hypothesis}' not found!")
-                sys.exit(1)
-            except yaml.YAMLError as e:
-                logging.error(f"Error parsing YAML file: {e}")
-                sys.exit(1)
-            
-            # Extract values
-            hypothesis_name = config_h['hypothesis']['name']
-            features = config_h['required_features']
-            
-            logging.info(f"---------- Hypothesis: {hypothesis_name} ----------")
-            logging.info(f"Features: {features}")
+            hypothesis_name, features = shared_utils.handle_hypothesis_source(args.hypothesis)
             
             data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv", 
                                                 selected_features=features)

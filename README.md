@@ -1,8 +1,11 @@
-# ml-pred
-The goal of this repository, is to create a complete prediction and trading system that uses machine learning to predict intraday financial market data. I will also have a complete data pipeline, backtesting system of model, and live data functionality.<br>
-It's important to note that this will probably not be the very best system, as I will also use this as a place to learn and take the time I need to really create this system myself.
+# ml-pred 🚀
+The goal of this repository is to **explore possible ways to profit off the financial market**. In this current status of the repo, I'm **focusing on exploring different hypotheses** to find possible inefficiencies or micro-opportunities. Things that the "bigger institutions" might not prioritize because it is "so small" and not worth their time and resources.<br>
+In previous tries, I've explored the challenge of "**beating the market**". However, after many months, being a beginner and much reading on the topic, this is **not feasible** for a lone (beginner) developer. There are far too many institutions, competition and manipulation in the market for _me_ to be able to pull that off. Hence, I've **narrowed down my goal** to not fight or beat _them_, but **understand them and use _my_ strengths**: Under the radar (physically, and in the market), agile (big corps can't change as quick as lone me), "fail fast"-mindset, and most importantly: "**Big firms have to deploy large amounts of capital efficiently. They ignore things that can’t scale to billions in value. This gives me space.**"
+![Curent approach](images/current_approach_2025-05-27.png)
+> [!NOTE]
+> It's important know that this will probably not be the very best system, as I will also use this as a place to learn and take the time I need to really create and understand the different concepts of such a system myself.
 
-## Project outline (planned)
+## Project outline (planned) 🏗️
 ```
 ├── main.py                 # Main orchestrator for running all other "systems"
 ├── data/                   # Data engineering
@@ -24,7 +27,7 @@ It's important to note that this will probably not be the very best system, as I
     └── secrets.txt         # Main secret file
 ```
 
-## Setup repo
+## Setup repo 🛠️
 If this is the first time using the repo, follow these instructions:
 1. Clone the environment (eg.): ``` git clone git@github.com:DanielWestgaard/ml-pred.git ```
 2. Create a virtual environment (in root of project): ``` python3.11 -m venv venv ```
@@ -35,11 +38,11 @@ If this is the first time using the repo, follow these instructions:
     - **For using Capital.com's [API](https://open-api.capital.com/)**: 
         1. Make sure you're following these [getting started steps](https://open-api.capital.com/#section/Getting-started).
         2. Paste in these variables in the secrets-file:
-        ```
-        API_KEY_CAP=
-        PASSWORD_CAP=
-        EMAIL=
-        ```
+            ```
+            API_KEY_CAP=
+            PASSWORD_CAP=
+            EMAIL=
+            ```
         3. Fill in the values with from your own properties.
     - **For using [Alpha Vantage API](https://www.alphavantage.co/documentation/)**:
         1. Create your own [API token](https://www.alphavantage.co/support/#api-key).
@@ -50,7 +53,7 @@ If this is the first time using the repo, follow these instructions:
     - [Rainbow CSV](https://marketplace.visualstudio.com/items/?itemName=mechatroner.rainbow-csv): Prettier view of .csv-files.
     - [Material Icon Theme](https://marketplace.visualstudio.com/items/?itemName=PKief.material-icon-theme): Helps massively when you have many folders (icon some names).
 
-## Running ```main.py```
+## Running ```main.py``` 👨‍✈️
 ```main.py``` is the main orchestrator of this whole project. If you want to run entire componentes, or test out smaller stuff, this is where you do it from.<br>
 Make sure you've activated your venv, before running ```python main.py```.<br>
 All other components will have an argument you can run ```main``` with. Eg. ```python main.py --fetch-data-capcom```.
@@ -62,7 +65,7 @@ All other components will have an argument you can run ```main``` with. Eg. ```p
 - **Run Data Processing and Engineering Pipeline**: ...
 - **Run Data Pipeline with a Hypothesis**: ```python main.py --engineer-data --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"```
 
-## Nice to know
+## Nice to know 💡
 Trying to follow best practice for python, I have...
 - Added readme's to each (important) folder to more granular descriptions and information about the different systems, and also trying to update them with a ```Structure``` paragraph for easier overview short descriptions.
 - Using methods with prefix ```_``` before the method name to indicate a "private" method (/helper function). Eg. ```_plot_fs_analysis_cfs()```.
