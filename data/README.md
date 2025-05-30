@@ -105,12 +105,12 @@ The ```run()``` has some functionality that excludes some features from normaliz
 > [!NOTE]
 > There are several steps in the normalization process that exludes some features with particular prefixes (eg. like starting with ```target_```) from normalization.
 
-### About target_hypothesis.py
+### About Creating Target Column for the Hypothesis - target_hypothesis.py
 If the pipeline is being ran with ```hypothesis``` argument, the selection process is skipped and this is ran after generation.<br>
 It's basically setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file.<br>
 For a more through and technical description, see the ```README.md``` documentation under the ```hypothesis/``` folder.
 > [!IMPORTANT]
-> Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
+> When adding functionality for new hypotheses: Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
 
 ### Feature Selection - selection.py
 The feature selection file performs _very simple_ Feature Selection, by using different techniques/methods, to then select the features that two or more techniques agree about:
