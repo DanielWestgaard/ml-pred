@@ -21,7 +21,7 @@ def parse_arguments():
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
     parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Alpha Vantage API.')
-    parser.add_argument('--engineer-data', action='store_true', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
+    parser.add_argument('--engineer-data', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
     parser.add_argument('--hypothesis', '-hyp', default=False, help='Run data engineering pipeline with hypoethesis: Provide path to the config.yml file.')
     
 
@@ -36,12 +36,11 @@ def main():
     if args.engineer_data:        
         if args.hypothesis:
             logging.info("Trying to run data engineering with hypothesis config file.")
-            hypothesis_name, features = shared_utils.handle_hypothesis_source(args.hypothesis)
             
-            data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv", 
-                                                selected_features=features)
+            data_pipeline = EngineeringPipeline(raw_dataset=args.engineer_data or "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv", 
+                                                hypothesis_source=args.hypothesis)
         else:
-            data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
+            data_pipeline = EngineeringPipeline(raw_dataset=args.engineer_data or "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
         
         data_pipeline.run()
     

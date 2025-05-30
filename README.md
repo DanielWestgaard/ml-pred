@@ -5,6 +5,17 @@ In previous tries, I've explored the challenge of "**beating the market**". Howe
 > [!NOTE]
 > It's important know that this will probably not be the very best system, as I will also use this as a place to learn and take the time I need to really create and understand the different concepts of such a system myself.
 
+## The hypothesis approach 🧑‍🚀
+The approach of using different hypotheses to test and find possible inefficiencies is as follows:
+1. **Data Processing**: Cleaning and Validating
+2. **Data Engineering**: Creates features relevant for the hypothesis (e.g., volatility, returns, time of day). This will naturally not use Feature Selection.
+3. **Data Labeling**: Create labels based on the inefficiency hypothesis. Eg:
+    ```python
+    # Label: Binary momentum success after 5 green candles?
+    df['momentum_success'] = ((df['close'].shift(-5) - df['close']) > 0.0005)
+    ```
+4. **Machine Learning Model Training**: Train and evaluate ML models.
+
 ## Project outline (planned) 🏗️
 ```
 ├── main.py                 # Main orchestrator for running all other "systems"

@@ -152,14 +152,19 @@ class FeatureTransformer(BaseProcessor):
                     logging.debug(f"Renamed duplicate column '{col}' to '{new_name}'")
     
     def normalize(self, preserve_original=False, window=20):
-        """Perform normalization"""
+        """Perform normalization. Excludes columns that starts with 'target_ (among aother things).'"""
         # First identify categorical columns to exclude from normalization
         categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns.tolist()
         
         # Also identify binary/regime columns (that might be numeric but shouldn't be normalized)
         regime_indicators = [col for col in self.df.columns if 
                             any(x in col for x in ['regime', 'is_', 'in_value_area', 'state'])]
-        exclude_from_normalization = categorical_cols + regime_indicators
+        
+        # Exclude target columns from normalization
+        target_columns = [col for col in self.df.columns if col.startswith('target_')]
+        
+        # Combine all exclusions
+        exclude_from_normalization = categorical_cols + regime_indicators + target_columns
         
         # Group 1: Price data (OHLC) - Z-score normalize
         price_cols = ['open', 'high', 'low', 'close']
@@ -176,6 +181,7 @@ class FeatureTransformer(BaseProcessor):
         z_score_features = [col for col in self.df.columns if 
                         any(x in col for x in ['roc_', 'macd', 'vwap', 'log_return', 'distance', 'vol_', 
                                             'atr', 'bb_width', 'obv', 'cci', 'adx'])]
+        # *** IMPORTANT: Filter out target columns from z_score_features ***
         z_score_features = [col for col in z_score_features if col not in exclude_from_normalization]
         
         # Group 4: Bounded indicators - Min-Max
