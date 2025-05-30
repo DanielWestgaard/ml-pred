@@ -12,7 +12,7 @@ from data.processing.validation import DataValidator
 from data.features.generation import FeatureGenerator
 from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
-from data.hypothesis.target_hypothesis import TargetHypothesis
+from data.features.target_hypothesis import TargetHypothesis
 
 
 class EngineeringPipeline():

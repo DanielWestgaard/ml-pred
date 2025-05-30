@@ -26,10 +26,8 @@ Will also use this for planning.
 ├── features/                   # Feature engineering
 │   ├── generation.py           # Generating features with simplistic error handling
 │   ├── normalization.py        # Rescaling numeric data to a standard range
+│   ├── target_hypothesis.py    # Functions realated to getting/calculating- and setting target to the selected hypothesis (based on 'name' var in the hypotheses config.yml-file)
 │   └── selection.py            # Various techniques (3) to select the "most efficient" features
-│
-├── hypothesis/                 
-│   └── target_hypothesis.py    # Functions realated to getting/calculating- and setting target to the selected hypothesis (based on 'name' var in the hypotheses config.yml-file)
 │
 ├── pipeline/                   # Pipeline orchestration
 │   └── engineer_pipeline.py    # Main orchestrator and pipeline for engineering historical data
@@ -111,7 +109,7 @@ The feature selection file performs _very simple_ Feature Selection, by using di
 2. **XGB Regression**: "Ranks" features based on importance, and selects features above ```threshold```-variable.
 3. **Recursive Feature Elimination**: Fits  a model (XGB Regressor) and removes the weakest feature (or features) until the specified number of features is reached.
 
-## About hypothesis/
+### About target_hypothesis.py
 If the pipeline is being ran with ```hypothesis``` argument, the selection process is skipped and this is ran after generation.<br>
 It's basically setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file.<br>
 For a more through and technical description, see the ```README.md``` documentation under the ```hypothesis/``` folder.
