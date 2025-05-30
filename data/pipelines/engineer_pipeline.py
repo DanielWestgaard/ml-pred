@@ -27,7 +27,7 @@ class EngineeringPipeline():
         Args:
             - raw_dataset: path to the raw dataset (csv format).
             - output_path: potential output path for processed data (csv format).
-            - hypothesis_source: The path of the hypothesis config.yml-file.
+            - hypothesis_source: For running pipeline with hypothesis - The path of the hypothesis config.yml-file.
             xxx selected_features: Feature Generator only generates those features, and pipeline skips Selesction.
         """
         self.output_path = output_path

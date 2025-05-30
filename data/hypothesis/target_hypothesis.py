@@ -1,10 +1,11 @@
 import logging
 import inspect
 
+from data.processing.base_processor import BaseProcessor
 from utils import data_utils
 
 
-class TargetHypothesis():
+class TargetHypothesis(BaseProcessor):
     """Change target of dataset according to the hypothesis."""
     def __init__(self, dataset, hypothesis:str):
         """
