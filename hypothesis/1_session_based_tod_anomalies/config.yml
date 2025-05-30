@@ -1,5 +1,5 @@
 hypothesis:
-    name: 1_session_based_tod_anomalies
+    name: session_based_tod_anomalies
 
 required_features:
     time_of_day: []  # all features

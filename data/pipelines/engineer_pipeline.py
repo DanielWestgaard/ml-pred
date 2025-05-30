@@ -1,3 +1,4 @@
+import inspect
 import logging
 import os
 import sys
@@ -11,10 +12,11 @@ from data.processing.validation import DataValidator
 from data.features.generation import FeatureGenerator
 from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
+from data.hypothesis.target_hypothesis import TargetHypothesis
 
 
 class EngineeringPipeline():
-    def __init__(self, raw_dataset:str, output_path:str = None, selected_features:list = None):
+    def __init__(self, raw_dataset:str, output_path:str = None, hypothesis_source:str = None):
         """
         Pipeline and orchestrator for processing and engineering raw datasets
         into data ready to be used for training.
@@ -23,17 +25,22 @@ class EngineeringPipeline():
         (of they exist). This also makes the pipeline skip the Feature Selection step entirely.
         
         Args:
-            raw_dataset: path to the raw dataset (csv format).
-            output_path: potential output path for processed data (csv format).
-            selected_features: Feature Generator only generates those features, and pipeline skips Selesction.
+            - raw_dataset: path to the raw dataset (csv format).
+            - output_path: potential output path for processed data (csv format).
+            - hypothesis_source: The path of the hypothesis config.yml-file.
+            xxx selected_features: Feature Generator only generates those features, and pipeline skips Selesction.
         """
         self.output_path = output_path
         self.raw_data_path = raw_dataset
-        self.selected_features = selected_features
 
         # Loading data
         self.df, self.original_df = data_utils.check_and_return_df(raw_dataset)
         logging.debug("Engineering Pipeline - Successfully loaded data!")
+        
+        if hypothesis_source is not None:
+            self.hypothesis_name, self.selected_features = shared_utils.handle_hypothesis_source(hypothesis_source)
+        else:
+            self.selected_features = None
         
         # Initializing processors
         self.cleaner = DataCleaner(raw_dataset=self.df)
@@ -62,12 +69,16 @@ class EngineeringPipeline():
             logging.debug(f"User provided specific features to be generated: {self.selected_features}")
             self.skip_selection = True
             self.feature_generator = FeatureGenerator(self.df, selected_features=self.selected_features)
+            self.df = self.feature_generator.run()
+            
+            # Also change target to the hypothesis
+            self.hypo = TargetHypothesis(self.df, self.hypothesis_name or "session_based_tod_anomalies_X")
+            self.df = self.hypo.run()
         else:
             logging.debug("User did not provide any specific features to be generated - generating all features.")
             self.skip_selection = False
             self.feature_generator = FeatureGenerator(self.df)
-        
-        self.df = self.feature_generator.run()
+            self.df = self.feature_generator.run()
         
         # Transformation, scaling, handle missing values, etc. of newly generated features
         self.transformation = FeatureTransformer(self.df)

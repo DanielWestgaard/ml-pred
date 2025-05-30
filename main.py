@@ -36,10 +36,9 @@ def main():
     if args.engineer_data:        
         if args.hypothesis:
             logging.info("Trying to run data engineering with hypothesis config file.")
-            hypothesis_name, features = shared_utils.handle_hypothesis_source(args.hypothesis)
             
             data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv", 
-                                                selected_features=features)
+                                                hypothesis_source=args.hypothesis)
         else:
             data_pipeline = EngineeringPipeline(raw_dataset="storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
         
