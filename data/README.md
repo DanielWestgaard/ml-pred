@@ -102,6 +102,15 @@ The ```run()``` has some functionality that excludes some features from normaliz
   - One-hot encoded regime columns with prefixes like ```vol_regime_```, ```adx_regime_```, ```trend_regime_```, ```state_```
 - **Ordinal Numeric Codes**:
   - ```market_state``` (0-8 representing different market states)
+> [!NOTE]
+> There are several steps in the normalization process that exludes some features with particular prefixes (eg. like starting with ```target_```) from normalization.
+
+### About target_hypothesis.py
+If the pipeline is being ran with ```hypothesis``` argument, the selection process is skipped and this is ran after generation.<br>
+It's basically setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file.<br>
+For a more through and technical description, see the ```README.md``` documentation under the ```hypothesis/``` folder.
+> [!IMPORTANT]
+> Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
 
 ### Feature Selection - selection.py
 The feature selection file performs _very simple_ Feature Selection, by using different techniques/methods, to then select the features that two or more techniques agree about:
@@ -109,10 +118,7 @@ The feature selection file performs _very simple_ Feature Selection, by using di
 2. **XGB Regression**: "Ranks" features based on importance, and selects features above ```threshold```-variable.
 3. **Recursive Feature Elimination**: Fits  a model (XGB Regressor) and removes the weakest feature (or features) until the specified number of features is reached.
 
-### About target_hypothesis.py
-If the pipeline is being ran with ```hypothesis``` argument, the selection process is skipped and this is ran after generation.<br>
-It's basically setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file.<br>
-For a more through and technical description, see the ```README.md``` documentation under the ```hypothesis/``` folder.
+
 
 ## About providers/ 
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>

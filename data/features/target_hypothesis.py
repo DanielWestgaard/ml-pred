@@ -90,3 +90,6 @@ class TargetHypothesis(BaseProcessor):
                 logging.error(f"Target hypothesis column is not possible to calculate based on missing needed features: 'atr' and 'primary_session'")
         except Exception as e:
             logging.error(f"Unable to calculate the target hypothesis column: {e}")
+    
+    # IMPORTANT FOR FURTHER DEVELOPMENT: Remember to add the prefix 'target_*' for the target column to the hypothesis.
+    # This is because the normalization step after generation and this step will not normalize columns that starts with 'target_'.
