@@ -68,18 +68,25 @@ class TargetHypothesis(BaseProcessor):
         This target captures when future volatility is abnormally high relative to that specific session's
         typical behavior - directly testing the hypothesis that sessions behave differently.
         """
-        # Calculate session-specific volatility norms
-        self.df['session_vol_mean'] = self.df.groupby('fx_trading_sessions')['true_range'].transform(
-            lambda x: x.rolling(window=100, min_periods=20).mean()
-        )
-        self.df['session_vol_std'] = self.df.groupby('fx_trading_sessions')['true_range'].transform(
-            lambda x: x.rolling(window=100, min_periods=20).std()
-        )
-        # Future volatility (next 30 minutes assuming 1-min bars)
-        self.df['future_volatility'] = self.df['true_range'].shift(-30).rolling(window=30).mean()
-        
-        self.df['target_vol_anomaly'] = (
-            (self.df['future_volatility'] > self.df['session_vol_mean'] + 1.5 * self.df['session_vol_std'])
-        ).astype(int)
-        logging.debug(f"Target column for hypothesis session_based_tod_anomalies: {self.df['target_vol_anomaly']}")
-        
+        try:
+            if 'atr' in self.df.columns and 'primary_session' in self.df.columns:
+                # Calculate session-specific ATR norms using primary_session feature
+                self.df['session_atr_mean'] = self.df.groupby('primary_session')['atr'].transform(
+                    lambda x: x.rolling(window=100, min_periods=20).mean()
+                )
+                self.df['session_atr_std'] = self.df.groupby('primary_session')['atr'].transform(
+                    lambda x: x.rolling(window=100, min_periods=20).std()
+                )
+                
+                # Future volatility (next 30 minutes, assuming 1-min bars)
+                self.df['future_atr'] = self.df['atr'].shift(-30).rolling(window=30).mean()
+                # Target: Future volatility > session mean + 1.5 * session std
+                self.df['target_session_vol_anomaly'] = (
+                    (self.df['future_atr'] > self.df['session_atr_mean'] + 1.5 * self.df['session_atr_std'])
+                ).astype(int)
+                
+                logging.debug(f"Target column, target_session_vol_anomaly, for hypothesis session_based_tod_anomalies created.")
+            else:
+                logging.error(f"Target hypothesis column is not possible to calculate based on missing needed features: 'atr' and 'primary_session'")
+        except Exception as e:
+            logging.error(f"Unable to calculate the target hypothesis column: {e}")
