@@ -12,6 +12,7 @@ from data.providers.alpha_vantage import ProviderAlphaVantage
 import utils.alpha_vantage_utils as alpha_utils
 from data.pipelines.engineer_pipeline import EngineeringPipeline
 from utils import shared_utils
+from data.plot.plot_data import PlotData
 
 
 def parse_arguments():
@@ -21,9 +22,9 @@ def parse_arguments():
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
     parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Alpha Vantage API.')
+    parser.add_argument('--plot-data', '-pd', default=False, help='Plot dataset containing candlestick data.')
     parser.add_argument('--engineer-data', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
     parser.add_argument('--hypothesis', '-hyp', default=False, help='Run data engineering pipeline with hypoethesis: Provide path to the config.yml file.')
-    
 
     return parser.parse_args()
 
@@ -33,7 +34,7 @@ def main():
     log_utils._is_configured = False
     logging = log_utils.setup_logging(name="historical_data", type="data", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
-    if args.engineer_data:        
+    if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         if args.hypothesis:
             logging.info("Trying to run data engineering with hypothesis config file.")
             
@@ -43,6 +44,10 @@ def main():
             data_pipeline = EngineeringPipeline(raw_dataset=args.engineer_data or "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
         
         data_pipeline.run()
+    
+    if args.plot_data:
+        plot_data = PlotData(dataset=args.plot_data)
+        plot_data.run()
     
     if args.fetch_data_alpha:
         provider = ProviderAlphaVantage()

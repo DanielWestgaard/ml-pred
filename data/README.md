@@ -32,6 +32,9 @@ Will also use this for planning.
 ├── pipeline/                   # Pipeline orchestration
 │   └── engineer_pipeline.py    # Main orchestrator and pipeline for engineering historical data
 │
+├── plot/                       # Functionality for plotting datasets
+│   └── plot_data.py            # Simple plotting
+│
 └── README.md
 ```
 
@@ -68,6 +71,7 @@ Simple validation class that performs validation of data after cleaning, to veri
 - **Price Movements** for extreme or suspicous patterns.
 - **Data Completeness**
 The second class is responsible for validating the features after feature generation.
+
 
 
 ## About features/
@@ -161,3 +165,8 @@ provider.fetch_and_save_historical_data(symbol="NVDA", timeframe="1min",
 - [API documentation](https://www.alphavantage.co/documentation/)
 - [Get free API token](https://www.alphavantage.co/support/#api-key)
 - [Premium API key](https://www.alphavantage.co/premium/) for actually utilizing the providers' possibilities large datasets.
+
+
+
+## About plot/
+Simple functionality to plot candlestick data.
