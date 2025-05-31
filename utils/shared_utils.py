@@ -112,9 +112,15 @@ def handle_hypothesis_source(config):
 def safely_execute(self, function_name:str):  # Similar to the one in features/generation.py
     """
     Safely execute a function method with proper error handling.
+    The reason for this need is to dynamically run a function given some input or need, or looping through
+    specific functions.
     
     Args:
-
+        - self: instance of the class calling this method.
+        - function_name: the name of the function you want to run.
+    
+    Returns:
+        - True (success) or False (error) based on success.
     """
     logging.debug(f"Starting shared utility method safely_execute().")
     
