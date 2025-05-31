@@ -40,25 +40,13 @@ class TargetHypothesis(BaseProcessor):
             successfull = False
             for hypotehesis in functions:
                 if hypotehesis == self.hypothesis:  # The one hypothesis user wants to target
-                    successfull = self.safely_execute(hypotehesis)
+                    successfull = shared_utils.safely_execute(self, hypotehesis)
             if not successfull:
                 logging.error(f"Could not find {self.hypothesis} in the list of functions: {functions}. Make sure your name matches the function you want to target!")
         except Exception as e:
             logging.error(f"Error trying to find and execute hypothesis method: {e}")
         
         return self.df
-    
-    def safely_execute(self, function_name):  # Similar to the one in features/generation.py
-        """Safely execute a hypothesis method with proper error handling."""
-        try:
-            method = getattr(self, function_name)
-            method()
-            
-            logging.debug(f"Hypothesis {function_name} successfully changed target.")
-            return True
-        except Exception as e:
-            logging.error(f"Error running {function_name} method: {e}")
-            return False
     
     def session_based_tod_anomalies(self):
         """
