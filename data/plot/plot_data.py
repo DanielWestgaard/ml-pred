@@ -40,12 +40,18 @@ class PlotData(BaseProcessor):
             if self.view in function:
                 shared_utils.safely_execute(self, function)
     
-    def simple_candle_plot(self):
-        """Simplistic plotting."""
+    def simple_go_candle_plot(self):
+        """Simplistic plotting. Suitable for shorter datasets."""
         self.fig = go.Figure(data=go.Candlestick(x=self.df['Date'],
                             open=self.df['Open'],
                             high=self.df['High'],
                             low=self.df['Low'],
                             close=self.df['Close']))
+        self.fig.update_layout(
+            xaxis=dict(type='category'),  # Can help with performance
+        )
         self.fig.show()
-        
+    
+    def simpler_xxx_candle_plot(self):
+        """Simplistic plotting. Suitable for medium to large-minus datasets."""
+        pass
