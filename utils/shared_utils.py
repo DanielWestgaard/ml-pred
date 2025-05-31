@@ -109,6 +109,26 @@ def handle_hypothesis_source(config):
     
     return hypothesis_name, features
 
+def safely_execute(self, function_name:str, path_to_class:str):  # Similar to the one in features/generation.py
+    """
+    Safely execute a function method with proper error handling.
+    
+    Args:
+
+    """
+    logging.debug(f"Starting shared utility method safely_execute().")
+    
+    try:
+        # Run the method
+        method = getattr(self, function_name)
+        method()
+        
+        logging.debug(f"Successfully ran function {function_name}().")
+        return True
+    except Exception as e:
+        logging.error(f"Error trying to run {function_name} method: {e}")
+        return False
+
 def list_of_functions_in_class(path_to_class:str, never_mind_functions:list = ['__init__', 'run', 'safely_execute']):
     """
     A simple function that gets and returns a list of existing functions based on the

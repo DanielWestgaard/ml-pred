@@ -18,14 +18,15 @@ class PlotData(BaseProcessor):
             - dataset: Dataset containing open, high, low, close, volume, and date (-time). Can be
             either path to .csv-file or pandas.DataFrame.
             - view: What kind of view you want to use. Standard is 'simple'. The different kinds:
-                ['simple', ]
+                ['simple', '']
         """
         try:
             # Load dataset based on format
             self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
+            self.class_path = 'data.plot.plot_data.PlotData'
             # Available plot functions 
-            plot_functions = shared_utils.list_of_functions_in_class(path_to_class='data1.plot.plot_data.PlotData')
+            self.plot_functions = shared_utils.list_of_functions_in_class(path_to_class=self.class_path)
             
             # Set view
             self.view = view
@@ -35,7 +36,9 @@ class PlotData(BaseProcessor):
     
     def run(self):
         """Run plotting of data."""
-        
+        for function in self.plot_functions:
+            if self.view in function:
+                shared_utils.safely_execute(self, function, self.class_path)
     
     def simple_candle_plot(self):
         """Simplistic plotting."""
