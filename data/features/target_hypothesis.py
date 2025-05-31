@@ -3,6 +3,7 @@ import inspect
 
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
+from utils import shared_utils
 
 
 class TargetHypothesis(BaseProcessor):
@@ -33,11 +34,7 @@ class TargetHypothesis(BaseProcessor):
         logging.info("---------- Running Hypothesis Targeting ----------")
         
         # Making a list of existing methods in this class
-        functions = []
-        never_mind = ['__init__', 'run', 'safely_execute']
-        for method in inspect.getmembers(TargetHypothesis, predicate=inspect.isfunction):
-            if method[0] not in never_mind:  # Won't add the 'basic' funtions, only the hypothesis ones
-                functions.append(method[0])
+        functions = shared_utils.list_of_functions_in_class(path_to_class='data.features.target_hypothesis.TargetHypothesis')
         
         try:
             successfull = False

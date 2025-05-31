@@ -138,6 +138,7 @@ def list_of_functions_in_class(path_to_class:str, never_mind_functions:list = ['
             for method in inspect.getmembers(mod, predicate=inspect.isfunction):
                 if method[0] not in never_mind_functions:  # Won't add the 'basic' funtions, only the hypothesis ones
                     functions.append(method[0])
+            logging.debug(f"Successfully populated list with functions in provided class! {functions}")
         except Exception as e:
             logging.error(f"Unable to add functions to list: {e}")
         
