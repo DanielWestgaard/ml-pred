@@ -109,7 +109,7 @@ def handle_hypothesis_source(config):
     
     return hypothesis_name, features
 
-def safely_execute(self, function_name:str):  # Similar to the one in features/generation.py
+def safely_execute(self:object, function_name:str):  # Similar to the one in features/generation.py
     """
     Safely execute a function method with proper error handling.
     The reason for this need is to dynamically run a function given some input or need, or looping through
@@ -139,6 +139,7 @@ def list_of_functions_in_class(path_to_class:str, never_mind_functions:list = ['
     """
     A simple function that gets and returns a list of existing functions based on the
     provided path.
+    Note: There is room for improvements in this implementation!
     
     Args:
         - path_to_class: Path to the file and class of the desired functions list. Eg. 'my_package.my_module.MyClass'
@@ -158,7 +159,7 @@ def list_of_functions_in_class(path_to_class:str, never_mind_functions:list = ['
         mod = __import__(components[0])
         for comp in components[1:]:
             mod = getattr(mod, comp)
-        
+
         # Loop through functions in the class, and add them to the list (as long they are not part of never_mind_functions)
         try:
             for method in inspect.getmembers(mod, predicate=inspect.isfunction):

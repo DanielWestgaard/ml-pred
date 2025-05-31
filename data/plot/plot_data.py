@@ -38,7 +38,7 @@ class PlotData(BaseProcessor):
         """Run plotting of data."""
         for function in self.plot_functions:
             if self.view in function:
-                shared_utils.safely_execute(self, function, self.class_path)
+                shared_utils.safely_execute(self, function)
     
     def simple_candle_plot(self):
         """Simplistic plotting."""
