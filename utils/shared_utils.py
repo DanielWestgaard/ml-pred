@@ -109,7 +109,7 @@ def handle_hypothesis_source(config):
     
     return hypothesis_name, features
 
-def safely_execute(self, function_name:str, path_to_class:str):  # Similar to the one in features/generation.py
+def safely_execute(self, function_name:str):  # Similar to the one in features/generation.py
     """
     Safely execute a function method with proper error handling.
     
