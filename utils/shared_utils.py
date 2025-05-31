@@ -1,3 +1,4 @@
+import inspect
 import logging
 import os
 import sys
@@ -107,3 +108,40 @@ def handle_hypothesis_source(config):
     logging.debug(f"Features: {features}")
     
     return hypothesis_name, features
+
+def list_of_functions_in_class(path_to_class:str, never_mind_functions:list = ['__init__', 'run', 'safely_execute']):
+    """
+    A simple function that gets and returns a list of existing functions based on the
+    provided path.
+    
+    Args:
+        - path_to_class: Path to the file and class of the desired functions list. Eg. 'my_package.my_module.MyClass'
+        - never_min_functions: Optional. Functions you want excluded in the returned list. Default: ['__init__', 'run', 'safely_execute']
+    
+    Returns:
+        - List of existing funtions in the provided class (excluding never_min_functions).
+    """
+    logging.debug(f"Starting shared utility method list_of_functions_in_class().")
+    
+    # List to populate with functions
+    functions = []
+    
+    try:
+        # Strip path to class and import it
+        components = path_to_class.split('.')
+        mod = __import__(components[0])
+        for comp in components[1:]:
+            mod = getattr(mod, comp)
+        
+        # Loop through functions in the class, and add them to the list (as long they are not part of never_mind_functions)
+        try:
+            for method in inspect.getmembers(mod, predicate=inspect.isfunction):
+                if method[0] not in never_mind_functions:  # Won't add the 'basic' funtions, only the hypothesis ones
+                    functions.append(method[0])
+        except Exception as e:
+            logging.error(f"Unable to add functions to list: {e}")
+        
+    except Exception as e:
+        logging.error(f"Unable to open and import provided path_to_class, {path_to_class}. Error: {e}")
+    
+    return functions
