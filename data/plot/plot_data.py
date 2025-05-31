@@ -11,7 +11,7 @@ from utils import shared_utils
 
 class PlotData(BaseProcessor):
     """Plot simple candlestick data"""
-    def __init__(self, dataset, view:str = "simple", save_plot:bool = True):
+    def __init__(self, dataset, view:str = "large", save_plot:bool = False):
         """
         A plotting class used to view ohlcv charts.
         
@@ -19,7 +19,8 @@ class PlotData(BaseProcessor):
             - dataset: Dataset containing open, high, low, close, volume, and date (-time). Can be
             either path to .csv-file or pandas.DataFrame.
             - view: What kind of view you want to use. Standard is 'simple'. The different kinds:
-                ['simple', '']
+                ['small',       # using plotly.graph_objects to plot dataset, suitable for smaller datasets
+                'large']        # using mplfinance to plot dataset, suitable for larger datasets
         """
         try:
             # Load dataset based on format
@@ -31,6 +32,8 @@ class PlotData(BaseProcessor):
             
             # Set view
             self.view = view
+            
+            self.save_plot = save_plot
         except Exception as e:
             logging.error(f"Error initializing FeatureGenerator: {str(e)}")
             raise
@@ -40,11 +43,16 @@ class PlotData(BaseProcessor):
         # Make sure the columns are lower case
         self.df.columns = self.df.columns.str.lower()
         
+        # Plot dataset based on 'needs'
         for function in self.plot_functions:
             if self.view in function:
                 shared_utils.safely_execute(self, function)
+        
+        # Potentially store file
+        if self.save_plot:
+            pass
     
-    def simple_go_candle_plot(self):
+    def simple_small_go_candle_plot(self):
         """Simplistic plotting. Suitable for shorter datasets."""
         self.fig = go.Figure(data=go.Candlestick(x=self.df['date'],
                             open=self.df['open'],
@@ -56,10 +64,12 @@ class PlotData(BaseProcessor):
 
         self.fig.show()
     
-    def somple2_mplfinance_candle_plot(self):
+    def simple2_large_mplfinance_candle_plot(self):
         """Suitable for decent size datasets. Must be processed data."""
         # Convert date column to datetime if it's not already
         try:
+            # Only plotting OHLC - in case dataset is processed (don't need to plot features)
+            self.df = self.df[['date', 'open', 'high', 'low', 'close']]
             self.df['date'] = pd.to_datetime(self.df['date'])
         except Exception as e:
             logging.error(f"Unable to plot dataset because of error reading date column. Must be datetime format: {e}")
