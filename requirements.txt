@@ -12,3 +12,4 @@ xgboost
 pytest
 seaborn
 pyyaml
+mplfinance

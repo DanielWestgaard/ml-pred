@@ -2,6 +2,7 @@ import logging
 import plotly.graph_objects as go
 import pandas as pd
 import sys
+import mplfinance as mpf
 
 from utils import data_utils
 from data.processing.base_processor import BaseProcessor
@@ -36,22 +37,35 @@ class PlotData(BaseProcessor):
     
     def run(self):
         """Run plotting of data."""
+        # Make sure the columns are lower case
+        self.df.columns = self.df.columns.str.lower()
+        
         for function in self.plot_functions:
             if self.view in function:
                 shared_utils.safely_execute(self, function)
     
     def simple_go_candle_plot(self):
         """Simplistic plotting. Suitable for shorter datasets."""
-        self.fig = go.Figure(data=go.Candlestick(x=self.df['Date'],
-                            open=self.df['Open'],
-                            high=self.df['High'],
-                            low=self.df['Low'],
-                            close=self.df['Close']))
-        self.fig.update_layout(
-            xaxis=dict(type='category'),  # Can help with performance
-        )
+        self.fig = go.Figure(data=go.Candlestick(x=self.df['date'],
+                            open=self.df['open'],
+                            high=self.df['high'],
+                            low=self.df['low'],
+                            close=self.df['close']))
+
+        self.fig.update_layout(yaxis=dict(fixedrange=False))
+
         self.fig.show()
     
-    def simpler_xxx_candle_plot(self):
-        """Simplistic plotting. Suitable for medium to large-minus datasets."""
-        pass
+    def somple2_mplfinance_candle_plot(self):
+        """Suitable for decent size datasets. Must be processed data."""
+        # Convert date column to datetime if it's not already
+        try:
+            self.df['date'] = pd.to_datetime(self.df['date'])
+        except Exception as e:
+            logging.error(f"Unable to plot dataset because of error reading date column. Must be datetime format: {e}")
+        
+        # Set the date column as index
+        self.df = self.df.set_index('date')
+        
+        mpf.plot(self.df, type='candle', style='yahoo')
+        mpf.show()
