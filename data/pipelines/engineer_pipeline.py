@@ -102,5 +102,4 @@ class EngineeringPipeline():
         
         logging.info("---------- Data Pipeline Finished ----------")
         
-        # FIX: Return the processed DataFrame
         return self.df
