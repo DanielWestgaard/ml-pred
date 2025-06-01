@@ -169,6 +169,14 @@ provider.fetch_and_save_historical_data(symbol="NVDA", timeframe="1min",
 
 
 ## About plot/ 📊
-Simple functionality to plot candlestick data.<br>
-- One challenge I've met is plotting 1-minute candles: The **datasets gets very large**, making the plotting and interaction _slow_, but also incredibly _difficult to see what's going on_. Current solution is a little improved ```plotly.graph_objects``` implementation in the method ```simple_small_go_candle_plot()```. Though this can easily be even more improved.
-- Another issue is **plotting engineered data**. This has been _normalized_ (even ohlcv), so I can't really check to see if the cleaning was done correctly. Solution is to _plot and save dataset after cleaning_ it.
+Simple functionality to plot candlestick data. Can both be run from main.py, but also used in Data Pipeline, after cleaning.<br>
+Currently only using have to methods for using either ```plotly.graph_objects``` or ```mplfinance```.
+### How to use
+Recommended usage is either plotting raw data, or after cleaning the data (eg. in the Data Pipeline), as the final step in the Data Pipeline is normalization.<br>
+To simply plot candlestick data:
+```bash
+python main.py --plot-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250515_20250523.csv'
+```
+### Challenges
+- Plotting 1-minute candles the **datasets can get very large**, making the plotting and interaction _slow_, and also incredibly _difficult to see what's going on_. Current solution is a little improved ```plotly.graph_objects``` implementation in the method ```simple_small_go_candle_plot()```. Though this can easily be even more improved. Perhaps splitting up the plotting?
+- **Plotting engineered data**: As most of the data has been _normalized_ (even ohlcv), I can't really check to see if the cleaning was done correctly. Solution is to _plot and save dataset after cleaning_ it, as part of the Data Pipeline.
