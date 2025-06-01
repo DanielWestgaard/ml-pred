@@ -87,14 +87,16 @@ class PlotData(BaseProcessor):
     
     def simple_large_mplfinance_candle_plot(self):
         """Suitable for decent size datasets. Must be processed data."""
+        try:
+            self.df = self.df[['date', 'open', 'high', 'low', 'close']]
+        except:  # Coming from the data pipeline, df['date'] is df.index, hence directly calling 'date' will fail in such cases
+            self.df['date'] = self.df.index
+            self.df = self.df[['date', 'open', 'high', 'low', 'close']]
+        
         # Convert date column to datetime if it's not already
         try:
-            x = self.df['date']
-        except:
-            x = self.df.index
-        try:
             # Only plotting OHLC - in case dataset is processed (don't need to plot features)
-            self.df = self.df[['date', 'open', 'high', 'low', 'close']]
+            # self.df = self.df[['date', 'open', 'high', 'low', 'close']]
             self.df['date'] = pd.to_datetime(self.df['date'])
         except Exception as e:
             logging.error(f"Unable to plot dataset because of error reading date column. Must be datetime format: {e}")
