@@ -11,7 +11,7 @@ from utils import shared_utils
 
 class PlotData(BaseProcessor):
     """Plot simple candlestick data"""
-    def __init__(self, dataset, view:str = "large", save_plot:bool = False):
+    def __init__(self, dataset, view:str = "go", save_plot:bool = False):
         """
         A plotting class used to view ohlcv charts.
         
@@ -19,8 +19,8 @@ class PlotData(BaseProcessor):
             - dataset: Dataset containing open, high, low, close, volume, and date (-time). Can be
             either path to .csv-file or pandas.DataFrame.
             - view: What kind of view you want to use. Standard is 'simple'. The different kinds:
-                ['small',       # using plotly.graph_objects to plot dataset, suitable for smaller datasets
-                'large']        # using mplfinance to plot dataset, suitable for larger datasets
+                ['go',              # using plotly.graph_objects to plot dataset, suitable for smaller datasets
+                'mplfinance']       # using mplfinance to plot dataset, suitable for larger datasets
         """
         try:
             # Load dataset based on format
@@ -53,18 +53,31 @@ class PlotData(BaseProcessor):
             pass
     
     def simple_small_go_candle_plot(self):
-        """Simplistic plotting. Suitable for shorter datasets."""
+        """Very simplistic plotting, a somewhat optimized for 'larger' datasets."""
         self.fig = go.Figure(data=go.Candlestick(x=self.df['date'],
                             open=self.df['open'],
                             high=self.df['high'],
                             low=self.df['low'],
-                            close=self.df['close']))
+                            close=self.df['close'],
+                            hoverinfo='x+y'
+                            ))
 
-        self.fig.update_layout(yaxis=dict(fixedrange=False))
-
-        self.fig.show()
+        # Optimize layout
+        self.fig.update_layout(
+            yaxis=dict(fixedrange=False),
+            xaxis=dict(rangeslider=dict(visible=False)),  # Disable range slider
+            showlegend=False,
+            margin=dict(l=0, r=0, t=0, b=0),
+            plot_bgcolor='white'
+        )
+        
+        # Configure for better performance
+        self.fig.update_xaxes(showspikes=False)
+        self.fig.update_yaxes(showspikes=False)
+        
+        self.fig.show(config={'displayModeBar': False})  # Hide toolbar for speed
     
-    def simple2_large_mplfinance_candle_plot(self):
+    def simple_large_mplfinance_candle_plot(self):
         """Suitable for decent size datasets. Must be processed data."""
         # Convert date column to datetime if it's not already
         try:
@@ -79,3 +92,4 @@ class PlotData(BaseProcessor):
         
         mpf.plot(self.df, type='candle', style='yahoo')
         mpf.show()
+    

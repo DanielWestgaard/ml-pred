@@ -169,4 +169,6 @@ provider.fetch_and_save_historical_data(symbol="NVDA", timeframe="1min",
 
 
 ## About plot/
-Simple functionality to plot candlestick data.
+Simple functionality to plot candlestick data.<br>
+- One challenge I've met is plotting 1-minute candles: The datasets gets very large, making the plotting and interaction slow, but also incredibly difficult to actually see what's going on. Hence, I've also made a plotting function to plot a smaller portion of the dataset.
+- Another one is that plotting engineered. This has been normalized (ohlcv values), so I can't really check to see if the cleaning was done correctly.
