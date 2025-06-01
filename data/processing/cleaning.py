@@ -47,8 +47,7 @@ class DataCleaner(BaseProcessor):
         
         # If user wants to plot and save data
         if self.save_cleaned_data:
-            logging.debug(f"Will plot and save plot of Cleaned data.")
-            print(self.df)
+            logging.debug(f"Will plot and save plot of Cleaned data.")            
             plot_data = PlotData(dataset=self.df, save_plot=self.save_cleaned_data)
             plot_data.run()
         

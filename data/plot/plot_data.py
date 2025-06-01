@@ -50,7 +50,12 @@ class PlotData(BaseProcessor):
     
     def simple_small_go_candle_plot(self):
         """Very simplistic plotting, a somewhat optimized for 'larger' datasets."""
-        self.fig = go.Figure(data=go.Candlestick(x=self.df['date'],
+        try:
+            x = self.df['date']
+        except:
+            x = self.df.index
+        
+        self.fig = go.Figure(data=go.Candlestick(x=x,
                             open=self.df['open'],
                             high=self.df['high'],
                             low=self.df['low'],
