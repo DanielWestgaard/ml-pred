@@ -13,7 +13,7 @@ import config.config as config
 
 class PlotData(BaseProcessor):
     """Plot simple candlestick data"""
-    def __init__(self, dataset, view:str = "mplfinance", save_plot:bool = False, storage_path:str = config.CLEANED_DATA_BASE_DIR, output_file:str = None):
+    def __init__(self, dataset, view:str = "go", save_plot:bool = False, storage_path:str = config.CLEANED_DATA_BASE_DIR, output_file:str = None):
         """
         A plotting class used to view ohlcv charts.
         
@@ -80,7 +80,7 @@ class PlotData(BaseProcessor):
         self.fig.update_xaxes(showspikes=False)
         self.fig.update_yaxes(showspikes=False)
         
-        self.fig.show(config={'displayModeBar': False})  # Hide toolbar for speed
+        self.fig.show()  # Hide toolbar for speed - config={'displayModeBar': False} inside show()
         
         if self.save_plot:
             self.fig.write_image(self.output_file)
