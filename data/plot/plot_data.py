@@ -1,3 +1,4 @@
+import datetime
 import logging
 import plotly.graph_objects as go
 import pandas as pd
@@ -7,11 +8,12 @@ import mplfinance as mpf
 from utils import data_utils
 from data.processing.base_processor import BaseProcessor
 from utils import shared_utils
+import config.config as config
 
 
 class PlotData(BaseProcessor):
     """Plot simple candlestick data"""
-    def __init__(self, dataset, view:str = "go", save_plot:bool = False):
+    def __init__(self, dataset, view:str = "mplfinance", save_plot:bool = False, storage_path:str = config.CLEANED_DATA_BASE_DIR, output_file:str = None):
         """
         A plotting class used to view ohlcv charts.
         
@@ -34,6 +36,8 @@ class PlotData(BaseProcessor):
             self.view = view
             
             self.save_plot = save_plot
+            self.plot_storage_path = storage_path
+            self.output_file = output_file or f"{self.plot_storage_path}/plot_{datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.png"
         except Exception as e:
             logging.error(f"Error initializing PlotData: {str(e)}")
             raise
@@ -79,11 +83,15 @@ class PlotData(BaseProcessor):
         self.fig.show(config={'displayModeBar': False})  # Hide toolbar for speed
         
         if self.save_plot:
-            self.fig.write_image("testing.png")
+            self.fig.write_image(self.output_file)
     
     def simple_large_mplfinance_candle_plot(self):
         """Suitable for decent size datasets. Must be processed data."""
         # Convert date column to datetime if it's not already
+        try:
+            x = self.df['date']
+        except:
+            x = self.df.index
         try:
             # Only plotting OHLC - in case dataset is processed (don't need to plot features)
             self.df = self.df[['date', 'open', 'high', 'low', 'close']]
@@ -96,6 +104,6 @@ class PlotData(BaseProcessor):
         
         mpf.plot(self.df, type='candle', style='yahoo')
         if self.save_plot:
-            mpf.plot(self.df, type='candle', style='yahoo', savefig='my_chart.png')
+            mpf.plot(self.df, type='candle', style='yahoo', savefig=self.output_file)
         mpf.show()
     
