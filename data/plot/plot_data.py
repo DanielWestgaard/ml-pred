@@ -35,7 +35,7 @@ class PlotData(BaseProcessor):
             
             self.save_plot = save_plot
         except Exception as e:
-            logging.error(f"Error initializing FeatureGenerator: {str(e)}")
+            logging.error(f"Error initializing PlotData: {str(e)}")
             raise
     
     def run(self):
@@ -47,10 +47,6 @@ class PlotData(BaseProcessor):
         for function in self.plot_functions:
             if self.view in function:
                 shared_utils.safely_execute(self, function)
-        
-        # Potentially store file
-        if self.save_plot:
-            pass
     
     def simple_small_go_candle_plot(self):
         """Very simplistic plotting, a somewhat optimized for 'larger' datasets."""
@@ -76,6 +72,9 @@ class PlotData(BaseProcessor):
         self.fig.update_yaxes(showspikes=False)
         
         self.fig.show(config={'displayModeBar': False})  # Hide toolbar for speed
+        
+        if self.save_plot:
+            self.fig.write_image("testing.png")
     
     def simple_large_mplfinance_candle_plot(self):
         """Suitable for decent size datasets. Must be processed data."""
@@ -91,5 +90,7 @@ class PlotData(BaseProcessor):
         self.df = self.df.set_index('date')
         
         mpf.plot(self.df, type='candle', style='yahoo')
+        if self.save_plot:
+            mpf.plot(self.df, type='candle', style='yahoo', savefig='my_chart.png')
         mpf.show()
     

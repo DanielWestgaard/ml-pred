@@ -168,7 +168,7 @@ provider.fetch_and_save_historical_data(symbol="NVDA", timeframe="1min",
 
 
 
-## About plot/
+## About plot/ 📊
 Simple functionality to plot candlestick data.<br>
-- One challenge I've met is plotting 1-minute candles: The datasets gets very large, making the plotting and interaction slow, but also incredibly difficult to actually see what's going on. Hence, I've also made a plotting function to plot a smaller portion of the dataset.
-- Another one is that plotting engineered. This has been normalized (ohlcv values), so I can't really check to see if the cleaning was done correctly.
+- One challenge I've met is plotting 1-minute candles: The **datasets gets very large**, making the plotting and interaction _slow_, but also incredibly _difficult to see what's going on_. Current solution is a little improved ```plotly.graph_objects``` implementation in the method ```simple_small_go_candle_plot()```. Though this can easily be even more improved.
+- Another issue is **plotting engineered data**. This has been _normalized_ (even ohlcv), so I can't really check to see if the cleaning was done correctly. Solution is to _plot and save dataset after cleaning_ it.

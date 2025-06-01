@@ -16,7 +16,7 @@ from data.features.target_hypothesis import TargetHypothesis
 
 
 class EngineeringPipeline():
-    def __init__(self, raw_dataset:str, output_path:str = None, hypothesis_source:str = None):
+    def __init__(self, raw_dataset:str, output_path:str = None, save_cleaned_data:bool = False, hypothesis_source:str = None):
         """
         Pipeline and orchestrator for processing and engineering raw datasets
         into data ready to be used for training.
@@ -42,8 +42,11 @@ class EngineeringPipeline():
         else:
             self.selected_features = None
         
+        # Potentially save cleaned dataset
+        self.save_cleaned_data = save_cleaned_data
+        
         # Initializing processors
-        self.cleaner = DataCleaner(raw_dataset=self.df)
+        self.cleaner = DataCleaner(raw_dataset=self.df, save_cleaned_data=save_cleaned_data)
     
     def run(self):
         """
@@ -56,7 +59,7 @@ class EngineeringPipeline():
         
         # Clean the data
         self.df = self.cleaner.run()
-        
+        sys.exit()
         # Validate
         self.validator = DataValidator(self.df)
         self.validator_results = self.validator.run()

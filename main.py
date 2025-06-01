@@ -35,18 +35,20 @@ def main():
     logging = log_utils.setup_logging(name="engineering", type="data", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
+        save_cleaned_data = True
         if args.hypothesis:
             logging.info("Trying to run data engineering with hypothesis config file.")
             
             data_pipeline = EngineeringPipeline(raw_dataset=args.engineer_data or "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv", 
-                                                hypothesis_source=args.hypothesis)
+                                                save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
         else:
-            data_pipeline = EngineeringPipeline(raw_dataset=args.engineer_data or "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv")
+            data_pipeline = EngineeringPipeline(raw_dataset=args.engineer_data or "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv",
+                                                save_cleaned_data = save_cleaned_data)
         
         data_pipeline.run()
     
     if args.plot_data:
-        plot_data = PlotData(dataset=args.plot_data)
+        plot_data = PlotData(dataset=args.plot_data, save_plot=False)
         plot_data.run()
     
     if args.fetch_data_alpha:
