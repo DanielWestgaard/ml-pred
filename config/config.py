@@ -35,6 +35,7 @@ ALPVAN_RAW_DATA_DIR = os.path.join(ALPVAN_BASE_STORAGE_DIR, 'raw')
 ALPVAN_RESPONSE_JSON_DIR = os.path.join(ALPVAN_BASE_STORAGE_DIR, 'saved_responses')
 # Data Engineering
 DATA_ENGINEERING_STATS_DIR = os.path.join(BASE_STORAGE_DIR, 'data_engineering_stats')
+CLEANED_DATA_BASE_DIR = os.path.join(DATA_ENGINEERING_STATS_DIR, 'cleaned_data')
 FE_SEL_BASE_DIR = os.path.join(DATA_ENGINEERING_STATS_DIR, 'fe_selection')
 
 

@@ -4,19 +4,21 @@ import numpy as np
 
 from data.processing.base_processor import BaseProcessor
 import utils.data_utils as data_utils
+from data.plot.plot_data import PlotData
 
 
 class DataCleaner(BaseProcessor):
-    def __init__(self, raw_dataset):
+    def __init__(self, raw_dataset, save_cleaned_data:bool = False):
         """
         Class for cleaning market data.
         
         Args:
             raw_dataset: path to the raw dataset (csv format). Can be either path to csv or already loaded DataFrame.
         """
-        
         # Load dataset based on format
         self.df, self.original_df = data_utils.check_and_return_df(raw_dataset)
+        # Potentially save dataset
+        self.save_cleaned_data = save_cleaned_data
         
     def run(self):
         """
@@ -42,6 +44,12 @@ class DataCleaner(BaseProcessor):
         self._handle_outliers()
         self._datatype_consistency()
         self._ohlc_validity()
+        
+        # If user wants to plot and save data
+        if self.save_cleaned_data:
+            logging.debug(f"Will plot and save plot of Cleaned data.")            
+            plot_data = PlotData(dataset=self.df, save_plot=self.save_cleaned_data)
+            plot_data.run()
         
         return self.df
         

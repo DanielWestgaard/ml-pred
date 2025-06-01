@@ -1,3 +1,4 @@
+import inspect
 import logging
 import os
 import sys
@@ -107,3 +108,68 @@ def handle_hypothesis_source(config):
     logging.debug(f"Features: {features}")
     
     return hypothesis_name, features
+
+def safely_execute(self:object, function_name:str):  # Similar to the one in features/generation.py
+    """
+    Safely execute a function method with proper error handling.
+    The reason for this need is to dynamically run a function given some input or need, or looping through
+    specific functions.
+    
+    Args:
+        - self: instance of the class calling this method.
+        - function_name: the name of the function you want to run.
+    
+    Returns:
+        - True (success) or False (error) based on success.
+    """
+    logging.debug(f"Starting shared utility method safely_execute().")
+    
+    try:
+        # Run the method
+        method = getattr(self, function_name)
+        method()
+        
+        logging.debug(f"Successfully ran function {function_name}().")
+        return True
+    except Exception as e:
+        logging.error(f"Error trying to run {function_name} method: {e}")
+        return False
+
+def list_of_functions_in_class(path_to_class:str, never_mind_functions:list = ['__init__', 'run', 'safely_execute']):
+    """
+    A simple function that gets and returns a list of existing functions based on the
+    provided path.
+    Note: There is room for improvements in this implementation!
+    
+    Args:
+        - path_to_class: Path to the file and class of the desired functions list. Eg. 'my_package.my_module.MyClass'
+        - never_min_functions: Optional. Functions you want excluded in the returned list. Default: ['__init__', 'run', 'safely_execute']
+    
+    Returns:
+        - List of existing funtions in the provided class (excluding never_min_functions).
+    """
+    logging.debug(f"Starting shared utility method list_of_functions_in_class().")
+    
+    # List to populate with functions
+    functions = []
+    
+    try:
+        # Strip path to class and import it
+        components = path_to_class.split('.')
+        mod = __import__(components[0])
+        for comp in components[1:]:
+            mod = getattr(mod, comp)
+
+        # Loop through functions in the class, and add them to the list (as long they are not part of never_mind_functions)
+        try:
+            for method in inspect.getmembers(mod, predicate=inspect.isfunction):
+                if method[0] not in never_mind_functions:  # Won't add the 'basic' funtions, only the hypothesis ones
+                    functions.append(method[0])
+            logging.debug(f"Successfully populated list with functions in provided class! {functions}")
+        except Exception as e:
+            logging.error(f"Unable to add functions to list: {e}")
+        
+    except Exception as e:
+        logging.error(f"Unable to open and import provided path_to_class, {path_to_class}. Error: {e}")
+    
+    return functions

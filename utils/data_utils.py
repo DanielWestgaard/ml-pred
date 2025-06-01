@@ -181,6 +181,11 @@ def save_processed_file(filepath, processed_data : pd.DataFrame):
     - Replace 'raw' with 'processed' in the filename (or add 'processed_' if 'raw' isn't found)
     - Save to ../processed/ directory
     
+    Note: As the method is saving the data, it's setting the index_label to 'date'. Using the Data Pipeline,
+    the cleaning file (method timestamp_alignment()) sets 'date' as index, but when saving file with 'date'
+    as index "the column gets 'lost' since indices don't have column names in the same way regular columns do.
+    Hence, we have to "manually name it" when storing.
+    
     Args:
         filepath: Original filepath, e.g. "storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv"
         
@@ -212,9 +217,12 @@ def save_processed_file(filepath, processed_data : pd.DataFrame):
     output_path = os.path.join(processed_dir, processed_filename)
     
     # Save the dataframe
-    processed_data.to_csv(output_path, index=True)
+    try:  # If df has 'date' as index (done in cleaning), we want to preserve the 'date' name of the column
+        processed_data.to_csv(output_path, index=True, index_label='date')
+    except:  # Might be failing because date is not the index? Saving standard just in case
+        processed_data.to_csv(output_path, index=True)
     
-    logging.info("Successfully saved file!")
+    logging.info(f"Successfully saved file! {output_path}")
     
     return output_path
 

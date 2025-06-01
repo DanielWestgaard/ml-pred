@@ -69,6 +69,9 @@ class FeatureGenerator():
             
             else:
                 logging.debug("Starting to generate all features...")
+                
+                # TODO: Instead of manually calling each file, consider using shared_utils.list_of_functions_in_class()
+                
                 # Price Action Features
                 self.safely_execute("moving_averages", "Moving Averages")
                 self.safely_execute("rate_of_change", "Rate of Change")
