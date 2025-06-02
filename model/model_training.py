@@ -47,6 +47,7 @@ class ModelTraining():
         # Find file matching provided model_type
         model_factory_dir = os.path.join(config.BASE_DIR, 'model', 'model_factory')
         model_implementation_list = os.listdir(model_factory_dir)
+        model_implementation_list.remove('__pycache__')  # No need to list this as it's not a model type
         
         found_model = False  # var for wether we find the model file or not
         model_module = None  # var for potential model import
