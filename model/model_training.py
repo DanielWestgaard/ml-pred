@@ -27,7 +27,7 @@ class ModelTraining():
             logging.error(f"Error initializing Model Training: {str(e)}")
             raise
     
-    def train(self):
+    def run(self):
         """
         Train initialized model type. Successfully training the model will store in according to
         the config.py-file.

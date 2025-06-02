@@ -91,8 +91,8 @@ def main():
         broker.end_session()
     
     if args.model_training:
-        model = ModelTraining(dataset=args.model_training, model_type='xgboost')
-        model.train()
+        model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')
+        model_training.run()
 
 if __name__=="__main__":
     main()
