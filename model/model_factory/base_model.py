@@ -1,0 +1,1 @@
+# Act as an interface for all model implementations
