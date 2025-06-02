@@ -39,9 +39,8 @@ class ModelTraining():
         
         self.model_module, self.module_path = self._get_implemented_models()
         
-        # Now you can use the imported module
-        # Example: if your model files have a class like XGBoostModel, DecisionTreeModel, etc.
-        # You might need to adapt this based on your actual class naming convention
+        # Using imported module
+        # Current implementation: if your model files have a class like XGBoostModel, DecisionTreeModel, etc.
         try:
             # Assuming each model file has a class that follows a naming pattern
             class_name = f"{self.model_type.title().replace('_', '')}Model"
