@@ -13,6 +13,7 @@ import utils.alpha_vantage_utils as alpha_utils
 from data.pipelines.engineer_pipeline import EngineeringPipeline
 from utils import shared_utils
 from data.plot.plot_data import PlotData
+from model.model_training import ModelTraining
 
 
 def parse_arguments():
@@ -90,7 +91,8 @@ def main():
         broker.end_session()
     
     if args.model_training:
-        
+        model = ModelTraining(dataset=args.model_training, model_type='xgboost')
+        model.train()
 
 if __name__=="__main__":
     main()
