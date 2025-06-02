@@ -37,12 +37,32 @@ class ModelTraining():
         """
         logging.info(f"Starting to train {self.model_type} model ...")
         
-        self._get_implemented_models()
+        self.model_module, self.module_path = self._get_implemented_models()
+        
+        # Now you can use the imported module
+        # Example: if your model files have a class like XGBoostModel, DecisionTreeModel, etc.
+        # You might need to adapt this based on your actual class naming convention
+        try:
+            # Assuming each model file has a class that follows a naming pattern
+            class_name = f"{self.model_type.title().replace('_', '')}Model"
+            model_class = getattr(self.model_module, class_name)
+            
+            # Instantiate and train the model
+            model_instance = model_class(self.df)
+            return model_instance.train()
+            
+        except AttributeError as e:
+            logging.error(f"Could not find expected class in {self.module_path}: {str(e)}")
+            return False
         
     def _get_implemented_models(self):
         """
-        Simple method to get implemented models by reading files in model_factory/ and matching
+        Method to get implemented models by reading files in model_factory/ and matching
         it with provided model_type.
+        
+        If it finds a match and successfully imports the module (model file), returns the
+        model_module and module_path.
+        Unsuccessfull will exit.
         """
         # Find file matching provided model_type
         model_factory_dir = os.path.join(config.BASE_DIR, 'model', 'model_factory')
@@ -56,7 +76,6 @@ class ModelTraining():
         for model_file in model_implementation_list:
             if self.model_type in model_file and model_file.endswith('.py'):
                 found_model = True
-                print(f"Found matching {self.model_type} and {model_file}")
                 
                 # Dynamically import the module
                 module_name = model_file[:-3]  # Remove .py extension
@@ -65,7 +84,7 @@ class ModelTraining():
                 try:
                     model_module = importlib.import_module(module_path)
                     logging.debug(f"Successfully imported {module_path}")
-                    break
+                    return model_module, module_path
                 except ImportError as e:
                     logging.error(f"Failed to import {module_path}: {str(e)}")
                     sys.exit()
