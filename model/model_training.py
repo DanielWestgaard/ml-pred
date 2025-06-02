@@ -1,6 +1,10 @@
+import importlib
 import logging
+import os
+import sys
 
 from utils import data_utils
+import config.config as config
 
 
 class ModelTraining():
@@ -14,6 +18,7 @@ class ModelTraining():
             - model_type: Type of model you want to train. Eg. 'xgboost', 'decision_tree', 'random_forest', etc.
         """
         try:
+            logging.info(f"---------- Initiating Model Training ----------")
             # Load dataset based on format
             self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
@@ -30,4 +35,43 @@ class ModelTraining():
         Returns:
             - If successful, will return the path of stored model, else False.
         """
-        pass
+        logging.info(f"Starting to train {self.model_type} model ...")
+        
+        self._get_implemented_models()
+        
+    def _get_implemented_models(self):
+        """
+        Simple method to get implemented models by reading files in model_factory/ and matching
+        it with provided model_type.
+        """
+        # Find file matching provided model_type
+        model_factory_dir = os.path.join(config.BASE_DIR, 'model', 'model_factory')
+        model_implementation_list = os.listdir(model_factory_dir)
+        
+        found_model = False  # var for wether we find the model file or not
+        model_module = None  # var for potential model import
+        
+        # Loop through model list and find model file based on provided model type
+        for model_file in model_implementation_list:
+            if self.model_type in model_file and model_file.endswith('.py'):
+                found_model = True
+                print(f"Found matching {self.model_type} and {model_file}")
+                
+                # Dynamically import the module
+                module_name = model_file[:-3]  # Remove .py extension
+                module_path = f"model.model_factory.{module_name}"
+                
+                try:
+                    model_module = importlib.import_module(module_path)
+                    logging.debug(f"Successfully imported {module_path}")
+                    break
+                except ImportError as e:
+                    logging.error(f"Failed to import {module_path}: {str(e)}")
+                    sys.exit()
+        
+        if not found_model or model_module is None:
+            logging.error("Model Trainer could not find an implementation of wanted model type. " +
+                          f"You asked for '{self.model_type}', but these are the current " +
+                          f"implementations: {model_implementation_list}.")
+            logging.debug("^ Remember 'model_type' must match exact name of file, eg. 'model_type == model_type.py'.")
+            sys.exit()
