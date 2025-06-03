@@ -51,15 +51,10 @@ class XgboostModel(BaseModel):
     def train(self):
         """
         Train the XGBoost model.
-        Splitting dataset in train/test in 80/20.
+        Splitting dataset in train/test 80/20.
         """
         logging.info(f"---------- Starting to train XGBoost Model! ----------")
         
         y_train, y_test, X_train, X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
-        print(f"X_train: \n {X_train}")
-        print()
-        print(f"X_test: \n {X_test}")
-        print()
-        print(f"y_train: \n {y_train}")
-        print()
-        print(f"y_test: \n {y_test}")
+
+        pass
