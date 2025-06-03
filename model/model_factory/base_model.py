@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 
+import pandas as pd
+
 
 class BaseModel(ABC):
     """XGBoost Model"""
     @abstractmethod
-    def __init__(self):
+    def __init__(self, dataset:pd.DataFrame, target_col:str = 'close', hypothesis:bool = False):
         """Initialize the Model."""
         pass
     

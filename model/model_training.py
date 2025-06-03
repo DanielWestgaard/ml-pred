@@ -9,13 +9,14 @@ import config.config as config
 
 class ModelTraining():
     """Train a specific ML Model."""
-    def __init__(self, dataset, model_type:str):
+    def __init__(self, dataset, model_type:str, hypothesis:str = None):
         """
         Initialize the class by providing specifics.
         
         Args:
             - dataset: Path to the Engineered (ohlcv) dataset to train the model on.
             - model_type: Type of model you want to train. Eg. 'xgboost', 'decision_tree', 'random_forest', etc.
+            - TODO: hypothesis: Provide path to hypothesis' config.yml to target its column.
         """
         try:
             logging.info(f"---------- Initiating Model Training ----------")
