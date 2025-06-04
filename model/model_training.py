@@ -25,7 +25,7 @@ class ModelTraining():
             self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
             self.model_type = model_type
-            print(self.df)
+            
             # Most likely reading directly from the csv file, which has no index.
             if (self.df.index.name is not 'date'):
                 # DataFrame has no index (name 'date'), so setting it and dropping the duplicate
@@ -44,7 +44,7 @@ class ModelTraining():
         Returns:
             - If successful, will return the path of stored model, else False.
         """
-        logging.info(f"---------- Starting to train {self.model_type} model ... ----------")
+        logging.info(f"---------- Starting to run training of {self.model_type} Model ... ----------")
         
         self.model_module, self.module_path = self._get_implemented_models()
         

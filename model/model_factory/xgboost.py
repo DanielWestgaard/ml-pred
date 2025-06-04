@@ -45,10 +45,10 @@ class XgboostModel(BaseModel):
             
             # Features
             self.X = self.df.drop(target_col, axis=1)
-            logging.debug(f"Successfully set features (X), with {len(self.X.columns)} columns/features: {self.X.columns.to_list()} ...")
+            logging.debug(f"Successfully set Features (X), with {len(self.X.columns)} columns/features ...")
             # Target
             self.y = self.df[target_col]
-            logging.debug(f"and target (y), '{target_col}', {self.y.size} values.")
+            logging.debug(f"and Target (y), '{target_col}', {self.y.size} values.")
         except Exception as e:
             logging.error(f"Unable to set train/test targets: {e}")
     
@@ -59,7 +59,7 @@ class XgboostModel(BaseModel):
         """
         logging.info(f"---------- Starting to train XGBoost Model! ----------")
 
-        # self._ensure_correct_xy_format()
+        self._ensure_correct_xy_format()
 
         y_train, y_test, X_train, X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
 
@@ -100,20 +100,20 @@ class XgboostModel(BaseModel):
         # Check your current y format
         try:
             check_raise(self.y, mtype='pd.Series')
-            print("✓ y is in correct format")
+            logging.debug("✓ y is in correct format")
         except Exception as e:
-            print(f"✗ Error with y: {e}")
+            logging.ERROR(f"✗ Error with y: {e}")
 
         # Check your current X format  
         try:
             check_raise(self.X, mtype='pd.DataFrame')
-            print("✓ X is in correct format")
+            logging.debug("✓ X is in correct format")
         except Exception as e:
-            print(f"✗ Error with X: {e}")
+            logging.error(f"✗ Error with X: {e}")
 
         # Let's also inspect your index
-        print(f"Index type: {type(self.y.index)}")
-        print(f"Index dtype: {self.y.index.dtype}")
-        print(f"Index sample: {self.y.index[:5]}")
-        print(f"Index frequency: {self.y.index.freq}")
+        logging.debug(f"Index type: {type(self.y.index)}")
+        logging.debug(f"Index dtype: {self.y.index.dtype}")
+        logging.debug(f"Index sample: {self.y.index[:5]}")
+        logging.debug(f"Index frequency: {self.y.index.freq}")
     
