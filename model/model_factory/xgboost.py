@@ -64,7 +64,16 @@ class XgboostModel(BaseModel):
         y_train, y_test, X_train, X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
 
         # Create model instance
-        xgb = XGBRegressor(n_estimators=2, max_depth=2, learning_rate=1, objective='reg:squarederror', enable_categorical=True)
+        xgb = XGBRegressor(n_estimators=100,                # More trees: number of trees in the ensemble, often increased until no further improvements are seen
+                           max_depth=12,                    # Deeper trees: maximum depth of each tree, often values are between 1 and 10
+                           learning_rate=0.001,
+                           objective='reg:squarederror',    # 'Perfect' for price prediction
+                           subsample=0.8,                   # Random sampling to prevent overfitting
+                           colsample_bytree=0.8,            # Feature sampling
+                           reg_alpha=0.1,                   # L1 regularization
+                           reg_lambda=1.0,                  # L2 regularization
+                           random_state=42,
+                           enable_categorical=True)         # handling categorical features
         
         # Fit (train) model
         xgb.fit(X_train, y_train)
