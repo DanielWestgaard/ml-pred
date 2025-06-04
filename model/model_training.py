@@ -3,7 +3,10 @@ import logging
 import os
 import sys
 import pandas as pd
+# Train-test
 from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
+# Evaluation
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 
 from utils import data_utils, model_utils
 import config.config as config
@@ -58,14 +61,14 @@ class ModelTraining():
             class_name = f"{self.model_type.title().replace('_', '')}Model"
             model_class = getattr(self.model_module, class_name)
             
+            # Split data into train and test
             self.temporal_train_test_split()
             
             # Instantiate and train the model
             model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
-            
-            model = model_instance.train()
-            
-            return model
+            self.model = model_instance.train()
+
+            return self.model
             
         except AttributeError as e:
             logging.error(f"Could not find expected class in {self.module_path}: {str(e)}")
@@ -137,5 +140,8 @@ class ModelTraining():
         self.y_train, self.y_test, self.X_train, self.X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
         
     def evaluate_model(self):
-        """Evaluate trained model."""
-        pass
+        """Evaluate trained model. Further down the line, this could be so much more complex being its own file/component."""
+        logging.info(f"----- Evaluate Model -----")
+        self.y_pred = self.model.predict(self.X_test)
+        # print(self.y_pred.size)
+        print("Accuracy:", accuracy_score(self.y_test, self.y_pred))  # ValueError: continuous is not supported

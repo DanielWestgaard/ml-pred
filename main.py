@@ -93,6 +93,7 @@ def main():
     if args.model_training:
         model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')
         model_training.run()
+        model_training.evaluate_model()
 
 if __name__=="__main__":
     main()
