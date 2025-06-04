@@ -73,6 +73,7 @@ class XgboostModel(BaseModel):
         print(preds)
 
     def _ensure_correct_xy_format(self):
+        """Temporary class used to check if the formats (dtype) is valid or not."""
         from sktime.datatypes import check_raise
 
         # Check your current y format
@@ -94,3 +95,4 @@ class XgboostModel(BaseModel):
         print(f"Index dtype: {self.y.index.dtype}")
         print(f"Index sample: {self.y.index[:5]}")
         print(f"Index frequency: {self.y.index.freq}")
+    
