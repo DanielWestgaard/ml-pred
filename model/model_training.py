@@ -25,11 +25,11 @@ class ModelTraining():
             self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
             self.model_type = model_type
-            
+            print(self.df)
             # Most likely reading directly from the csv file, which has no index.
             if (self.df.index.name is not 'date'):
                 # DataFrame has no index (name 'date'), so setting it and dropping the duplicate
-                self.df.index = self.df['date']
+                self.df.index = pd.to_datetime(self.df['date'])  # setting index, but ensure its in datetime format
                 self.df = self.df.drop('date', axis=1)
                 logging.debug(f"Successfully made index to {self.df.index.name}")
         except Exception as e:

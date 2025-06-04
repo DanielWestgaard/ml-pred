@@ -55,7 +55,11 @@ class XgboostModel(BaseModel):
         Splitting dataset in train/test 80/20.
         """
         logging.info(f"---------- Starting to train XGBoost Model! ----------")
+
+        print(self.y.index)
         
+        # self._ensure_correct_xy_format()
+
         y_train, y_test, X_train, X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
 
         # Create model instance
@@ -67,3 +71,26 @@ class XgboostModel(BaseModel):
         # Make predictions
         preds = bst.predict(X_test)
         print(preds)
+
+    def _ensure_correct_xy_format(self):
+        from sktime.datatypes import check_raise
+
+        # Check your current y format
+        try:
+            check_raise(self.y, mtype='pd.Series')
+            print("✓ y is in correct format")
+        except Exception as e:
+            print(f"✗ Error with y: {e}")
+
+        # Check your current X format  
+        try:
+            check_raise(self.X, mtype='pd.DataFrame')
+            print("✓ X is in correct format")
+        except Exception as e:
+            print(f"✗ Error with X: {e}")
+
+        # Let's also inspect your index
+        print(f"Index type: {type(self.y.index)}")
+        print(f"Index dtype: {self.y.index.dtype}")
+        print(f"Index sample: {self.y.index[:5]}")
+        print(f"Index frequency: {self.y.index.freq}")
