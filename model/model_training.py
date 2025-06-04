@@ -126,10 +126,10 @@ class ModelTraining():
             # Need to change potential columns having dtype object to category, for model to 'accept'
             self.df = model_utils.handle_categories(df = self.df)
             
-            # Features
+            # Features (Input variables)
             self.X = self.df.drop(self.target_col, axis=1)
             logging.debug(f"Successfully set Features (X), with {len(self.X.columns)} columns/features ...")
-            # Target
+            # Target (Output variables)
             self.y = self.df[self.target_col]
             logging.debug(f"and Target (y), '{self.target_col}', {self.y.size} values.")
         except Exception as e:
@@ -144,4 +144,5 @@ class ModelTraining():
         logging.info(f"----- Evaluate Model -----")
         self.y_pred = self.model.predict(self.X_test)
         # print(self.y_pred.size)
-        print("Accuracy:", accuracy_score(self.y_test, self.y_pred))  # ValueError: continuous is not supported
+        print('F1 score:', f1_score(self.y_test, self.y_pred,
+                            average="weighted"))
