@@ -40,6 +40,9 @@ class XgboostModel(BaseModel):
         
         # Initialize train/test targets
         try:
+            # Need to change potential columns having dtype object to category, for model to 'accept'
+            self.handle_categories()
+            
             # Features
             self.X = self.df.drop(target_col, axis=1)
             logging.debug(f"Successfully set features (X), with {len(self.X.columns)} columns/features: {self.X.columns.to_list()} ...")
@@ -56,14 +59,12 @@ class XgboostModel(BaseModel):
         """
         logging.info(f"---------- Starting to train XGBoost Model! ----------")
 
-        print(self.y.index)
-        
         # self._ensure_correct_xy_format()
 
         y_train, y_test, X_train, X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
 
         # Create model instance
-        bst = XGBRegressor(n_estimators=2, max_depth=2, learning_rate=1, objective='reg:squarederror')
+        bst = XGBRegressor(n_estimators=2, max_depth=2, learning_rate=1, objective='reg:squarederror', enable_categorical=True)
         
         # Fit (train) model
         bst.fit(X_train, y_train)
@@ -72,6 +73,26 @@ class XgboostModel(BaseModel):
         preds = bst.predict(X_test)
         print(preds)
 
+    def handle_categories(self):
+        """
+        Handle columns of object type, and make them categorical type.
+        The reason for this need, is that xgboost don't accept columns of object.
+        """
+        # list for keeping track of changed columns
+        column_object_list = []
+        
+        # Loop through df to find columns of object type, and replace with categorical.
+        for col in self.df.columns:
+            if self.df[col].dtype == object:
+                try:
+                    self.df[col] = self.df[col].astype('category')
+                    column_object_list.append(col)
+                    logging.debug(f"Successfully changed {col} dtype from object to category!")
+                except Exception as e:
+                    logging.error(f"Will drop {col}: Unable to change dtype of {col} from object to categorical: {e}")
+                    self.df = self.df.drop(col, axis=1)
+    
+    
     def _ensure_correct_xy_format(self):
         """Temporary class used to check if the formats (dtype) is valid or not."""
         from sktime.datatypes import check_raise
