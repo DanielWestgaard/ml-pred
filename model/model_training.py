@@ -3,14 +3,15 @@ import logging
 import os
 import sys
 import pandas as pd
+from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
 
-from utils import data_utils
+from utils import data_utils, model_utils
 import config.config as config
 
 
 class ModelTraining():
     """Train a specific ML Model."""
-    def __init__(self, dataset, model_type:str, hypothesis:str = None):
+    def __init__(self, dataset, model_type:str, target_col:str = 'close', hypothesis:str = None):
         """
         Initialize the class by providing specifics.
         
@@ -25,6 +26,8 @@ class ModelTraining():
             self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
             self.model_type = model_type
+            
+            self.target_col = target_col
             
             # Most likely reading directly from the csv file, which has no index.
             if (self.df.index.name is not 'date'):
@@ -55,8 +58,11 @@ class ModelTraining():
             class_name = f"{self.model_type.title().replace('_', '')}Model"
             model_class = getattr(self.model_module, class_name)
             
+            self.temporal_train_test_split()
+            
             # Instantiate and train the model
-            model_instance = model_class(self.df)
+            model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+            
             return model_instance.train()
             
         except AttributeError as e:
@@ -103,3 +109,27 @@ class ModelTraining():
                           f"implementations: {model_implementation_list}.")
             logging.debug("^ Remember 'model_type' must match exact name of file, eg. 'model_type == model_type.py'.")
             sys.exit()
+    
+    def temporal_train_test_split(self):
+        """
+        'Complete' way of creating X and y, and getting their respecitve *_train and *_test for model training and testing.
+        Train test split is done using sktime.split.temporal_train_test_split() (meaning not random as it's important for 
+        avoiding lookahead bias).
+        """
+        # Initialize train/test targets
+        try:
+            # Need to change potential columns having dtype object to category, for model to 'accept'
+            self.df = model_utils.handle_categories(df = self.df)
+            
+            # Features
+            self.X = self.df.drop(self.target_col, axis=1)
+            logging.debug(f"Successfully set Features (X), with {len(self.X.columns)} columns/features ...")
+            # Target
+            self.y = self.df[self.target_col]
+            logging.debug(f"and Target (y), '{self.target_col}', {self.y.size} values.")
+        except Exception as e:
+            logging.error(f"Unable to set train/test targets: {e}")
+            
+        model_utils.ensure_correct_xy_format(X = self.X, y = self.y)
+        
+        self.y_train, self.y_test, self.X_train, self.X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split

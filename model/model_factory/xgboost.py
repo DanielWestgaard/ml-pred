@@ -5,7 +5,6 @@ import pandas as pd
 from xgboost import XGBRegressor
 # Read data
 from sklearn.datasets import load_iris
-from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
 
 from model.model_factory.base_model import BaseModel
 import utils.model_utils as model_utils
@@ -19,7 +18,7 @@ class XgboostModel(BaseModel):
     gradient boosting algorithms. It's known for its speed, efficiency, and ability to handle large datasets.
     XGBoost is widely used for both classification and regression tasks.
     """
-    def __init__(self, dataset:pd.DataFrame, target_col:str = 'close', hypothesis:bool = False):
+    def __init__(self, dataset:pd.DataFrame, X_train:pd.DataFrame, y_train:pd.DataFrame):
         """
         Initialize XGBoost.
         
@@ -38,20 +37,8 @@ class XgboostModel(BaseModel):
         logging.debug(f"----- Initializing XGBoost Model -----")
         
         self.df = dataset
-        
-        # Initialize train/test targets
-        try:
-            # Need to change potential columns having dtype object to category, for model to 'accept'
-            self.df = model_utils.handle_categories(df = self.df)
-            
-            # Features
-            self.X = self.df.drop(target_col, axis=1)
-            logging.debug(f"Successfully set Features (X), with {len(self.X.columns)} columns/features ...")
-            # Target
-            self.y = self.df[target_col]
-            logging.debug(f"and Target (y), '{target_col}', {self.y.size} values.")
-        except Exception as e:
-            logging.error(f"Unable to set train/test targets: {e}")
+        self.X_train = X_train
+        self.y_train = y_train
     
     def train(self):
         """
@@ -59,10 +46,6 @@ class XgboostModel(BaseModel):
         Splitting dataset in train/test 80/20.
         """
         logging.info(f"---------- Starting to train XGBoost Model! ----------")
-
-        model_utils.ensure_correct_xy_format(X = self.X, y = self.y)
-
-        y_train, y_test, X_train, X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
 
         # Create model instance
         xgb = XGBRegressor(n_estimators=100,                # More trees: number of trees in the ensemble, often increased until no further improvements are seen
@@ -77,9 +60,9 @@ class XgboostModel(BaseModel):
                            enable_categorical=True)         # handling categorical features
         
         # Fit (train) model
-        xgb.fit(X_train, y_train)
+        xgb.fit(self.X_train, self.y_train)
         
         # Make predictions
-        preds = xgb.predict(X_test)
-        print(preds)
+        # preds = xgb.predict(X_test)
+        # print(preds)
     
