@@ -64,13 +64,13 @@ class XgboostModel(BaseModel):
         y_train, y_test, X_train, X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
 
         # Create model instance
-        bst = XGBRegressor(n_estimators=2, max_depth=2, learning_rate=1, objective='reg:squarederror', enable_categorical=True)
+        xgb = XGBRegressor(n_estimators=2, max_depth=2, learning_rate=1, objective='reg:squarederror', enable_categorical=True)
         
         # Fit (train) model
-        bst.fit(X_train, y_train)
+        xgb.fit(X_train, y_train)
         
         # Make predictions
-        preds = bst.predict(X_test)
+        preds = xgb.predict(X_test)
         print(preds)
 
     def handle_categories(self):
