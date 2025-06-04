@@ -2,6 +2,7 @@ import importlib
 import logging
 import os
 import sys
+import pandas as pd
 
 from utils import data_utils
 import config.config as config
@@ -24,6 +25,13 @@ class ModelTraining():
             self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
             self.model_type = model_type
+            
+            # Most likely reading directly from the csv file, which has no index.
+            if (self.df.index.name is not 'date'):
+                # DataFrame has no index (name 'date'), so setting it and dropping the duplicate
+                self.df.index = self.df['date']
+                self.df = self.df.drop('date', axis=1)
+                logging.debug(f"Successfully made index to {self.df.index.name}")
         except Exception as e:
             logging.error(f"Error initializing Model Training: {str(e)}")
             raise
@@ -36,7 +44,7 @@ class ModelTraining():
         Returns:
             - If successful, will return the path of stored model, else False.
         """
-        logging.info(f"Starting to train {self.model_type} model ...")
+        logging.info(f"---------- Starting to train {self.model_type} model ... ----------")
         
         self.model_module, self.module_path = self._get_implemented_models()
         
