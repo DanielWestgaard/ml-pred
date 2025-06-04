@@ -60,9 +60,7 @@ class XgboostModel(BaseModel):
                            enable_categorical=True)         # handling categorical features
         
         # Fit (train) model
-        xgb.fit(self.X_train, self.y_train)
+        model = xgb.fit(self.X_train, self.y_train)
         
-        # Make predictions
-        # preds = xgb.predict(X_test)
-        # print(preds)
-    
+        logging.info(f"Successfully trained XGBRegressor Model!")
+        return model

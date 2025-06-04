@@ -63,7 +63,9 @@ class ModelTraining():
             # Instantiate and train the model
             model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
             
-            return model_instance.train()
+            model = model_instance.train()
+            
+            return model
             
         except AttributeError as e:
             logging.error(f"Could not find expected class in {self.module_path}: {str(e)}")
@@ -133,3 +135,7 @@ class ModelTraining():
         model_utils.ensure_correct_xy_format(X = self.X, y = self.y)
         
         self.y_train, self.y_test, self.X_train, self.X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
+        
+    def evaluate_model(self):
+        """Evaluate trained model."""
+        pass
