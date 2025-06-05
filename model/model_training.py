@@ -2,11 +2,12 @@ import importlib
 import logging
 import os
 import sys
+import numpy as np
 import pandas as pd
 # Train-test
 from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
 # Evaluation
-from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
+from sklearn.metrics import mean_squared_error, root_mean_squared_error, mean_absolute_error
 
 from utils import data_utils, model_utils
 import config.config as config
@@ -139,10 +140,32 @@ class ModelTraining():
         
         self.y_train, self.y_test, self.X_train, self.X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
         
-    def evaluate_model(self):
-        """Evaluate trained model. Further down the line, this could be so much more complex being its own file/component."""
+    def evaluate_regression_model(self):
+        """
+        Evaluate trained model. Further down the line, this could be so much more complex being its own file/component.
+        Implemented methods: Mean Squared Error, Root Mean Squared Error, Mean Absolute Error, Directional Accuracy
+        
+        Remember we cannot calculate accuracy for a regression model.
+            "The skill or performance of a regression model must be reported as an error in those predictions."
+            - https://machinelearningmastery.com/regression-metrics-for-machine-learning/
+        """
         logging.info(f"----- Evaluate Model -----")
         self.y_pred = self.model.predict(self.X_test)
-        # print(self.y_pred.size)
-        print('F1 score:', f1_score(self.y_test, self.y_pred,
-                            average="weighted"))
+        
+        # Mean Squared Error
+        mse = mean_squared_error(self.y_test, self.y_pred)  # perfect mse value is 0.0, which means that all predictions matched the expected values exactly
+        logging.info(f"Mean Squared Error: {mse:.4%}")
+        
+        # Root Mean Squared Error
+        rmse = root_mean_squared_error(self.y_test, self.y_pred)
+        logging.info(f"Root Mean Squared Error: {rmse:.4%}")  # perfect RMSE value is 0.0, which means that all predictions matched the expected values exactly
+        
+        # Mean Absolute Error
+        mae = mean_absolute_error(self.y_test, self.y_pred)
+        logging.info(f"Mean Absolute Error: {mae:.4%}")  # perfect mae value is 0.0, which means that all predictions matched the expected values exactly
+        
+        # Financial metrics
+        directional_accuracy = np.mean(
+            np.sign(self.y_pred - self.y_test.shift(1)) == np.sign(self.y_test - self.y_test.shift(1))
+        )
+        logging.info(f"Directional Accuracy: {directional_accuracy:.2%}")
