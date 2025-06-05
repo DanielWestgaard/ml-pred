@@ -61,6 +61,16 @@ def ensure_correct_xy_format(X:pd.DataFrame, y:pd.DataFrame):
     logging.debug(f"Index sample: {y.index[:5]}")
     logging.debug(f"Index frequency: {y.index.freq}")
 
+def package_model():
+    """
+    This method will package a trained model and store it to the relevant 'storage/'.
+    
+    'Packaging refers to the process of bundling or containerizing the necessary components of a model,
+    such as the model file, dependencies, configuration files, etc., into a single deployable package.
+    The goal of a package is to make it easier to distribute and deploy the ML model in a production environment.'
+    """
+    # TODO
+
 
 # Deprecated?
 def preprocess_features_for_xgboost(df, target_col=None, enable_categorical=False):

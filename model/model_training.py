@@ -1,9 +1,11 @@
+import datetime
 import importlib
 import logging
 import os
 import sys
 import numpy as np
 import pandas as pd
+import pickle
 # Train-test
 from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
 # Evaluation
@@ -68,7 +70,9 @@ class ModelTraining():
             # Instantiate and train the model
             model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
             self.model = model_instance.train()
-
+            
+            self.save_model()
+            
             return self.model
             
         except AttributeError as e:
@@ -139,6 +143,25 @@ class ModelTraining():
         model_utils.ensure_correct_xy_format(X = self.X, y = self.y)
         
         self.y_train, self.y_test, self.X_train, self.X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
+        
+    def save_model(self, filename:str = None):
+        """Save trained model."""
+        import pickle
+        
+        current_time = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
+
+        # Save model as a pickle file
+        model_pkl_file = os.path.join(config.TRAINED_MODEL_PACKAGE_STORAGE, f"{self.model_type}_{current_time}.pkl")
+
+        try:
+            with open(model_pkl_file, 'wb') as file:  
+                pickle.dump(self.model, file)
+            logging.info(f"Successfully saved trained model: {model_pkl_file}")
+        except Exception as e:
+            logging.error(f"Unable to save trained model: {e}. Trying again..")
+            with open("trained_model.pkl", 'wb') as file:  
+                pickle.dump(self.model, file)
+            
         
     def evaluate_regression_model(self):
         """

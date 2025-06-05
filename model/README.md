@@ -8,7 +8,8 @@ This folder focuses on training ML Models. <br>
 │
 ├── model_factory/              # Different ML Models that main file can use to train
 │   ├── base_model.py           # Interface for all model type implementations
-│   └── xgboost.py              # XGBoost Classifier
+│   ├── xgboost.py              # XGBoost Regressor
+│   └── ...
 │
 └── ...
 ```
