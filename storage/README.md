@@ -13,10 +13,15 @@ This folder is used for storage of different purposes.
 │   │   ├── raw
 │   │   └── saved_responses
 │   └── ...
+│
 ├── data_engineeering_stats/    # Statistics and plots during data engineering pipeline
+│   ├── cleaned_data/           # Plots of dataset after cleaning
 │   ├── fe_generation/
 │   └── fe_selection/
-├── models/                     # Trained models and metadata
-├── backtesting_results/        # Results from backtesting
+│
+├── models/                     # Trained models and (TODO:) metadata
+│
+├── backtesting_results/        # TODO: Results from backtesting
+│
 └── README.md                   # Documentation related to storage/
 ```

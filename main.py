@@ -13,6 +13,7 @@ import utils.alpha_vantage_utils as alpha_utils
 from data.pipelines.engineer_pipeline import EngineeringPipeline
 from utils import shared_utils
 from data.plot.plot_data import PlotData
+from model.model_training import ModelTraining
 
 
 def parse_arguments():
@@ -25,6 +26,7 @@ def parse_arguments():
     parser.add_argument('--plot-data', '-pd', default=False, help='Plot dataset containing candlestick data.')
     parser.add_argument('--engineer-data', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
     parser.add_argument('--hypothesis', '-hyp', default=False, help='Run data engineering pipeline with hypoethesis: Provide path to the config.yml file.')
+    parser.add_argument('--model-training', '-ml', default=False, help='Train ML Model on Engineered Data.')
 
     return parser.parse_args()
 
@@ -87,6 +89,11 @@ def main():
         # broker.sub_live_market_data(symbol="GBPUSD", timeframe="MINUTE")
         
         broker.end_session()
+    
+    if args.model_training:
+        model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')
+        model_training.run()
+        model_training.evaluate_regression_model()
 
 if __name__=="__main__":
     main()

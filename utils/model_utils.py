@@ -1,8 +1,78 @@
+import logging
 import pandas as pd
 import numpy as np
 import ast
 from sklearn.preprocessing import LabelEncoder
 
+
+def handle_categories(df:pd.DataFrame):
+    """
+    Simple method to handle columns of object type, and make them categorical type.
+    The reason for this need, is that xgboost don't accept columns of object, so we need to
+    change their type.
+    
+    Args:
+        - df: the dataframe you intend to 
+    """
+    # list for keeping track of changed columns
+    column_object_list = []
+    
+    # Loop through df to find columns of object type, and replace with categorical.
+    for col in df.columns:
+        if df[col].dtype == object:
+            try:
+                df[col] = df[col].astype('category')
+                column_object_list.append(col)
+                logging.debug(f"Successfully changed {col} dtype from object to category!")
+            except Exception as e:
+                logging.error(f"Will drop {col}: Unable to change dtype of {col} from object to categorical: {e}")
+                df = df.drop(col, axis=1)
+    
+    return df
+
+def ensure_correct_xy_format(X:pd.DataFrame, y:pd.DataFrame):
+    """
+    Method used to check if the formats (dtype) is valid or not when using temporal_train_test_split()
+    from sktime.split.
+    
+    Args: 
+        - X: pd.DataFrame containing columns (Features).
+        - y: pd.DataFrame containing the Target.
+    """
+    from sktime.datatypes import check_raise
+
+    # Check current y format
+    try:
+        check_raise(y, mtype='pd.Series')
+        logging.debug("✓ y is in correct format")
+    except Exception as e:
+        logging.ERROR(f"✗ Error with y: {e}")
+
+    # Check current X format  
+    try:
+        check_raise(X, mtype='pd.DataFrame')
+        logging.debug("✓ X is in correct format")
+    except Exception as e:
+        logging.error(f"✗ Error with X: {e}")
+
+    # Let's also inspect your index
+    logging.debug(f"Index type: {type(y.index)}")
+    logging.debug(f"Index dtype: {y.index.dtype}")
+    logging.debug(f"Index sample: {y.index[:5]}")
+    logging.debug(f"Index frequency: {y.index.freq}")
+
+def package_model():
+    """
+    This method will package a trained model and store it to the relevant 'storage/'.
+    
+    'Packaging refers to the process of bundling or containerizing the necessary components of a model,
+    such as the model file, dependencies, configuration files, etc., into a single deployable package.
+    The goal of a package is to make it easier to distribute and deploy the ML model in a production environment.'
+    """
+    # TODO
+
+
+# Deprecated?
 def preprocess_features_for_xgboost(df, target_col=None, enable_categorical=False):
     """
     Preprocess features for XGBoost, handling all object and category types dynamically.

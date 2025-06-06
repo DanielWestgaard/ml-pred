@@ -21,6 +21,12 @@ required_features:
   feature_name_1: [5, 20, 50]                                # Only these periods of that feature
   feature_name_2: []                                         # All "features" from this feature method
   feature_name_3: ['feature_value_1', 'feature_value_2']     # Only these features from the feature method
+
+# TODO:
+model_name: <name-of-ml-model>
+  parameters:                                                # Empty means using 'default' hyperparameter values
+    - n_estimators: 100
+    - max_depth: 12
 ```
 > [!IMPORTANT]
 > The ```name``` of the hypothesis _must match_ the _function name_ in the ```data/hypothesis/target_hypothesis.py```. I plan to make it so you can specify the function-name dynamically in the Data Pipeline, but not yet.<br>
