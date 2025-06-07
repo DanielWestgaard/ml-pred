@@ -21,14 +21,28 @@ def parse_arguments():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description='Train hybrid trading strategy models with uncertainty quantification')
     
+    # Full Broker functionality
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
+    
+    # Provider usage
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
     parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Alpha Vantage API.')
+    
+    # Plotting
     parser.add_argument('--plot-data', '-pd', default=False, help='Plot dataset containing candlestick data.')
+    
+    # Data Pipeline
     parser.add_argument('--engineer-data', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
+    
+    # Hypothesis 
     parser.add_argument('--hypothesis', '-hyp', default=False, help='Run data engineering pipeline with hypoethesis: Provide path to the config.yml file.')
+    
+    # Model Training
     parser.add_argument('--model-training', '-ml', default=False, help='Train ML Model on Engineered Data.')
-    parser.add_argument('--evaluate', '-ev', default=False, help='Evaluate Trained ML Model.')
+    
+    # Model Evaluation
+    parser.add_argument('--evaluate', '-ev', default=False, help='Evaluate Trained model.')
+    parser.add_argument('--evaluation-data', '-ed', default=False, help='Evaluate Trained ML Model using this dataset.')
 
     return parser.parse_args()
 

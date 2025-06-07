@@ -59,10 +59,10 @@ Simple class having different evaluation implementations. One 'main' `run()` to 
 - `plot_model_prediction()`: Plot (trained) data with model predictions for 'manual inspection'.
 
 ### How to use
-1. Using **right after training** a model:
+1. Evaluate **right after training** a model:
 In main.py, first train the model, and then evaluate:
 ```bash
 python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' -ev
 ```
-2. Using for an 'old'/**stored model**:
+2. Evaluate an 'old'/**stored model**:
 ...
