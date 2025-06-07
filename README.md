@@ -60,7 +60,8 @@ If this is the first time using the repo, follow these instructions:
         2. Paste in this variable in the secrets-file: ```alpha_vantage_free_api_key=```.
         3. Fill in your own API token for its value.
 ### Recommended, but not needed
-- If you're using VSCode, I highly recommend installing the extensions
+- If you're using VSCode, I highly recommend installing these extensions:
+    - [Excalidraw](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor): an open-source virtual whiteboard tool designed for collaborative, freehand drawing and diagramming. This extension allows you to create and draw in VSCode, and view much more easily. Extension ID: pomdtr.excalidraw-editor
     - [Rainbow CSV](https://marketplace.visualstudio.com/items/?itemName=mechatroner.rainbow-csv): Prettier view of .csv-files.
     - [Material Icon Theme](https://marketplace.visualstudio.com/items/?itemName=PKief.material-icon-theme): Helps massively when you have many folders (icon some names).
 
