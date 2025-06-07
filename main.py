@@ -14,6 +14,7 @@ from data.pipelines.engineer_pipeline import EngineeringPipeline
 from utils import shared_utils
 from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
+from model.evaluation import ModelEvaluation
 
 
 def parse_arguments():
@@ -92,8 +93,12 @@ def main():
     
     if args.model_training:
         model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')
-        model_training.run()
-        model_training.evaluate_regression_model()
+        model = model_training.run()
+        
+        print(model.type)
+        
+        evaluation = ModelEvaluation(dataset=args.model_training, trained_model=model)
+        evaluation.evaluate_regression_model()
 
 if __name__=="__main__":
     main()

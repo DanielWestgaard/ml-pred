@@ -1,14 +1,35 @@
+import logging
+# Evaluation
+import numpy as np
+from sklearn.metrics import mean_squared_error, root_mean_squared_error, mean_absolute_error
+
+from model.model_training import ModelTraining 
+
+
 class ModelEvaluation():
     """
     Different approaches of evaluating a Trained Models abilities. Also with a main orchestrator, 
     run(), for running all methods.
     """
     
-    def __init__(self):
+    def __init__(self, dataset, trained_model):
         """Initialize the Evaluator."""
-        # Data Model was trained on?
+        logging.info(f"----- Initializing Model Ealuation -----")
+        
+        # Getting the training and test sets model was trained on to evaluate properly
+        model_training = ModelTraining(dataset=dataset, model_type=trained_model.type)
+        self.y_train, self.y_test, self.X_train, self.X_test = model_training.temporal_train_test_split(retur=True)
         
         # Model
+        try:
+            self.model = trained_model
+            logging.debug(f"Have initialized model: {self.model}")
+        except Exception as e:
+            logging.error(f"Unable to get trained model: {self.model}")
+        
+    def run(self):
+        """TODO: Main orchestrator for running all implemented evaluations."""
+        pass
     
     def evaluate_regression_model(self):
         """
@@ -19,7 +40,26 @@ class ModelEvaluation():
             "The skill or performance of a regression model must be reported as an error in those predictions."
             - https://machinelearningmastery.com/regression-metrics-for-machine-learning/
         """
-        pass
+        logging.info(f"----- Evaluate Model -----")
+        self.y_pred = self.model.predict(self.X_test)
+        
+        # Mean Squared Error
+        mse = mean_squared_error(self.y_test, self.y_pred)  # perfect mse value is 0.0, which means that all predictions matched the expected values exactly
+        logging.info(f"Mean Squared Error: {mse:.4%}")
+        
+        # Root Mean Squared Error
+        rmse = root_mean_squared_error(self.y_test, self.y_pred)
+        logging.info(f"Root Mean Squared Error: {rmse:.4%}")  # perfect RMSE value is 0.0, which means that all predictions matched the expected values exactly
+        
+        # Mean Absolute Error
+        mae = mean_absolute_error(self.y_test, self.y_pred)
+        logging.info(f"Mean Absolute Error: {mae:.4%}")  # perfect mae value is 0.0, which means that all predictions matched the expected values exactly
+        
+        # Financial metrics
+        directional_accuracy = np.mean(
+            np.sign(self.y_pred - self.y_test.shift(1)) == np.sign(self.y_test - self.y_test.shift(1))
+        )
+        logging.info(f"Directional Accuracy: {directional_accuracy:.2%}")
     
     def plot_model_prediction(self):
         """Plot trained models prediction with dataset."""
