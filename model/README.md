@@ -62,7 +62,15 @@ Simple class having different evaluation implementations. One 'main' `run()` to 
 1. Evaluate **right after training** a model:
 In main.py, first train the model, and then evaluate:
 ```bash
-python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' -ev
+python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' -evf
 ```
+> [!NOTE]
+> The `--evaluate-fresh`/`-evf` flag stores true, so nothing needed after. This is meant to be used after training a model (after the `-ml` flag).
 2. Evaluate an 'old'/**stored model**:
-...
+**NOT FINISHED** as I need to add functionality for saving model's parameters, weights, place of stored model, etc.<br>
+In main.py, only evaluate an 'old'/stored model:
+```bash
+python main.py -evf '<path-to-saved-model>'
+```
+> [!NOTE]
+> The `--evaluate-old`/`-evo` flag requires the path to `<SAVED INFORMATION ABOUT TRAINED MODEL>` info about the trained model.

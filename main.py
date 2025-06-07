@@ -41,8 +41,8 @@ def parse_arguments():
     parser.add_argument('--model-training', '-ml', default=False, help='Train ML Model on Engineered Data.')
     
     # Model Evaluation
-    parser.add_argument('--evaluate', '-ev', default=False, help='Evaluate Trained model.')
-    parser.add_argument('--evaluation-data', '-ed', default=False, help='Evaluate Trained ML Model using this dataset.')
+    parser.add_argument('--evaluate-fresh', '-evf', action='store_true', default=False, help='Evaluate Trained model.')
+    parser.add_argument('--evaluate-old', '-evo', default=False, help='Evaluate Trained ML Model using this dataset.')
 
     return parser.parse_args()
 
