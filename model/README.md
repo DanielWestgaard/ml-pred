@@ -4,7 +4,7 @@ This folder focuses on training ML Models. <br>
 ## Structure
 ```
 ├── model_training.py           # Main file to train different models
-├── model_evaluation.py         # TODO: Evaluate trained model
+├── evaluation.py               # TODO: Evaluate trained model
 │
 ├── model_factory/              # Different ML Models that main file can use to train
 │   ├── base_model.py           # Interface for all model type implementations
@@ -48,3 +48,12 @@ To add a new implementation of a new Model Type:
 3. Pretty much good to go! `ModelTraining.run()` will split training and testing data, so make sure all model implementations have the same required parameters (as they will all be initiated, dynamically, the same): `model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)`
 > [!NOTE]
 > I plan on later enchanding the evaluation method into its own class, as evaluating different models (Classification v. Regression) is quite different.
+
+
+## Training - model_training.py
+...
+
+
+## Evaluation
+Simple class having different evaluation implementations. One 'main' `run()` to orcestrate and run all implementations, but also possible to run each individual implementation.
+- `plot_model_prediction()`: Plot (trained) data with model predictions for 'manual inspection'.
