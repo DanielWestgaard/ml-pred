@@ -28,6 +28,7 @@ def parse_arguments():
     parser.add_argument('--engineer-data', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
     parser.add_argument('--hypothesis', '-hyp', default=False, help='Run data engineering pipeline with hypoethesis: Provide path to the config.yml file.')
     parser.add_argument('--model-training', '-ml', default=False, help='Train ML Model on Engineered Data.')
+    parser.add_argument('--evaluate', '-ev', default=False, help='Evaluate Trained ML Model.')
 
     return parser.parse_args()
 
@@ -94,10 +95,15 @@ def main():
     if args.model_training:
         model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')
         model = model_training.run()
+    
+    if args.evaluate:
+        # How do I send with the model type AND provide dataset when evaluating an old model?
+        # Also, how can I optionally add argument to the -ev flag?
         
-        print(model.type)
+        # Either using the datapath for potentially newly trained model, or provided with evaluate-flag
+        dataset = args.model_training or args.evaluate
         
-        evaluation = ModelEvaluation(dataset=args.model_training, trained_model=model)
+        evaluation = ModelEvaluation(dataset=dataset, trained_model=model)
         evaluation.evaluate_regression_model()
 
 if __name__=="__main__":
