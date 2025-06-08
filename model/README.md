@@ -28,15 +28,15 @@ It is created to "dynamically" run the implementation of your provided Model Typ
 ### How to use
 To train a Machine Learning Model, you can choose how you want to use it:
 - Use `main.py` and run it with the `--model-training`/`-ml` flag, followed by the path to the processed dataset you intend to train the model on. Eg:
-```bash
-python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv'
-```
-Optionally, to specify which model type you want to train (and not use defalut, 'xgboost'), you can also provide the `--model-type`/`-mt` flag and model type string:
-```bash
-python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' --mt 'xgboost'
-```
-> [!IMPORTANT]
-> It's important that the `model_type`/`-mt` matches the name of the file. Eg. `xgboost` will match `xgboost.py`.
+    ```bash
+    python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv'
+    ```
+    Optionally, to specify which model type you want to train (and not use defalut, 'xgboost'), you can also provide the `--model-type`/`-mt` flag and model type string:
+    ```bash
+    python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' --mt 'xgboost'
+    ```
+    > [!IMPORTANT]
+    > It's important that the `model_type`/`-mt` matches the name of the file. Eg. `xgboost` will match `xgboost.py`.
 
 - Implement/use it yourself like this:
 ```python
@@ -60,8 +60,6 @@ To add a new implementation of a new Model Type:
     class XgboostModel(BaseModel):
     ```
 3. Pretty much good to go! `ModelTraining.run()` will split training and testing data, so make sure all model implementations have the same required parameters (as they will all be initiated, dynamically, the same): `model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)`
-> [!NOTE]
-> I plan on later enchanding the evaluation method into its own class, as evaluating different models (Classification v. Regression) is quite different.
 
 
 ## Evaluation
