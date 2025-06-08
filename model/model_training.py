@@ -91,7 +91,8 @@ class ModelTraining():
         # Find file matching provided model_type
         model_factory_dir = os.path.join(config.BASE_DIR, 'model', 'model_factory')
         model_implementation_list = os.listdir(model_factory_dir)
-        model_implementation_list.remove('__pycache__')  # No need to list this as it's not a model type
+        model_implementation_list.remove(['__pycache__'])  # No need to list this as it's not a model type
+        model_implementation_list.remove('base_model.py')
         
         found_model = False  # var for wether we find the model file or not
         model_module = None  # var for potential model import
@@ -156,7 +157,7 @@ class ModelTraining():
         
         current_time = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
 
-        # Save model as a pickle file
+        # Save the model itself as a pickle file
         model_pkl_file = os.path.join(config.TRAINED_MODEL_PACKAGE_STORAGE, f"{self.model_type}_{current_time}.pkl")
 
         try:
@@ -167,4 +168,5 @@ class ModelTraining():
             logging.error(f"Unable to save trained model: {e}. Trying again..")
             with open("trained_model.pkl", 'wb') as file:  
                 pickle.dump(self.model, file)
-    
+
+        # TODO: Save information about model to .yml-file

@@ -39,14 +39,14 @@ To train a Machine Learning Model, you can choose how you want to use it:
     > It's important that the `model_type`/`-mt` matches the name of the file. Eg. `xgboost` will match `xgboost.py`.
 
 - Implement/use it yourself like this:
-```python
-# Model instance
-model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')  # 'model_type' must match name of implemented model file
-# Actually train a model
-model_training.run()
-# Evaluate model - currently only supporting regression models
-model_training.evaluate_regression_model()
-```
+    ```python
+    # Model instance
+    model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')  # 'model_type' must match name of implemented model file
+    # Actually train a model
+    model_training.run()
+    # Evaluate model - currently only supporting regression models
+    model_training.evaluate_regression_model()
+    ```
 
 ### Further development
 As mentioned, `model_training.py` dynamically runs and imports model-file based on `model_type`.<br>

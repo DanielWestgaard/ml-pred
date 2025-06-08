@@ -39,6 +39,7 @@ def parse_arguments():
     
     # Model Training
     parser.add_argument('--model-training', '-ml', default=False, help='Train ML Model on Engineered Data.')
+    parser.add_argument('--model-type', '-mt', default=False, help='Type of model to train.')
     
     # Model Evaluation
     parser.add_argument('--evaluate-fresh', '-evf', action='store_true', default=False, help='Evaluate Trained model.')
@@ -107,10 +108,10 @@ def main():
         broker.end_session()
     
     if args.model_training:
-        model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')
+        model_training = ModelTraining(dataset=args.model_training, model_type=args.model_type or 'xgboost')
         model = model_training.run()
     
-    if args.evaluate:
+    if args.evaluate_fresh or args.evaluate_old:
         # How do I send with the model type AND provide dataset when evaluating an old model?
         # Also, how can I optionally add argument to the -ev flag?
         
