@@ -35,8 +35,8 @@ To train a Machine Learning Model, you can choose how you want to use it:
     ```bash
     python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' --mt 'xgboost'
     ```
-    > [!IMPORTANT]
-    > It's important that the `model_type`/`-mt` matches the name of the file. Eg. `xgboost` will match `xgboost.py`.
+> [!IMPORTANT]
+> It's important that the `model_type`/`-mt` matches the name of the file. Eg. `xgboost` will match `xgboost.py`.
 
 - Implement/use it yourself like this:
     ```python
