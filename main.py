@@ -119,7 +119,7 @@ def main():
         dataset = args.model_training or args.evaluate
         
         evaluation = ModelEvaluation(dataset=dataset, trained_model=model)
-        evaluation.evaluate_regression_model()
+        evaluation.run()
 
 if __name__=="__main__":
     main()

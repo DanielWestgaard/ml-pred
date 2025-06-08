@@ -1,5 +1,6 @@
 import logging
 # Evaluation
+from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.metrics import mean_squared_error, root_mean_squared_error, mean_absolute_error
 
@@ -14,7 +15,7 @@ class ModelEvaluation():
     
     def __init__(self, dataset, trained_model):
         """Initialize the Evaluator."""
-        logging.info(f"----- Initializing Model Ealuation -----")
+        logging.info(f"---------- Initializing Model Ealuation ----------")
         
         # Getting the training and test sets model was trained on to evaluate properly
         model_training = ModelTraining(dataset=dataset, model_type=trained_model.type)
@@ -28,8 +29,9 @@ class ModelEvaluation():
             logging.error(f"Unable to get trained model: {self.model}")
         
     def run(self):
-        """TODO: Main orchestrator for running all implemented evaluations."""
-        pass
+        """Main orchestrator for running all implemented evaluations."""
+        self.evaluate_regression_model()
+        self.plot_regression_model_prediction()
     
     def evaluate_regression_model(self):
         """
@@ -61,7 +63,22 @@ class ModelEvaluation():
         )
         logging.info(f"Directional Accuracy: {directional_accuracy:.2%}")
     
-    def plot_model_prediction(self):
-        """Plot trained models prediction with dataset."""
-        pass
+    def plot_regression_model_prediction(self):
+        """
+        Plot trained models prediction with dataset.
+        Will have model predict first. I'm sure there is a smarter way of doing this, but works for now.
+        """
+        logging.info(f"----- Plot Regression Models Prediction-----")
+        
+        # Make predictions
+        y_pred = self.model.predict(self.X_test)
+        
+        # Plot actual vs predicted
+        plt.figure(figsize=(10, 6))
+        plt.scatter(self.y_test, y_pred, alpha=0.6)
+        plt.plot([self.y_test.min(), self.y_test.max()], [self.y_test.min(), self.y_test.max()], 'r--', lw=2)
+        plt.xlabel('Actual Values')
+        plt.ylabel('Predicted Values')
+        plt.title('Actual vs Predicted Values')
+        plt.show()
     
