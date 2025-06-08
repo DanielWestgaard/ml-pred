@@ -1,4 +1,5 @@
 import logging
+import sys
 # Evaluation
 from matplotlib import pyplot as plt
 import numpy as np
@@ -73,12 +74,28 @@ class ModelEvaluation():
         # Make predictions
         y_pred = self.model.predict(self.X_test)
         
-        # Plot actual vs predicted
-        plt.figure(figsize=(10, 6))
-        plt.scatter(self.y_test, y_pred, alpha=0.6)
-        plt.plot([self.y_test.min(), self.y_test.max()], [self.y_test.min(), self.y_test.max()], 'r--', lw=2)
-        plt.xlabel('Actual Values')
-        plt.ylabel('Predicted Values')
-        plt.title('Actual vs Predicted Values')
+        try:
+            test_dates = self.y_test.index
+            logging.debug(f"date in y_test was index, which is correct. Using this for plotting.")
+        except Exception as e:
+            try:  # Date might not be index and just set as normal colum - weird, but try
+                test_dates = self.y_test['date']
+                logging.debug(f"date in y_test was normal date column. Should be index, but ok.")
+            except Exception as e:
+                logging.error(f"Unable to find/use date in the provided dataset: {e}")
+                sys.exit()
+        
+        # df should have columns: date, open, high, low, close, volume
+        # predictions should be array/series with same length as test data
+        
+        plt.figure(figsize=(15, 8))
+        plt.plot(test_dates, self.y_test, label='Actual Close', linewidth=2, alpha=0.8)
+        plt.plot(test_dates, y_pred, label='Predicted Close', linewidth=2, alpha=0.8)
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.title('Stock Price Prediction')
+        plt.legend()
+        plt.xticks(rotation=45)
+        plt.tight_layout()
         plt.show()
-    
+        
