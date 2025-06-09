@@ -116,9 +116,9 @@ def main():
         # Also, how can I optionally add argument to the -ev flag?
         
         # Either using the datapath for potentially newly trained model, or provided with evaluate-flag
-        dataset = args.model_training or args.evaluate
+        dataset = args.model_training or args.evaluate_old
         
-        evaluation = ModelEvaluation(dataset=dataset, trained_model=model)
+        evaluation = ModelEvaluation(model_directory = args.evaluate_old)
         evaluation.run()
 
 if __name__=="__main__":

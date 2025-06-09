@@ -161,8 +161,8 @@ class ModelTraining():
     def save_model(self, filename: str = None):
         """Save trained model and metadata under timestamped folder."""
         # Track training time (you'd start this timer at beginning of training)
-        training_start_time = getattr(self, 'training_start_time', time.time())
-        training_duration = time.time() - training_start_time
+        # training_start_time = getattr(self, 'training_start_time', time.time())
+        training_duration = time.time() - self.training_start_time
         
         current_time = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
         

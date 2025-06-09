@@ -1,11 +1,15 @@
 import logging
+import os
+import pickle
 import sys
 # Evaluation
 from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.metrics import mean_squared_error, root_mean_squared_error, mean_absolute_error
 
-from model.model_training import ModelTraining 
+from model.model_training import ModelTraining
+# from utils.model_utils import ModelMetadataLoader
+from utils.model_utils import load_model_metadata, find_models_by_type, get_latest_model
 
 
 class ModelEvaluation():
@@ -14,20 +18,40 @@ class ModelEvaluation():
     run(), for running all methods.
     """
     
-    def __init__(self, dataset, trained_model):
-        """Initialize the Evaluator."""
+    def __init__(self, model_directory:str):
+        """
+        Initialize the Evaluator.
+        If both trained_model and dataset are None, we assume the evaluation will be done on a 'pre-trained'
+        model, hence we need to extract the model and data from the models metadatafile.
+        
+        Args:
+            - trained_model: The actual instance of the trained model.
+            - dataset: Dataset model was trained on
+        """
         logging.info(f"---------- Initializing Model Ealuation ----------")
         
-        # Getting the training and test sets model was trained on to evaluate properly
-        model_training = ModelTraining(dataset=dataset, model_type=trained_model.type)
-        self.y_train, self.y_test, self.X_train, self.X_test = model_training.temporal_train_test_split(retur=True)
-        
-        # Model
         try:
-            self.model = trained_model
+            # Load the metadata
+            loader = load_model_metadata(model_directory)
+            # Get data path
+            dataset = loader.get_dataset_path()
+            print(f"I HAVE : {dataset}")
+            # Get model file path
+            model_type = loader.get_model_type()
+            model_file = os.path.join(model_directory, f"{model_type}.pkl")
+            
+            # Load the actual model
+            with open(model_file, 'rb') as file:
+                self.model = pickle.load(file)
+            
+            # Getting the training and test sets model was trained on to evaluate properly
+            model_training = ModelTraining(dataset=dataset, model_type=model_type)
+            self.y_train, self.y_test, self.X_train, self.X_test = model_training.temporal_train_test_split(retur=True)
+            
             logging.debug(f"Have initialized model: {self.model}")
+            
         except Exception as e:
-            logging.error(f"Unable to get trained model: {self.model}")
+            logging.error(f"Unable to initialize Model Evaluation: {e}")
         
     def run(self):
         """Main orchestrator for running all implemented evaluations."""
