@@ -19,7 +19,15 @@ This folder is used for storage of different purposes.
 │   ├── fe_generation/
 │   └── fe_selection/
 │
-├── models/                     # Trained models and (TODO:) metadata
+├── models/                     # Trained models and (TODO:) metadata - most up-to-date structure is in readme of model/
+│   ├── TM_todaysDateTime/      # TODO: IMPLEMENT THIS STRUCTURE
+│   │   ├── trained_model.pkl   # Actual trained model
+│   │   ├── metadata.yml        # Information (metadata) about model training, location, parameters, etc.
+│   │   └── evaluation/         # Evaluation of model and plots of its predictions
+│   │       ├── plot.pdf        # eg.
+│   │       └── evaluation.pdf  # eg.
+│   └── ...
+│
 │
 ├── backtesting_results/        # TODO: Results from backtesting
 │

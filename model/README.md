@@ -25,7 +25,64 @@ It is created to "dynamically" run the implementation of your provided Model Typ
 > It's important that the `model_type` matches the name of the file. Eg. `xgboost` will match `xgboost.py`.
 
 
-### How to use
+### Storage 💽
+The trained model will, as for all kind of storage in this project, be stored under `storage/`.<br>
+Currently, this is the current plan for storage:
+```
+storage/
+├── models/                     # Trained models and (TODO:) metadata
+│   ├── TM_todaysDateTime/      # TODO: IMPLEMENT THIS STRUCTURE
+│   │   ├── trained_model.pkl   # Actual trained model
+│   │   ├── metadata.yml        # Information (metadata) about model training, location, parameters, etc.
+│   │   └── evaluation/         # Evaluation of model and plots of its predictions
+│   │       ├── plot.pdf        # eg.
+│   │       └── evaluation.pdf  # eg.
+│   └── ...
+```
+This is the **structure for metadata.yml** (might be changed to .json or split up later):
+```yml
+model_type: <name-of-model-type>
+
+# General info
+general:
+    - storage_path_of_model: ...
+    - date_for_training: ...
+    - hardware_used: ...
+    - training_time: ...
+
+# Hyperparameters/configuration used under training
+parameters: ...
+
+dataset:
+    # Features (X) used for training 
+    features: ...
+    # Target (y), like 'close' or hypothesis. What the model is predicting
+    target: ...
+```
+
+#### Example:
+```yml
+model_type: XGBRegression  # can change this later
+
+# General info
+general:
+    - storage_path_of_model: 'storage/models/2025-06-05_22:58:09/xgboost.pkl'
+    - date_for_training: ...
+    - hardware_used: ...
+    - training_time: ...
+
+# Hyperparameters/configuration used under training
+parameters: ...
+
+dataset:
+    # Features (X) used for training 
+    features: ...
+    # Target (y), like 'close' or hypothesis. What the model is predicting
+    target: ...
+```
+
+
+### How to use 🤓
 To train a Machine Learning Model, you can choose how you want to use it:
 - Use `main.py` and run it with the `--model-training`/`-ml` flag, followed by the path to the processed dataset you intend to train the model on. Eg:
     ```bash
