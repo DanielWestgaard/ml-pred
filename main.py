@@ -14,19 +14,36 @@ from data.pipelines.engineer_pipeline import EngineeringPipeline
 from utils import shared_utils
 from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
+from model.evaluation import ModelEvaluation
 
 
 def parse_arguments():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description='Train hybrid trading strategy models with uncertainty quantification')
     
+    # Full Broker functionality
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
+    
+    # Provider usage
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
     parser.add_argument('--fetch-data-alpha', action='store_true', default=False, help='Fetch historical data using Alpha Vantage API.')
+    
+    # Plotting
     parser.add_argument('--plot-data', '-pd', default=False, help='Plot dataset containing candlestick data.')
+    
+    # Data Pipeline
     parser.add_argument('--engineer-data', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
+    
+    # Hypothesis 
     parser.add_argument('--hypothesis', '-hyp', default=False, help='Run data engineering pipeline with hypoethesis: Provide path to the config.yml file.')
+    
+    # Model Training
     parser.add_argument('--model-training', '-ml', default=False, help='Train ML Model on Engineered Data.')
+    parser.add_argument('--model-type', '-mt', default=False, help='Type of model to train.')
+    
+    # Model Evaluation
+    parser.add_argument('--evaluate-fresh', '-evf', action='store_true', default=False, help='Evaluate Trained model.')
+    parser.add_argument('--evaluate-old', '-evo', default=False, help='Evaluate Trained ML Model using this dataset.')
 
     return parser.parse_args()
 
@@ -91,9 +108,18 @@ def main():
         broker.end_session()
     
     if args.model_training:
-        model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')
-        model_training.run()
-        model_training.evaluate_regression_model()
+        model_training = ModelTraining(dataset=args.model_training, model_type=args.model_type or 'xgboost')
+        model = model_training.run()
+    
+    if args.evaluate_fresh or args.evaluate_old:
+        # How do I send with the model type AND provide dataset when evaluating an old model?
+        # Also, how can I optionally add argument to the -ev flag?
+        
+        # Either using the datapath for potentially newly trained model, or provided with evaluate-flag
+        dataset = args.model_training or args.evaluate
+        
+        evaluation = ModelEvaluation(dataset=dataset, trained_model=model)
+        evaluation.run()
 
 if __name__=="__main__":
     main()
