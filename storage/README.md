@@ -19,11 +19,11 @@ This folder is used for storage of different purposes.
 │   ├── fe_generation/
 │   └── fe_selection/
 │
-├── models/                     # Trained models and (TODO:) metadata - most up-to-date structure is in readme of model/
-│   ├── TM_todaysDateTime/      # TODO: IMPLEMENT THIS STRUCTURE
-│   │   ├── trained_model.pkl   # Actual trained model
+├── models/                     # Trained models and (TODO:) metadata
+│   ├── <datetimenow>/          # Name of directory for model will be of now: Eg. '2025-06-09_20:19:29/'
+│   │   ├── trained_model.pkl   # Actual trained model. Eg. 'xgboost.pkl'
 │   │   ├── metadata.yml        # Information (metadata) about model training, location, parameters, etc.
-│   │   └── evaluation/         # Evaluation of model and plots of its predictions
+│   │   └── evaluation/         # Evaluation of model and plots of its predictions. Created in evaluation.py (plot method).
 │   │       ├── plot.pdf        # eg.
 │   │       └── evaluation.pdf  # eg.
 │   └── ...
