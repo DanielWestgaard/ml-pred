@@ -28,7 +28,6 @@ This folder is used for storage of different purposes.
 │   │       └── evaluation.pdf  # eg.
 │   └── ...
 │
-│
 ├── backtesting_results/        # TODO: Results from backtesting
 │
 └── README.md                   # Documentation related to storage/
