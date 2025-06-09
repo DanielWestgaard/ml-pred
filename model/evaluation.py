@@ -18,7 +18,7 @@ class ModelEvaluation():
     run(), for running all methods.
     """
     
-    def __init__(self, model_directory:str):
+    def __init__(self, model_directory:str, save_evaluations:bool = True):
         """
         Initialize the Evaluator.
         If both trained_model and dataset are None, we assume the evaluation will be done on a 'pre-trained'
@@ -30,12 +30,13 @@ class ModelEvaluation():
         """
         logging.info(f"---------- Initializing Model Ealuation ----------")
         
+        self.model_directory = model_directory
         try:
             # Load the metadata
             loader = load_model_metadata(model_directory)
             # Get data path
             dataset = loader.get_dataset_path()
-            print(f"I HAVE : {dataset}")
+            
             # Get model file path
             model_type = loader.get_model_type()
             model_file = os.path.join(model_directory, f"{model_type}.pkl")
@@ -48,6 +49,13 @@ class ModelEvaluation():
             model_training = ModelTraining(dataset=dataset, model_type=model_type)
             self.y_train, self.y_test, self.X_train, self.X_test = model_training.temporal_train_test_split(retur=True)
             
+            self.save_evaluations = save_evaluations
+            # Storing results under the models directory and evalutaion. Create directory if it doesn't exist.
+            self.evaluation_path = os.path.join(self.model_directory, 'evaluation')
+            if not os.path.exists(self.evaluation_path):
+                logging.debug(f"Creating directory now.")
+                os.makedirs(self.evaluation_path)
+            
             logging.debug(f"Have initialized model: {self.model}")
             
         except Exception as e:
@@ -56,7 +64,7 @@ class ModelEvaluation():
     def run(self):
         """Main orchestrator for running all implemented evaluations."""
         self.evaluate_regression_model()
-        self.plot_regression_model_prediction()
+        self.plot_regression_model_prediction(save_plot=self.save_evaluations)
     
     def evaluate_regression_model(self):
         """
@@ -125,8 +133,14 @@ class ModelEvaluation():
         plt.legend()
         plt.xticks(rotation=45)
         plt.tight_layout()
+
+        if save_plot:
+            # Save location under models folder
+            try:
+                plt.savefig(f"{self.evaluation_path}/plot.png")
+            except Exception as e:
+                logging.error(f"Unable to save plot under Models folder, '{self.model_directory}'. Falling back to your current dir : {e}")
+                plt.savefig("plot.png")
+        
         plt.show()
         
-        if save_plot:
-            # TODO: Save location in "models folder"
-            plt.savefig("test.png")
