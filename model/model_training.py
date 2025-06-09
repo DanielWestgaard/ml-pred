@@ -156,13 +156,15 @@ class ModelTraining():
         import pickle
         
         current_time = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
+        
         # Directory and folder model and info will be saved under
         directory = os.path.join(config.TRAINED_MODEL_PACKAGE_STORAGE, current_time)
-        # Save the model itself as a pickle file
-        model_pkl_file = os.path.join(directory, f"{self.model_type}.pkl")
-
+        
+        # Storing the model itself first
         try:
-
+            # Save the model itself as a pickle file
+            model_pkl_file = os.path.join(directory, f"{self.model_type}.pkl")
+            
             # Check if the directory exists. If not, create it.
             if not os.path.exists(directory):
                 logging.debug(f"Creating directory now.")
