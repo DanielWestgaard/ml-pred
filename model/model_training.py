@@ -152,21 +152,34 @@ class ModelTraining():
             return self.y_train, self.y_test, self.X_train, self.X_test
         
     def save_model(self, filename:str = None):
-        """Save trained model."""
+        """Save trained model under 'now' timestamp folder."""
         import pickle
         
         current_time = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
-
+        # Directory and folder model and info will be saved under
+        directory = os.path.join(config.TRAINED_MODEL_PACKAGE_STORAGE, current_time)
         # Save the model itself as a pickle file
-        model_pkl_file = os.path.join(config.TRAINED_MODEL_PACKAGE_STORAGE, f"{self.model_type}_{current_time}.pkl")
+        model_pkl_file = os.path.join(directory, f"{self.model_type}.pkl")
 
         try:
+
+            # Check if the directory exists. If not, create it.
+            if not os.path.exists(directory):
+                logging.debug(f"Creating directory now.")
+                os.makedirs(directory)
+                
             with open(model_pkl_file, 'wb') as file:  
                 pickle.dump(self.model, file)
             logging.info(f"Successfully saved trained model: {model_pkl_file}")
+            
         except Exception as e:
-            logging.error(f"Unable to save trained model: {e}. Trying again..")
+            logging.error(f"Unable to save trained model: {e}. Falling back to storing at your location: {os.getcwd()}")
+            
             with open("trained_model.pkl", 'wb') as file:  
                 pickle.dump(self.model, file)
 
         # TODO: Save information about model to .yml-file
+
+    def _save_model_info(self):
+        """Helper function to assist in saving a trained models information into a .yml file."""
+        pass
