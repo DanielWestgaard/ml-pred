@@ -87,13 +87,14 @@ class ModelEvaluation():
         
         # df should have columns: date, open, high, low, close, volume
         # predictions should be array/series with same length as test data
-        
         plt.figure(figsize=(15, 8))
-        plt.plot(test_dates, self.y_test, label='Actual Close', linewidth=2, alpha=0.8)
-        plt.plot(test_dates, y_pred, label='Predicted Close', linewidth=2, alpha=0.8)
-        plt.xlabel('Date')
-        plt.ylabel('Price')
-        plt.title('Stock Price Prediction')
+        plt.plot(test_dates, self.y_test,
+                 label=f"Actual '{self.y_test.name}' Price (Test Data)",
+                 linewidth=2, alpha=0.8)
+        plt.plot(test_dates, y_pred, label=f"Predicted '{self.y_test.name}'", linewidth=2, alpha=0.8)
+        plt.xlabel('Datetime')
+        plt.ylabel('Price/values')
+        plt.title(f'{self.model.type} Model Price Prediction')
         plt.legend()
         plt.xticks(rotation=45)
         plt.tight_layout()

@@ -22,7 +22,7 @@ class ModelTraining():
         Args:
             - dataset: Path to the Engineered (ohlcv) dataset to train the model on.
             - model_type: Type of model you want to train. Eg. 'xgboost', 'decision_tree', 'random_forest', etc.
-            - TODO: hypothesis: Provide path to hypothesis' config.yml to target its column.
+            - TODO: hypothesis: Provide path to hypothesis' config.yml to target its column. This currently only works close target.
         """
         try:
             logging.info(f"---------- Initiating Model Training ----------")
