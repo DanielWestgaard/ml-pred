@@ -158,10 +158,11 @@ class ModelTraining():
         if retur:
             return self.y_train, self.y_test, self.X_train, self.X_test
         
-    def save_model(self, filename:str = None):
-        """Save trained model under 'now' timestamp folder."""
-        # Track training time
-        training_duration = time.time() - self.training_start_time
+    def save_model(self, filename: str = None):
+        """Save trained model and metadata under timestamped folder."""
+        # Track training time (you'd start this timer at beginning of training)
+        training_start_time = getattr(self, 'training_start_time', time.time())
+        training_duration = time.time() - training_start_time
         
         current_time = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
         
@@ -201,22 +202,44 @@ class ModelTraining():
                 'os': f"{platform.system()} {platform.release()}"
             }
         
+        # Convert any value to a YAML-safe native Python type
+        def make_yaml_safe(obj):
+            """Convert numpy/pandas types to native Python types for YAML serialization."""
+            import numpy as np
+            import pandas as pd
+            
+            if obj is None:
+                return None
+            elif isinstance(obj, (np.integer, np.floating)):
+                return obj.item()
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, (pd.Series, pd.DataFrame)):
+                return obj.to_dict()
+            elif isinstance(obj, dict):
+                return {key: make_yaml_safe(value) for key, value in obj.items()}
+            elif isinstance(obj, (list, tuple)):
+                return [make_yaml_safe(item) for item in obj]
+            elif isinstance(obj, (str, int, float, bool)):
+                return obj
+            elif hasattr(obj, 'item'):  # numpy scalars
+                return obj.item()
+            elif pd.isna(obj):
+                return None
+            else:
+                return str(obj)
+        
         # Get model hyperparameters if available
         def get_model_params():
             if hasattr(self.model, 'get_params'):
-                return self.model.get_params()
+                params = self.model.get_params()
+                return make_yaml_safe(params)
             elif hasattr(self.model, '__dict__'):
                 # Filter out non-parameter attributes
                 params = {}
                 for key, value in self.model.__dict__.items():
                     if not key.startswith('_') and not callable(value):
-                        # Convert numpy/pandas types to native Python types for YAML serialization
-                        if hasattr(value, 'item'):  # numpy scalars
-                            params[key] = value.item()
-                        elif isinstance(value, (list, tuple, dict, str, int, float, bool, type(None))):
-                            params[key] = value
-                        else:
-                            params[key] = str(value)
+                        params[key] = make_yaml_safe(value)
                 return params
             else:
                 return {}
@@ -234,21 +257,21 @@ class ModelTraining():
                 'duration_seconds': round(training_duration, 2),
                 'duration_formatted': str(datetime.timedelta(seconds=int(training_duration))),
                 'completed_at': datetime.datetime.now().isoformat(),
-                'train_samples': len(self.X_train),
-                'test_samples': len(self.X_test)
+                'train_samples': int(len(self.X_train)),
+                'test_samples': int(len(self.X_test))
             },
             
             'dataset': {
-                'dataset': self.dataset_path,
+                'dataset_path': getattr(self, 'dataset_path', 'unknown'),  # Add this line
                 'target_column': self.target_col,
-                'feature_count': len(self.X_train.columns),
+                'feature_count': int(len(self.X_train.columns)),
                 'features': self.X_train.columns.tolist(),
-                'total_samples': len(self.df),
+                'total_samples': int(len(self.df)),
                 'date_range': {
                     'start': str(self.df.index.min()),
                     'end': str(self.df.index.max())
                 },
-                'missing_values': self.X_train.isnull().sum().sum()
+                'missing_values': make_yaml_safe(self.X_train.isnull().sum().sum())
             },
             
             'model_parameters': get_model_params(),
@@ -256,8 +279,8 @@ class ModelTraining():
             'system_info': get_system_info(),
             
             'data_split': {
-                'train_size': len(self.X_train),
-                'test_size': len(self.X_test),
+                'train_size': int(len(self.X_train)),
+                'test_size': int(len(self.X_test)),
                 'split_ratio': f"{len(self.X_train)}/{len(self.X_test)}"
             }
         }
@@ -266,7 +289,7 @@ class ModelTraining():
         metadata_file = os.path.join(directory, 'model_metadata.yml')
         
         # Generate YAML string
-        yaml_content = yaml.dump(metadata, default_flow_style=False, sort_keys=False, indent=4)
+        yaml_content = yaml.dump(metadata, default_flow_style=False, sort_keys=False, indent=2)
         
         # Add blank lines between top-level sections
         sections = ['training:', 'dataset:', 'model_parameters:', 'system_info:', 'data_split:']
