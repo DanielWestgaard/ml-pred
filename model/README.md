@@ -27,11 +27,11 @@ It is created to "dynamically" run the implementation of your provided Model Typ
 
 ### Storage 💽
 The trained model will, as for all kind of storage in this project, be stored under `storage/`.<br>
-Currently, this is the current plan for storage:
+Currently, this is the organization for storage:
 ```
 storage/
 ├── models/                     # Trained models and (TODO:) metadata
-│   ├── TM_todaysDateTime/      # TODO: IMPLEMENT THIS STRUCTURE
+│   ├── <datetimenow>/          # TODO: IMPLEMENT THIS STRUCTURE
 │   │   ├── trained_model.pkl   # Actual trained model
 │   │   ├── metadata.yml        # Information (metadata) about model training, location, parameters, etc.
 │   │   └── evaluation/         # Evaluation of model and plots of its predictions
@@ -39,47 +39,7 @@ storage/
 │   │       └── evaluation.pdf  # eg.
 │   └── ...
 ```
-This is the **structure for metadata.yml** (might be changed to .json or split up later):
-```yml
-model_type: <name-of-model-type>
-
-# General info
-general:
-    - storage_path_of_model: ...
-    - date_for_training: ...
-    - hardware_used: ...
-    - training_time: ...
-
-# Hyperparameters/configuration used under training
-parameters: ...
-
-dataset:
-    # Features (X) used for training 
-    features: ...
-    # Target (y), like 'close' or hypothesis. What the model is predicting
-    target: ...
-```
-
-#### Example:
-```yml
-model_type: XGBRegression  # can change this later
-
-# General info
-general:
-    - storage_path_of_model: 'storage/models/2025-06-05_22:58:09/xgboost.pkl'
-    - date_for_training: ...
-    - hardware_used: ...
-    - training_time: ...
-
-# Hyperparameters/configuration used under training
-parameters: ...
-
-dataset:
-    # Features (X) used for training 
-    features: ...
-    # Target (y), like 'close' or hypothesis. What the model is predicting
-    target: ...
-```
+The **structure for metadata.yml** gets auto-generated after successfully training the model (might be changed to .json or split up later). It's done in `model_training.py` in `_save_model_info()`, and these are currently the implemented sections: ['training:', 'dataset:', 'model_parameters:', 'system_info:', 'data_split:']
 
 
 ### How to use 🤓
