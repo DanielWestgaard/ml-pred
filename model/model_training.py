@@ -31,6 +31,7 @@ class ModelTraining():
         """
         try:
             logging.info(f"---------- Initiating Model Training ----------")
+            self.dataset_path = dataset
             # Load dataset based on format
             self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
@@ -238,6 +239,7 @@ class ModelTraining():
             },
             
             'dataset': {
+                'dataset': self.dataset_path,
                 'target_column': self.target_col,
                 'feature_count': len(self.X_train.columns),
                 'features': self.X_train.columns.tolist(),
