@@ -66,8 +66,11 @@ class ModelEvaluation():
     
     def plot_regression_model_prediction(self):
         """
-        Plot trained models prediction with dataset.
-        Will have model predict first. I'm sure there is a smarter way of doing this, but works for now.
+        Plot actual test data vs. (trained models) prediction.
+        Make sure the test dataset provided in init of class is the same one you trained the model on.
+        
+        This method reuses the train test data from model_training.py (done in this class' init),
+        and makes model predict here before plotting.
         """
         logging.info(f"----- Plot Regression Models Prediction-----")
         
