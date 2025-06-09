@@ -64,7 +64,7 @@ class ModelEvaluation():
         )
         logging.info(f"Directional Accuracy: {directional_accuracy:.2%}")
     
-    def plot_regression_model_prediction(self):
+    def plot_regression_model_prediction(self, save_plot:bool = True):
         """
         Plot actual test data vs. (trained models) prediction.
         Make sure the test dataset provided in init of class is the same one you trained the model on.
@@ -103,3 +103,6 @@ class ModelEvaluation():
         plt.tight_layout()
         plt.show()
         
+        if save_plot:
+            # TODO: Save location in "models folder"
+            plt.savefig("test.png")
