@@ -260,9 +260,19 @@ class ModelTraining():
             }
         }
         
-        # Save to YAML file
+        # Save to YAML file with spacing between sections
         metadata_file = os.path.join(directory, 'model_metadata.yml')
+        
+        # Generate YAML string
+        yaml_content = yaml.dump(metadata, default_flow_style=False, sort_keys=False, indent=4)
+        
+        # Add blank lines between top-level sections
+        sections = ['training:', 'dataset:', 'model_parameters:', 'system_info:', 'data_split:']
+        for section in sections:
+            yaml_content = yaml_content.replace(f'\n{section}', f'\n\n{section}')
+        
+        # Write formatted YAML
         with open(metadata_file, 'w') as file:
-            yaml.dump(metadata, file, default_flow_style=False, sort_keys=False, indent=4)
+            file.write(yaml_content)
         
         logging.info(f"Successfully saved model metadata: {metadata_file}")
