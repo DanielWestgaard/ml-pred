@@ -15,6 +15,11 @@ class BaseModel(ABC):
         """Train the Model."""
         pass
     
+    @abstractmethod
+    def save_model_and_info(self):
+        """Save trained model and information (see model documentation for details)."""
+        pass
+    
     # @abstractmethod
     # def load_trained_model(self, path_to_model):
     #     """Load a pre-trained model for usage."""

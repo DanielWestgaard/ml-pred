@@ -6,6 +6,11 @@ import sys
 import numpy as np
 import pandas as pd
 import pickle
+import psutil
+import yaml  # stroring
+import time
+import platform
+
 # Train-test
 from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
 
@@ -65,11 +70,12 @@ class ModelTraining():
             # Split data into train and test
             self.temporal_train_test_split()
             
-            # Instantiate and train the model
+            # Instantiate model
             model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+            # Actually train the model
+            self.training_start_time = time.time()  # not really accurate starting it here, but short term solution
             self.model = model_instance.train()
             self.model.type = self.model_type
-            print(f"har {self.model.type}")
             
             self.save_model()
             
@@ -152,21 +158,121 @@ class ModelTraining():
             return self.y_train, self.y_test, self.X_train, self.X_test
         
     def save_model(self, filename:str = None):
-        """Save trained model."""
-        import pickle
+        """Save trained model under 'now' timestamp folder."""
+        # Track training time
+        training_duration = time.time() - self.training_start_time
         
         current_time = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
-
-        # Save the model itself as a pickle file
-        model_pkl_file = os.path.join(config.TRAINED_MODEL_PACKAGE_STORAGE, f"{self.model_type}_{current_time}.pkl")
-
+        
+        # Directory and folder model and info will be saved under
+        directory = os.path.join(config.TRAINED_MODEL_PACKAGE_STORAGE, current_time)
+        
+        # Create directory if it doesn't exist
+        if not os.path.exists(directory):
+            logging.debug(f"Creating directory now.")
+            os.makedirs(directory)
+        
         try:
+            # Save the model itself as a pickle file
+            model_pkl_file = os.path.join(directory, f"{self.model_type}.pkl")
             with open(model_pkl_file, 'wb') as file:  
                 pickle.dump(self.model, file)
             logging.info(f"Successfully saved trained model: {model_pkl_file}")
+            
+            # Save model metadata
+            self._save_model_info(directory, training_duration)
+            
         except Exception as e:
-            logging.error(f"Unable to save trained model: {e}. Trying again..")
-            with open("trained_model.pkl", 'wb') as file:  
-                pickle.dump(self.model, file)
+            logging.error(f"Unable to save trained model: {e}")
+            raise
 
-        # TODO: Save information about model to .yml-file
+    def _save_model_info(self, directory: str, training_duration: float):
+        """Save model metadata to YAML file."""
+        
+        # Collect system information
+        def get_system_info():
+            return {
+                'cpu': platform.processor() or platform.machine(),
+                'cpu_cores': psutil.cpu_count(logical=False),
+                'cpu_threads': psutil.cpu_count(logical=True),
+                'memory_gb': round(psutil.virtual_memory().total / (1024**3), 2),
+                'python_version': platform.python_version(),
+                'os': f"{platform.system()} {platform.release()}"
+            }
+        
+        # Get model hyperparameters if available
+        def get_model_params():
+            if hasattr(self.model, 'get_params'):
+                return self.model.get_params()
+            elif hasattr(self.model, '__dict__'):
+                # Filter out non-parameter attributes
+                params = {}
+                for key, value in self.model.__dict__.items():
+                    if not key.startswith('_') and not callable(value):
+                        # Convert numpy/pandas types to native Python types for YAML serialization
+                        if hasattr(value, 'item'):  # numpy scalars
+                            params[key] = value.item()
+                        elif isinstance(value, (list, tuple, dict, str, int, float, bool, type(None))):
+                            params[key] = value
+                        else:
+                            params[key] = str(value)
+                return params
+            else:
+                return {}
+        
+        # Create metadata dictionary
+        metadata = {
+            'model_info': {
+                'model_type': self.model_type,
+                'model_class': self.model.__class__.__name__,
+                'storage_path': directory,
+                'created_at': datetime.datetime.now().isoformat()
+            },
+            
+            'training': {
+                'duration_seconds': round(training_duration, 2),
+                'duration_formatted': str(datetime.timedelta(seconds=int(training_duration))),
+                'completed_at': datetime.datetime.now().isoformat(),
+                'train_samples': len(self.X_train),
+                'test_samples': len(self.X_test)
+            },
+            
+            'dataset': {
+                'target_column': self.target_col,
+                'feature_count': len(self.X_train.columns),
+                'features': self.X_train.columns.tolist(),
+                'total_samples': len(self.df),
+                'date_range': {
+                    'start': str(self.df.index.min()),
+                    'end': str(self.df.index.max())
+                },
+                'missing_values': self.X_train.isnull().sum().sum()
+            },
+            
+            'model_parameters': get_model_params(),
+            
+            'system_info': get_system_info(),
+            
+            'data_split': {
+                'train_size': len(self.X_train),
+                'test_size': len(self.X_test),
+                'split_ratio': f"{len(self.X_train)}/{len(self.X_test)}"
+            }
+        }
+        
+        # Save to YAML file with spacing between sections
+        metadata_file = os.path.join(directory, 'model_metadata.yml')
+        
+        # Generate YAML string
+        yaml_content = yaml.dump(metadata, default_flow_style=False, sort_keys=False, indent=4)
+        
+        # Add blank lines between top-level sections
+        sections = ['training:', 'dataset:', 'model_parameters:', 'system_info:', 'data_split:']
+        for section in sections:
+            yaml_content = yaml_content.replace(f'\n{section}', f'\n\n{section}')
+        
+        # Write formatted YAML
+        with open(metadata_file, 'w') as file:
+            file.write(yaml_content)
+        
+        logging.info(f"Successfully saved model metadata: {metadata_file}")
