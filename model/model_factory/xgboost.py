@@ -64,3 +64,7 @@ class XgboostModel(BaseModel):
         
         logging.info(f"Successfully trained XGBRegressor Model!")
         return model
+    
+    def save_model_and_info(self):
+        """Save trained model and information (see model documentation for details)."""
+        pass
