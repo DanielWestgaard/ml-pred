@@ -66,27 +66,6 @@ def ensure_correct_xy_format(X:pd.DataFrame, y:pd.DataFrame):
     logging.debug(f"Index sample: {y.index[:5]}")
     logging.debug(f"Index frequency: {y.index.freq}")
 
-# def load_model_metadata(model_metadata_path) -> Dict[str, Any]:
-#     """Load metadata from YAML file."""
-#     if os.path.isdir(model_metadata_path):
-#         # If directory provided, look for metadata file
-#         metadata_file = os.path.join(model_metadata_path, 'model_metadata.yml')
-#     else:
-#         metadata_file = model_metadata_path
-        
-#     if not os.path.exists(metadata_file):
-#         raise FileNotFoundError(f"Metadata file not found: {metadata_file}")
-        
-#     metadata_path = metadata_file
-#     try:
-#         with open(metadata_path, 'r') as file:
-#             metadata = yaml.safe_load(file)
-#         logging.debug(f"Successfully loaded metadata from {metadata_path}")
-#         return metadata
-#     except Exception as e:
-#         logging.error(f"Error loading metadata: {e}")
-#         raise
-
 
 class ModelMetadataLoader:
     """Utility class for loading and accessing model metadata from YAML files."""
