@@ -63,6 +63,7 @@ class ModelEvaluation():
             
         except Exception as e:
             logging.error(f"Unable to initialize Model Evaluation: {e}")
+            sys.exit()
         
     def run(self):
         """Main orchestrator for running all implemented evaluations."""
