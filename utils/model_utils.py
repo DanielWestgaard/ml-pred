@@ -67,6 +67,9 @@ def ensure_correct_xy_format(X:pd.DataFrame, y:pd.DataFrame):
     logging.debug(f"Index frequency: {y.index.freq}")
 
 
+
+########## Code for loading contents of model_metadata.yml - metadata related to trained model ##########
+
 class ModelMetadataLoader:
     """Utility class for loading and accessing model metadata from YAML files."""
     
@@ -294,6 +297,7 @@ def get_latest_model(models_directory: str, model_type: str = None) -> Optional[
                 logging.warning(f"Could not load metadata from {root}: {e}")
     
     return latest_model
+
 
 
 
