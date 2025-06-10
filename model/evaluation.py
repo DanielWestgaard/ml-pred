@@ -10,6 +10,7 @@ from sklearn.metrics import mean_squared_error, root_mean_squared_error, mean_ab
 from model.model_training import ModelTraining
 # from utils.model_utils import ModelMetadataLoader
 from utils.model_utils import load_model_metadata, find_models_by_type, get_latest_model
+import config.config as config
 
 
 class ModelEvaluation():
@@ -18,7 +19,7 @@ class ModelEvaluation():
     run(), for running all methods.
     """
     
-    def __init__(self, model_directory:str, save_evaluations:bool = True):
+    def __init__(self, model_directory:str = None, save_evaluations:bool = True, model_type:str = None):
         """
         Initialize the Evaluator.
         If both trained_model and dataset are None, we assume the evaluation will be done on a 'pre-trained'
@@ -26,11 +27,13 @@ class ModelEvaluation():
         
         Args:
             - trained_model: The actual instance of the trained model.
-            - dataset: Dataset model was trained on
+            - dataset: Dataset model was trained on.
+            - model_type: Only for use of a newly trained model. This is used to find the newest trained model of this type.
         """
         logging.info(f"---------- Initializing Model Ealuation ----------")
         
-        self.model_directory = model_directory
+        # User can now both provide the path to model they want to evaluate, and not - meaning we get the newest for them
+        self.model_directory = model_directory or get_latest_model(models_directory = config.TRAINED_MODEL_STORAGE, model_type = model_type)
         try:
             # Load the metadata
             loader = load_model_metadata(model_directory)

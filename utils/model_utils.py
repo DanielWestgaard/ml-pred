@@ -276,6 +276,7 @@ def get_latest_model(models_directory: str, model_type: str = None) -> Optional[
     Returns:
         Path to latest model directory, or None if no models found
     """
+    print("Hello!!")
     latest_model = None
     latest_date = None
     
@@ -296,6 +297,7 @@ def get_latest_model(models_directory: str, model_type: str = None) -> Optional[
             except Exception as e:
                 logging.warning(f"Could not load metadata from {root}: {e}")
     
+    logging.debug(f"Utility function, get_latest_model(), found the latest trained model: {latest_model}")
     return latest_model
 
 

@@ -167,7 +167,7 @@ class ModelTraining():
         current_time = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
         
         # Directory and folder model and info will be saved under
-        directory = os.path.join(config.TRAINED_MODEL_PACKAGE_STORAGE, current_time)
+        directory = os.path.join(config.TRAINED_MODEL_STORAGE, current_time)
         
         # Create directory if it doesn't exist
         if not os.path.exists(directory):

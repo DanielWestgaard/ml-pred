@@ -91,6 +91,7 @@ python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_202501
 ```
 > [!NOTE]
 > The `--evaluate-fresh`/`-evf` flag stores true, so nothing needed after. This is meant to be used after training a model (after the `-ml` flag).
+
 2. Evaluate an _old_/**pre-trained**/**stored model**:
 When a model is, successfully trained, the Model Trainer will save it with metadata. The Evaluator will use the metadata file to find the used dataset and modeltype. So, using `main.py` provide the `-evo` flag followed by the path to the models `metadata.yml`-file.
 ```bash

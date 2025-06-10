@@ -112,13 +112,14 @@ def main():
         model = model_training.run()
     
     if args.evaluate_fresh or args.evaluate_old:
-        # How do I send with the model type AND provide dataset when evaluating an old model?
-        # Also, how can I optionally add argument to the -ev flag?
-        
-        # Either using the datapath for potentially newly trained model, or provided with evaluate-flag
-        dataset = args.model_training or args.evaluate_old
-        
-        evaluation = ModelEvaluation(model_directory = args.evaluate_old)
+        if args.evaluate_old:
+            evaluation = ModelEvaluation(model_directory = args.evaluate_old)
+        else:
+            try:  # I think we can safely use the model type, as this is 'part' meant the be used after newly trained model
+                evaluation = ModelEvaluation(model_type = model.type)
+            except Exception as e:
+                logging.warning(f"Unable to send with newly trained model, trying without: {e}")
+                evaluation = ModelEvaluation()
         evaluation.run()
 
 if __name__=="__main__":
