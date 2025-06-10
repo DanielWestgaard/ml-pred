@@ -84,18 +84,18 @@ Simple class having different evaluation implementations. One 'main' `run()` to 
 - `plot_model_prediction()`: Plot (trained) data with model predictions for 'manual inspection'.
 
 ### How to use
-1. Evaluate **right after training** a model (_fresh_):
-In main.py, first train the model, and then evaluate:
-```bash
-python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' -evf
-```
-> [!NOTE]
-> The `--evaluate-fresh`/`-evf` flag stores true, so nothing needed after. This is meant to be used after training a model (after the `-ml` flag).
-
-2. Evaluate an _old_/**pre-trained**/**stored model**:
+1. Evaluate an _old_/**pre-trained**/**stored model**:
 When a model is, successfully trained, the Model Trainer will save it with metadata. The Evaluator will use the metadata file to find the used dataset and modeltype. So, using `main.py` provide the `-evo` flag followed by the path to the models `metadata.yml`-file.
 ```bash
 python main.py -evo 'storage/models/2025-06-09_20:19:29/model_metadata.yml'
 ```
 > [!NOTE]
 > The `--evaluate-old`/`-evo` flag requires the path to `<SAVED INFORMATION ABOUT TRAINED MODEL>` info about the trained model.
+
+2. Evaluate **right after training** a model (_fresh_), though not recommended to avoid tming issues:
+In main.py, first train the model, and then evaluate:
+```bash
+python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' -evf
+```
+> [!NOTE]
+> The `--evaluate-fresh`/`-evf` flag stores true, so nothing needed after. This is meant to be used after training a model (after the `-ml` flag).

@@ -169,6 +169,9 @@ class ModelTraining():
         # Directory and folder model and info will be saved under
         directory = os.path.join(config.TRAINED_MODEL_STORAGE, current_time)
         
+        # Store the model directory for later use
+        self.model_directory = directory
+        
         # Create directory if it doesn't exist
         if not os.path.exists(directory):
             logging.debug(f"Creating directory now.")

@@ -15,6 +15,7 @@ from utils import shared_utils
 from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
 from model.evaluation import ModelEvaluation
+from utils.model_utils import get_latest_model
 
 
 def parse_arguments():
@@ -110,16 +111,28 @@ def main():
     if args.model_training:
         model_training = ModelTraining(dataset=args.model_training, model_type=args.model_type or 'xgboost')
         model = model_training.run()
+        
+        # Store the model directory for potential evaluation
+        if hasattr(model_training, 'model_directory'):
+            trained_model_dir = model_training.model_directory
+        else:
+            # Get the latest model directory that was just created
+            trained_model_dir = get_latest_model(models_directory=config.TRAINED_MODEL_STORAGE, 
+                                               model_type=args.model_type or 'xgboost')
     
     if args.evaluate_fresh or args.evaluate_old:
         if args.evaluate_old:
-            evaluation = ModelEvaluation(model_directory = args.evaluate_old)
+            # Evaluate specific model directory
+            evaluation = ModelEvaluation(model_directory=args.evaluate_old)
+        elif args.evaluate_fresh and trained_model_dir:
+            # Evaluate the model that was just trained
+            logging.info(f"Evaluating freshly trained model at: {trained_model_dir}")
+            evaluation = ModelEvaluation(model_directory=trained_model_dir)
         else:
-            try:  # I think we can safely use the model type, as this is 'part' meant the be used after newly trained model
-                evaluation = ModelEvaluation(model_type = model.type)
-            except Exception as e:
-                logging.warning(f"Unable to send with newly trained model, trying without: {e}")
-                evaluation = ModelEvaluation()
+            # Find the latest model of the specified type
+            logging.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
+            evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
+        
         evaluation.run()
 
 if __name__=="__main__":

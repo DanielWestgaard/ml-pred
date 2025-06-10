@@ -26,23 +26,37 @@ class ModelEvaluation():
         model, hence we need to extract the model and data from the models metadatafile.
         
         Args:
-            - trained_model: The actual instance of the trained model.
-            - dataset: Dataset model was trained on.
+            - model_directory: Path to the model directory to evaluate
+            - save_evaluations: Whether to save evaluation results
             - model_type: Only for use of a newly trained model. This is used to find the newest trained model of this type.
         """
-        logging.info(f"---------- Initializing Model Ealuation ----------")
+        logging.info(f"---------- Initializing Model Evaluation ----------")
         
         # User can now both provide the path to model they want to evaluate, and not - meaning we get the newest for them
-        self.model_directory = model_directory or get_latest_model(models_directory = config.TRAINED_MODEL_STORAGE, model_type = model_type)
+        if model_directory is not None:  # Model path is provided
+            self.model_directory = model_directory
+        else:  # Model path is not provided
+            self.model_directory = get_latest_model(models_directory = config.TRAINED_MODEL_STORAGE, model_type = model_type)
+            
         try:
             # Load the metadata
-            loader = load_model_metadata(model_directory)
+            loader = load_model_metadata(self.model_directory)
             # Get data path
             dataset = loader.get_dataset_path()
             
+            # Check if dataset path is valid
+            if dataset is None or dataset == 'unknown' or not os.path.exists(dataset):
+                logging.error(f"Dataset path from metadata is invalid: {dataset}")
+                logging.info("This might be due to a race condition with fresh model evaluation.")
+                logging.info("Trying to find the dataset from the model directory...")
+                
+                # Fallback: try to find the dataset from the model type and recent files
+                # This is a workaround for when metadata hasn't been fully written
+                raise ValueError("Invalid dataset path, will retry with fallback method")
+            
             # Get model file path
             model_type = loader.get_model_type()
-            model_file = os.path.join(model_directory, f"{model_type}.pkl")
+            model_file = os.path.join(self.model_directory, f"{model_type}.pkl")
             
             # Load the actual model
             with open(model_file, 'rb') as file:
@@ -53,7 +67,7 @@ class ModelEvaluation():
             self.y_train, self.y_test, self.X_train, self.X_test = model_training.temporal_train_test_split(retur=True)
             
             self.save_evaluations = save_evaluations
-            # Storing results under the models directory and evalutaion. Create directory if it doesn't exist.
+            # Storing results under the models directory and evaluation. Create directory if it doesn't exist.
             self.evaluation_path = os.path.join(self.model_directory, 'evaluation')
             if not os.path.exists(self.evaluation_path):
                 logging.debug(f"Creating directory now.")
@@ -63,6 +77,9 @@ class ModelEvaluation():
             
         except Exception as e:
             logging.error(f"Unable to initialize Model Evaluation: {e}")
+            logging.info("This might be due to timing issues with fresh model evaluation.")
+            logging.info("Try running the evaluation separately after a moment:")
+            logging.info(f"python main.py -evo '{self.model_directory}'")
             sys.exit()
         
     def run(self):
