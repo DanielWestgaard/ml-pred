@@ -38,7 +38,7 @@ DATA_ENGINEERING_STATS_DIR = os.path.join(BASE_STORAGE_DIR, 'data_engineering_st
 CLEANED_DATA_BASE_DIR = os.path.join(DATA_ENGINEERING_STATS_DIR, 'cleaned_data')
 FE_SEL_BASE_DIR = os.path.join(DATA_ENGINEERING_STATS_DIR, 'fe_selection')
 # ML Model
-TRAINED_MODEL_PACKAGE_STORAGE = os.path.join(BASE_STORAGE_DIR, 'models')
+TRAINED_MODEL_STORAGE = os.path.join(BASE_STORAGE_DIR, 'models')
 
 # LOGGING
 DEFAULT_LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
