@@ -1,7 +1,7 @@
-# About data/
+# About data/ 💽
 This folder will be solely responsible for engineering data that a ML model will use for training.
 
-## Focus points
+## Focus points (not updated - TODO) 🎯
 - **Quality data**: Make sure the data is reliable.
 - **A lot of historical data**: The more data, the better.
 - **Cleaning**: Make sure data is accurate, consistent, and free from errors or irrelevant information.
@@ -11,7 +11,7 @@ This folder will be solely responsible for engineering data that a ML model will
 - ...
 
 
-## Structure
+## Structure 🗂️
 Will also use this for planning.
 ```
 ├── providers                   # Different providers/sources to get/retrieve historical data
@@ -39,17 +39,19 @@ Will also use this for planning.
 ```
 
 
-## Important notes:
+## Important notes: 📝
 - Cleaning, timezone: As I understand it, capital.com API uses "snapshotTimeUTC", so that's what I'll use (temporary). - _timestamp_alignment(). Should be improved when using other providers using another timezone.
 - The library pandas_lib could really help with calculating features, but the following error appears on (on any Python version) ``` ImportError: cannot import name 'NaN' from 'numpy' ```. After some reasearch, this appears after numpy version 2.0. Considering I'll use this project and the whole pipeline on other servers/machines one day, I will create my own functions/calculations as to not rely on older libraries.
 - Fetching historical data using providers/capital_com.py: It uses (naturally) an API that returns both bid and ask prices, but the code will "Calculate mid prices (average of bid and ask) with rounding" so its easier to train. I don't know if that's the best solution, but currently the one in place.
   - Under the ```broker/``` component, you can see that the actual ```broker/capital_com/rest_api/markets_info.py``` and the function called ```fetch_and_save_historical_prices()```, uses ```convert_json_to_ohlcv_csv``` method from ```utils/broker``` to "calculate" these "new prices" from the actual response.
 
 
-## About pipelines/
-### Data Pipeline
+# About pipelines/ 👨‍🔧
+
+## Data Pipeline 💽🪠
 This is the main orchestrator for processing and engineering raw data into clean, validated, feature rich, processed data - ready to be used for training Machine Learning Model/-s.<br>
-#### How to use
+
+### How to use 🙋‍♂️
 There are 2 ways of running the Data Pipeline on your raw data:
 1. **Default/Standard**: The Pipeline will do the _usual flow_ of (simplified) `Cleaning` -> `Validation` -> `Feature Generation` -> `Transformation` -> `Feature Selection` -> `Save`.
     - Use `main.py` to run the Data Pipeline on your processed data: (flag-name might change in the future)
