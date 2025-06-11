@@ -59,7 +59,7 @@ class EngineeringPipeline():
         
         # Clean the data
         self.df = self.cleaner.run()
-        sys.exit()
+        
         # Validate
         self.validator = DataValidator(self.df)
         self.validator_results = self.validator.run()
