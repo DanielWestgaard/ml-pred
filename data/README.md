@@ -69,7 +69,7 @@ There are 2 ways of running the Data Pipeline on your raw data:
         ```
     
 2. **Focusing on a Hypothesis**: The pipeline will have a somewhat different flow: `Cleaning` -> `Validation` -> `Generation` (only generating the specified features from given hypothesis config-file) -> `Target Hypothesis` (creating/calculating target column representing the Hypothesis - what the Model will predict) -> `Transformation` -> `Save`.<br>
-This really is at the heart of this project. Check out the documentation under `hypothesis/` to see what this is, and how to create one to focus on.
+This really is at **the heart of this project**. Check out the documentation under `hypothesis/` and `Target Hypothesis` (chapter _here_) to see what this is, and how to create one to focus on (`config.yml`, `README.md`, new method in `target_hypothesis.py`).<br>
 When this is done, you can:
     - Use `main.py`and run the Pipeline like this (eg.):
         ```bash
@@ -83,8 +83,8 @@ When this is done, you can:
         ```
 
 > [!NOTE]
-> Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/` and use the existing functionality as examples. However, this is currently a quick run-down:
-> 1. `config.yml`-file for the hypothesis in the given format.
+> Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/`, under `Processing`/`Target Hypothesis` in this document, and use the existing functionality as examples. However, this is currently a quick run-down:
+> 1. `config.yml`-file for the hypothesis in the given format. Also recommended to have a `README.md` under the directory of your hypothesis for a more detailed description, but not needed for this functionality to work.
 > 2. Create a method in the (`data/features/`)`target_hypothesis.py` to calculate your `target` (the hypothesis). Eg. like Hypothesis 1 ("session_based_tod_anomalies").<br>
 
 
