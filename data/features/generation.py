@@ -3,14 +3,15 @@ import pandas as pd
 import numpy as np
 import scipy
 from scipy.fft import fft, fftfreq
-from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
+from statsmodels.tsa.seasonal import seasonal_decompose, STL, MSTL
 import time
+from contextlib import contextmanager
 
 from utils import data_utils
 
 
 class FeatureGenerator():
-    def __init__(self, dataset, selected_features:list = None):
+    def __init__(self, dataset, selected_features: list = None):
         """
         Class focusing on generating features with helpful prediction powers,
         that might help a ML model learn and predict better.
@@ -164,6 +165,119 @@ class FeatureGenerator():
         features_list = [col for col in columns if col not in basic_cols]
         
         return len(features_list), features_list
+    
+    # =============================================================================
+    # Section: Helper Methods for Efficient Column Operations
+    # =============================================================================
+
+    def _add_columns_batch(self, new_columns_dict, prefix=None):
+        """
+        Efficiently add multiple columns to the DataFrame at once.
+        
+        Parameters:
+        -----------
+        new_columns_dict : dict
+            Dictionary where keys are column names and values are Series/arrays
+        prefix : str, optional
+            Prefix to add to all column names
+        """
+        if not new_columns_dict:
+            return
+            
+        # Create DataFrame from new columns
+        if prefix:
+            new_columns_dict = {f"{prefix}_{k}": v for k, v in new_columns_dict.items()}
+        
+        new_df = pd.DataFrame(new_columns_dict, index=self.df.index)
+        
+        # Concatenate with existing DataFrame
+        self.df = pd.concat([self.df, new_df], axis=1)
+    
+    def _add_columns_with_dummies(self, new_columns_dict, dummy_columns=None):
+        """
+        Add columns and their one-hot encoded versions in a single operation.
+        
+        Parameters:
+        -----------
+        new_columns_dict : dict
+            Dictionary of new columns to add
+        dummy_columns : list, optional
+            List of column names to create dummies for
+        """
+        if not new_columns_dict:
+            return
+            
+        # Create main DataFrame
+        new_df = pd.DataFrame(new_columns_dict, index=self.df.index)
+        
+        # Add dummy columns if specified
+        if dummy_columns:
+            for col in dummy_columns:
+                if col in new_columns_dict:
+                    dummies = pd.get_dummies(
+                        pd.Series(new_columns_dict[col], index=self.df.index), 
+                        prefix=col
+                    )
+                    new_df = pd.concat([new_df, dummies], axis=1)
+        
+        # Concatenate with existing DataFrame
+        self.df = pd.concat([self.df, new_df], axis=1)
+    
+    @contextmanager
+    def _batch_column_context(self):
+        """
+        Context manager for batching column operations.
+        Usage:
+            with self._batch_column_context() as batch:
+                batch['new_col1'] = series1
+                batch['new_col2'] = series2
+        """
+        batch_dict = {}
+        try:
+            yield batch_dict
+        finally:
+            if batch_dict:
+                self._add_columns_batch(batch_dict)
+    
+    def _calculate_multiple_periods(self, base_series, periods, operation, **kwargs):
+        """
+        Calculate the same operation for multiple periods efficiently.
+        
+        Parameters:
+        -----------
+        base_series : pd.Series
+            The series to operate on
+        periods : list
+            List of periods to calculate
+        operation : str
+            Type of operation ('rolling_mean', 'rolling_std', 'ewm_mean', 'pct_change', etc.)
+        **kwargs : additional arguments for the operation
+        
+        Returns:
+        --------
+        dict : Dictionary with period as key and result series as value
+        """
+        results = {}
+        
+        for period in periods:
+            if operation == 'rolling_mean':
+                results[period] = base_series.rolling(window=period, **kwargs).mean()
+            elif operation == 'rolling_std':
+                results[period] = base_series.rolling(window=period, **kwargs).std()
+            elif operation == 'ewm_mean':
+                results[period] = base_series.ewm(span=period, adjust=False, min_periods=period, **kwargs).mean()
+            elif operation == 'pct_change':
+                results[period] = (base_series / base_series.shift(period) - 1) * 100
+            elif operation == 'rolling_min':
+                results[period] = base_series.rolling(window=period, **kwargs).min()
+            elif operation == 'rolling_max':
+                results[period] = base_series.rolling(window=period, **kwargs).max()
+            elif operation == 'rolling_sum':
+                results[period] = base_series.rolling(window=period, **kwargs).sum()
+            else:
+                raise ValueError(f"Unsupported operation: {operation}")
+                
+        return results
     
     # =============================================================================
     # Section: Price Action Features
