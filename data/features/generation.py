@@ -906,29 +906,37 @@ class FeatureGenerator():
             Number of volatility regimes to identify (typically 2 or 3)
         """
         # Calculate rolling volatility (standard deviation of returns)
-        self.df['returns'] = self.df['close'].pct_change()
-        self.df['volatility_short'] = self.df['returns'].rolling(window=lookback_short).std() * np.sqrt(252)  # Annualized
-        self.df['volatility_long'] = self.df['returns'].rolling(window=lookback_long).std() * np.sqrt(252)
-        self.df['volatility_long'] = self.df['volatility_long'].replace(0, np.nan)
+        returns = self.df['close'].pct_change()
         
-        # Volatility ratio (current vol relative to longer-term vol)
-        self.df['volatility_ratio'] = self.df['volatility_short'] / self.df['volatility_long']
-        # Add a small epsilon to avoid division by extremely small numbers
+        # Create all new columns in a dictionary first
+        new_columns = {}
+        
+        # Calculate volatility components
+        volatility_short = returns.rolling(window=lookback_short).std() * np.sqrt(252)  # Annualized
+        volatility_long = returns.rolling(window=lookback_long).std() * np.sqrt(252)
+        volatility_long = volatility_long.replace(0, np.nan)
+        
+        # Add epsilon to avoid division by extremely small numbers
         epsilon = 1e-8
-        self.df['volatility_ratio'] = self.df['volatility_short'] / (self.df['volatility_long'] + epsilon)
-
+        volatility_ratio = volatility_short / (volatility_long + epsilon)
+        
+        # Store in dictionary
+        new_columns['returns'] = returns
+        new_columns['volatility_short'] = volatility_short
+        new_columns['volatility_long'] = volatility_long
+        new_columns['volatility_ratio'] = volatility_ratio
         
         # Identify volatility regimes using quantiles
         if n_regimes == 2:
             # Simple binary regime (high/low)
-            self.df['volatility_regime'] = np.where(
-                self.df['volatility_short'] > self.df['volatility_short'].rolling(window=lookback_long).quantile(0.5),
+            volatility_regime = np.where(
+                volatility_short > volatility_short.rolling(window=lookback_long).quantile(0.5),
                 'high', 'low'
             )
         else:
             # Multi-regime approach (e.g., low/medium/high)
             # Calculate historical percentiles for current volatility
-            vol_percentile = self.df['volatility_short'].rolling(window=lookback_long).apply(
+            vol_percentile = volatility_short.rolling(window=lookback_long).apply(
                 lambda x: pd.Series(x).rank(pct=True).iloc[-1]
             )
             
@@ -939,19 +947,27 @@ class FeatureGenerator():
                 (vol_percentile >= 0.66)
             ]
             choices = ['low', 'medium', 'high']
-            self.df['volatility_regime'] = np.select(conditions, choices, default='medium')
+            volatility_regime = np.select(conditions, choices, default='medium')
+        
+        new_columns['volatility_regime'] = volatility_regime
         
         # One-hot encode the regime if needed for ML
-        regime_dummies = pd.get_dummies(self.df['volatility_regime'], prefix='vol_regime')
-        self.df = pd.concat([self.df, regime_dummies], axis=1)
+        regime_dummies = pd.get_dummies(pd.Series(volatility_regime, index=self.df.index), prefix='vol_regime')
         
-        # Also add a continuous volatility Z-score (how many standard deviations from mean)
-        vol_mean = self.df['volatility_short'].rolling(window=lookback_long).mean()
-        vol_std = self.df['volatility_short'].rolling(window=lookback_long).std()
-        self.df['volatility_zscore'] = (self.df['volatility_short'] - vol_mean) / vol_std
+        # Add continuous volatility Z-score
+        vol_mean = volatility_short.rolling(window=lookback_long).mean()
+        vol_std = volatility_short.rolling(window=lookback_long).std()
+        new_columns['volatility_zscore'] = (volatility_short - vol_mean) / vol_std
         
         # Volatility acceleration/deceleration
-        self.df['volatility_change'] = np.log(self.df['volatility_short'] + epsilon).diff(5)
+        new_columns['volatility_change'] = np.log(volatility_short + epsilon).diff(5)
+        
+        # Create DataFrame from new columns and concatenate all at once
+        new_df = pd.DataFrame(new_columns, index=self.df.index)
+        new_df = pd.concat([new_df, regime_dummies], axis=1)
+        
+        # Concatenate with original DataFrame
+        self.df = pd.concat([self.df, new_df], axis=1)
 
     def trend_strength_indicators(self, lookback=20, adx_threshold=25):
         """
