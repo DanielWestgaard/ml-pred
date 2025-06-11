@@ -33,7 +33,7 @@ def parse_arguments():
     parser.add_argument('--plot-data', '-pd', default=False, help='Plot dataset containing candlestick data.')
     
     # Data Pipeline
-    parser.add_argument('--engineer-data', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
+    parser.add_argument('--engineer-data', '-eg', default=False, help='Run data engineering pipeline to engineer raw datasets (csv-format).')
     
     # Hypothesis 
     parser.add_argument('--hypothesis', '-hyp', default=False, help='Run data engineering pipeline with hypoethesis: Provide path to the config.yml file.')
