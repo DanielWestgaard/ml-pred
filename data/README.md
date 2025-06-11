@@ -86,7 +86,7 @@ When this is done, you can:
         ```
 
 > [!NOTE]
-> Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/`, under `Processing`/`Target Hypothesis` in this document, and use the existing functionality as examples. However, this is currently a quick run-down:
+> Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/` and under `Processing`/`Target Hypothesis` in this document. Also, use the existing functionality as examples. This is currently a quick run-down:
 > 1. `config.yml`-file for the hypothesis in the given format. Also recommended to have a `README.md` under the directory of your hypothesis for a more detailed description, but not needed for this functionality to work.
 > 2. Create a method in the (`data/features/`)`target_hypothesis.py` to calculate your `target` (the hypothesis). Eg. like Hypothesis 1 ("session_based_tod_anomalies").<br>
 
