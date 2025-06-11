@@ -86,7 +86,7 @@ When this is done, you can:
         ```
 
 > [!NOTE]
-> Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/` and under `Processing`/`Target Hypothesis` in this document. Also, use the existing functionality as examples. This is currently a quick run-down:
+> Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/` and under `Features`/`Target Hypothesis` in this document. Also, use the existing functionality as examples. This is currently a quick run-down:
 > 1. `config.yml`-file for the hypothesis in the given format. Also recommended to have a `README.md` under the directory of your hypothesis for a more detailed description, but not needed for this functionality to work.
 > 2. Create a method in the (`data/features/`)`target_hypothesis.py` to calculate your `target` (the hypothesis). Eg. like Hypothesis 1 ("session_based_tod_anomalies").<br>
 
@@ -172,10 +172,10 @@ The ```run()``` has some functionality that excludes some features from normaliz
 > [!NOTE]
 > There are several steps in the normalization process that exludes some features with particular prefixes (eg. like starting with ```target_```) from normalization.
 
-### About Creating Target Column for the Hypothesis - target_hypothesis.py
-If the pipeline is being ran with ```hypothesis``` argument, the selection process is skipped and this is ran after generation.<br>
-It's basically setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file.<br>
-For a more through and technical description, see the ```README.md``` documentation under the ```hypothesis/``` folder.
+### Creating Target Column (for the Hypothesis) - target_hypothesis.py
+If the pipeline is being ran with ```hypothesis``` argument (path to `config.yml`), the `Feature Selection` process is skipped and this (file) is ran after `Feature Generation`.<br>
+It's basically calculating and setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file.<br>
+For some more background and format, see the ```README.md``` documentation under the ```hypothesis/``` folder.
 > [!IMPORTANT]
 > When adding functionality for new hypotheses: Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
 

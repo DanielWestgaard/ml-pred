@@ -11,6 +11,12 @@ The purpose of this is that beating the market is _near_ impossible (considering
 └── README.md                               # You are here - description about this folder
 ```
 
+# Adding a new hypothesis
+Each new (and all existing) hypotheses should follow _this_ structure.<br>
+1. Create a new folder named after your hypothesis.
+2. Create a `config.yml` file for configuring the hypothesis and other potential parameters, following the given format.
+3. Optionally, though recommended, a `README.md` describing the hypothesis in more detail and with better formulations.
+4. Add a method in the (`data/features/`)`target_hypothesis.py` that calculates the target column, representing the hypothesis (that a model will predict).
 
 ## config.yml structure
 This should serve as an example template to how features are selected to new hypotheses.
