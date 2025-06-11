@@ -157,6 +157,7 @@ def some_feature(self):
 ### Normalization
 Simple Normalization class that uses **two Normalization Techniques**; [Z-Score](https://www.investopedia.com/terms/z/zscore.asp) for _Unbounded_ (no boundaries of certainty) features and [MinMax Scaker](https://medium.com/@iamkamleshrangi/how-min-max-scaler-works-9fbebb9347da) for _Bounded_ (field that has limited scope) features.<br>
 The ```run()``` has some functionality that excludes some features from normalization:
+- **Features with prefix (starting with) `target_`**, as this is how target hypothesis columns are calculated and named.
 - **String Categorical Features**:
   - ```market_state_desc``` (e.g., 'low_vol_ranging', 'high_vol_strong_trend')
   - ```adx_trend_regime``` (e.g., 'trending', 'ranging')
