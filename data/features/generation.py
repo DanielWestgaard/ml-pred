@@ -166,6 +166,32 @@ class FeatureGenerator():
         
         return len(features_list), features_list
     
+    def _add_features_efficiently(self, new_features_dict, drop_columns=None):
+        """
+        Helper method to add multiple features efficiently without DataFrame fragmentation.
+        
+        Parameters:
+        -----------
+        new_features_dict : dict
+            Dictionary where keys are column names and values are Series/arrays with the feature data
+        drop_columns : list, optional
+            List of column names to drop after adding new features (for intermediate calculations)
+        """
+        if not new_features_dict:
+            return
+            
+        # Create DataFrame from new features
+        new_features_df = pd.DataFrame(new_features_dict, index=self.df.index)
+        
+        # Concatenate with original DataFrame
+        self.df = pd.concat([self.df, new_features_df], axis=1)
+        
+        # Drop intermediate columns if specified
+        if drop_columns:
+            existing_drop_cols = [col for col in drop_columns if col in self.df.columns]
+            if existing_drop_cols:
+                self.df = self.df.drop(columns=existing_drop_cols)
+    
     # =============================================================================
     # Section: Helper Methods for Efficient Column Operations
     # =============================================================================
