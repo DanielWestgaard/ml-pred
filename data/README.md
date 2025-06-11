@@ -26,7 +26,7 @@ Will also use this for planning.
 ├── features/                   # Feature engineering
 │   ├── generation.py           # Generating features with simplistic error handling
 │   ├── normalization.py        # Rescaling numeric data to a standard range
-│   ├── target_hypothesis.py    # Functions realated to getting/calculating- and setting target to the selected hypothesis (based on 'name' var in the hypotheses config.yml-file)
+│   ├── target_hypothesis.py    # Methods realated to calculating and setting target to the selected hypothesis (based on 'name' var in the hypotheses config.yml-file)
 │   └── selection.py            # Various techniques (3) to select the "most efficient" features
 │
 ├── pipeline/                   # Pipeline orchestration
@@ -69,7 +69,7 @@ There are 2 ways of running the Data Pipeline on your raw data:
         ```
     
 2. **Focusing on a Hypothesis**: The pipeline will have a somewhat different flow: `Cleaning` -> `Validation` -> `Generation` (only generating the specified features from given hypothesis config-file) -> `Target Hypothesis` (creating/calculating target column representing the Hypothesis - what the Model will predict) -> `Transformation` -> `Save`.<br>
-This really is at **the heart of this project**. Check out the documentation under `hypothesis/` and `Target Hypothesis` (chapter _here_) to see what this is, and how to create one to focus on (`config.yml`, `README.md`, new method in `target_hypothesis.py`).<br>
+This really is at **the heart of this project**. Check out the documentation under `hypothesis/` and `Target Hypothesis` (chapter _in this readme file_) to see what this is, and how to create one to focus on (`config.yml`, `README.md`, new method in `target_hypothesis.py`).<br>
 When this is done, you can:
     - Use `main.py`and run the Pipeline like this (eg.):
         ```bash
@@ -176,7 +176,8 @@ The ```run()``` has some functionality that excludes some features from normaliz
 
 ## Creating Target Column (for the Hypothesis) - target_hypothesis.py
 If the pipeline is being ran with ```hypothesis``` argument (path to `config.yml`), the `Feature Selection` process is skipped and this (file) is ran after `Feature Generation`.<br>
-It's basically calculating and setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file. This implementation follows some other files' implementations; It's using the `shared_utils.list_of_functions_in_class` to dynamically list all method names in the class. Then, we run the **method name that matches with the hypothesis name** - meaning it's **important** they match!<br>
+It's basically calculating and setting target column to the hypothesis: In this ```taget_hypothesis.py```-file, based on the `name` of the hypothesis in the ```config.yml```-file.<br>
+The approach is to use `shared_utils.list_of_functions_in_class` to dynamically list all method names in the class. Then, we run the **method name that matches with the hypothesis name** - meaning it's **important** they match!<br>
 For some more background and format, see the ```README.md``` documentation under the ```hypothesis/``` folder.
 > [!IMPORTANT]
 > When adding functionality for new hypotheses: Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
