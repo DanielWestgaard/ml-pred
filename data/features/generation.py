@@ -3,14 +3,15 @@ import pandas as pd
 import numpy as np
 import scipy
 from scipy.fft import fft, fftfreq
-from statsmodels.tsa.seasonal import seasonal_decompose, STL , MSTL
+from statsmodels.tsa.seasonal import seasonal_decompose, STL, MSTL
 import time
+from contextlib import contextmanager
 
 from utils import data_utils
 
 
 class FeatureGenerator():
-    def __init__(self, dataset, selected_features:list = None):
+    def __init__(self, dataset, selected_features: list = None):
         """
         Class focusing on generating features with helpful prediction powers,
         that might help a ML model learn and predict better.
@@ -165,6 +166,32 @@ class FeatureGenerator():
         
         return len(features_list), features_list
     
+    def _add_features_efficiently(self, new_features_dict, drop_columns=None):
+        """
+        Helper method to add multiple features efficiently without DataFrame fragmentation.
+        
+        Parameters:
+        -----------
+        new_features_dict : dict
+            Dictionary where keys are column names and values are Series/arrays with the feature data
+        drop_columns : list, optional
+            List of column names to drop after adding new features (for intermediate calculations)
+        """
+        if not new_features_dict:
+            return
+            
+        # Create DataFrame from new features
+        new_features_df = pd.DataFrame(new_features_dict, index=self.df.index)
+        
+        # Concatenate with original DataFrame
+        self.df = pd.concat([self.df, new_features_df], axis=1)
+        
+        # Drop intermediate columns if specified
+        if drop_columns:
+            existing_drop_cols = [col for col in drop_columns if col in self.df.columns]
+            if existing_drop_cols:
+                self.df = self.df.drop(columns=existing_drop_cols)
+    
     # =============================================================================
     # Section: Price Action Features
     # =============================================================================
@@ -173,48 +200,91 @@ class FeatureGenerator():
         """Generating/calculating both simple and exponential moving averages over different time periods."""
         num_periods = [5, 10, 20, 50, 200]
         
+        # Collect all moving averages in a dictionary
+        new_features = {}
+        
         for period in num_periods:
-            self.df[f"sma_{period}"] = self.df["close"].rolling(window=period).mean()
-            self.df[f"ema_{period}"] = self.df["close"].ewm(span=period, adjust=False, min_periods=period).mean()
+            new_features[f"sma_{period}"] = self.df["close"].rolling(window=period).mean()
+            new_features[f"ema_{period}"] = self.df["close"].ewm(span=period, adjust=False, min_periods=period).mean()
+        
+        # Add all features at once
+        self._add_features_efficiently(new_features)
         
     def rate_of_change(self):
         """Price momentum: Rate of change (ROC) over various lookback periods."""
         lookback_periods = [1, 5, 10, 20, 60]
         
+        new_features = {}
+        
         for period in lookback_periods:
             # Standard ROC formula: [(Close_t / Close_t-n) - 1] * 100
-            self.df[f"roc_{period}"] = (self.df["close"] / self.df["close"].shift(period) - 1) * 100
+            new_features[f"roc_{period}"] = (self.df["close"] / self.df["close"].shift(period) - 1) * 100
+        
+        self._add_features_efficiently(new_features)
+
     
     def average_true_range(self, period_atr:int = 14):
         """Average of true ranges over specified period. ATR measures volatility, taking into account any gaps in the price movement"""
-        self.df["high_low"] = self.df["high"] - self.df["low"]                          # Current High — Current Low
-        self.df["high_prev_close"] = abs(self.df["high"] - self.df["close"].shift(1))   # |Current High — Previous Close|
-        self.df["low_prev_close"] = abs(self.df["low"] - self.df["close"].shift(1))     # |Current Low — Previous Close|
-        self.df["true_range"] = self.df[['high_low', 'high_prev_close', 'low_prev_close']].max(axis=1)
         
-        self.df["atr"] = self.df["true_range"].ewm(span=period_atr, adjust=False).mean()
-        # Dropping used columns
-        self.df = self.df.drop(columns=["high_low", "high_prev_close", "low_prev_close", "true_range"], axis=1)
+        # Calculate all components without adding to DataFrame
+        high_low = self.df["high"] - self.df["low"]
+        high_prev_close = abs(self.df["high"] - self.df["close"].shift(1))
+        low_prev_close = abs(self.df["low"] - self.df["close"].shift(1))
+        
+        # Calculate true range using vectorized max
+        true_range_df = pd.DataFrame({
+            'high_low': high_low,
+            'high_prev_close': high_prev_close,
+            'low_prev_close': low_prev_close
+        })
+        true_range = true_range_df.max(axis=1)
+        
+        # Calculate ATR
+        atr = true_range.ewm(span=period_atr, adjust=False).mean()
+        
+        # Add only the final ATR feature
+        self._add_features_efficiently({"atr": atr})
 
     def bollinger_bands(self, period_bb:int = 20):
         """Statistical chart characterizing the prices and volatility over time. Represent standard deviation channels around price"""
-        # middle band is sma
-        self.df["std"] = self.df["close"].rolling(window=period_bb).std()  # rolling standard deviation
+        
+        # Calculate all components
+        sma_key = f'sma_{period_bb}'
+        std = self.df["close"].rolling(window=period_bb).std()
         num_std_dev = 2
-        if f'sma_{period_bb}' not in self.df.columns:  # if sma_n isn't a generated feature, generate it first
-            self.df[f"sma_{period_bb}"] = self.df["close"].rolling(window=period_bb).mean()
-        self.df['upper_band'] = self.df[f'sma_{period_bb}'] + (num_std_dev * self.df['std'])
-        self.df['lower_band'] = self.df[f'sma_{period_bb}'] - (num_std_dev * self.df['std'])
-        # Add Bollinger Band Width
-        self.df['bb_width'] = (self.df['upper_band'] - self.df['lower_band']) / self.df[f'sma_{period_bb}']
+        
+        # Check if SMA already exists, if not calculate it
+        if sma_key not in self.df.columns:
+            sma = self.df["close"].rolling(window=period_bb).mean()
+        else:
+            sma = self.df[sma_key]
+        
+        # Calculate bands
+        upper_band = sma + (num_std_dev * std)
+        lower_band = sma - (num_std_dev * std)
+        bb_width = (upper_band - lower_band) / sma
+        
+        # Prepare new features
+        new_features = {
+            'upper_band': upper_band,
+            'lower_band': lower_band,
+            'bb_width': bb_width
+        }
+        
+        # Add SMA if it wasn't already present
+        if sma_key not in self.df.columns:
+            new_features[sma_key] = sma
+            
+        self._add_features_efficiently(new_features)
         
     def support_resistance(self, lookback=20):
         """Distance from recent high/lows."""
-        # Distance from recent high
-        self.df['distance_from_high'] = (self.df['close'] / self.df['high'].rolling(lookback).max() - 1) * 100
+        new_features = {
+            'distance_from_high': (self.df['close'] / self.df['high'].rolling(lookback).max() - 1) * 100,
+            'distance_from_low': (self.df['close'] / self.df['low'].rolling(lookback).min() - 1) * 100
+        }
         
-        # Distance from recent low
-        self.df['distance_from_low'] = (self.df['close'] / self.df['low'].rolling(lookback).min() - 1) * 100
+        self._add_features_efficiently(new_features)
         
         # TODO: add "distance from pivot points"
         
@@ -225,16 +295,25 @@ class FeatureGenerator():
         """Identify unusual volume spikes."""
         num_periods = [7, 15, 30, 60]
         
+        new_features = {}
+        
         for period in num_periods:
-            self.df[f'vma_{period}'] = self.df['volume'].rolling(window=period).mean()
-            self.df[f'relative_volume_{period}'] = self.df['volume'] / self.df[f'vma_{period}']
+            vma = self.df['volume'].rolling(window=period).mean()
+            new_features[f'vma_{period}'] = vma
+            new_features[f'relative_volume_{period}'] = self.df['volume'] / vma
+            
+        self._add_features_efficiently(new_features)
             
     def volume_rate_of_change(self):
         """How rapidly volume is increasing/decreasing."""
         lookback_periods = [1, 5, 10, 20]
         
+        new_features = {}
+        
         for period in lookback_periods:
-            self.df[f"vroc_{period}"] = (self.df["volume"] / self.df["volume"].shift(period) - 1) * 100
+            new_features[f"vroc_{period}"] = (self.df["volume"] / self.df["volume"].shift(period) - 1) * 100
+        
+        self._add_features_efficiently(new_features)
         
     def on_balance_volume(self):
         """Cumulative indicator that relates volume to price changes."""
@@ -244,12 +323,14 @@ class FeatureGenerator():
         price_direction[self.df['close'].diff() == 0] = 0
         # Calculate OBV
         volume_direction = self.df['volume'] * price_direction
-        self.df['obv'] = volume_direction.cumsum()
+        obv = volume_direction.cumsum()
+        
+        self._add_features_efficiently({'obv': obv})
         
     def volume_profile(self, num_bins=10, lookback=20, key_metrics=True):
         """
         Calculate rolling volume profile with adaptive bins and key metrics.
-        
+
         Volume Profile shows the distribution of trading volume across price levels,
         identifying areas of high interest/liquidity in the market.
         
@@ -268,46 +349,54 @@ class FeatureGenerator():
         # Vectorized calculation of min/max for each window
         rolling_min = self.df['low'].rolling(window=lookback).min()
         rolling_max = self.df['high'].rolling(window=lookback).max()
+        typical_price = (self.df['high'] + self.df['low'] + self.df['close']) / 3
         
-        # Calculate VWAP for each period for better volume distribution
-        self.df['typical_price'] = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        # Initialize new features dictionary
+        new_features = {}
         
-        # Process each window more efficiently
+        # Add typical_price temporarily for calculations
+        temp_df = self.df.copy()
+        temp_df['typical_price'] = typical_price
+        
+        # Initialize arrays for key metrics
+        vol_poc = np.full(len(self.df), np.nan)
+        vol_va_high = np.full(len(self.df), np.nan)
+        vol_va_low = np.full(len(self.df), np.nan)
+        vol_va_width = np.full(len(self.df), np.nan)
+        
+        # Process each window
         for i in range(lookback, len(self.df)):
-            window = self.df.iloc[i-lookback:i]
+            window = temp_df.iloc[i-lookback:i]
             price_min = rolling_min.iloc[i]
             price_max = rolling_max.iloc[i]
             price_range = price_max - price_min
             
-            if price_range > 0:  # Prevent division by zero
+            if price_range > 0:
                 bin_size = price_range / num_bins
                 
-                # Calculate volume distribution using typical price for better accuracy
+                # Calculate volume distribution
                 for j, row in window.iterrows():
-                    # Determine which bin this bar's volume belongs to
                     bin_idx = min(num_bins - 1, int((row['typical_price'] - price_min) / bin_size))
-                    
-                    # Add time decay - more recent volume has higher weight
-                    time_factor = 1 + 0.1 * (window.index.get_loc(j) / lookback)  # 10% boost for recent data
+                    time_factor = 1 + 0.1 * (window.index.get_loc(j) / lookback)
                     vol_profiles[i, bin_idx] += row['volume'] * time_factor
-                    
-                # Normalize the volume profile (percentage of total volume)
+                
+                # Normalize
                 total_vol = np.sum(vol_profiles[i])
                 if total_vol > 0:
                     vol_profiles[i] = vol_profiles[i] / total_vol * 100
                 
-                # Add to dataframe
+                # Add volume profile bins to features
                 for bin_num in range(num_bins):
-                    self.df.loc[self.df.index[i], f'vol_bin_{bin_num}'] = vol_profiles[i, bin_num]
+                    if f'vol_bin_{bin_num}' not in new_features:
+                        new_features[f'vol_bin_{bin_num}'] = np.full(len(self.df), np.nan)
+                    new_features[f'vol_bin_{bin_num}'][i] = vol_profiles[i, bin_num]
                 
-                # Calculate key volume profile metrics
+                # Calculate key metrics if requested
                 if key_metrics:
-                    # Point of Control (POC) - price level with highest volume
                     poc_bin = np.argmax(vol_profiles[i])
-                    poc_price = price_min + (poc_bin + 0.5) * bin_size
-                    self.df.loc[self.df.index[i], 'vol_poc'] = poc_price
+                    vol_poc[i] = price_min + (poc_bin + 0.5) * bin_size
                     
-                    # Value Area - price range containing specified volume percentage (typically 70%)
+                    # Value Area calculation
                     value_area_threshold = 0.7
                     sorted_bins = np.argsort(vol_profiles[i])[::-1]
                     cum_vol = 0
@@ -319,37 +408,41 @@ class FeatureGenerator():
                         if cum_vol >= value_area_threshold:
                             break
                     
-                    value_area_high = price_min + (max(value_area_bins) + 1) * bin_size
-                    value_area_low = price_min + min(value_area_bins) * bin_size
-                    
-                    self.df.loc[self.df.index[i], 'vol_va_high'] = value_area_high
-                    self.df.loc[self.df.index[i], 'vol_va_low'] = value_area_low
-                    self.df.loc[self.df.index[i], 'vol_va_width'] = (value_area_high - value_area_low) / price_range
+                    vol_va_high[i] = price_min + (max(value_area_bins) + 1) * bin_size
+                    vol_va_low[i] = price_min + min(value_area_bins) * bin_size
+                    vol_va_width[i] = (vol_va_high[i] - vol_va_low[i]) / price_range
         
-        # Calculate features from volume profile for ML
-        if key_metrics and 'vol_poc' in self.df.columns:
-            # Distance of close from POC (shows potential mean reversion)
-            self.df['close_to_poc_pct'] = (self.df['close'] - self.df['vol_poc']) / self.df['vol_poc'] * 100
+        # Convert arrays to Series and add to features
+        if key_metrics:
+            new_features['vol_poc'] = pd.Series(vol_poc, index=self.df.index)
+            new_features['vol_va_high'] = pd.Series(vol_va_high, index=self.df.index)
+            new_features['vol_va_low'] = pd.Series(vol_va_low, index=self.df.index)
+            new_features['vol_va_width'] = pd.Series(vol_va_width, index=self.df.index)
             
-            # Is price within value area? (binary feature)
-            self.df['in_value_area'] = ((self.df['close'] >= self.df['vol_va_low']) & 
-                                        (self.df['close'] <= self.df['vol_va_high'])).astype(int)
+            # Calculate derivative features
+            close_to_poc_pct = (self.df['close'] - new_features['vol_poc']) / new_features['vol_poc'] * 100
+            in_value_area = ((self.df['close'] >= new_features['vol_va_low']) & 
+                            (self.df['close'] <= new_features['vol_va_high'])).astype(int)
             
-            # Volume concentration (high = volume concentrated at few prices, low = distributed)
-            # Calculate entropy of volume distribution
+            # Volume concentration (entropy-based)
             entropy = np.zeros(len(self.df))
             for i in range(lookback, len(self.df)):
-                profile = vol_profiles[i] / 100  # Convert to probability
-                # Filter out zeros to avoid log(0)
+                profile = vol_profiles[i] / 100
                 profile = profile[profile > 0]
                 if len(profile) > 0:
                     entropy[i] = -np.sum(profile * np.log(profile))
+            vol_concentration = 1 - entropy / np.log(num_bins)
             
-            self.df['vol_concentration'] = 1 - entropy / np.log(num_bins)  # Normalized 0-1
+            new_features['close_to_poc_pct'] = close_to_poc_pct
+            new_features['in_value_area'] = in_value_area
+            new_features['vol_concentration'] = pd.Series(vol_concentration, index=self.df.index)
         
-        # Clean up
-        if 'typical_price' in self.df.columns:
-            self.df = self.df.drop(['typical_price'], axis=1)
+        # Convert any remaining numpy arrays to Series
+        for key, value in new_features.items():
+            if isinstance(value, np.ndarray):
+                new_features[key] = pd.Series(value, index=self.df.index)
+        
+        self._add_features_efficiently(new_features)
     
     # FX doesn't have traditional volume, so you might use tick volume or spread-based proxies
     def fx_activity_profile(self, lookback=20):
@@ -359,37 +452,30 @@ class FeatureGenerator():
     
     def vwap(self, period=1):
         """Calculate daily Volume Weighted Average Price."""
-        # Assuming you have date info in index or as a column
-        self.df['vwap'] = (self.df['volume'] * (self.df['high'] + self.df['low'] + self.df['close']) / 3).rolling(period).sum() / self.df['volume'].rolling(period).sum()
+        typical_price = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        vwap = (self.df['volume'] * typical_price).rolling(period).sum() / self.df['volume'].rolling(period).sum()
+        
+        self._add_features_efficiently({'vwap': vwap})
         
     def money_flow_index(self, period=14):
         """Calculate Money Flow Index - a volume-weighted RSI."""
-        # Typical price
-        self.df['typical_price'] = (self.df['high'] + self.df['low'] + self.df['close']) / 3
-        
-        # Money flow
-        self.df['money_flow'] = self.df['typical_price'] * self.df['volume']
+        # Calculate all components without intermediate DataFrame assignments
+        typical_price = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        money_flow = typical_price * self.df['volume']
         
         # Positive and negative money flow
-        self.df['positive_flow'] = np.where(self.df['typical_price'] > self.df['typical_price'].shift(1), 
-                                            self.df['money_flow'], 0)
-        self.df['negative_flow'] = np.where(self.df['typical_price'] < self.df['typical_price'].shift(1), 
-                                            self.df['money_flow'], 0)
+        positive_flow = np.where(typical_price > typical_price.shift(1), money_flow, 0)
+        negative_flow = np.where(typical_price < typical_price.shift(1), money_flow, 0)
+        
+        # Money flow sums
+        positive_flow_sum = pd.Series(positive_flow, index=self.df.index).rolling(window=period).sum()
+        negative_flow_sum = pd.Series(negative_flow, index=self.df.index).rolling(window=period).sum()
         
         # Money flow ratio and index
-        self.df['positive_flow_sum'] = self.df['positive_flow'].rolling(window=period).sum()
-        self.df['negative_flow_sum'] = self.df['negative_flow'].rolling(window=period).sum()
+        money_ratio = np.where(negative_flow_sum != 0, positive_flow_sum / negative_flow_sum, 0)
+        mfi = 100 - (100 / (1 + money_ratio))
         
-        # Avoid division by zero
-        self.df['money_ratio'] = np.where(self.df['negative_flow_sum'] != 0,
-                                        self.df['positive_flow_sum'] / self.df['negative_flow_sum'], 0)
-        
-        self.df['mfi'] = 100 - (100 / (1 + self.df['money_ratio']))
-        
-        # Drop intermediate columns
-        self.df = self.df.drop(['typical_price', 'money_flow', 'positive_flow', 
-                            'negative_flow', 'positive_flow_sum', 'negative_flow_sum', 
-                            'money_ratio'], axis=1)
+        self._add_features_efficiently({'mfi': mfi})
     
     # =============================================================================
     # Section: Technical Indicators
@@ -424,24 +510,29 @@ class FeatureGenerator():
         rsi = 100 - (100 / (1 + rs))
         
         # Add to dataframe
-        self.df[f'rsi_{window}'] = pd.Series(rsi, index=rsi.index)
+        rsi_full = pd.Series(index=self.df.index, dtype=float)
+        rsi_full.loc[rsi.index] = rsi
+        
+        self._add_features_efficiently({f'rsi_{window}': rsi_full})
     
     def moving_average_convergence_divergence(self):
         """Trend-following momentum indicator."""
-        self.df['ema_12'] = self.df['close'].ewm(span=12, adjust=False).mean()
-        self.df['ema_26'] = self.df['close'].ewm(span=26, adjust=False).mean()
+        # Calculate EMAs
+        ema_12 = self.df['close'].ewm(span=12, adjust=False).mean()
+        ema_26 = self.df['close'].ewm(span=26, adjust=False).mean()
 
-        # Calculate MACD line (the difference between 12-period EMA and 26-period EMA)
-        self.df['macd_line'] = self.df['ema_12'] - self.df['ema_26']
+        # Calculate MACD components
+        macd_line = ema_12 - ema_26
+        macd_signal = macd_line.ewm(span=9, adjust=False).mean()
+        macd_histogram = macd_line - macd_signal
         
-        # Calculate the signal line (9-period EMA of MACD)
-        self.df['macd_signal'] = self.df['macd_line'].ewm(span=9, adjust=False).mean()
+        new_features = {
+            'macd_line': macd_line,
+            'macd_signal': macd_signal,
+            'macd_histogram': macd_histogram
+        }
         
-        # Calculate MACD histogram
-        self.df['macd_histogram'] = self.df['macd_line'] - self.df['macd_signal']
-        
-        # Drop intermediate EMAs if not needed
-        self.df = self.df.drop(["ema_12", "ema_26"], axis=1)
+        self._add_features_efficiently(new_features)
     
     def average_directional_index(self, lookback=14):
         """Measures trend strength."""
@@ -478,17 +569,19 @@ class FeatureGenerator():
         # Calculate +DI and -DI
         plus_di = 100 * (smoothed_plus_dm / smoothed_tr)
         minus_di = 100 * (smoothed_minus_dm / smoothed_tr)
-        
         # Calculate DX
         dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di)
-        
         # Calculate ADX - smoothed DX
         adx = dx.rolling(window=lookback).mean()
         
-        # Add to dataframe
-        self.df["+di"] = plus_di
-        self.df["-di"] = minus_di
-        self.df["adx"] = adx
+        # Add all features at once
+        new_features = {
+            "+di": plus_di,
+            "-di": minus_di,
+            "adx": adx
+        }
+        
+        self._add_features_efficiently(new_features)
         
     def stochastic_oscillator(self, k_period=14, d_period=3, slowing=3):
         """Calculate Stochastic Oscillator."""
@@ -497,7 +590,6 @@ class FeatureGenerator():
         high_max = self.df['high'].rolling(window=k_period).max()
         
         # Calculate %K (Fast Stochastic)
-        # %K = 100 * (current close - lowest low) / (highest high - lowest low)
         k_fast = 100 * (self.df['close'] - low_min) / (high_max - low_min)
         
         # Handle division by zero
@@ -509,52 +601,52 @@ class FeatureGenerator():
         # Calculate %D (signal line) - simple moving average of %K
         d = k.rolling(window=d_period).mean()
         
-        # Add to dataframe
-        self.df['stoch_k'] = k
-        self.df['stoch_d'] = d
+        new_features = {
+            'stoch_k': k,
+            'stoch_d': d
+        }
+        
+        self._add_features_efficiently(new_features)
         
     def commodity_channel_index(self, period=20):
         """Calculate Commodity Channel Index."""
         # Typical Price
         tp = (self.df['high'] + self.df['low'] + self.df['close']) / 3
-        
         # Moving Average of Typical Price
         ma_tp = tp.rolling(window=period).mean()
-        
         # Mean Absolute Deviation (MAD)
         mad = abs(tp - ma_tp).rolling(window=period).mean()
-        
         # CCI
         cci = (tp - ma_tp) / (0.015 * mad)
         
-        self.df['cci'] = cci
+        self._add_features_efficiently({'cci': cci})
     
     def ichimoku_cloud(self, tenkan_period=9, kijun_period=26, senkou_b_period=52, displacement=26):
         """Calculate Ichimoku Cloud components."""
-        # Tenkan-sen (Conversion Line): (highest high + lowest low) / 2 for the past tenkan_period
+        # Calculate all components
         tenkan_sen = (self.df['high'].rolling(window=tenkan_period).max() + 
                     self.df['low'].rolling(window=tenkan_period).min()) / 2
         
-        # Kijun-sen (Base Line): (highest high + lowest low) / 2 for the past kijun_period
         kijun_sen = (self.df['high'].rolling(window=kijun_period).max() + 
                     self.df['low'].rolling(window=kijun_period).min()) / 2
         
-        # Senkou Span A (Leading Span A): (Tenkan-sen + Kijun-sen) / 2 displaced forward displacement periods
         senkou_span_a = ((tenkan_sen + kijun_sen) / 2).shift(displacement)
         
-        # Senkou Span B (Leading Span B): (highest high + lowest low) / 2 for the past senkou_b_period, displaced forward displacement periods
         senkou_span_b = ((self.df['high'].rolling(window=senkou_b_period).max() + 
                         self.df['low'].rolling(window=senkou_b_period).min()) / 2).shift(displacement)
         
-        # Chikou Span (Lagging Span): Current closing price, displaced backwards displacement periods
         chikou_span = self.df['close'].shift(-displacement)
         
-        # Add to dataframe
-        self.df['ichimoku_tenkan'] = tenkan_sen
-        self.df['ichimoku_kijun'] = kijun_sen
-        self.df['ichimoku_senkou_a'] = senkou_span_a
-        self.df['ichimoku_senkou_b'] = senkou_span_b
-        self.df['ichimoku_chikou'] = chikou_span
+        # Add all features at once
+        new_features = {
+            'ichimoku_tenkan': tenkan_sen,
+            'ichimoku_kijun': kijun_sen,
+            'ichimoku_senkou_a': senkou_span_a,
+            'ichimoku_senkou_b': senkou_span_b,
+            'ichimoku_chikou': chikou_span
+        }
+        
+        self._add_features_efficiently(new_features)
         
     # =============================================================================
     # Section: Time-based Features
@@ -566,115 +658,120 @@ class FeatureGenerator():
         
         all_features, values = data_utils.check_feature_specification(self.selected_features, 'time_of_day')
         
+        new_features = {}
+        
         # Create cyclical features using sine and cosine transformations
-        # This preserves the cyclical nature (hour 23 is close to hour 0)
         if all_features or not all_features and 'hour_sin' in values:
-            self.df['hour_sin'] = np.sin(2 * np.pi * hour / 24)
+            new_features['hour_sin'] = np.sin(2 * np.pi * hour / 24)
         if all_features or not all_features and 'hour_cos' in values:
-            self.df['hour_cos'] = np.cos(2 * np.pi * hour / 24)
+            new_features['hour_cos'] = np.cos(2 * np.pi * hour / 24)
+            
+        self._add_features_efficiently(new_features)
     
     def time_of_week(self):
         """Extract time of week features from datetime index."""
-        # Calculate the hour within the week (0-167)
-        day_of_week = self.df.index.dayofweek  # Monday=0, Sunday=6
+        day_of_week = self.df.index.dayofweek
         hour_of_day = self.df.index.hour
         hour_of_week = day_of_week * 24 + hour_of_day
         
-        # Create cyclical features
-        self.df['hour_of_week_sin'] = np.sin(2 * np.pi * hour_of_week / 168)  # 168 = 7 days * 24 hours
-        self.df['hour_of_week_cos'] = np.cos(2 * np.pi * hour_of_week / 168)
+        new_features = {
+            'hour_of_week_sin': np.sin(2 * np.pi * hour_of_week / 168),
+            'hour_of_week_cos': np.cos(2 * np.pi * hour_of_week / 168),
+            'is_weekend': (day_of_week >= 5).astype(int)
+        }
         
-        # Flag for weekend
-        self.df['is_weekend'] = (day_of_week >= 5).astype(int)
+        self._add_features_efficiently(new_features)
     
     def time_of_month(self):
         """Extract time of month features from datetime index."""
-        # Extract day of month
         day = self.df.index.day
         days_in_month = pd.Series(self.df.index).dt.days_in_month.values
-        
-        # Normalize day to account for different month lengths
         normalized_day = day / days_in_month
+        month = self.df.index.month
         
-        # Create cyclical features
-        self.df['month_progress_sin'] = np.sin(2 * np.pi * normalized_day)
-        self.df['month_progress_cos'] = np.cos(2 * np.pi * normalized_day)
-        
-        # Mark start, middle and end of month periods
-        self.df['month_period'] = pd.cut(
+        # Create month period categories
+        month_period = pd.cut(
             normalized_day, 
             bins=[0, 0.33, 0.66, 1],
             labels=['start_of_month', 'mid_month', 'end_of_month']
         )
         
-        # Month of year cyclical features
-        month = self.df.index.month
-        self.df['month_of_year_sin'] = np.sin(2 * np.pi * month / 12)
-        self.df['month_of_year_cos'] = np.cos(2 * np.pi * month / 12)
+        new_features = {
+            'month_progress_sin': np.sin(2 * np.pi * normalized_day),
+            'month_progress_cos': np.cos(2 * np.pi * normalized_day),
+            'month_period': month_period,
+            'month_of_year_sin': np.sin(2 * np.pi * month / 12),
+            'month_of_year_cos': np.cos(2 * np.pi * month / 12)
+        }
+        
+        self._add_features_efficiently(new_features)
     
     def day_of_week(self):
         """Extract day of week features from datetime index."""
         day_of_week = self.df.index.dayofweek  # Monday=0, Sunday=6
         
-        # Standard cyclical features
-        self.df['day_of_week_sin'] = np.sin(2 * np.pi * day_of_week / 7)
-        self.df['day_of_week_cos'] = np.cos(2 * np.pi * day_of_week / 7)
+        new_features = {
+            # Standard cyclical features
+            'day_of_week_sin': np.sin(2 * np.pi * day_of_week / 7),
+            'day_of_week_cos': np.cos(2 * np.pi * day_of_week / 7),
+            
+            # FX-specific day flags
+            'is_monday': (day_of_week == 0).astype(int),
+            'is_friday': (day_of_week == 4).astype(int),
+            'is_midweek': (day_of_week.isin([1, 2, 3])).astype(int),
+            
+            # Weekend proximity
+            'friday_afternoon': ((day_of_week == 4) & (self.df.index.hour >= 15)).astype(int),
+            'sunday_evening': ((day_of_week == 6) & (self.df.index.hour >= 20)).astype(int)
+        }
         
-        # FX-specific day flags
-        self.df['is_monday'] = (day_of_week == 0).astype(int)  # Gap trading
-        self.df['is_friday'] = (day_of_week == 4).astype(int)  # Position unwinding
-        self.df['is_midweek'] = (day_of_week.isin([1, 2, 3])).astype(int)  # Trend days
-        
-        # Weekend proximity
-        self.df['friday_afternoon'] = (
-            (day_of_week == 4) & (self.df.index.hour >= 15)
-        ).astype(int)
-        
-        self.df['sunday_evening'] = (
-            (day_of_week == 6) & (self.df.index.hour >= 20)
-        ).astype(int)
+        self._add_features_efficiently(new_features)
     
     def fx_trading_sessions(self):
-        """
-        Create proper FX trading session features with overlaps.
-        Sessions based on GMT/UTC time zones (adjust for your data's timezone).
-        """
+        """Create proper FX trading session features with overlaps."""
         hour = self.df.index.hour
         
-        # Define FX sessions (in GMT/UTC)
-        # Asian: 22:00-08:00 GMT (Tokyo: 7am-5pm JST)
-        # London: 07:00-16:00 GMT (London: 8am-5pm GMT)
-        # New York: 12:00-21:00 GMT (NY: 8am-5pm EST)
+        # Calculate all session indicators
+        asian_session = ((hour >= 22) | (hour < 8)).astype(int)
+        london_session = ((hour >= 7) & (hour < 16)).astype(int)
+        ny_session = ((hour >= 12) & (hour < 21)).astype(int)
         
-        # Individual session indicators
-        self.df['asian_session'] = ((hour >= 22) | (hour < 8)).astype(int)
-        self.df['london_session'] = ((hour >= 7) & (hour < 16)).astype(int)
-        self.df['ny_session'] = ((hour >= 12) & (hour < 21)).astype(int)
+        # Session overlaps
+        asian_london_overlap = ((hour >= 7) & (hour < 8)).astype(int)
+        london_ny_overlap = ((hour >= 12) & (hour < 16)).astype(int)
         
-        # Session overlaps (where the magic happens)
-        self.df['asian_london_overlap'] = ((hour >= 7) & (hour < 8)).astype(int)
-        self.df['london_ny_overlap'] = ((hour >= 12) & (hour < 16)).astype(int)
-        
-        # Primary session (highest priority)
+        # Primary session
         conditions = [
-            (hour >= 12) & (hour < 16),  # London-NY overlap (highest volume)
-            (hour >= 7) & (hour < 12),   # London only
-            (hour >= 16) & (hour < 21),  # NY only  
-            ((hour >= 22) | (hour < 7)), # Asian only
-            True  # Other times (low volume)
+            (hour >= 12) & (hour < 16),
+            (hour >= 7) & (hour < 12),
+            (hour >= 16) & (hour < 21),
+            ((hour >= 22) | (hour < 7)),
+            True
         ]
         choices = ['london_ny_overlap', 'london_primary', 'ny_primary', 'asian_primary', 'off_hours']
-        self.df['primary_session'] = np.select(conditions, choices)
+        primary_session = np.select(conditions, choices)
         
-        # Session intensity (0-1 scale based on typical volume)
-        session_intensity = {
+        # Session intensity mapping
+        session_intensity_map = {
             'london_ny_overlap': 1.0,
             'london_primary': 0.8,
             'ny_primary': 0.7,
             'asian_primary': 0.6,
             'off_hours': 0.2
         }
-        self.df['session_intensity'] = self.df['primary_session'].map(session_intensity)
+        session_intensity = pd.Series(primary_session).map(session_intensity_map).values
+        
+        new_features = {
+            'asian_session': asian_session,
+            'london_session': london_session,
+            'ny_session': ny_session,
+            'asian_london_overlap': asian_london_overlap,
+            'london_ny_overlap': london_ny_overlap,
+            'primary_session': primary_session,
+            'session_intensity': session_intensity
+        }
+        
+        self._add_features_efficiently(new_features)
     
     def session_timing_features(self):
         """Add granular timing features within sessions"""
@@ -951,7 +1048,7 @@ class FeatureGenerator():
         
         new_columns['volatility_regime'] = volatility_regime
         
-        # One-hot encode the regime if needed for ML
+        # One-hot encode the regime
         regime_dummies = pd.get_dummies(pd.Series(volatility_regime, index=self.df.index), prefix='vol_regime')
         
         # Add continuous volatility Z-score
@@ -970,100 +1067,87 @@ class FeatureGenerator():
         self.df = pd.concat([self.df, new_df], axis=1)
 
     def trend_strength_indicators(self, lookback=20, adx_threshold=25):
-        """
-        Create indicators to identify trending vs. ranging markets.
+        """Create indicators to identify trending vs. ranging markets."""
+        new_features = {}
         
-        Parameters:
-        -----------
-        lookback : int
-            Window for trend calculations
-        adx_threshold : int
-            ADX threshold above which market is considered trending (typically 25)
-        """
-        # 1. Directional Movement Trend Strength (simplified ADX-based)
-        # Note: This assumes you've already calculated ADX in your technical indicators
+        # 1. ADX-based trend regime (if ADX exists)
         if 'adx' in self.df.columns:
-            # Create trend regime based on ADX
-            self.df['adx_trend_regime'] = np.where(self.df['adx'] > adx_threshold, 'trending', 'ranging')
+            adx_trend_regime = np.where(self.df['adx'] > adx_threshold, 'trending', 'ranging')
+            new_features['adx_trend_regime'] = adx_trend_regime
             
-            # One-hot encode if needed
-            regime_dummies = pd.get_dummies(self.df['adx_trend_regime'], prefix='adx_regime')
-            self.df = pd.concat([self.df, regime_dummies], axis=1)
+            # One-hot encode
+            regime_dummies = pd.get_dummies(pd.Series(adx_trend_regime, index=self.df.index), prefix='adx_regime')
+            for col in regime_dummies.columns:
+                new_features[col] = regime_dummies[col]
         
-        # 2. Price vs Moving Average Trend Indicators
-        # Calculate price position relative to moving averages
+        # 2. Price vs Moving Average indicators
         for period in [20, 50, 200]:
-            # Ensure the SMA exists
-            if f'sma_{period}' not in self.df.columns:
-                self.df[f'sma_{period}'] = self.df['close'].rolling(window=period).mean()
+            sma_col = f'sma_{period}'
+            if sma_col not in self.df.columns:
+                new_features[sma_col] = self.df['close'].rolling(window=period).mean()
+                sma_values = new_features[sma_col]
+            else:
+                sma_values = self.df[sma_col]
             
-            # Calculate % distance from moving average
-            self.df[f'dist_from_sma_{period}'] = (self.df['close'] / self.df[f'sma_{period}'] - 1) * 100
-            
-            # Direction of moving average (is it sloping up or down)
-            self.df[f'sma_{period}_slope'] = self.df[f'sma_{period}'].pct_change(5, fill_method=None) * 100  # self.df[f'sma_{period}'].pct_change(5) * 100  # 5-period slope
+            # Distance from SMA and slope
+            new_features[f'dist_from_sma_{period}'] = (self.df['close'] / sma_values - 1) * 100
+            new_features[f'sma_{period}_slope'] = sma_values.pct_change(5, fill_method=None) * 100
         
-        # 3. Moving Average Crossovers for trend identification
-        self.df['ma_cross_50_200'] = np.where(
-            self.df['sma_50'] > self.df['sma_200'], 1, -1  # 1 for bullish, -1 for bearish
-        )
+        # 3. Moving average crossovers
+        if 'sma_50' in self.df.columns and 'sma_200' in self.df.columns:
+            new_features['ma_cross_50_200'] = np.where(self.df['sma_50'] > self.df['sma_200'], 1, -1)
+        elif 'sma_50' in new_features and 'sma_200' in new_features:
+            new_features['ma_cross_50_200'] = np.where(new_features['sma_50'] > new_features['sma_200'], 1, -1)
         
-        # 4. Linear regression indicators for trend strength
-        # Fit linear regression on closing prices
-        self.df['regression_slope'] = np.nan
-        self.df['r_squared'] = np.nan
+        # 4. Linear regression indicators
+        regression_slope = np.full(len(self.df), np.nan)
+        r_squared = np.full(len(self.df), np.nan)
         
-        # Calculate for each window
         for i in range(lookback, len(self.df)):
-            # Get window of prices
             y = self.df['close'].iloc[i-lookback:i].values
             x = np.arange(len(y))
-            
-            # Fit linear regression
             slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(x, y)
-            
-            # Store results
-            self.df.iloc[i, self.df.columns.get_loc('regression_slope')] = slope
-            self.df.iloc[i, self.df.columns.get_loc('r_squared')] = r_value**2
+            regression_slope[i] = slope
+            r_squared[i] = r_value**2
         
-        # Normalize the slope based on price level (for comparison across different price levels)
-        self.df['norm_regression_slope'] = self.df['regression_slope'] / self.df['close']
+        new_features['regression_slope'] = pd.Series(regression_slope, index=self.df.index)
+        new_features['r_squared'] = pd.Series(r_squared, index=self.df.index)
+        new_features['norm_regression_slope'] = new_features['regression_slope'] / self.df['close']
         
         # 5. Combined trend strength indicator
-        # Calculate a composite trend strength score (0-100)
-        # Higher values indicate stronger trends
         components = []
         
-        # Add ADX component (scaled 0-1)
         if 'adx' in self.df.columns:
             components.append(self.df['adx'] / 100)
         
-        # Add r-squared component (already 0-1)
-        components.append(self.df['r_squared'])
+        components.append(new_features['r_squared'])
         
-        # Add moving average alignment component
+        # MA alignment component
         ma_alignment = (
-            np.sign(self.df['dist_from_sma_20']) * 
-            np.sign(self.df['dist_from_sma_50']) * 
-            np.sign(self.df['dist_from_sma_200'])
+            np.sign(new_features['dist_from_sma_20']) * 
+            np.sign(new_features['dist_from_sma_50']) * 
+            np.sign(new_features['dist_from_sma_200'])
         )
-        # This will be 1 when all are positive, -1 when all negative, 0 when mixed
         ma_aligned = (abs(ma_alignment) == 1).astype(float)
         components.append(ma_aligned)
         
-        # Average the components and scale to 0-100
-        self.df['trend_strength'] = pd.concat(components, axis=1).mean(axis=1) * 100
+        trend_strength = pd.concat(components, axis=1).mean(axis=1) * 100
+        new_features['trend_strength'] = trend_strength
         
         # 6. Trend regime classification
-        self.df['trend_regime'] = np.where(
-            self.df['trend_strength'] > 70, 'strong_trend',
-            np.where(self.df['trend_strength'] > 40, 'weak_trend', 'ranging')
+        trend_regime = np.where(
+            trend_strength > 70, 'strong_trend',
+            np.where(trend_strength > 40, 'weak_trend', 'ranging')
         )
+        new_features['trend_regime'] = trend_regime
         
-        # One-hot encode the trend regime
-        trend_dummies = pd.get_dummies(self.df['trend_regime'], prefix='trend_regime')
-        self.df = pd.concat([self.df, trend_dummies], axis=1)
-
+        # One-hot encode trend regime
+        trend_dummies = pd.get_dummies(pd.Series(trend_regime, index=self.df.index), prefix='trend_regime')
+        for col in trend_dummies.columns:
+            new_features[col] = trend_dummies[col]
+        
+        self._add_features_efficiently(new_features)
+    
     def market_state_indicators(self, window=20):
         """
         Generate overall market state indicators that combine volatility and trend regimes.
@@ -1135,7 +1219,8 @@ class FeatureGenerator():
     # =============================================================================
     def log_returns(self):
         """Logarithmic returns: measure the percentage change in the price of an asset over a specific period."""
-        self.df['log_return'] = np.log( self.df['close'] / self.df['close'].shift(1) )
+        log_return = np.log(self.df['close'] / self.df['close'].shift(1))
+        self._add_features_efficiently({'log_return': log_return})
 
     def fast_fourier_transforms(self, column='close', n_components=5):
         """
