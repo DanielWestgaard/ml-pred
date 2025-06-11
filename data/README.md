@@ -91,10 +91,10 @@ When this is done, you can:
 > 2. Create a method in the (`data/features/`)`target_hypothesis.py` to calculate your `target` (the hypothesis). Eg. like Hypothesis 1 ("session_based_tod_anomalies").<br>
 
 
-## About processing/
+# About processing/
 All code related to actual processing, like cleaning, validation, normalizing, etc. will be placed here.
 
-### Cleaning
+## Cleaning
 Simple cleaning class that performs the following: 
 - **Handles missing values** (detailed description in class for the different columns).
 - **Removes duplicates** (of dates).
@@ -103,7 +103,7 @@ Simple cleaning class that performs the following:
 - Ensures **concistency in datatypes** (timestamps, prices as floats, volume as integers).
 - **OHLC validity**.
 
-### Validation 
+## Validation 
 There are two validation classes in ```validation.py```.<br>
 Simple validation class that performs validation of data after cleaning, to verify data integrity and ensure loical consistency. These are the current validations done:
 - **OHLC Relationships**, similar to the one in cleaning, but using this to validate that work.
@@ -115,10 +115,10 @@ The second class is responsible for validating the features after feature genera
 
 
 
-## About features/
+# About features/
 Code related to creating and selecting features with prediction power to help a ML model train and predict.
 
-### Feature Generation
+## Feature Generation
 The feature generator generates a lot of features (100+). I have tried to implement and use a lot of the major technical indicators and features types relevant for financial time series. The easiest way to get a quick glance on the features are through ```run()``` in the ```FeatureGenerator``` class.<br>
 To handle errors, but also keep a more simplistic code, have I implemented ```safely_execute()``` that I run/calculate all features through. This way error handling is improved (not the best) and code is still simplistic.<br>
 Furthermore, there is also implemented a helper method, `_add_features_efficiently()`, that does excactly what the name suggests. The main goal of this function is to eliminate DataFrame fragmentation, improve performance, reduce memory usage, and better code organization. Hence, when improving Generation with new features, remember this approach:
@@ -139,21 +139,22 @@ def some_feature(self):
 ```
 > [!NOTE]
 > The feature generator creates several categorical features. Some ML Models requires only numerical input, so this should be handled accordingly for the models needs.
-#### Future Performance tips (TODO - Note to self):
+### Future Performance tips (TODO - Note to self):
 1. **Vectorize operations** when possible instead of loops
 2. **Avoid intermediate DataFrames** - work with Series/arrays
 3. **Group related calculations** - do all moving averages at once
 4. **Use dropna() strategically** - only when necessary
 5. **Pre-allocate arrays** for complex calculations like volume profiles
 
-### Transformation - transformation.py
-#### Preparation of features before normalization
+## Transformation - transformation.py
+### Preparation of features before normalization
 - **Handling missing values**: Some steps to handle missing values, as this can mess up normalization and selection later.
   1. Dropping whole features (technically columns) that contain more empty values (```Null```, ```NaN```) than the threshold (default is 50%).
   2. Based on a fixed/static list with feature names, extracts the maximum window size (eg. ```n```) and drops the first ```n``` rows. This can also be fixed (TODO).
     - **<ins>Note</ins>**: This fix _assumes_ all generated features (that requires past data to calculate _and_ the features manually added in the ```high_feature_windows``` list) starts with the abbreviation or one-word of the feature name, followed by "_" and the window size. Eg. For Simple Moving Average with window size 50: ```sma_50```.
 - **Handles duplicated features**/columns.
-#### Normalization
+
+### Normalization
 Simple Normalization class that uses **two Normalization Techniques**; [Z-Score](https://www.investopedia.com/terms/z/zscore.asp) for _Unbounded_ (no boundaries of certainty) features and [MinMax Scaker](https://medium.com/@iamkamleshrangi/how-min-max-scaler-works-9fbebb9347da) for _Bounded_ (field that has limited scope) features.<br>
 The ```run()``` has some functionality that excludes some features from normalization:
 - **String Categorical Features**:
@@ -172,14 +173,14 @@ The ```run()``` has some functionality that excludes some features from normaliz
 > [!NOTE]
 > There are several steps in the normalization process that exludes some features with particular prefixes (eg. like starting with ```target_```) from normalization.
 
-### Creating Target Column (for the Hypothesis) - target_hypothesis.py
+## Creating Target Column (for the Hypothesis) - target_hypothesis.py
 If the pipeline is being ran with ```hypothesis``` argument (path to `config.yml`), the `Feature Selection` process is skipped and this (file) is ran after `Feature Generation`.<br>
 It's basically calculating and setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file.<br>
 For some more background and format, see the ```README.md``` documentation under the ```hypothesis/``` folder.
 > [!IMPORTANT]
 > When adding functionality for new hypotheses: Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
 
-### Feature Selection - selection.py
+## Feature Selection - selection.py
 The feature selection file performs _very simple_ Feature Selection, by using different techniques/methods, to then select the features that two or more techniques agree about:
 1. **Correlation-based Feature Selection**: Selects subsets of features that are highly correlated with the target variable (```close```), but have low correlation with each other.
 2. **XGB Regression**: "Ranks" features based on importance, and selects features above ```threshold```-variable.
@@ -187,14 +188,14 @@ The feature selection file performs _very simple_ Feature Selection, by using di
 
 
 
-## About providers/ 
+# About providers/ 
 Files under this are used solely used for fetching raw historical data. This data is intended to engineer and used for model training.<br>
 Default behaviour is to store the files under storage/data and under the respective provider.
 
-### Capital.com
+## Capital.com
 Only uses the broker/capitalcom.py implementation to only get historical data. For more information on the broker itself, see broker/ documentation.<br>
 The broker itself has relatively restricted with historical data, especially for 1min intraday timeframe, but useful in early stages. 5min has a little more.
-#### How to use
+### How to use
 Only one way to use this, no matter timeframe, symbol, etc. Example:
 ```python
 from data.providers.capital_com import ProviderCapitalCom
@@ -204,16 +205,16 @@ provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE_5",
                                         from_date="2024-04-15T00:00:00", to_date="2025-05-01T01:00:00",
                                         print_answer=False)
 ```
-#### Useful links:
+### Useful links:
 - [API documentation](https://open-api.capital.com/)
 - [Requirements to use their API](https://open-api.capital.com/#section/Getting-started)
 
-### Alpha Vantage
+## Alpha Vantage
 Different restrictions on free api token, but seems quite good when you have the paid subscription.<br>
 Currently (for this use), intraday can be used for (eg.) "core stocks", but not intraday Forex as it's not a part of free plan.<br>
 This is also why methods like "saving the name of raw datafile" is very proprietary and can be seen as "not finished", as I'm planning to use this provider 
 (or someone else) when this project has come further down.
-#### How to use
+### How to use
 This one is a little different. Current implementation is only tested, and implemented, with free api key and used on "Core Stock APIs". So if you're using this on forex or others, you will need to change fetch_historical_data() according to the selected "type of API" you need. Documentation is fairly good, so should be okay.<br>
 Example of current use:
 ```python
@@ -224,22 +225,22 @@ provider.fetch_and_save_historical_data(symbol="NVDA", timeframe="1min",
                                         month="2025-04", print_answer=False,
                                         store_answer=True)
 ```
-#### Useful links:
+### Useful links:
 - [API documentation](https://www.alphavantage.co/documentation/)
 - [Get free API token](https://www.alphavantage.co/support/#api-key)
 - [Premium API key](https://www.alphavantage.co/premium/) for actually utilizing the providers' possibilities large datasets.
 
 
 
-## About plot/ 📊
+# About plot/ 📊
 Simple functionality to plot candlestick data. Can both be run from main.py, but also used in Data Pipeline, after cleaning.<br>
 Currently only using have to methods for using either ```plotly.graph_objects``` or ```mplfinance```.
-### How to use
+## How to use
 Recommended usage is either plotting raw data, or after cleaning the data (eg. in the Data Pipeline), as the final step in the Data Pipeline is normalization.<br>
 To simply plot candlestick data:
 ```bash
 python main.py --plot-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250515_20250523.csv'
 ```
-### Challenges
+## Challenges
 - Plotting 1-minute candles the **datasets can get very large**, making the plotting and interaction _slow_, and also incredibly _difficult to see what's going on_. Current solution is a little improved ```plotly.graph_objects``` implementation in the method ```simple_small_go_candle_plot()```. Though this can easily be even more improved. Perhaps splitting up the plotting?
 - **Plotting engineered data**: As most of the data has been _normalized_ (even ohlcv), I can't really check to see if the cleaning was done correctly. Solution is to _plot and save dataset after cleaning_ it, as part of the Data Pipeline.
