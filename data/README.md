@@ -47,7 +47,43 @@ Will also use this for planning.
 
 
 ## About pipelines/
-...
+### Data Pipeline
+This is the main orchestrator for processing and engineering raw data into clean, validated, feature rich, processed data - ready to be used for training Machine Learning Model/-s.<br>
+#### How to use
+There are 2 ways of running the Data Pipeline on your raw data:
+1. **Default/Standard**: The Pipeline will do the _usual flow_ of (simplified) `Cleaning` -> `Validation` -> `Feature Generation` -> `Transformation` -> `Feature Selection` -> `Save`.
+    - Use `main.py` to run the Data Pipeline on your processed data: (flag-name might change in the future)
+        ```bash
+        python main.py -eg 'storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv'
+        ```
+    - Or, implement it yourself. Eg.:
+        ```python
+        from data.pipelines.engineer_pipeline import EngineeringPipeline
+
+        data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv",
+                                            save_cleaned_data = True)
+        
+        data_pipeline.run()
+        ```
+    
+2. **Focusing on a Hypothesis**: The pipeline will have a somewhat different flow: `Cleaning` -> `Validation` -> `Generation` (only generating the specified features from given hypothesis config-file) -> `Target Hypothesis` (creating/calculating target column representing the Hypothesis - what the Model will predict) -> `Transformation` -> `Save`.
+This is the main focus of this project. Check out the documentation under `hypothesis/` to see what this is, and how to create one to focus on.
+When this is done, you can:
+    - Use `main.py`and run the Pipeline like this (eg.):
+        ```bash
+        python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
+        ```
+    - Or, implement it yourself:
+        ```python
+        data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv",
+                                            save_cleaned_data = True,
+                                            hypothesis_source = "hypothesis/1_session_based_tod_anomalies/config.yml")
+        ```
+
+> [!NOTE]
+> Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/` and use the existing functionality as examples. However, this is currently a quick run-down:
+> 1. `config.yml`-file for the hypothesis in the given format.
+> 2. Create a method in the (`data/features/`)`target_hypothesis.py` to calculate your `target` (the hypothesis). Eg. like Hypothesis 1 ("session_based_tod_anomalies").<br>
 
 
 ## About processing/
