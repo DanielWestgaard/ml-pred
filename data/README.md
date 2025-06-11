@@ -77,9 +77,12 @@ When this is done, you can:
         ```
     - Or, implement it yourself:
         ```python
+        from data.pipelines.engineer_pipeline import EngineeringPipeline
+
         data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv",
                                             save_cleaned_data = True,
                                             hypothesis_source = "hypothesis/1_session_based_tod_anomalies/config.yml")
+        data_pipeline.run()
         ```
 
 > [!NOTE]
