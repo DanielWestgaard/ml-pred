@@ -80,8 +80,30 @@ Code related to creating and selecting features with prediction power to help a 
 ### Feature Generation
 The feature generator generates a lot of features (100+). I have tried to implement and use a lot of the major technical indicators and features types relevant for financial time series. The easiest way to get a quick glance on the features are through ```run()``` in the ```FeatureGenerator``` class.<br>
 To handle errors, but also keep a more simplistic code, have I implemented ```safely_execute()``` that I run/calculate all features through. This way error handling is improved (not the best) and code is still simplistic.<br>
+Furthermore, there is also implemented a helper method, `_add_features_efficiently()`, that does excactly what the name suggests. The main goal of this function is to eliminate DataFrame fragmentation, improve performance, reduce memory usage, and better code organization. Hence, when improving Generation with new features, remember this approach:
+```python
+def some_feature(self):
+    # Calculate all features first
+    feature1 = calculation1
+    feature2 = calculation2  
+    feature3 = calculation3
+    
+    # Add all at once
+    new_features = {
+        'feature1': feature1,
+        'feature2': feature2,
+        'feature3': feature3
+    }
+    self._add_features_efficiently(new_features)
+```
 > [!NOTE]
 > The feature generator creates several categorical features. Some ML Models requires only numerical input, so this should be handled accordingly for the models needs.
+#### Future Performance tips (TODO - Note to self):
+1. **Vectorize operations** when possible instead of loops
+2. **Avoid intermediate DataFrames** - work with Series/arrays
+3. **Group related calculations** - do all moving averages at once
+4. **Use dropna() strategically** - only when necessary
+5. **Pre-allocate arrays** for complex calculations like volume profiles
 
 ### Transformation - transformation.py
 #### Preparation of features before normalization
