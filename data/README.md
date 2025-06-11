@@ -176,7 +176,7 @@ The ```run()``` has some functionality that excludes some features from normaliz
 
 ## Creating Target Column (for the Hypothesis) - target_hypothesis.py
 If the pipeline is being ran with ```hypothesis``` argument (path to `config.yml`), the `Feature Selection` process is skipped and this (file) is ran after `Feature Generation`.<br>
-It's basically calculating and setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file.<br>
+It's basically calculating and setting target column to the hypothesis. In the ```taget_hypothesis.py```-file, based on the name of the hypothesis in the ```config.yml```-file. This implementation follows some other files' implementations; It's using the `shared_utils.list_of_functions_in_class` to dynamically list all method names in the class. Then, we run the **method name that matches with the hypothesis name** - meaning it's **important** they match!<br>
 For some more background and format, see the ```README.md``` documentation under the ```hypothesis/``` folder.
 > [!IMPORTANT]
 > When adding functionality for new hypotheses: Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
