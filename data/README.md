@@ -48,13 +48,13 @@ Will also use this for planning.
 
 # About pipelines/ 👨‍🔧
 
-## Data Pipeline 💽🪠
+## Data Pipeline 💽 🪠
 This is the main orchestrator for processing and engineering raw data into clean, validated, feature rich, processed data - ready to be used for training Machine Learning Model/-s.<br>
 
 ### How to use 🙋‍♂️
 There are 2 ways of running the Data Pipeline on your raw data:
 1. **Default/Standard**: The Pipeline will do the _usual flow_ of (simplified) `Cleaning` -> `Validation` -> `Feature Generation` -> `Transformation` -> `Feature Selection` -> `Save`.
-    - Use `main.py` to run the Data Pipeline on your processed data: (flag-name might change in the future)
+    - Use `main.py` to run the Data Pipeline on your raw data: (flag-name might change in the future)
         ```bash
         python main.py -eg 'storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv'
         ```
@@ -68,8 +68,8 @@ There are 2 ways of running the Data Pipeline on your raw data:
         data_pipeline.run()
         ```
     
-2. **Focusing on a Hypothesis**: The pipeline will have a somewhat different flow: `Cleaning` -> `Validation` -> `Generation` (only generating the specified features from given hypothesis config-file) -> `Target Hypothesis` (creating/calculating target column representing the Hypothesis - what the Model will predict) -> `Transformation` -> `Save`.
-This is the main focus of this project. Check out the documentation under `hypothesis/` to see what this is, and how to create one to focus on.
+2. **Focusing on a Hypothesis**: The pipeline will have a somewhat different flow: `Cleaning` -> `Validation` -> `Generation` (only generating the specified features from given hypothesis config-file) -> `Target Hypothesis` (creating/calculating target column representing the Hypothesis - what the Model will predict) -> `Transformation` -> `Save`.<br>
+This really is at the heart of this project. Check out the documentation under `hypothesis/` to see what this is, and how to create one to focus on.
 When this is done, you can:
     - Use `main.py`and run the Pipeline like this (eg.):
         ```bash

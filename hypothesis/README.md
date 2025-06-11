@@ -1,6 +1,6 @@
 # About hypothesis/
-This folder is meant to document testing of different hypothesis'. Meaning trying to find patterns, anomalies, inefficiencies, available/repeatable liquidy, etc. in the market.<br>
-The purpose of this is that beating the market is _near_ impossible (considering all factors, challenges, and actors), but maybe there are higher changes of success finding smaller oppurtunities in inefficiencies.
+This folder is meant to document testing of different hypotheses. Meaning trying to find patterns, anomalies, **inefficiencies**, available/repeatable liquidy, etc. in the market.<br>
+The purpose of this is that beating the market is _near_ impossible (considering all factors, challenges, and actors), but maybe there are higher changes of success by finding smaller oppurtunities in inefficiencies.
 
 
 ## Structure
@@ -13,7 +13,7 @@ The purpose of this is that beating the market is _near_ impossible (considering
 
 
 ## config.yml structure
-This should serve as an example template to how features are selected to new hypothesis'.
+This should serve as an example template to how features are selected to new hypotheses.
 ```yml
 name: <name-of-the-hypothesis>
 
