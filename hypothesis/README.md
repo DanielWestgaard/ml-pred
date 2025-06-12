@@ -11,26 +11,36 @@ The purpose of this is that beating the market is _near_ impossible (considering
 └── README.md                               # You are here - description about this folder
 ```
 
-# Adding a new hypothesis
+
+# Adding a new hypothesis 
 Each new (and all existing) hypotheses should follow _this_ structure.<br>
 1. Create a new folder named after your hypothesis.
 2. Create a `config.yml` file for configuring the hypothesis and other potential parameters, following the given format.
 3. Optionally, though recommended, a `README.md` describing the hypothesis in more detail and with better formulations.
 4. Add a method in the (`data/features/`)`target_hypothesis.py` that calculates the target column, representing the hypothesis (that a model will predict).
 
-## config.yml structure
+## config.yml structure - WIP
+These are the different componentes/sections you can specify in the configuration-file. None of these are required (I think), but could be thought of as flags when running `main.py`, to tell the main orchestrator what components to run, and potentially specify how (features, parameters, etc.).
+- **Data Pipeline**: 
+- **Model Training**: 
+
 This should serve as an example template to how features are selected to new hypotheses.
 ```yml
 name: <name-of-the-hypothesis>
 
-required_features:
-  feature_name_1: [5, 20, 50]                                # Only these periods of that feature
-  feature_name_2: []                                         # All "features" from this feature method
-  feature_name_3: ['feature_value_1', 'feature_value_2']     # Only these features from the feature method
+data_pipeline:
+  raw_source: <source-to-raw-data>
+  
+  required_features:
+    feature_name_1: [5, 20, 50]                                # Only these periods of that feature
+    feature_name_2: []                                         # All "features" from this feature method
+    feature_name_3: ['feature_value_1', 'feature_value_2']     # Only these features from the feature method
 
-# TODO:
-model_name: <name-of-ml-model>
-  parameters:                                                # Empty means using 'default' hyperparameter values
+# TODO: implement functionality
+model_training:
+  name: <name-of-ml-model>
+
+  parameters:                                                # Completely or somewhat empty means using 'default' hyperparameter values
     - n_estimators: 100
     - max_depth: 12
 ```
