@@ -75,13 +75,25 @@ def main():
         conf = shared_utils.handle_hypothesis_source(args.hypothesis)
         conf_keys = conf.keys()
         
+        # Data Pipeline
         if 'raw_data_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
             data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
             data_pipeline.run()
         
-        # TODO: Same logic for Model Training 
-        print(conf_keys)
-                
+        # Model Training
+        if 'model_type' in conf_keys:  # Found Model Type in config, meaning user wants to use Model Training
+            # Considering argument 'sending': 'Cheap' solution compared to Data Pipeline?
+            # As Data Pipeline also has the capability to read the config, but here we send them. Though this might also be a cleaner solution?
+            model_training = ModelTraining(dataset = conf.get('processed_data'), model_type = conf.get('model_type'))
+            model = model_training.run()
+            
+            # Store the model directory for potential evaluation
+            if hasattr(model_training, 'model_directory'):
+                trained_model_dir = model_training.model_directory
+            else:
+                # Get the latest model directory that was just created
+                trained_model_dir = get_latest_model(models_directory = config.TRAINED_MODEL_STORAGE,
+                                                model_type = conf.get('model_type'))
     
     if args.plot_data:
         plot_data = PlotData(dataset=args.plot_data, save_plot=False)
