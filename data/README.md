@@ -156,6 +156,7 @@ def some_feature(self):
 
 ### Normalization
 Simple Normalization class that uses **two Normalization Techniques**; [Z-Score](https://www.investopedia.com/terms/z/zscore.asp) for _Unbounded_ (no boundaries of certainty) features and [MinMax Scaker](https://medium.com/@iamkamleshrangi/how-min-max-scaler-works-9fbebb9347da) for _Bounded_ (field that has limited scope) features.<br>
+In the `z_score` method; original close price/value is preserved before normalization as default, called `close_og`.<br>
 The ```run()``` has some functionality that excludes some features from normalization:
 - **Features with prefix (starting with) `target_`**, as this is how target hypothesis columns are calculated and named.
 - **String Categorical Features**:
@@ -183,10 +184,12 @@ For some more background and format, see the ```README.md``` documentation under
 > When adding functionality for new hypotheses: Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
 
 ## Feature Selection - selection.py
-The feature selection file performs _very simple_ Feature Selection, by using different techniques/methods, to then select the features that two or more techniques agree about:
+The Selector file performs _very simple_ Feature Selection, by using different techniques/methods, to then select the features that two or more techniques agree about:
 1. **Correlation-based Feature Selection**: Selects subsets of features that are highly correlated with the target variable (```close```), but have low correlation with each other.
 2. **XGB Regression**: "Ranks" features based on importance, and selects features above ```threshold```-variable.
 3. **Recursive Feature Elimination**: Fits  a model (XGB Regressor) and removes the weakest feature (or features) until the specified number of features is reached.
+> [!NOTE]
+> Before the Selector returns the Features it found most predictive, I have added a manual step for preserving the `close_og` column, meaning the close price value without normalization. This is important to have in the processed file, as the model/strategy will later use this to place and execute trades.
 
 
 
