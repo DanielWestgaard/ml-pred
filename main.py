@@ -80,6 +80,7 @@ def main():
             data_pipeline.run()
         
         # TODO: Same logic for Model Training 
+        print(conf_keys)
                 
     
     if args.plot_data:

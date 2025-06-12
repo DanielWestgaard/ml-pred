@@ -38,7 +38,9 @@ data_pipeline:  # TODO: Now have to change logic for reading required features a
 
 # TODO: implement all of this functionality
 model_training:
-  name: <name-of-ml-model>
+  type: <name-of-ml-model>
+
+  processed_data: <path-to-processed-data>                  # Optional: If this is empty or not 'there', will assume you´ve ran Data Pipeline first (meaning we must dynamically fetch that file but processed)
 
   parameters:                                                # Completely or somewhat empty means using 'default' hyperparameter values
     - n_estimators: 100

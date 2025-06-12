@@ -129,6 +129,31 @@ def handle_hypothesis_source(config_file: str) -> dict:
     except Exception as e:
         logging.warning(f"Unable to extract Raw Dataset, for Data Pipeline, from configurations (might not exist?) : {e}")
     
+    # Model Training
+    try:
+        # Model Type
+        model_type = config_h['model_training']['type']
+        dict.update({'model_type': model_type})
+        logging.info(f"model_type: {model_type}")
+        
+        try:
+            # Potential Processed Data
+            processed_data = config_h['model_training']['processed_data']
+            dict.update({"processed_data": processed_data})
+            logging.debug(f"processed_data: {processed_data}")
+        except Exception as e:
+            logging.warning(f"Unable to extract processed_data for model training, but they might also not be there : {e}")
+        
+        try:
+            # Potential Parameters
+            parameters = config_h['model_training']['parameters']
+            dict.update({"parameters": parameters})
+            logging.debug(f"parameters: {parameters}")
+        except Exception as e:
+            logging.warning(f"Unable to extract Parameters for model training, but they might also not be there : {e}")
+        
+    except Exception as e:
+        logging.warning(f"Unable to get model_type from configuration, might not be there? : {e}")    
     
     return dict
 
