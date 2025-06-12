@@ -11,7 +11,7 @@ from data.providers.capital_com import ProviderCapitalCom
 from data.providers.alpha_vantage import ProviderAlphaVantage
 import utils.alpha_vantage_utils as alpha_utils
 from data.pipelines.engineer_pipeline import EngineeringPipeline
-from utils import shared_utils
+import utils.shared_utils as shared_utils
 from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
 from model.evaluation import ModelEvaluation
@@ -66,6 +66,21 @@ def main():
                                                 save_cleaned_data = save_cleaned_data)
         
         data_pipeline.run()
+
+    if args.hypothesis:
+        logging.info(f"User using pure hypothesis flow!")
+        save_cleaned_data = True
+        
+        # Getting all the configurations
+        conf = shared_utils.handle_hypothesis_source(args.hypothesis)
+        conf_keys = conf.keys()
+        
+        if 'raw_data_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
+            data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
+            data_pipeline.run()
+        
+        # TODO: Same logic for Model Training 
+                
     
     if args.plot_data:
         plot_data = PlotData(dataset=args.plot_data, save_plot=False)

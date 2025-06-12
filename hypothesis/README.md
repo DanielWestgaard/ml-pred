@@ -50,3 +50,36 @@ model_training:
 
 > [!NOTE]
 > The possibility to select the granular ```feature_values``` (of a ```feature_name```) is something I create 'per need basis'. So if I haven't used a feature with feature_values in a hypothesis before, it has not been implemented. Either you must implement this yourself (into the existing method - should be relatively easy utilizing the ```utils/data_utils/check_feature_specification()``` and some if-statements before each calculation), or just create all the ```feature_values``` of that ```feature``` (-_name).
+
+## How to use
+You can use the "hypothesis flow" in two, main, different ways:
+1. The preferred way: Configure `config.yml` with all the components you need/want to run. Eg. If you want the hypothesis to be used in (only) the Data Pipeline, then you "configure" that in there. If you want to run only Model Training on a processed dataset (or first Data Pipeline and then MT), you configure that in the `config.yml`.
+    - And then you can use `main.py` with the -hyp flag (might change flag name in the future) to run "all the components in the configuration file" (as long as you've followed the structure for the yml.):
+        ```bash
+        python main.py -hyp 'hypothesis/1_session_based_tod_anomalies/config.yml'
+        ```
+    - Or implement it yourself, as the different components should be able to (in the future) to dynamically read the contents of the configuration file. Eg.:
+        ```python
+        import utils.shared_utils as shared utils
+        from data.pipelines.engineer_pipeline import EngineeringPipeline
+
+        # Getting all the configurations
+        conf = shared_utils.handle_hypothesis_source(args.hypothesis)
+        conf_keys = conf.keys()
+        
+        if 'raw_data_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
+            data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
+            data_pipeline.run()
+        
+        # TODO: Same logic for Model Training
+        # ...
+        ```
+
+> [!NOTE]
+> The whole point is for it to be a centralized way to configure what you want to do, and not remember all the different flags you can run with `main.py`.
+
+2. Or using flags (however, I can imagine this might get removed/deprecated later), using the first component you want to use followed by the -hyp flag again (and the path to the config-file):
+    - For Data Pipeline:
+        ```bash
+        python main.py -eg 'storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv' -hyp 'hypothesis/1_session_based_tod_anomalies/config.yml'
+        ```

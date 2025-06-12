@@ -79,7 +79,7 @@ def get_available_filename(directory:str, filename:str):
             return new_filename
         counter += 1
         
-def handle_hypothesis_source(config_file):
+def handle_hypothesis_source(config_file: str) -> dict:
     """
     Function for checking provided config.yml source for hypothesis, and returning the configurations it finds.
     
