@@ -87,7 +87,8 @@ def handle_hypothesis_source(config):
         config: Path for the config.yml, specifying hypothesis and selected features.
     
     returns:
-        hypothesis_name, features object
+        list of successfully ectracted 'components'.
+            Can be accessed like this: features = hei.get('features') 
     """
     # Load YAML file
     try:
@@ -100,14 +101,25 @@ def handle_hypothesis_source(config):
         logging.error(f"Error parsing YAML file: {e}")
         sys.exit(1)
     
+    list = {}
+    
     # Extract values
     hypothesis_name = config_h['hypothesis']['name']
-    features = config_h['required_features']
+    list.update({'hypothesis_name': hypothesis_name})
+    logging.info(f"hypothesis_name: {hypothesis_name}")
     
-    logging.info(f"Hypothesis: {hypothesis_name}")
-    logging.debug(f"Features: {features}")
+    # Data Pipeline
+    try:
+        raw_data_source = config_h['data_pipeline']['raw_source']
+        list.update({'raw_data_source': raw_data_source})
+        features = config_h['data_pipeline']['required_features']
+        list.update({"features": features})
+        logging.debug(f"Data source: '{raw_data_source}' and required Features: {features}")
+    except Exception as e:
+        logging.warning(f"Unable to extract data pipeline configurations (might not exist?) : {e}")
     
-    return hypothesis_name, features
+    
+    return list
 
 def safely_execute(self:object, function_name:str):  # Similar to the one in features/generation.py
     """

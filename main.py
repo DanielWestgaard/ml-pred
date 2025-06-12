@@ -52,7 +52,7 @@ def main():
     args = parse_arguments()
     
     log_utils._is_configured = False
-    logging = log_utils.setup_logging(name="engineering", type="data", log_to_file=True, log_level=config.DEBUG_LOG_LEVEL)
+    logging = log_utils.setup_logging(name="engineering", type="data", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True

@@ -38,7 +38,9 @@ class EngineeringPipeline():
         logging.debug("Engineering Pipeline - Successfully loaded data!")
         
         if hypothesis_source is not None:
-            self.hypothesis_name, self.selected_features = shared_utils.handle_hypothesis_source(hypothesis_source)
+            configurations = shared_utils.handle_hypothesis_source(hypothesis_source)
+            self.hypothesis_name = configurations.get('hypothesis_name')
+            self.selected_features = configurations.get('features')
         else:
             self.selected_features = None
         
