@@ -183,10 +183,12 @@ For some more background and format, see the ```README.md``` documentation under
 > When adding functionality for new hypotheses: Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
 
 ## Feature Selection - selection.py
-The feature selection file performs _very simple_ Feature Selection, by using different techniques/methods, to then select the features that two or more techniques agree about:
+The Selector file performs _very simple_ Feature Selection, by using different techniques/methods, to then select the features that two or more techniques agree about:
 1. **Correlation-based Feature Selection**: Selects subsets of features that are highly correlated with the target variable (```close```), but have low correlation with each other.
 2. **XGB Regression**: "Ranks" features based on importance, and selects features above ```threshold```-variable.
 3. **Recursive Feature Elimination**: Fits  a model (XGB Regressor) and removes the weakest feature (or features) until the specified number of features is reached.
+> [!NOTE]
+> Before the Selector returns the Features it found most predictive, I have added a manual step for preserving the `close_og` column, meaning the close price value without normalization. This is important to have in the processed file, as the model/strategy will later use this to place and execute trades.
 
 
 

@@ -48,6 +48,8 @@ class FeatureSelector(BaseProcessor):
         """
         logging.info("---------- Running Feature Selection ----------")
         
+        original_close_price_col_name = 'close_og'
+        
         selected_features = {}
         
         if 'cfs' in methods:
@@ -75,6 +77,18 @@ class FeatureSelector(BaseProcessor):
             final_features = selected_features[methods[0]]
         
         logging.info(f"Feature selection concluded with the following features: {final_features}.")
+        
+        # Force close_og column to stay in final features if it exists in the dataframe
+        if (original_close_price_col_name in self.df.columns and 
+            original_close_price_col_name not in final_features):
+            logging.debug(f"Forcing {original_close_price_col_name} col to stay in df.")
+            try:
+                final_features.append(original_close_price_col_name)  # Append the column name, not the Series
+                logging.debug(f"Successfully added {original_close_price_col_name} to final features.")
+            except Exception as e:
+                logging.error(f"Failed to append {original_close_price_col_name} to final features: {e}")
+        elif original_close_price_col_name not in self.df.columns:
+            logging.warning(f"Column {original_close_price_col_name} does not exist in dataframe. Cannot force include it.")
         
         # Create final dataframe with selected features
         self.selected_features = final_features
