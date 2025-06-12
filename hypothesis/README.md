@@ -50,14 +50,3 @@ model_training:
 
 > [!NOTE]
 > The possibility to select the granular ```feature_values``` (of a ```feature_name```) is something I create 'per need basis'. So if I haven't used a feature with feature_values in a hypothesis before, it has not been implemented. Either you must implement this yourself (into the existing method - should be relatively easy utilizing the ```utils/data_utils/check_feature_specification()``` and some if-statements before each calculation), or just create all the ```feature_values``` of that ```feature``` (-_name).
-
-
-### Example
-```yml
-name: session_based_tod_anomalies
-
-required_features:
-  moving_averages: [5, 20, 50]
-  time_of_day: []
-  volatility_features: ['atr', 'volatility_regime']
-```
