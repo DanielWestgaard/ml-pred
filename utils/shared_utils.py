@@ -79,47 +79,58 @@ def get_available_filename(directory:str, filename:str):
             return new_filename
         counter += 1
         
-def handle_hypothesis_source(config):
+def handle_hypothesis_source(config_file):
     """
-    Function for checking provided config.yml source for hypothesis, and returning the name and features.
+    Function for checking provided config.yml source for hypothesis, and returning the configurations it finds.
     
     Args:
-        config: Path for the config.yml, specifying hypothesis and selected features.
+        - config_file: Path to config.yml, specifying hypothesis (-name), selected features, etc.
     
     returns:
-        list of successfully ectracted 'components'.
-            Can be accessed like this: features = hei.get('features') 
+        - list of successfully ectracted 'components'/configurations in Dict format.
+            - Eg: '{'hypothesis_name': 'session_based_tod_anomalies', 'raw_data_source': 'bla/raw_data.csv', 'features': {'time_of_day': [], 'time_of_week': []}'
+            - Can be accessed like this: features = shared_utils.handle_hypothesis_source.get('features') 
     """
     # Load YAML file
     try:
-        with open(config, 'r') as file:
+        with open(config_file, 'r') as file:
             config_h = yaml.safe_load(file)
     except FileNotFoundError:
-        logging.error(f"Error: Config file '{config}' not found!")
+        logging.error(f"Error: Config file '{config_file}' not found!")
         sys.exit(1)
     except yaml.YAMLError as e:
         logging.error(f"Error parsing YAML file: {e}")
         sys.exit(1)
     
-    list = {}
+    # Dict to populate with successfully extracted 'values'
+    dict = {}
     
-    # Extract values
-    hypothesis_name = config_h['hypothesis']['name']
-    list.update({'hypothesis_name': hypothesis_name})
-    logging.info(f"hypothesis_name: {hypothesis_name}")
+    # Hypothesis name - must match with the name of its target method in target_hypothesis.py
+    try:
+        hypothesis_name = config_h['hypothesis']['name']
+        dict.update({'hypothesis_name': hypothesis_name})
+        logging.info(f"hypothesis_name: {hypothesis_name}")
+    except Exception as e:
+        logging.error(f"Unable to get hypothesis name : {e}")
+        sys.exit()
     
     # Data Pipeline
     try:
+        # Raw data
         raw_data_source = config_h['data_pipeline']['raw_source']
-        list.update({'raw_data_source': raw_data_source})
-        features = config_h['data_pipeline']['required_features']
-        list.update({"features": features})
-        logging.debug(f"Data source: '{raw_data_source}' and required Features: {features}")
+        dict.update({'raw_data_source': raw_data_source})
+        try:
+            # Provided features
+            features = config_h['data_pipeline']['required_features']
+            dict.update({"features": features})
+            logging.debug(f"Data source: '{raw_data_source}' and required Features: {features}")
+        except Exception as e:
+            logging.error(f"Unable to extract Required/Selected Features for generation : {e}")
     except Exception as e:
-        logging.warning(f"Unable to extract data pipeline configurations (might not exist?) : {e}")
+        logging.warning(f"Unable to extract Raw Dataset, for Data Pipeline, from configurations (might not exist?) : {e}")
     
     
-    return list
+    return dict
 
 def safely_execute(self:object, function_name:str):  # Similar to the one in features/generation.py
     """
