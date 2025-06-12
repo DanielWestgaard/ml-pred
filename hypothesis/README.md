@@ -28,7 +28,7 @@ This should serve as an example template to how features are selected to new hyp
 ```yml
 name: <name-of-the-hypothesis>
 
-data_pipeline:
+data_pipeline:  # TODO: Now have to change logic for reading required features and possibility for providing data source
   raw_source: <source-to-raw-data>
   
   required_features:
@@ -36,7 +36,7 @@ data_pipeline:
     feature_name_2: []                                         # All "features" from this feature method
     feature_name_3: ['feature_value_1', 'feature_value_2']     # Only these features from the feature method
 
-# TODO: implement functionality
+# TODO: implement all of this functionality
 model_training:
   name: <name-of-ml-model>
 
