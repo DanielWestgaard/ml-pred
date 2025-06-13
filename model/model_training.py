@@ -14,30 +14,59 @@ import platform
 # Train-test
 from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
 
-from utils import data_utils, model_utils
+from utils import data_utils, model_utils, shared_utils
 import config.config as config
 
 
 class ModelTraining():
     """Train a specific ML Model."""
-    def __init__(self, dataset, model_type:str, target_col:str = 'close', hypothesis:str = None):
+    def __init__(self, dataset:str = None, model_type:str = None, target_col:str = 'close', hypothesis_source:str = None):
         """
         Initialize the class by providing specifics.
         
         Args:
-            - dataset: Path to the Engineered (ohlcv) dataset to train the model on.
-            - model_type: Type of model you want to train. Eg. 'xgboost', 'decision_tree', 'random_forest', etc.
+            - dataset: Path to the Engineered (ohlcv) dataset to train the model on. Is 'optional' as it might be provided in hypothesis_source
+            - model_type: Type of model you want to train. Eg. 'xgboost', 'decision_tree', 'random_forest', etc. Is 'optional' as it might be provided in hypothesis_source
             - TODO: hypothesis: Provide path to hypothesis' config.yml to target its column. This currently only works close target.
         """
         try:
             logging.info(f"---------- Initiating Model Training ----------")
-            self.dataset_path = dataset
+            
+            if hypothesis_source is not None:
+                logging.info(f"Model Training was initialized with Hypothesis configuration!")
+                configurations = shared_utils.handle_hypothesis_source(hypothesis_source)
+                
+                self.model_type = configurations.get("model_type")
+                
+                self.target_col = None  # TODO: Logic to find target column
+                
+                try:
+                    dataset = configurations.get("processed_data")
+                except:  # Failed means user either forgot to provide datapath, og have ran data pipeline first, meaning we must find that one
+                    try:
+                        raw_dataset = configurations.get("processed_data")
+                        
+                        # TODO: Logic to find processed data from that raw data
+                        # ...
+                        dataset = None  # result is this name
+                    except Exception as e:
+                        logging.error(f"Was unable to find neither processed datapath nor raw datapath. Make sure you provide at least one of them!")
+                        logging.debug(f"Congigurations found in provided config.yml path: {configurations}")
+                        sys.exit()
+                
+            else:  # Not provided hypothesis, user must provide dataset and model_type
+                logging.info(f"Model Training initialized without hypothesis configuration.")
+                
+                if dataset is None or model_type is None:
+                    logging.error(f"Model Training must be initialized with path to dataset and model_type! You provided dataset {dataset} and model_type {model_type}")
+                    sys.exit()
+                    
+                self.dataset_path = dataset
+                self.model_type = model_type
+                self.target_col = target_col
+            
             # Load dataset based on format
             self.df, self.original_df = data_utils.check_and_return_df(dataset)
-            
-            self.model_type = model_type
-            
-            self.target_col = target_col
             
             # Most likely reading directly from the csv file, which has no index.
             if (self.df.index.name is not 'date'):

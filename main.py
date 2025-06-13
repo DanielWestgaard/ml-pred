@@ -75,7 +75,6 @@ def main():
         conf = shared_utils.handle_hypothesis_source(args.hypothesis)
         conf_keys = conf.keys()
         
-        # Data Pipeline
         if 'raw_data_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
             data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
             data_pipeline.run()
