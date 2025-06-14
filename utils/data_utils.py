@@ -143,6 +143,7 @@ def check_and_return_df(input_data) -> pd.DataFrame:
     """
     Method that checks what kind of input type it is, and returns a DataFrame if it exists.
     """
+    logging.debug(f"Loading {input_data}")
     # Load dataset based on format
     try:
         input_type = check_input_type(input_data)

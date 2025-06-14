@@ -41,13 +41,38 @@ class ModelTraining():
                 
                 try:
                     dataset = configurations.get("processed_data")
-                except:  # Failed means user either forgot to provide datapath, og have ran data pipeline first, meaning we must find that one
-                    try:
-                        raw_dataset = configurations.get("processed_data")
+                    
+                    if dataset is None:
+                        raw_dataset = configurations.get("raw_data_source")
                         
                         # TODO: Logic to find processed data from that raw data
-                        # ...
-                        dataset = None  # result is this name
+                        # Currently, the approach from raw to processed data (in terms of naming standards) is that
+                        # I use the exact same name for processed as raw, but switch out the first name 'raw' with 'processed'
+                        # Meaning we can use this same approach here
+                        # Replace /raw/ with /processed/ in the directory structure
+                        processed_path = raw_dataset.replace("/raw/", "/processed/")
+                        
+                        # Replace raw_ prefix with processed_ in the filename
+                        processed_path = processed_path.replace("raw_", "processed_")
+                        
+                        dataset = processed_path  # result is this name
+                except:  # Failed means user either forgot to provide datapath, og have ran data pipeline first, meaning we must find that one
+                    try:
+                        print("hei3")
+                        raw_dataset = configurations.get("raw_data_source")
+                        
+                        # TODO: Logic to find processed data from that raw data
+                        # Currently, the approach from raw to processed data (in terms of naming standards) is that
+                        # I use the exact same name for processed as raw, but switch out the first name 'raw' with 'processed'
+                        # Meaning we can use this same approach here
+                        # Replace /raw/ with /processed/ in the directory structure
+                        processed_path = raw_dataset.replace("/raw/", "/processed/")
+                        
+                        # Replace raw_ prefix with processed_ in the filename
+                        processed_path = processed_path.replace("raw_", "processed_")
+                        
+                        dataset = processed_path  # result is this name
+                        print(f"hei4 = {dataset}")
                     except Exception as e:
                         logging.error(f"Was unable to find neither processed datapath nor raw datapath. Make sure you provide at least one of them!")
                         logging.debug(f"Congigurations found in provided config.yml path: {configurations}")
@@ -56,7 +81,7 @@ class ModelTraining():
                 # Load dataset based on format
                 self.df, self.original_df = data_utils.check_and_return_df(dataset)
                         
-                # Assuming all target, hypothesis, columns starts with ´target_'
+                # ASSUMING all target, hypothesis, columns starts with ´target_'
                 for col in self.df.columns:
                     if 'target_' in col:
                         self.target_col = col  # TODO: Logic to find target column
