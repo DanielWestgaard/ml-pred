@@ -29,20 +29,19 @@ This should serve as an example template to how features are selected to new hyp
 name: <name-of-the-hypothesis>
 
 data_pipeline:  # TODO: Now have to change logic for reading required features and possibility for providing data source
-  raw_source: <source-to-raw-data>
+  raw_source: <source-to-raw-data>                             # Must have
   
   required_features:
     feature_name_1: [5, 20, 50]                                # Only these periods of that feature
     feature_name_2: []                                         # All "features" from this feature method
     feature_name_3: ['feature_value_1', 'feature_value_2']     # Only these features from the feature method
 
-# TODO: implement all of this functionality
 model_training:
-  type: <name-of-ml-model>
+  type: <name-of-ml-model>                          # Must have. Eg. 'xgboost'
 
-  processed_data: <path-to-processed-data>                  # Optional: If this is empty or not 'there', will assume you´ve ran Data Pipeline first (meaning we must dynamically fetch that file but processed)
+  processed_data: <path-to-processed-data>          # Optional: If this is not specified, I will assume you´ve ran Data Pipeline first (meaning using raw_source to get the processed)
 
-  parameters:                                                # Completely or somewhat empty means using 'default' hyperparameter values
+  parameters:                                       # Completely or somewhat empty means using 'default' hyperparameter values
     - n_estimators: 100
     - max_depth: 12
 ```
