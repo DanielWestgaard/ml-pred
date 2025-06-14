@@ -42,8 +42,41 @@ storage/
 The **structure for metadata.yml** gets auto-generated after successfully training the model (might be changed to .json or split up later). It's done in `model_training.py` in `_save_model_info()`, and these are currently the implemented sections: ['training:', 'dataset:', 'model_parameters:', 'system_info:', 'data_split:']
 
 
+### Hypothesis 'flow'
+Following the projects goal of having a hypothesis to configure what processes to run, Model Training also supports this.<br>
+Using the configuration structure outlined in the `hypothesis/README.md`, the Model Trainers `__init__()` will...
+1. Check to see if you have a **provided path to the hypothesis config-file** using the **`hypothesis_source` parameter**.
+2. When this is done, it will find the `model_type`
+3. Then (if you have provided a) path to `processed_data`.
+    - However, if you're running Data Pipeline first, you don't necessarily know the path. Meaning if `processed_data` fails or returns `None`, it will use the path to `raw_source` to find the path to its equivalent processed path. The current approach for this is very simple: Change directory `raw/` to `processed/` and first prefix of `raw_*` to `processed_*`.
+
+> [!NOTE] 
+> Because of this "Hypothesis approach/flow", I've made the arguments `dataset` and `model_type` "optional". However, they must be provided/set for the Model Trainer for work. So, if `hypothesis_source` is not provided and one of `dataset` or `model_type` is not provided, an error will be raised and the execution will be stopped (`sys.exit()`).
+
+
 ### How to use 🤓
 To train a Machine Learning Model, you can choose how you want to use it:
+- Configure hypothesis `config.yml` following the structure outlined in `hypothesis/README.md` and either 
+    - Run `main.py` with 
+        ```bash
+        python main.py -hyp 'hypothesis/1_session_based_tod_anomalies/config.yml'
+        ```
+    - Or implement it yourself:
+        ```python
+        from model.model_training import ModelTraining
+
+        model_training = ModelTraining(hypothesis_source = args.hypothesis)
+        model = model_training.run()
+
+        # Optional: Store the model directory for potential evaluation
+        if hasattr(model_training, 'model_directory'):
+            trained_model_dir = model_training.model_directory
+        else:
+            # Get the latest model directory that was just created
+            trained_model_dir = get_latest_model(models_directory = config.TRAINED_MODEL_STORAGE,
+                                            model_type = conf.get('model_type'))
+        ```
+
 - Use `main.py` and run it with the `--model-training`/`-ml` flag, followed by the path to the processed dataset you intend to train the model on. Eg:
     ```bash
     python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv'
