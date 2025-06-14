@@ -32,9 +32,11 @@ class ModelTraining():
         try:
             logging.info(f"---------- Initiating Model Training ----------")
             
-            # Hypothesis. Much of this can be made into a method later - just need to get it working
+            # Hypothesis
             if hypothesis_source is not None:
                 logging.info(f"Model Training was initialized with Hypothesis configuration!")
+                
+                # Loading in all configurations in the provided config.yml
                 configurations = shared_utils.handle_hypothesis_source(hypothesis_source)
                 
                 self.model_type = configurations.get("model_type")
@@ -43,36 +45,14 @@ class ModelTraining():
                     dataset = configurations.get("processed_data")
                     
                     if dataset is None:
-                        raw_dataset = configurations.get("raw_data_source")
+                        raw_dataset = configurations.get("raw_data_source")                        
                         
-                        # TODO: Logic to find processed data from that raw data
-                        # Currently, the approach from raw to processed data (in terms of naming standards) is that
-                        # I use the exact same name for processed as raw, but switch out the first name 'raw' with 'processed'
-                        # Meaning we can use this same approach here
-                        # Replace /raw/ with /processed/ in the directory structure
-                        processed_path = raw_dataset.replace("/raw/", "/processed/")
-                        
-                        # Replace raw_ prefix with processed_ in the filename
-                        processed_path = processed_path.replace("raw_", "processed_")
-                        
-                        dataset = processed_path  # result is this name
+                        dataset = self._get_processed_path(raw_dataset)
                 except:  # Failed means user either forgot to provide datapath, og have ran data pipeline first, meaning we must find that one
                     try:
-                        print("hei3")
                         raw_dataset = configurations.get("raw_data_source")
                         
-                        # TODO: Logic to find processed data from that raw data
-                        # Currently, the approach from raw to processed data (in terms of naming standards) is that
-                        # I use the exact same name for processed as raw, but switch out the first name 'raw' with 'processed'
-                        # Meaning we can use this same approach here
-                        # Replace /raw/ with /processed/ in the directory structure
-                        processed_path = raw_dataset.replace("/raw/", "/processed/")
-                        
-                        # Replace raw_ prefix with processed_ in the filename
-                        processed_path = processed_path.replace("raw_", "processed_")
-                        
-                        dataset = processed_path  # result is this name
-                        print(f"hei4 = {dataset}")
+                        dataset = self._get_processed_path(raw_dataset)
                     except Exception as e:
                         logging.error(f"Was unable to find neither processed datapath nor raw datapath. Make sure you provide at least one of them!")
                         logging.debug(f"Congigurations found in provided config.yml path: {configurations}")
@@ -81,17 +61,18 @@ class ModelTraining():
                 # Load dataset based on format
                 self.df, self.original_df = data_utils.check_and_return_df(dataset)
                         
-                # ASSUMING all target, hypothesis, columns starts with ´target_'
+                # Assuming all target, hypothesis, columns starts with ´target_'
                 for col in self.df.columns:
                     if 'target_' in col:
                         self.target_col = col  # TODO: Logic to find target column
                         logging.debug(f"Found hypothesis target : '{self.target_col}'")
-                
-            else:  # Not provided hypothesis, user must provide dataset and model_type
+            
+            # Not Hypothesis flow: User must provide dataset and model_type
+            else:
                 logging.info(f"Model Training initialized without hypothesis configuration.")
                 
                 if dataset is None or model_type is None:
-                    logging.error(f"Model Training must be initialized with path to dataset and model_type! You provided dataset {dataset} and model_type {model_type}")
+                    logging.error(f"Model Training must be initialized with path to processed dataset and model_type! You provided dataset '{dataset}' and model_type '{model_type}'.")
                     sys.exit()
                     
                 self.dataset_path = dataset
@@ -101,12 +82,13 @@ class ModelTraining():
                 # Load dataset based on format
                 self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
-            # Most likely reading directly from the csv file, which has no index.
+            # Reading directly from a .csv-file means df will have no index.
             if (self.df.index.name is not 'date'):
                 # DataFrame has no index (name 'date'), so setting it and dropping the duplicate
                 self.df.index = pd.to_datetime(self.df['date'])  # setting index, but ensure its in datetime format
                 self.df = self.df.drop('date', axis=1)
                 logging.debug(f"Successfully made index to {self.df.index.name}")
+            
         except Exception as e:
             logging.error(f"Error initializing Model Training: {str(e)}")
             raise
@@ -147,6 +129,27 @@ class ModelTraining():
         except AttributeError as e:
             logging.error(f"Could not find expected class in {self.module_path}: {str(e)}")
             return False
+    
+    def _get_processed_path(raw_path: str):
+        """
+        Convert a raw file path to its processed equivalent.
+        Currently, the approach from raw to processed data (in terms of naming standards) is that
+        I use the exact same name for processed as raw, but switch out the first name 'raw' with 'processed'
+        (same with dir). Meaning we can use this same approach here.
+        
+        Args:
+            raw_path (str): Path to the raw file
+            
+        Returns:
+            str: Path to the processed file
+        """
+        # Replace /raw/ with /processed/ in the directory structure
+        processed_path = raw_path.replace("/raw/", "/processed/")
+        
+        # Replace raw_ prefix with processed_ in the filename
+        processed_path = processed_path.replace("raw_", "processed_")
+        
+        return processed_path
         
     def _get_implemented_models(self):
         """
