@@ -83,7 +83,8 @@ def main():
         if 'model_type' in conf_keys:  # Found Model Type in config, meaning user wants to use Model Training
             # Considering argument 'sending': 'Cheap' solution compared to Data Pipeline?
             # As Data Pipeline also has the capability to read the config, but here we send them. Though this might also be a cleaner solution?
-            model_training = ModelTraining(dataset = conf.get('processed_data'), model_type = conf.get('model_type'))
+            #model_training = ModelTraining(dataset = conf.get('processed_data'), model_type = conf.get('model_type'))
+            model_training = ModelTraining(hypothesis_source = args.hypothesis)
             model = model_training.run()
             
             # Store the model directory for potential evaluation

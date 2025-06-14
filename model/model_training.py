@@ -32,13 +32,12 @@ class ModelTraining():
         try:
             logging.info(f"---------- Initiating Model Training ----------")
             
+            # Hypothesis. Much of this can be made into a method later - just need to get it working
             if hypothesis_source is not None:
                 logging.info(f"Model Training was initialized with Hypothesis configuration!")
                 configurations = shared_utils.handle_hypothesis_source(hypothesis_source)
                 
                 self.model_type = configurations.get("model_type")
-                
-                self.target_col = None  # TODO: Logic to find target column
                 
                 try:
                     dataset = configurations.get("processed_data")
@@ -54,6 +53,15 @@ class ModelTraining():
                         logging.debug(f"Congigurations found in provided config.yml path: {configurations}")
                         sys.exit()
                 
+                # Load dataset based on format
+                self.df, self.original_df = data_utils.check_and_return_df(dataset)
+                        
+                # Assuming all target, hypothesis, columns starts with ´target_'
+                for col in self.df.columns:
+                    if 'target_' in col:
+                        self.target_col = col  # TODO: Logic to find target column
+                        logging.debug(f"Found hypothesis target : '{self.target_col}'")
+                
             else:  # Not provided hypothesis, user must provide dataset and model_type
                 logging.info(f"Model Training initialized without hypothesis configuration.")
                 
@@ -65,8 +73,8 @@ class ModelTraining():
                 self.model_type = model_type
                 self.target_col = target_col
             
-            # Load dataset based on format
-            self.df, self.original_df = data_utils.check_and_return_df(dataset)
+                # Load dataset based on format
+                self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
             # Most likely reading directly from the csv file, which has no index.
             if (self.df.index.name is not 'date'):
