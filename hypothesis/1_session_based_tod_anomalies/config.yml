@@ -24,3 +24,7 @@ model_training:
     parameters:
         n_estimators: 100
         max_depth: 12
+    
+evaluate_model:
+    type: new
+    model_folder: storage/models/2025-06-09_22:09:38

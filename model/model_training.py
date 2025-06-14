@@ -46,7 +46,7 @@ class ModelTraining():
                     
                     if dataset is None:
                         raw_dataset = configurations.get("raw_data_source")                        
-                        
+
                         dataset = self._get_processed_path(raw_dataset)
                 except:  # Failed means user either forgot to provide datapath, og have ran data pipeline first, meaning we must find that one
                     try:
@@ -54,9 +54,12 @@ class ModelTraining():
                         
                         dataset = self._get_processed_path(raw_dataset)
                     except Exception as e:
-                        logging.error(f"Was unable to find neither processed datapath nor raw datapath. Make sure you provide at least one of them!")
+                        logging.error(f"Was unable to find neither processed datapath nor raw datapath. Make sure you provide at least one of them: {e}")
                         logging.debug(f"Congigurations found in provided config.yml path: {configurations}")
                         sys.exit()
+                
+                # This is used (temporarily), in the very end, for storing the dataset path used for model training: 'getattr(self, 'dataset_path', 'unknown')'
+                self.dataset_path = dataset
                 
                 # Load dataset based on format
                 self.df, self.original_df = data_utils.check_and_return_df(dataset)
@@ -130,7 +133,7 @@ class ModelTraining():
             logging.error(f"Could not find expected class in {self.module_path}: {str(e)}")
             return False
     
-    def _get_processed_path(raw_path: str):
+    def _get_processed_path(self, raw_path: str):
         """
         Convert a raw file path to its processed equivalent.
         Currently, the approach from raw to processed data (in terms of naming standards) is that
@@ -330,7 +333,7 @@ class ModelTraining():
             },
             
             'dataset': {
-                'dataset_path': getattr(self, 'dataset_path', 'unknown'),  # Add this line
+                'dataset_path': getattr(self, 'dataset_path', 'unknown'),  # Needs 'self.dataset_path = dataset' 
                 'target_column': self.target_col,
                 'feature_count': int(len(self.X_train.columns)),
                 'features': self.X_train.columns.tolist(),

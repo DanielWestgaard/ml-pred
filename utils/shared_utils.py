@@ -153,7 +153,28 @@ def handle_hypothesis_source(config_file: str) -> dict:
             logging.warning(f"Unable to extract Parameters for model training, but they might also not be there : {e}")
         
     except Exception as e:
-        logging.warning(f"Unable to get model_type from configuration, might not be there? : {e}")    
+        logging.warning(f"Unable to get model_type from configuration, might not be there? : {e}")
+
+    # Evaluation
+    try:
+        # Evaluate model
+        evaluate_model = config_h['evaluate_model']
+        dict.update({"evaluate_model": evaluate_model})
+        logging.debug(f"evaluate_model: {evaluate_model}")
+        try:
+            evaluation_type = config_h['evaluate_model']['type']
+            dict.update({"evaluation_type": evaluation_type})
+            logging.debug(f"evaluation_type: {evaluation_type}")
+            try:
+                evaluation_model_path = config_h['evaluate_model']['model_folder']
+                dict.update({"model_folder": evaluation_model_path})
+                logging.debug(f"model_folder: {evaluation_model_path}")
+            except:
+                logging.warning(f"Unable to get evaluation model folder. Might having type 'new'?")
+        except:
+            logging.warning(f"Unable to get evaluation type.")
+    except Exception as e:
+        logging.warning(f"Unable to extract evaluation from model training, but might also not be there : {e}")
     
     return dict
 

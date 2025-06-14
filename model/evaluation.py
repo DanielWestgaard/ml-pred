@@ -62,8 +62,11 @@ class ModelEvaluation():
             with open(model_file, 'rb') as file:
                 self.model = pickle.load(file)
             
+            # Dynamically using target column used for training the model (important for different models trained on different hypotheses)
+            self.target_col = loader.get_target_column()
+            
             # Getting the training and test sets model was trained on to evaluate properly
-            model_training = ModelTraining(dataset=dataset, model_type=model_type)
+            model_training = ModelTraining(dataset=dataset, model_type=model_type, target_col = self.target_col)
             self.y_train, self.y_test, self.X_train, self.X_test = model_training.temporal_train_test_split(retur=True)
             
             self.save_evaluations = save_evaluations

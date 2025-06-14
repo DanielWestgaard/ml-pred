@@ -29,21 +29,25 @@ This should serve as an example template to how features are selected to new hyp
 name: <name-of-the-hypothesis>
 
 data_pipeline:  # TODO: Now have to change logic for reading required features and possibility for providing data source
-  raw_source: <source-to-raw-data>                             # Must have
+    raw_source: <source-to-raw-data>                             # Must have
   
-  required_features:
-    feature_name_1: [5, 20, 50]                                # Only these periods of that feature
-    feature_name_2: []                                         # All "features" from this feature method
-    feature_name_3: ['feature_value_1', 'feature_value_2']     # Only these features from the feature method
+    required_features:
+        feature_name_1: [5, 20, 50]                                # Only these periods of that feature
+        feature_name_2: []                                         # All "features" from this feature method
+        feature_name_3: ['feature_value_1', 'feature_value_2']     # Only these features from the feature method
 
 model_training:
-  type: <name-of-ml-model>                          # Must have. Eg. 'xgboost'
+    type: <name-of-ml-model>                          # Must have. Eg. 'xgboost'
 
-  processed_data: <path-to-processed-data>          # Optional: If this is not specified, I will assume you´ve ran Data Pipeline first (meaning using raw_source to get the processed)
+    processed_data: <path-to-processed-data>          # Optional: If this is not specified, I will assume you´ve ran Data Pipeline first (meaning using raw_source to get the processed)
 
-  parameters:                                       # Completely or somewhat empty means using 'default' hyperparameter values
-    - n_estimators: 100
-    - max_depth: 12
+    parameters:                                       # Completely or somewhat empty means using 'default' hyperparameter values
+        - n_estimators: 100
+        - max_depth: 12
+
+evaluate_model: 
+    type: <stored-or-new>                             # Optional: Keeping it simple: 'stored' means already trained model, 'new' means you just ran model training 'in this run'
+    model_folder: <path-to-processed-data>            # Only provide if you are evaluating a 'stored' model. Path to model folder
 ```
 > [!IMPORTANT]
 > The ```name``` of the hypothesis _must match_ the _function name_ in the ```data/hypothesis/target_hypothesis.py```. I plan to make it so you can specify the function-name dynamically in the Data Pipeline, but not yet.<br>
