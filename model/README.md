@@ -118,8 +118,9 @@ Simple class having different evaluation implementations. One 'main' `run()` to 
 - `plot_model_prediction()`: Plot (test) data with model predictions for _manual inspection_.
 
 ### How to use
-1. Evaluate an _old_/**pre-trained**/**stored model**:
-When a model is, successfully trained, the Model Trainer will save it with metadata. The Evaluator will use the metadata file to find the used dataset and modeltype. So, using `main.py` provide the `-evo` flag followed by the path to the models `metadata.yml`-file.
+1. Evaluate an _old_/**pre-trained**/**'stored' model**:
+When a model is, successfully trained, the Model Trainer will save it with metadata. The Evaluator will use the metadata file to find the used dataset and model type.
+- So, using `main.py` provide the `-evo` flag followed by the path to the models `metadata.yml`-file.
 ```bash
 python main.py -evo 'storage/models/2025-06-09_20:19:29/model_metadata.yml'
 ```
@@ -133,3 +134,14 @@ python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_202501
 ```
 > [!NOTE]
 > The `--evaluate-fresh`/`-evf` flag stores true, so nothing needed after. This is meant to be used after training a model (after the `-ml` flag).
+
+#### Using it with Hypothesis:
+Evaluation naturally follows the exact same flow as other components supporting Hypothesis Flow: Configure evaluation in the `config.yml`-file, following syntax provided in `hypothesis/README.md`.<br>
+Although you should follow the documentation and syntax under `hypothesis/README.md`, this is roughly it:
+```yml
+# Can have Data Pipeline- and/or Model Training config before if needed..
+
+evaluate_model: 
+    type: <stored-or-new>                             # Optional: Keeping it simple: 'stored' means already trained model, 'new' means you just ran model training 'in this run'
+    model_folder: <path-to-processed-data>            # Only provide if you are evaluating a 'stored' model. Path to model folder
+```
