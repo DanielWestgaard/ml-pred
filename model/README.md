@@ -131,7 +131,7 @@ python main.py -evo 'storage/models/2025-06-09_20:19:29/model_metadata.yml'
 > [!NOTE]
 > The `--evaluate-old`/`-evo` flag requires the path to `<SAVED INFORMATION ABOUT TRAINED MODEL>` info about the trained model.
 
-#### Evaluate **right after training** a model (_fresh_), though **not recommended to avoid tming issues**:
+#### Evaluate **right after training** a model (_fresh_), though be aware of possible race condition:
 In main.py, first train the model, and then evaluate:
 ```bash
 python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' -evf
