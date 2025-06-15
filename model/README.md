@@ -30,14 +30,18 @@ The trained model will, as for all kind of storage in this project, be stored un
 Currently, this is the organization for storage:
 ```
 storage/
-├── models/                     # Trained models and (TODO:) metadata
-│   ├── <datetimenow>/          # TODO: IMPLEMENT THIS STRUCTURE
-│   │   ├── trained_model.pkl   # Actual trained model
-│   │   ├── metadata.yml        # Information (metadata) about model training, location, parameters, etc.
+├── models/                     # Trained models, metadata, evaluation
+│   │
+│   ├── <datetimenow>/          # Eg. '2025-06-09_20:19:29/'
+│   │   ├── trained_model.pkl   # Actual trained model. Eg. 'xgboost.pkl'
+│   │   ├── model_metadata.yml  # Information (metadata) about model training, location, parameters, etc.
 │   │   └── evaluation/         # Evaluation of model and plots of its predictions
-│   │       ├── plot.pdf        # eg.
-│   │       └── evaluation.pdf  # eg.
+│   │       ├── plot.pdf        # Currently, plot of test data and model prediction (done in Evaluation)
+│   │       └── evaluation.pdf  # Todo: 
+│   │
 │   └── ...
+│
+└── ...
 ```
 The **structure for metadata.yml** gets auto-generated after successfully training the model (might be changed to .json or split up later). It's done in `model_training.py` in `_save_model_info()`, and these are currently the implemented sections: ['training:', 'dataset:', 'model_parameters:', 'system_info:', 'data_split:']
 
