@@ -50,18 +50,18 @@ The **structure for metadata.yml** gets auto-generated after successfully traini
 Following the projects goal of having a hypothesis to configure what processes to run, Model Training also supports this.<br>
 Using the configuration structure outlined in the `hypothesis/README.md`, the Model Trainers `__init__()` will...
 1. Check to see if you have a **provided path to the hypothesis config-file** using the **`hypothesis_source` parameter**.
-2. When this is done, it will find the `model_type`
-3. Then (if you have provided a) path to `processed_data`.
-    - However, if you're running Data Pipeline first, you don't necessarily know the path. Meaning if `processed_data` fails or returns `None`, it will use the path to `raw_source` to find the path to its equivalent processed path. The current approach for this is very simple: Change directory `raw/` to `processed/` and first prefix of `raw_*` to `processed_*`.
+2. Find the `model_type` (in/from configuration).
+3. Then, if provided, path to `processed_data`.
+    - However, for the usecase of "running Data Pipeline first", you don't necessarily know the path to the processed data. Meaning if `processed_data` fails or returns `None` (from config), I will use `raw_source` to find the path to its equivalent processed path. The current approach for this is very simple: Change directory `raw/` to `processed/` and first prefix of `raw_*` to `processed_*`.
 
 > [!NOTE] 
-> Because of this "Hypothesis approach/flow", I've made the arguments `dataset` and `model_type` "optional". However, they must be provided/set for the Model Trainer for work. So, if `hypothesis_source` is not provided and one of `dataset` or `model_type` is not provided, an error will be raised and the execution will be stopped (`sys.exit()`).
+> Because of this "Hypothesis approach/flow", I've made the arguments `dataset` and `model_type` "optional". However, they must be provided/set for the Model Trainer to work. So, if `hypothesis_source` is not provided and either `dataset` or `model_type` (or both) is not provided, an error will be raised and the execution will be stopped (`sys.exit()`).
 
 
 ### How to use 🤓
 To train a Machine Learning Model, you can choose how you want to use it:
-- Configure hypothesis `config.yml` following the structure outlined in `hypothesis/README.md` and either 
-    - Run `main.py` with 
+1. Configure **hypothesis** `config.yml`, following the structure outlined in `hypothesis/README.md`, and either 
+    - Run `main.py` with:
         ```bash
         python main.py -hyp 'hypothesis/1_session_based_tod_anomalies/config.yml'
         ```
@@ -81,7 +81,7 @@ To train a Machine Learning Model, you can choose how you want to use it:
                                             model_type = conf.get('model_type'))
         ```
 
-- Use `main.py` and run it with the `--model-training`/`-ml` flag, followed by the path to the processed dataset you intend to train the model on. Eg:
+2. Use `main.py` and run it with the `--model-training`/`-ml` flag, followed by the path to the processed dataset you intend to train the model on. Eg:
     ```bash
     python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv'
     ```
@@ -92,7 +92,7 @@ To train a Machine Learning Model, you can choose how you want to use it:
 > [!IMPORTANT]
 > It's important that the `model_type`/`-mt` matches the name of the file. Eg. `xgboost` will match `xgboost.py`.
 
-- Implement/use it yourself like this:
+3. Implement/use it yourself like this:
     ```python
     # Model instance
     model_training = ModelTraining(dataset=args.model_training, model_type='xgboost')  # 'model_type' must match name of implemented model file
@@ -102,10 +102,10 @@ To train a Machine Learning Model, you can choose how you want to use it:
     model_training.evaluate_regression_model()
     ```
 
-### Further development
+### Further development - Implementing new model types
 As mentioned, `model_training.py` dynamically runs and imports model-file based on `model_type`.<br>
 To add a new implementation of a new Model Type:
-1. Name the file of the Model Type (you will be using this to call, and match, it later).
+1. Name the file of the Model Type (you will be using this to call, and match, it later). Eg. 'xgboost.py' will match 'xgboost'
 2. Use the `BaseModel` Interface as a Blueprint for the needed classes. Eg:
     ```python
     # Import
@@ -122,16 +122,16 @@ Simple class having different evaluation implementations. One 'main' `run()` to 
 - `plot_model_prediction()`: Plot (test) data with model predictions for _manual inspection_.
 
 ### How to use
-1. Evaluate an _old_/**pre-trained**/**'stored' model**:
-When a model is, successfully trained, the Model Trainer will save it with metadata. The Evaluator will use the metadata file to find the used dataset and model type.
-- So, using `main.py` provide the `-evo` flag followed by the path to the models `metadata.yml`-file.
+#### Evaluate an _old_/**pre-trained**/**'stored' model**:
+When a model is, successfully trained, the Model Trainer will save it with metadata. The Evaluator will use the metadata file to find the used dataset and model type.<br>
+Using `main.py` provide the `-evo` flag followed by the path to the models `metadata.yml`-file.
 ```bash
 python main.py -evo 'storage/models/2025-06-09_20:19:29/model_metadata.yml'
 ```
 > [!NOTE]
 > The `--evaluate-old`/`-evo` flag requires the path to `<SAVED INFORMATION ABOUT TRAINED MODEL>` info about the trained model.
 
-2. Evaluate **right after training** a model (_fresh_), though **not recommended to avoid tming issues**:
+#### Evaluate **right after training** a model (_fresh_), though **not recommended to avoid tming issues**:
 In main.py, first train the model, and then evaluate:
 ```bash
 python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv' -evf
@@ -140,6 +140,7 @@ python main.py -ml 'storage/data/capital_com/processed/processed_GBPUSD_m_202501
 > The `--evaluate-fresh`/`-evf` flag stores true, so nothing needed after. This is meant to be used after training a model (after the `-ml` flag).
 
 #### Using it with Hypothesis:
+You can use the Hypothesis configuration file to run Evaluation with both of these usecases (though one at a time).<br>
 Evaluation naturally follows the exact same flow as other components supporting Hypothesis Flow: Configure evaluation in the `config.yml`-file, following syntax provided in `hypothesis/README.md`.<br>
 Although you should follow the documentation and syntax under `hypothesis/README.md`, this is roughly it:
 ```yml
@@ -149,3 +150,4 @@ evaluate_model:
     type: <stored-or-new>                             # Optional: Keeping it simple: 'stored' means already trained model, 'new' means you just ran model training 'in this run'
     model_folder: <path-to-processed-data>            # Only provide if you are evaluating a 'stored' model. Path to model folder
 ```
+When ready, run `python main.py -hyp 'hypothesis/1_session_based_tod_anomalies/config.yml'`
