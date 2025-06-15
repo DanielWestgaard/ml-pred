@@ -15,3 +15,4 @@ pyyaml
 mplfinance
 kaleido
 sktime
+gitstats

@@ -64,6 +64,7 @@ If this is the first time using the repo, follow these instructions:
     - [Excalidraw](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor): an open-source virtual whiteboard tool designed for collaborative, freehand drawing and diagramming. This extension allows you to create and draw in VSCode, and view much more easily. Extension ID: pomdtr.excalidraw-editor
     - [Rainbow CSV](https://marketplace.visualstudio.com/items/?itemName=mechatroner.rainbow-csv): Prettier view of .csv-files.
     - [Material Icon Theme](https://marketplace.visualstudio.com/items/?itemName=PKief.material-icon-theme): Helps massively when you have many folders (icon some names).
+- `pytest` cmd-line tool (already in `requirements.txt`): Simple and easy tool to get statistics about your repository. Eg: `gitstats /Users/dmartinsen/pers-prog/ml-pred /Users/dmartinsen/pers-prog/ml-pred`
 
 ## Running ```main.py``` 👨‍✈️
 ```main.py``` is the main orchestrator of this whole project. If you want to run entire componentes, or test out smaller stuff, this is where you do it from.<br>
