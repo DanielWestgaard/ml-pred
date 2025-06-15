@@ -68,10 +68,14 @@ There are 2 ways of running the Data Pipeline on your raw data:
         data_pipeline.run()
         ```
     
-2. **Focusing on a Hypothesis**: The pipeline will have a somewhat different flow: `Cleaning` -> `Validation` -> `Generation` (only generating the specified features from given hypothesis config-file) -> `Target Hypothesis` (creating/calculating target column representing the Hypothesis - what the Model will predict) -> `Transformation` -> `Save`.<br>
+2. **Focusing on a Hypothesis**: The pipeline will have a somewhat different flow: `Cleaning` -> `Validation` -> `Generation` (only generating specified features from config-file) -> `Target Hypothesis` (generating _target column_ representing the Hypothesis) -> `Transformation` -> `Save`.<br>
 This really is at **the heart of this project**. Check out the documentation under `hypothesis/` and `Target Hypothesis` (chapter _in this readme file_) to see what this is, and how to create one to focus on (`config.yml`, `README.md`, new method in `target_hypothesis.py`).<br>
 When this is done, you can:
-    - Use `main.py`and run the Pipeline like this (eg.):
+    - **Recommended**: Use `main.py`and run the Pipeline, with hypothesis config, like this (eg.):
+        ```bash
+        python main.py -hyp "hypothesis/1_session_based_tod_anomalies/config.yml"
+        ```
+    - **Older version of using hypothesis flow**: Use `main.py`and run the Pipeline like this (eg.):
         ```bash
         python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         ```
@@ -79,7 +83,7 @@ When this is done, you can:
         ```python
         from data.pipelines.engineer_pipeline import EngineeringPipeline
 
-        data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv",
+        data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv",  # Using hypothesis config-file, this will be dynamically fetched - so no need to provide if so
                                             save_cleaned_data = True,
                                             hypothesis_source = "hypothesis/1_session_based_tod_anomalies/config.yml")
         data_pipeline.run()
@@ -120,7 +124,7 @@ Code related to creating and selecting features with prediction power to help a 
 
 ## Feature Generation
 The feature generator generates a lot of features (100+). I have tried to implement and use a lot of the major technical indicators and features types relevant for financial time series. The easiest way to get a quick glance on the features are through ```run()``` in the ```FeatureGenerator``` class.<br>
-To handle errors, but also keep a more simplistic code, have I implemented ```safely_execute()``` that I run/calculate all features through. This way error handling is improved (not the best) and code is still simplistic.<br>
+To handle errors, but also keep a more simplistic code, I have implemented ```safely_execute()``` that's used run/calculate all features. This way, error handling is improved (not the best) and code is still simplistic.<br>
 Furthermore, there is also implemented a helper method, `_add_features_efficiently()`, that does excactly what the name suggests. The main goal of this function is to eliminate DataFrame fragmentation, improve performance, reduce memory usage, and better code organization. Hence, when improving Generation with new features, remember this approach:
 ```python
 def some_feature(self):

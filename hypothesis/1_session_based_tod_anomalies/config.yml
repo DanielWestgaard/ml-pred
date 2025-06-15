@@ -1,14 +1,30 @@
 hypothesis:
     name: session_based_tod_anomalies
 
-required_features:
-    time_of_day: []  # all features
-    time_of_week: []
-    time_of_month: []
-    day_of_week: []
-    average_true_range: []
-    volatility_regimes: []
-    fx_activity_profile: []
-    fx_trading_sessions: []
-    session_timing_features: []
-    session_transition_features: []
+data_pipeline:
+    raw_source: storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv
+  
+    required_features:
+        time_of_day: []  # all features
+        time_of_week: []
+        time_of_month: []
+        day_of_week: []
+        average_true_range: []
+        volatility_regimes: []
+        fx_activity_profile: []
+        fx_trading_sessions: []
+        session_timing_features: []
+        session_transition_features: []
+
+model_training:
+    type: xgboost
+
+    # processed_data: storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv
+
+    parameters:
+        n_estimators: 100
+        max_depth: 12
+    
+evaluate_model:
+    type: new
+    model_folder: storage/models/2025-06-09_22:09:38

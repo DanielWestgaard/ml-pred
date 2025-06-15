@@ -2,6 +2,7 @@
 import argparse
 import json
 import sys
+import time
 import yaml
 
 from config import config
@@ -11,7 +12,7 @@ from data.providers.capital_com import ProviderCapitalCom
 from data.providers.alpha_vantage import ProviderAlphaVantage
 import utils.alpha_vantage_utils as alpha_utils
 from data.pipelines.engineer_pipeline import EngineeringPipeline
-from utils import shared_utils
+import utils.shared_utils as shared_utils
 from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
 from model.evaluation import ModelEvaluation
@@ -52,7 +53,7 @@ def main():
     args = parse_arguments()
     
     log_utils._is_configured = False
-    logging = log_utils.setup_logging(name="engineering", type="data", log_to_file=True, log_level=config.DEBUG_LOG_LEVEL)
+    logging = log_utils.setup_logging(name="engineering", type="data", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True
@@ -66,6 +67,49 @@ def main():
                                                 save_cleaned_data = save_cleaned_data)
         
         data_pipeline.run()
+
+    if args.hypothesis:
+        logging.info(f"User using pure hypothesis flow!")
+        save_cleaned_data = True
+        
+        # Getting all the configurations
+        conf = shared_utils.handle_hypothesis_source(args.hypothesis)
+        conf_keys = conf.keys()
+        
+        if 'raw_data_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
+            data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
+            data_pipeline.run()
+        
+        # Model Training
+        if 'model_type' in conf_keys:  # Found Model Type in config, meaning user wants to use Model Training
+            model_training = ModelTraining(hypothesis_source = args.hypothesis)
+            model = model_training.run()
+            
+            # Store the model directory for potential evaluation
+            if hasattr(model_training, 'model_directory'):
+                trained_model_dir = model_training.model_directory
+            else:
+                # Get the latest model directory that was just created
+                trained_model_dir = get_latest_model(models_directory = config.TRAINED_MODEL_STORAGE,
+                                                model_type = conf.get('model_type'))
+        
+        if 'evaluate_model' in conf_keys:
+            eval_type = conf.get('evaluation_type')
+            
+            if eval_type in 'stored':
+                # Evaluate specific model directory
+                evaluation = ModelEvaluation(model_directory = conf.get('model_folder'))
+            elif eval_type in 'new' and trained_model_dir:
+                time.sleep(1)  # Temporary, just to not get any race conditions
+                # Evaluate the model that was just trained
+                logging.info(f"Evaluating freshly trained model at: {trained_model_dir}")
+                evaluation = ModelEvaluation(model_directory = trained_model_dir)
+            else:
+                # Find the latest model of the specified type
+                logging.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
+                evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
+            
+            evaluation.run()
     
     if args.plot_data:
         plot_data = PlotData(dataset=args.plot_data, save_plot=False)

@@ -16,7 +16,7 @@ from data.features.target_hypothesis import TargetHypothesis
 
 
 class EngineeringPipeline():
-    def __init__(self, raw_dataset:str, output_path:str = None, save_cleaned_data:bool = False, hypothesis_source:str = None):
+    def __init__(self, raw_dataset:str = None, output_path:str = None, save_cleaned_data:bool = False, hypothesis_source:str = None):
         """
         Pipeline and orchestrator for processing and engineering raw datasets
         into data ready to be used for training.
@@ -25,22 +25,25 @@ class EngineeringPipeline():
         (of they exist). This also makes the pipeline skip the Feature Selection step entirely.
         
         Args:
-            - raw_dataset: path to the raw dataset (csv format).
+            - raw_dataset: path to the raw dataset (csv format). Is now currently optional as when you use hypothesis_source,
+              the path to data is provided there and thet trumphs provided raw_dataset argument.
             - output_path: potential output path for processed data (csv format).
             - hypothesis_source: For running pipeline with hypothesis - The path of the hypothesis config.yml-file.
-            xxx selected_features: Feature Generator only generates those features, and pipeline skips Selesction.
         """
         self.output_path = output_path
+        
+        if hypothesis_source is not None:
+            configurations = shared_utils.handle_hypothesis_source(hypothesis_source)
+            self.hypothesis_name = configurations.get('hypothesis_name')
+            raw_dataset = configurations.get('raw_data_source')
+            self.selected_features = configurations.get('features')
+        else:
+            self.selected_features = None
+        
         self.raw_data_path = raw_dataset
-
         # Loading data
         self.df, self.original_df = data_utils.check_and_return_df(raw_dataset)
         logging.debug("Engineering Pipeline - Successfully loaded data!")
-        
-        if hypothesis_source is not None:
-            self.hypothesis_name, self.selected_features = shared_utils.handle_hypothesis_source(hypothesis_source)
-        else:
-            self.selected_features = None
         
         # Potentially save cleaned dataset
         self.save_cleaned_data = save_cleaned_data

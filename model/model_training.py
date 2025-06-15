@@ -14,37 +14,84 @@ import platform
 # Train-test
 from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
 
-from utils import data_utils, model_utils
+from utils import data_utils, model_utils, shared_utils
 import config.config as config
 
 
 class ModelTraining():
     """Train a specific ML Model."""
-    def __init__(self, dataset, model_type:str, target_col:str = 'close', hypothesis:str = None):
+    def __init__(self, dataset:str = None, model_type:str = None, target_col:str = 'close', hypothesis_source:str = None):
         """
         Initialize the class by providing specifics.
         
         Args:
-            - dataset: Path to the Engineered (ohlcv) dataset to train the model on.
-            - model_type: Type of model you want to train. Eg. 'xgboost', 'decision_tree', 'random_forest', etc.
+            - dataset: Path to the Engineered (ohlcv) dataset to train the model on. Is 'optional' as it might be provided in hypothesis_source
+            - model_type: Type of model you want to train. Eg. 'xgboost', 'decision_tree', 'random_forest', etc. Is 'optional' as it might be provided in hypothesis_source
             - TODO: hypothesis: Provide path to hypothesis' config.yml to target its column. This currently only works close target.
         """
         try:
             logging.info(f"---------- Initiating Model Training ----------")
-            self.dataset_path = dataset
-            # Load dataset based on format
-            self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
-            self.model_type = model_type
+            # Hypothesis
+            if hypothesis_source is not None:
+                logging.info(f"Model Training was initialized with Hypothesis configuration!")
+                
+                # Loading in all configurations in the provided config.yml
+                configurations = shared_utils.handle_hypothesis_source(hypothesis_source)
+                
+                self.model_type = configurations.get("model_type")
+                
+                try:
+                    dataset = configurations.get("processed_data")
+                    
+                    if dataset is None:
+                        raw_dataset = configurations.get("raw_data_source")                        
+
+                        dataset = self._get_processed_path(raw_dataset)
+                except:  # Failed means user either forgot to provide datapath, og have ran data pipeline first, meaning we must find that one
+                    try:
+                        raw_dataset = configurations.get("raw_data_source")
+                        
+                        dataset = self._get_processed_path(raw_dataset)
+                    except Exception as e:
+                        logging.error(f"Was unable to find neither processed datapath nor raw datapath. Make sure you provide at least one of them: {e}")
+                        logging.debug(f"Congigurations found in provided config.yml path: {configurations}")
+                        sys.exit()
+                
+                # This is used (temporarily), in the very end, for storing the dataset path used for model training: 'getattr(self, 'dataset_path', 'unknown')'
+                self.dataset_path = dataset
+                
+                # Load dataset based on format
+                self.df, self.original_df = data_utils.check_and_return_df(dataset)
+                        
+                # Assuming all target, hypothesis, columns starts with ´target_'
+                for col in self.df.columns:
+                    if 'target_' in col:
+                        self.target_col = col  # TODO: Logic to find target column
+                        logging.debug(f"Found hypothesis target : '{self.target_col}'")
             
-            self.target_col = target_col
+            # Not Hypothesis flow: User must provide dataset and model_type
+            else:
+                logging.info(f"Model Training initialized without hypothesis configuration.")
+                
+                if dataset is None or model_type is None:
+                    logging.error(f"Model Training must be initialized with path to processed dataset and model_type! You provided dataset '{dataset}' and model_type '{model_type}'.")
+                    sys.exit()
+                    
+                self.dataset_path = dataset
+                self.model_type = model_type
+                self.target_col = target_col
             
-            # Most likely reading directly from the csv file, which has no index.
+                # Load dataset based on format
+                self.df, self.original_df = data_utils.check_and_return_df(dataset)
+            
+            # Reading directly from a .csv-file means df will have no index.
             if (self.df.index.name is not 'date'):
                 # DataFrame has no index (name 'date'), so setting it and dropping the duplicate
                 self.df.index = pd.to_datetime(self.df['date'])  # setting index, but ensure its in datetime format
                 self.df = self.df.drop('date', axis=1)
                 logging.debug(f"Successfully made index to {self.df.index.name}")
+            
         except Exception as e:
             logging.error(f"Error initializing Model Training: {str(e)}")
             raise
@@ -85,6 +132,27 @@ class ModelTraining():
         except AttributeError as e:
             logging.error(f"Could not find expected class in {self.module_path}: {str(e)}")
             return False
+    
+    def _get_processed_path(self, raw_path: str):
+        """
+        Convert a raw file path to its processed equivalent.
+        Currently, the approach from raw to processed data (in terms of naming standards) is that
+        I use the exact same name for processed as raw, but switch out the first name 'raw' with 'processed'
+        (same with dir). Meaning we can use this same approach here.
+        
+        Args:
+            raw_path (str): Path to the raw file
+            
+        Returns:
+            str: Path to the processed file
+        """
+        # Replace /raw/ with /processed/ in the directory structure
+        processed_path = raw_path.replace("/raw/", "/processed/")
+        
+        # Replace raw_ prefix with processed_ in the filename
+        processed_path = processed_path.replace("raw_", "processed_")
+        
+        return processed_path
         
     def _get_implemented_models(self):
         """
@@ -265,7 +333,7 @@ class ModelTraining():
             },
             
             'dataset': {
-                'dataset_path': getattr(self, 'dataset_path', 'unknown'),  # Add this line
+                'dataset_path': getattr(self, 'dataset_path', 'unknown'),  # Needs 'self.dataset_path = dataset' 
                 'target_column': self.target_col,
                 'feature_count': int(len(self.X_train.columns)),
                 'features': self.X_train.columns.tolist(),
