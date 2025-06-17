@@ -20,3 +20,33 @@ Currently only "relatively" simple tests for the data pipeline has been implemen
 │       └── test_pipeline.py                    # Testing the whole pipeline
 └── ...
 ```
+
+# Hypothesis tests
+> [!NOTE]
+> Temporary section? Might delete after completed testing.
+
+**Mocking** and `test_hypothesis_utils.py` will come in handy for using different config's with mistakes, mocking target methods that doesn't really exist, potentially skipping certain processes, etc.<br>
+
+Different test scenarios:
+1. Hypothesis file:
+    - [ ] Empty file
+    - [ ] Syntax (spelled words wrong, indentation, structure, etc.) 
+    - [ ] Hypothesis name matching an existing hypothesis target function in `target_hypothesis.py`
+    - [ ] ..?
+2. Different flow scenarios:
+    - [ ] Only ...
+        - [ ] Data Pipeline
+            - [ ] Provided, and not, raw data source
+        - [ ] Model Training
+            - [ ] 'Pre-' Processed data
+            - [ ] Mocking to use raw data source
+        - [ ] Evaluation (of model)
+            - [ ] Old/stored model
+            - [ ] Newst/most recently trained model
+    - [ ] Flows:
+        - [ ] Data Pipeline -> Model Training
+        - [ ] Data Pipeline -> Evaluation
+        - [ ] Model Training -> Evaluation
+3. Error handling:
+    - [ ] Correct handling for failing scenarios (forcing mistakes and handling them correct)
+    - [ ] Make sure error messages give informative "feedback"
