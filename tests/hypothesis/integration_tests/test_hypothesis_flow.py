@@ -11,6 +11,7 @@ from data.pipelines.engineer_pipeline import EngineeringPipeline
 from model.model_training import ModelTraining
 from model.evaluation import ModelEvaluation
 from utils.shared_utils import handle_hypothesis_source
+import tests.utils.test_hypothesis_utils as test_hypothesis_utils
 
 
 class TestHypothesisIntegrationFlow(unittest.TestCase):
@@ -25,70 +26,25 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
         os.makedirs(self.model_dir, exist_ok=True)
         
         # Create sample raw data
-        self.sample_data = pd.DataFrame({
-            'date': pd.date_range('2023-01-01', periods=1000, freq='h'),
-            'open': [1.2 + 0.001 * i for i in range(1000)],
-            'high': [1.21 + 0.001 * i for i in range(1000)],
-            'low': [1.19 + 0.001 * i for i in range(1000)],
-            'close': [1.205 + 0.001 * i for i in range(1000)],
-            'volume': [100 + i for i in range(1000)]
-        })
+        self.sample_data = test_hypothesis_utils.create_sample_raw_data()
         
         self.raw_data_path = os.path.join(self.data_dir, 'raw_test_data.csv')
         self.sample_data.to_csv(self.raw_data_path, index=False)
         
         # Complete hypothesis config
-        self.complete_config = {
-            'hypothesis': {
-                'name': 'session_based_tod_anomalies'
-            },
-            'data_pipeline': {
-                'raw_source': self.raw_data_path,
-                'required_features': {
-                    'time_of_day': [],
-                    'volatility_regimes': []
-                }
-            },
-            'model_training': {
-                'type': 'xgboost',
-                'parameters': {
-                    'n_estimators': 10,  # Small for testing
-                    'max_depth': 3
-                }
-            },
-            'evaluate_model': {
-                'type': 'new'
-            }
-        }
+        self.complete_config = test_hypothesis_utils.complete_config(raw_data_path = self.raw_data_path)
         
         # Data pipeline only config
-        self.data_only_config = {
-            'hypothesis': {
-                'name': 'test_hypothesis'
-            },
-            'data_pipeline': {
-                'raw_source': self.raw_data_path,
-                'required_features': {
-                    'time_of_day': []
-                }
-            }
-        }
+        self.data_only_config = test_hypothesis_utils.data_pipeline_only_config(raw_data_path = self.raw_data_path)
         
     def tearDown(self):
         """Clean up temp files"""
         import shutil
         shutil.rmtree(self.temp_dir, ignore_errors=True)
     
-    def _create_config_file(self, config_dict, filename='config.yml'):
-        """Helper to create config file"""
-        config_path = os.path.join(self.temp_dir, filename)
-        with open(config_path, 'w') as f:
-            yaml.dump(config_dict, f)
-        return config_path
-    
     def test_configuration_parsing_integration(self):
         """Test that configuration is properly parsed and contains expected keys"""
-        config_path = self._create_config_file(self.complete_config)
+        config_path = test_hypothesis_utils.create_config_file(config_dict = self.complete_config, temp_dir = self.temp_dir)
         
         result = handle_hypothesis_source(config_path)
         
@@ -111,7 +67,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
     @patch('data.pipelines.engineer_pipeline.DataValidator')
     def test_data_pipeline_hypothesis_integration(self, mock_validator, mock_cleaner, mock_generator):
         """Test data pipeline integration with hypothesis configuration"""
-        config_path = self._create_config_file(self.data_only_config)
+        config_path = test_hypothesis_utils.create_config_file(config_dict = self.data_only_config, temp_dir = self.temp_dir)
         
         # Mock the pipeline components
         mock_cleaner_instance = MagicMock()
@@ -142,7 +98,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
     @patch('model.model_training.importlib.import_module')
     def test_model_training_hypothesis_integration(self, mock_import):
         """Test model training integration with hypothesis configuration"""
-        config_path = self._create_config_file(self.complete_config)
+        config_path = test_hypothesis_utils.create_config_file(config_dict = self.complete_config, temp_dir = self.temp_dir)
         
         # Create processed data for model training
         processed_data = self.sample_data.copy()
@@ -153,7 +109,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
         # Update config to point to processed data
         config_with_processed = self.complete_config.copy()
         config_with_processed['model_training']['processed_data'] = processed_path
-        config_path = self._create_config_file(config_with_processed)
+        config_path = test_hypothesis_utils.create_config_file(config_dict = config_with_processed, temp_dir = self.temp_dir)
         
         # Mock the model class
         mock_model_class = MagicMock()
@@ -183,7 +139,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
                 'raw_source': self.raw_data_path
             }
         }
-        config_path = self._create_config_file(invalid_config)
+        config_path = test_hypothesis_utils.create_config_file(config_dict = invalid_config, temp_dir = self.temp_dir)
         
         # Should exit when trying to initialize components
         with self.assertRaises(SystemExit):
@@ -191,7 +147,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
     
     def test_configuration_key_precedence(self):
         """Test that hypothesis configuration takes precedence over direct parameters"""
-        config_path = self._create_config_file(self.complete_config)
+        config_path = test_hypothesis_utils.create_config_file(config_dict = self.complete_config, temp_dir = self.temp_dir)
         
         # Create pipeline with both direct dataset and hypothesis source
         pipeline = EngineeringPipeline(
@@ -211,7 +167,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
             'data_pipeline': {'raw_source': 'storage/data/raw/test.csv'},
             'model_training': {'type': 'xgboost'}
         }
-        config_path = self._create_config_file(config)
+        config_path = test_hypothesis_utils.create_config_file(config_dict = config, temp_dir = self.temp_dir)
         
         result = handle_hypothesis_source(config_path)
         
@@ -225,7 +181,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
             'hypothesis': {'name': 'test'},
             'evaluate_model': {'type': 'new'}
         }
-        config_path = self._create_config_file(new_eval_config)
+        config_path = test_hypothesis_utils.create_config_file(config_dict = new_eval_config, temp_dir = self.temp_dir)
         result = handle_hypothesis_source(config_path)
         
         self.assertEqual(result['evaluation_type'], 'new')
@@ -239,7 +195,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
                 'model_folder': 'storage/models/test_model'
             }
         }
-        config_path = self._create_config_file(stored_eval_config, 'stored_config.yml')
+        config_path = test_hypothesis_utils.create_config_file(config_dict = stored_eval_config, temp_dir = self.temp_dir, filename = 'stored_config.yml')
         result = handle_hypothesis_source(config_path)
         
         self.assertEqual(result['evaluation_type'], 'stored')
@@ -258,7 +214,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
                 }
             }
         }
-        config_path = self._create_config_file(feature_config)
+        config_path = test_hypothesis_utils.create_config_file(config_dict = feature_config, temp_dir = self.temp_dir)
         
         result = handle_hypothesis_source(config_path)
         
