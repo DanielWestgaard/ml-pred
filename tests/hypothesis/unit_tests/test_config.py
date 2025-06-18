@@ -7,6 +7,7 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
 from utils.shared_utils import handle_hypothesis_source
+import tests.utils.test_hypothesis_utils as test_hypothesis_utils
 
 
 class TestHypothesisConfiguration(unittest.TestCase):
@@ -15,42 +16,11 @@ class TestHypothesisConfiguration(unittest.TestCase):
         """Set up test fixtures with different config scenarios"""
         self.temp_dir = tempfile.mkdtemp()
         
-        self.valid_config = {
-            'hypothesis': {
-                'name': 'test_hypothesis'
-            },
-            'data_pipeline': {
-                'raw_source': 'storage/data/test/raw_data.csv',
-                'required_features': {
-                    'time_of_day': [],
-                    'volatility_regimes': []
-                }
-            },
-            'model_training': {
-                'type': 'xgboost',
-                'processed_data': 'storage/data/test/processed_data.csv',
-                'parameters': {
-                    'n_estimators': 100,
-                    'max_depth': 6
-                }
-            },
-            'evaluate_model': {
-                'type': 'new',
-                'model_folder': 'storage/models/test_model'
-            }
-        }
+        self.valid_config = test_hypothesis_utils.valid_config()
         
-        self.minimal_config = {
-            'hypothesis': {
-                'name': 'minimal_test'
-            }
-        }
+        self.minimal_config = test_hypothesis_utils.minimal_config()
         
-        self.invalid_config = {
-            'data_pipeline': {
-                'raw_source': 'test.csv'
-            }
-        }
+        self.invalid_config = test_hypothesis_utils.invalid_config()
         
     def tearDown(self):
         """Clean up temp files"""

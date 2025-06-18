@@ -3,6 +3,7 @@ import pandas as pd
 import yaml
 
 
+# Integration test of Hypothesis Flow
 def create_sample_raw_data():
     """Create sample raw data (simple)."""
     # Create sample raw data
@@ -67,3 +68,51 @@ def create_config_file(config_dict, temp_dir, filename='config.yml'):
     with open(config_path, 'w') as f:
         yaml.dump(config_dict, f)
     return config_path
+
+
+# Unit tests of Hypothesis config
+def valid_config():
+    valid_config = {
+        'hypothesis': {
+            'name': 'test_hypothesis'
+        },
+        'data_pipeline': {
+            'raw_source': 'storage/data/test/raw_data.csv',
+            'required_features': {
+                'time_of_day': [],
+                'volatility_regimes': []
+            }
+        },
+        'model_training': {
+            'type': 'xgboost',
+            'processed_data': 'storage/data/test/processed_data.csv',
+            'parameters': {
+                'n_estimators': 100,
+                'max_depth': 6
+            }
+        },
+        'evaluate_model': {
+            'type': 'new',
+            'model_folder': 'storage/models/test_model'
+        }
+    }
+    
+    return valid_config
+
+def minimal_config():
+    minimal_config = {
+        'hypothesis': {
+            'name': 'minimal_test'
+        }
+    }
+    
+    return minimal_config
+
+def invalid_config():
+    invalid_config = {
+        'data_pipeline': {
+            'raw_source': 'test.csv'
+        }
+    }
+    
+    return invalid_config
