@@ -1,7 +1,7 @@
 hypothesis:
     name: session_based_tod_anomalies
 
-data_pipeline:
+# data_pipeline:
     raw_source: storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv
   
     required_features:
@@ -16,7 +16,7 @@ data_pipeline:
         session_timing_features: []
         session_transition_features: []
 
-model_training:
+# model_training:
     type: xgboost
 
     # processed_data: storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv
@@ -26,5 +26,5 @@ model_training:
         max_depth: 12
     
 evaluate_model:
-    type: new
+    type: stored
     model_folder: storage/models/2025-06-09_22:09:38
