@@ -284,3 +284,8 @@ class ModelEvaluation():
                 plt.savefig("enhanced_evaluation_plot.png", dpi=300, bbox_inches='tight')
         
         plt.show()
+    
+    # TODO: 
+    # - Cross-validation to test model stability
+    # - Walk-forward Analysis (for time series)
+    # - Statistical significance 
