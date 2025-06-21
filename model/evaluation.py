@@ -32,6 +32,9 @@ class ModelEvaluation():
         """
         logging.info(f"---------- Initializing Model Evaluation ----------")
         
+        # Suppress matplotlib's debug font messages
+        logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
+        
         # User can now both provide the path to model they want to evaluate, and not - meaning we get the newest for them
         if model_directory is not None:  # Model path is provided
             self.model_directory = model_directory
