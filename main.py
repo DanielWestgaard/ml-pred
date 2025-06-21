@@ -15,7 +15,7 @@ from data.pipelines.engineer_pipeline import EngineeringPipeline
 import utils.shared_utils as shared_utils
 from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
-from model.evaluation import ModelEvaluation
+from evaluation.evaluation import ModelEvaluation
 from utils.model_utils import get_latest_model
 
 
