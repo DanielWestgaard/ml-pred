@@ -1,7 +1,10 @@
 import logging
+import os
 import yaml
+
 from utils.model_utils import load_model_metadata
-# from .evaluation_factory import EvaluationFactory
+import utils.shared_utils as shared_utils
+from evaluation.evaluation_factory import EvaluationFactory
 
 class ModelEvaluation:
     """
@@ -42,15 +45,17 @@ class ModelEvaluation:
         """
         # Option 1: From hypothesis config file
         if self.hypothesis_config and os.path.exists(self.hypothesis_config):
-            with open(self.hypothesis_config, 'r') as f:
-                config = yaml.safe_load(f)
-                return config.get('hypothesis_type')
+            configuration = shared_utils.handle_hypothesis_source(self.hypothesis_config)
+            return configuration.get('hypothesis_name')
+            # with open(self.hypothesis_config, 'r') as f:
+            #     config = yaml.safe_load(f)
+            #     return config.get('name')
         
         # Option 2: From model metadata
         if self.model_directory:
             try:
                 loader = load_model_metadata(self.model_directory)
-                return loader.get_hypothesis_type()  # You'll need to add this method
+                return loader.get_hypothesis_type()  # TODO: Not implemented yet
             except:
                 pass
         
