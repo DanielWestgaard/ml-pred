@@ -96,18 +96,20 @@ def main():
         if 'evaluate_model' in conf_keys:
             eval_type = conf.get('evaluation_type')
             
-            if eval_type in 'stored':
-                # Evaluate specific model directory
-                evaluation = ModelEvaluation(model_directory = conf.get('model_folder'))
-            elif eval_type in 'new' and trained_model_dir:
-                time.sleep(1)  # Temporary, just to not get any race conditions
-                # Evaluate the model that was just trained
-                logging.info(f"Evaluating freshly trained model at: {trained_model_dir}")
-                evaluation = ModelEvaluation(model_directory = trained_model_dir)
-            else:
-                # Find the latest model of the specified type
-                logging.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
-                evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
+            evaluation = ModelEvaluation(hypothesis_config = args.hypothesis)
+            
+            # if eval_type in 'stored':
+            #     # Evaluate specific model directory
+            #     evaluation = ModelEvaluation(model_directory = conf.get('model_folder'))
+            # elif eval_type in 'new' and trained_model_dir:
+            #     time.sleep(1)  # Temporary, just to not get any race conditions
+            #     # Evaluate the model that was just trained
+            #     logging.info(f"Evaluating freshly trained model at: {trained_model_dir}")
+            #     evaluation = ModelEvaluation(model_directory = trained_model_dir)
+            # else:
+            #     # Find the latest model of the specified type
+            #     logging.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
+            #     evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
             
             evaluation.run()
     

@@ -8,7 +8,7 @@ class EvaluationFactory:
     """
     
     EVALUATORS = {  # TODO: make this dynamic
-        'session_volume_anomaly': SessionVolumeAnomalyEvaluation,
+        'session_based_tod_anomalies': SessionVolumeAnomalyEvaluation,  #session_volume_anomaly
         'price_prediction': PricePredictionEvaluation,
         #'volatility_prediction': VolatilityPredictionEvaluation,
         # Add more hypothesis types as you develop them
