@@ -1,23 +1,49 @@
 # About evaluation/
 
+## Overview 🎯
+This evaluation module is designed to work with the **hypothesis-driven approach** for exploring financial market inefficiencies. Each hypothesis requires its own specialized evaluation methodology since different market theories and strategies need different metrics and analysis approaches.
+
+## Hypothesis-Driven Evaluation Philosophy 🧑‍🚀
+Following the project's core philosophy of testing specific market hypotheses:
+
+1. **Hypothesis-Specific Metrics**: Each hypothesis (e.g., session-based volume anomalies, price prediction) requires different evaluation criteria
+2. **Specialized Analysis**: Different hypotheses need different types of analysis (time-of-day effects, volatility patterns, anomaly detection)
+3. **Scalable Architecture**: Easy to add new hypothesis evaluations without modifying core components
+
 ## Structure 🗂️
 ```
 ├── evaluation.py                           # Main orchestrator
 ├── evaluation_factory.py                   # Creating the evaluator based on hypothesis name
 │   
 └── hypothesis_specific/                    # Specific evaluation for selected hypotheses
-    ├── base_evaluation.py                  # Just a simple interface for the implementations to follow
-    ├── session_based_tod_anomalies.py      # based on the name of the hypothesis?
-    ├── price_predicion_evaluation.py       # TODO...
-    └── ...
+    ├── base_evaluation.py                  # Interface for hypothesis-specific evaluations
+    ├── session_volume_anomaly_detection.py # Session-based volume anomaly evaluation
+    ├── price_prediction_evaluation.py      # Price prediction evaluation
+    └── ...                                 # Additional hypothesis evaluations
 ```
 
 ## Usage 🤓
-This evaluation "component" work as follows:
-- `evaluation.py`: _Main orchestrator_ for evaluating trained model. If you have provided a hypothesis `config.yml`-file, it will use the **hypothesis name** to match the implemented Hypothesis Evaluation file/class.
-    - This means that for new hypotheses, you must also create a hypothesis evaluation file. Mostly because evaluation might look different depending on the different hypotheses. If not, I will implement (in the future) a way of running the default evaluation.
-- `evaluation_factory.py`: Super simple way of semi-dynamically running the selected evaluation type based on the name in the hypothesis config-file, matching with the `EVALUATORS` list (that maps the name to the class/file).
-- `base_evaluation.py`: Simple interface for guiding creation/implemention of new hypothesis evaluations.
+This evaluation component works as follows:
+
+- **`evaluation.py`**: Main orchestrator for evaluating trained models. Uses the **hypothesis name** from `config.yml` to match the corresponding evaluation implementation.
+- **`evaluation_factory.py`**: Dynamic evaluation selector based on hypothesis name, mapping to the `EVALUATORS` registry.
+- **`base_evaluation.py`**: Abstract interface ensuring consistent evaluation structure across different hypotheses.
+
+### Adding New Hypothesis Evaluations
+When creating a new hypothesis:
+
+1. Create a new evaluation file under `evaluation/hypothesis_specific/`
+2. Inherit from `BaseEvaluation` class
+3. Implement hypothesis-specific evaluation methods
+4. Add the mapping to `EVALUATORS` in `evaluation_factory.py`
+5. Ensure the hypothesis name matches exactly between config and evaluator registry
+
+## Key Features 🔧
+- **Hypothesis-Specific Metrics**: Each evaluation provides metrics relevant to its specific market hypothesis
+- **Flexible Architecture**: Easy to extend with new hypothesis evaluations
+- **Consistent Interface**: All evaluations follow the same base structure
+- **Model Persistence**: Evaluations are saved with hypothesis tags for better organization
+- **Comprehensive Analysis**: Includes both general ML metrics and hypothesis-specific insights
 
 > [!NOTE]
-> It's important to note that when your creating a new hypothesis, you will (also) need to create its equivalent evaluation file under `evaluation/hypothesis_specific`, and that the name of "this file" is mapped to the excact same way you "spell" the hypothesis_name in the `EVALUATORS`.
+> Each hypothesis evaluation is designed to test specific market inefficiencies or opportunities. The evaluation metrics and analysis methods are tailored to validate or invalidate the underlying hypothesis about market behavior.
