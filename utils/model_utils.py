@@ -184,8 +184,7 @@ class ModelMetadataLoader:
     
     # Hypothesis methods
     def get_hypothesis_type(self):
-        logging.error("Method not created yet! Exiting..")
-        sys.exit()
+        return self.get_value('hypothesis')
     
     # System info methods
     def get_system_info(self) -> Dict[str, Any]:

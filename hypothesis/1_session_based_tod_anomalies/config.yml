@@ -19,7 +19,7 @@ hypothesis:
 # model_training:
     type: xgboost
 
-    # processed_data: storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv
+    processed_data: storage/data/capital_com/processed/processed_GBPUSD_m5_20240101_20250101.csv
 
     parameters:
         n_estimators: 100
@@ -27,4 +27,4 @@ hypothesis:
     
 evaluate_model:
     type: stored
-    model_folder: storage/models/2025-06-14_17:42:57
+    model_folder: storage/models/2025-07-03_12:27:50
