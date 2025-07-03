@@ -1,6 +1,6 @@
 import logging
 import os
-import time
+from datetime import time
 from .base_evaluation import BaseEvaluation
 import numpy as np
 import pandas as pd
@@ -211,7 +211,50 @@ class SessionVolumeAnomalyEvaluation(BaseEvaluation):
         return self.evaluation_metrics
     
     def plot_results(self, save_plot: bool = True):
-        """Session-specific plotting"""
-        # Your session-specific plotting logic
-        # (Using the plotting code from previous response)
-        pass
+        """
+        Plot actual test data vs. (trained models) prediction.
+        Make sure the test dataset provided in init of class is the same one you trained the model on.
+        
+        This method reuses the train test data from model_training.py (done in this class' init),
+        and makes model predict here before plotting.
+        """
+        logging.info(f"----- Plot Regression Models Prediction-----")
+        
+        # Make predictions
+        y_pred = self.model.predict(self.X_test)
+        
+        try:
+            test_dates = self.y_test.index
+            logging.debug(f"date in y_test was index, which is correct. Using this for plotting.")
+        except Exception as e:
+            try:  # Date might not be index and just set as normal colum - weird, but try
+                test_dates = self.y_test['date']
+                logging.debug(f"date in y_test was normal date column. Should be index, but ok.")
+            except Exception as e:
+                logging.error(f"Unable to find/use date in the provided dataset: {e}")
+                sys.exit()
+        
+        # df should have columns: date, open, high, low, close, volume
+        # predictions should be array/series with same length as test data
+        plt.figure(figsize=(15, 8))
+        plt.plot(test_dates, self.y_test,
+                 label=f"Actual '{self.y_test.name}' Price (Test Data)",
+                 linewidth=2, alpha=0.8)
+        plt.plot(test_dates, y_pred, label=f"Predicted '{self.y_test.name}'", linewidth=2, alpha=0.8)
+        plt.xlabel('Datetime')
+        plt.ylabel('Price/values')
+        plt.title(f'{self.model.type} Model Price Prediction')
+        plt.legend()
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+        if save_plot:
+            # Save location under models folder
+            try:
+                plt.savefig(f"{self.evaluation_path}/plot.png")
+            except Exception as e:
+                logging.error(f"Unable to save plot under Models folder, '{self.model_directory}'. Falling back to your current dir : {e}")
+                plt.savefig("plot.png")
+        
+        plt.show()
+        
