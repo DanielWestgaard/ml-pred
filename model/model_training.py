@@ -197,7 +197,7 @@ class ModelTraining():
             logging.debug("^ Remember 'model_type' must match exact name of file, eg. 'model_type == model_type.py'.")
             sys.exit()
     
-    def temporal_train_test_split(self, retur:bool = False):
+    def temporal_train_test_split(self, return_datasets:bool = False):
         """
         'Complete' way of creating X and y, and getting their respecitve *_train and *_test for model training and testing.
         Train test split is done using sktime.split.temporal_train_test_split() (meaning not random as it's important for 
@@ -224,7 +224,7 @@ class ModelTraining():
         
         self.y_train, self.y_test, self.X_train, self.X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
         
-        if retur:
+        if return_datasets:
             return self.y_train, self.y_test, self.X_train, self.X_test
         
     def save_model(self, filename: str = None):

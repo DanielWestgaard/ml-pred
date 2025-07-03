@@ -58,11 +58,15 @@ class BaseEvaluation(ABC):
         
         # Get target column and hypothesis type
         self.target_col = loader.get_target_column()
-        self.hypothesis_type = loader.get_hypothesis_type()  # You'll need to add this to metadata
+        try:
+            self.hypothesis_type = loader.get_hypothesis_type()
+        except AttributeError:
+            logging.warning("get_hypothesis_type() method not found in model metadata, setting to 'unknown'")
+            self.hypothesis_type = 'unknown'
         
         # Get train/test splits
         model_training = ModelTraining(dataset=dataset, model_type=model_type, target_col=self.target_col)
-        self.y_train, self.y_test, self.X_train, self.X_test = model_training.temporal_train_test_split(retur=True)
+        self.y_train, self.y_test, self.X_train, self.X_test = model_training.temporal_train_test_split(return_datasets=True)
     
     @abstractmethod
     def evaluate_model(self):

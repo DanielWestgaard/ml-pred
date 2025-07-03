@@ -47,9 +47,6 @@ class ModelEvaluation:
         if self.hypothesis_config and os.path.exists(self.hypothesis_config):
             configuration = shared_utils.handle_hypothesis_source(self.hypothesis_config)
             return configuration.get('hypothesis_name')
-            # with open(self.hypothesis_config, 'r') as f:
-            #     config = yaml.safe_load(f)
-            #     return config.get('name')
         
         # Option 2: From model metadata
         elif self.model_directory:
@@ -60,8 +57,8 @@ class ModelEvaluation:
                 pass
         
         # Option 3: Default fallback
-        logging.warning("Could not determine hypothesis type, defaulting to 'session_volume_anomaly'")
-        return 'session_volume_anomaly'
+        logging.warning("Could not determine hypothesis type, defaulting to 'session_based_tod_anomalies'")
+        return 'session_based_tod_anomalies'
     
     def run(self):
         """Run the appropriate evaluation"""
