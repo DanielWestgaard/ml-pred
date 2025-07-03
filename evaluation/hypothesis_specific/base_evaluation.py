@@ -22,24 +22,18 @@ class BaseEvaluation(ABC):
         
         # Suppress matplotlib's debug font messages
         logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
-        print(f"model directory sent is {model_directory}")
         # Common model loading logic
         if model_directory is not None:
             self.model_directory = model_directory
         else:
             self.model_directory = get_latest_model(models_directory=config.TRAINED_MODEL_STORAGE, model_type=model_type)
         
-        print(f"HAVE HERE ${self.model_directory}")
-        
         try:
             # Load metadata and model
             self._load_model_and_data()
-            print("hesdf")
             # Setup evaluation directory
             self.save_evaluations = save_evaluations
-            print("hesdfsdfsd")
             self.evaluation_path = os.path.join(self.model_directory, 'evaluation')
-            print("hesdf1234234")
             if not os.path.exists(self.evaluation_path):
                 os.makedirs(self.evaluation_path)
                 
@@ -65,7 +59,6 @@ class BaseEvaluation(ABC):
         # Get target column and hypothesis type
         self.target_col = loader.get_target_column()
         self.hypothesis_type = loader.get_hypothesis_type()  # You'll need to add this to metadata
-        print(f"Finally, have ${self.hypothesis_type}")
         
         # Get train/test splits
         model_training = ModelTraining(dataset=dataset, model_type=model_type, target_col=self.target_col)

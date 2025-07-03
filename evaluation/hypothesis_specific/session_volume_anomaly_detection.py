@@ -18,7 +18,6 @@ class SessionVolumeAnomalyEvaluation(BaseEvaluation):
         """
         Specialized evaluation for session-based volume anomaly prediction
         """
-        print("HELLOOOOO")
         logging.info(f"----- Session-Based Volume Anomaly Evaluation -----")
         
         

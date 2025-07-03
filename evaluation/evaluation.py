@@ -46,7 +46,6 @@ class ModelEvaluation:
         # Option 1: From hypothesis config file
         if self.hypothesis_config and os.path.exists(self.hypothesis_config):
             configuration = shared_utils.handle_hypothesis_source(self.hypothesis_config)
-            print("HSDLFK")
             return configuration.get('hypothesis_name')
             # with open(self.hypothesis_config, 'r') as f:
             #     config = yaml.safe_load(f)
@@ -54,10 +53,9 @@ class ModelEvaluation:
         
         # Option 2: From model metadata
         elif self.model_directory:
-            print("hæ??")
             try:
                 loader = load_model_metadata(self.model_directory)
-                return loader.get_hypothesis_type()  # TODO: Not implemented yet
+                return loader.get_hypothesis_type()
             except:
                 pass
         

@@ -31,5 +31,4 @@ class EvaluationFactory:
                            f"Available types: {list(cls.EVALUATORS.keys())}")
         
         evaluator_class = cls.EVALUATORS[hypothesis_type]
-        print(evaluator_class)
         return evaluator_class(**kwargs)
