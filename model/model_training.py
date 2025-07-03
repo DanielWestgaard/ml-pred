@@ -318,7 +318,9 @@ class ModelTraining():
         
         # Create metadata dictionary
         metadata = {
-            'hypothesis': _hypothesis(self),
+            'hypothesis': {
+                'name': _hypothesis(self)
+            },
             
             'model_info': {
                 'model_type': self.model_type,

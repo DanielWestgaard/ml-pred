@@ -27,4 +27,4 @@ hypothesis:
     
 evaluate_model:
     type: stored
-    model_folder: storage/models/2025-07-03_12:27:50
+    model_folder: storage/models/2025-07-03_12:45:35

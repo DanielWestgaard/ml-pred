@@ -110,7 +110,7 @@ def main():
             #     # Find the latest model of the specified type
             #     logging.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
             #     evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
-            
+            print("suii")
             evaluation.run()
     
     if args.plot_data:

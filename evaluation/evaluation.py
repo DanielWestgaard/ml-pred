@@ -34,7 +34,7 @@ class ModelEvaluation:
         # Create appropriate evaluator
         self.evaluator = EvaluationFactory.create_evaluator(
             hypothesis_type=self.hypothesis_type,
-            model_directory=model_directory,
+            model_directory=model_directory or shared_utils.handle_hypothesis_source(hypothesis_config).get("model_folder"),
             save_evaluations=save_evaluations,
             model_type=model_type
         )
@@ -46,13 +46,15 @@ class ModelEvaluation:
         # Option 1: From hypothesis config file
         if self.hypothesis_config and os.path.exists(self.hypothesis_config):
             configuration = shared_utils.handle_hypothesis_source(self.hypothesis_config)
+            print("HSDLFK")
             return configuration.get('hypothesis_name')
             # with open(self.hypothesis_config, 'r') as f:
             #     config = yaml.safe_load(f)
             #     return config.get('name')
         
         # Option 2: From model metadata
-        if self.model_directory:
+        elif self.model_directory:
+            print("hæ??")
             try:
                 loader = load_model_metadata(self.model_directory)
                 return loader.get_hypothesis_type()  # TODO: Not implemented yet

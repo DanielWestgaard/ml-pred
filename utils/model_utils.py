@@ -184,7 +184,7 @@ class ModelMetadataLoader:
     
     # Hypothesis methods
     def get_hypothesis_type(self):
-        return self.get_value('hypothesis')
+        return self.get_value('hypothesis', 'name')
     
     # System info methods
     def get_system_info(self) -> Dict[str, Any]:
