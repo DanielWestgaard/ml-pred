@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../..'))
 from data.pipelines.engineer_pipeline import EngineeringPipeline
 from model.model_training import ModelTraining
-from model.evaluation import ModelEvaluation
+from evaluation.evaluation import ModelEvaluation
 from utils.shared_utils import handle_hypothesis_source
 import tests.utils.test_hypothesis_utils as test_hypothesis_utils
 

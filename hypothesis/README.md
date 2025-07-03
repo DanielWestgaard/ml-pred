@@ -18,6 +18,7 @@ Each new (and all existing) hypotheses should follow _this_ structure.<br>
 2. Create a `config.yml` file for configuring the hypothesis and other potential parameters, following the given format.
 3. Optionally, though recommended, a `README.md` describing the hypothesis in more detail and with better formulations.
 4. Add a method in the (`data/features/`)`target_hypothesis.py` that calculates the target column, representing the hypothesis (that a model will predict).
+5. If you want to be able to **evaluate the model** trained on your hypothesis, you must also create a **dedicated hypothesis evaluation file**, `evaluation/hypothesis_specific/`, and (same as with the calculation of the target) must name (the file) the same as hypothesis_name in the config-file (matching).
 
 ## config.yml structure - WIP
 These are the different componentes/sections you can specify in the configuration-file. None of these are required (I think), but could be thought of as flags when running `main.py`, to tell the main orchestrator what components to run, and potentially specify how (features, parameters, etc.).

@@ -22,6 +22,7 @@ The approach of using different hypotheses to test and find possible inefficienc
 ├── data/                   # Data engineering
 ├── model/                  # Model training
 ├── hypothesis/             # Configuration and documentation to different hypothesis'
+├── evaluation/             # Dedicated evaluation of trained models
 ├── backtesting/            # Backtest trained models
 ├── live/                   # Deploy trained model on live market data
 ├── storage/                # General storage for data, models, results, etc.

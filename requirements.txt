@@ -16,3 +16,4 @@ mplfinance
 kaleido
 sktime
 gitstats
+plotly

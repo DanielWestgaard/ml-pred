@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import pandas as pd
 import numpy as np
 import ast
@@ -180,6 +181,10 @@ class ModelMetadataLoader:
     def get_parameter(self, param_name: str, default=None):
         """Get specific model parameter."""
         return self.get_value('model_parameters', param_name, default)
+    
+    # Hypothesis methods
+    def get_hypothesis_type(self):
+        return self.get_value('hypothesis', 'name')
     
     # System info methods
     def get_system_info(self) -> Dict[str, Any]:

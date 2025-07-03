@@ -32,8 +32,9 @@ class ModelTraining():
         try:
             logging.info(f"---------- Initiating Model Training ----------")
             
+            self.hypothesis_source = hypothesis_source
             # Hypothesis
-            if hypothesis_source is not None:
+            if self.hypothesis_source is not None:
                 logging.info(f"Model Training was initialized with Hypothesis configuration!")
                 
                 # Loading in all configurations in the provided config.yml
@@ -166,7 +167,7 @@ class ModelTraining():
         # Find file matching provided model_type
         model_factory_dir = os.path.join(config.BASE_DIR, 'model', 'model_factory')
         model_implementation_list = os.listdir(model_factory_dir)
-        model_implementation_list.remove('__pycache__')  # No need to list this as it's not a model type
+        model_implementation_list.remove('__pycache__') if '__pycache__' in model_implementation_list else None # No need to list this as it's not a model type
         model_implementation_list.remove('base_model.py')
         
         found_model = False  # var for wether we find the model file or not
@@ -196,7 +197,7 @@ class ModelTraining():
             logging.debug("^ Remember 'model_type' must match exact name of file, eg. 'model_type == model_type.py'.")
             sys.exit()
     
-    def temporal_train_test_split(self, retur:bool = False):
+    def temporal_train_test_split(self, return_datasets:bool = False):
         """
         'Complete' way of creating X and y, and getting their respecitve *_train and *_test for model training and testing.
         Train test split is done using sktime.split.temporal_train_test_split() (meaning not random as it's important for 
@@ -223,7 +224,7 @@ class ModelTraining():
         
         self.y_train, self.y_test, self.X_train, self.X_test = temporal_train_test_split(y=self.y, X=self.X, test_size=0.2, train_size=0.8)  # sktime's returns values in a different order than sklearn's train_test_split
         
-        if retur:
+        if return_datasets:
             return self.y_train, self.y_test, self.X_train, self.X_test
         
     def save_model(self, filename: str = None):
@@ -317,6 +318,10 @@ class ModelTraining():
         
         # Create metadata dictionary
         metadata = {
+            'hypothesis': {
+                'name': _hypothesis(self)
+            },
+            
             'model_info': {
                 'model_type': self.model_type,
                 'model_class': self.model.__class__.__name__,
@@ -372,3 +377,11 @@ class ModelTraining():
             file.write(yaml_content)
         
         logging.info(f"Successfully saved model metadata: {metadata_file}")
+
+def _hypothesis(self):
+    """Simple method to check if this model is trained on a hypothesis or not, and returns json ready answer."""
+    # If model is trained on hypothesis source: return json of the hypothesis_name
+    if self.hypothesis_source is not None:
+        return f"{shared_utils.handle_hypothesis_source(self.hypothesis_source).get('hypothesis_name')}"
+    else:  # If not, return none
+        return f'{None}'

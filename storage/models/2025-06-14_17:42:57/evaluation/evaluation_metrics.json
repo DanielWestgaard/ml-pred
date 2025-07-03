@@ -1,0 +1,13 @@
+{
+    "mse": 0.10472464561462402,
+    "rmse": 0.32361188530921936,
+    "mae": 0.2266482412815094,
+    "directional_accuracy": 0.17842363126099986,
+    "hit_rate": 0.13165905631659056,
+    "information_coefficient": 0.6948061319158041,
+    "total_return": 2768.0,
+    "sharpe_ratio": 6.181309647401206,
+    "max_drawdown": 0.0,
+    "calmar_ratio": 0.0,
+    "win_loss_ratio": null
+}
