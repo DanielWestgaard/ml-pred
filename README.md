@@ -23,6 +23,7 @@ The approach of using different hypotheses to test and find possible inefficienc
 ├── model/                  # Model training
 ├── hypothesis/             # Configuration and documentation to different hypothesis'
 ├── evaluation/             # Dedicated evaluation of trained models
+├── strategy/               # Interpreting model predictions into (possibly) trade executions
 ├── backtesting/            # Backtest trained models
 ├── live/                   # Deploy trained model on live market data
 ├── storage/                # General storage for data, models, results, etc.
