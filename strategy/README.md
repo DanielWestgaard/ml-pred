@@ -1,6 +1,15 @@
-# About strategy/
-...
+# About strategy/ 🎯
 
+## Overview 📈
+The strategy component transforms ML model predictions into actionable trading decisions through a **hypothesis-driven approach**. Each market hypothesis gets its own specialized strategy implementation with tailored signal processing, risk management, and execution logic.
+
+## Hypothesis-Driven Strategy Philosophy 🧬
+Following the project's core philosophy of testing specific market hypotheses:
+
+1. **Hypothesis-Specific Logic**: Each strategy (e.g., session anomalies, price prediction) implements unique trading rules and signal processing
+2. **Modular Components**: Reusable risk management, position tracking, and order execution components
+3. **Configuration-Driven**: Strategy parameters defined in hypothesis config files
+4. **Risk-First Approach**: Comprehensive risk management integrated at every level
 
 ## Structure
 ```
