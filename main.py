@@ -16,6 +16,7 @@ import utils.shared_utils as shared_utils
 from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
 from evaluation.evaluation import ModelEvaluation
+from strategy.strategy import StrategyOrchestrator
 from utils.model_utils import get_latest_model
 
 
@@ -46,6 +47,9 @@ def parse_arguments():
     # Model Evaluation
     parser.add_argument('--evaluate-fresh', '-evf', action='store_true', default=False, help='Evaluate Trained model.')
     parser.add_argument('--evaluate-old', '-evo', default=False, help='Evaluate Trained ML Model using this dataset.')
+    
+    # Strategy Execution
+    parser.add_argument('--strategy', '-strat', default=False, help='Run strategy with hypothesis config')
 
     return parser.parse_args()
 
@@ -180,6 +184,12 @@ def main():
             evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
         
         evaluation.run()
+    
+    if args.strategy:
+        logging.info(f"Starting strategy execution with config: {args.strategy}")
+        strategy = StrategyOrchestrator(hypothesis_config=args.strategy)
+        strategy_results = strategy.run()
+        logging.info(f"Strategy execution completed: {strategy_results.get('status', 'unknown')}")
 
 if __name__=="__main__":
     main()
