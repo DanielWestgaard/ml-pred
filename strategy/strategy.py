@@ -1,0 +1,67 @@
+import logging
+import os
+import yaml
+
+from utils.model_utils import load_model_metadata
+import utils.shared_utils as shared_utils
+from strategy.strategy_factory import StrategyFactory
+
+class StrategyOrchestrator:
+    """
+    Main orchestrator for strategy execution. 
+    Determines which hypothesis-specific strategy to use.
+    """
+    
+    def __init__(self, model_directory: str = None, save_results: bool = True, 
+                 model_type: str = None, hypothesis_config: str = None):
+        """
+        Initialize strategy orchestrator
+        
+        Args:
+            model_directory: Path to model directory
+            save_results: Whether to save strategy results
+            model_type: Model type (for finding latest model)
+            hypothesis_config: Path to hypothesis config file (optional)
+        """
+        self.model_directory = model_directory
+        self.save_results = save_results
+        self.model_type = model_type
+        self.hypothesis_config = hypothesis_config
+        
+        # Determine hypothesis type
+        self.hypothesis_type = self._determine_hypothesis_type()
+        
+        # Create appropriate strategy
+        self.strategy = StrategyFactory.create_strategy(
+            hypothesis_type=self.hypothesis_type,
+            model_directory=model_directory or shared_utils.handle_hypothesis_source(hypothesis_config).get("model_folder"),
+            save_results=save_results,
+            model_type=model_type,
+            hypothesis_config=hypothesis_config
+        )
+    
+    def _determine_hypothesis_type(self):  # TODO: Might be made into a utils method to avoid duplication with evaluation/evaluation.py ?
+        """
+        Determine hypothesis type from config or model metadata
+        """
+        # Option 1: From hypothesis config file
+        if self.hypothesis_config and os.path.exists(self.hypothesis_config):
+            configuration = shared_utils.handle_hypothesis_source(self.hypothesis_config)
+            return configuration.get('hypothesis_name')
+        
+        # Option 2: From model metadata
+        elif self.model_directory:
+            try:
+                loader = load_model_metadata(self.model_directory)
+                return loader.get_hypothesis_type()
+            except:
+                pass
+        
+        # Option 3: Default fallback
+        logging.warning("Could not determine hypothesis type, defaulting to 'session_based_tod_anomalies'")
+        return 'session_based_tod_anomalies'
+    
+    def run(self):
+        """Run the appropriate strategy"""
+        logging.info(f"Running strategy for hypothesis type: {self.hypothesis_type}")
+        return self.strategy.run()
