@@ -17,7 +17,7 @@ from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
 from evaluation.evaluation import ModelEvaluation
 from strategy.strategy import StrategyOrchestrator
-from utils.model_utils import get_latest_model
+from utils.model.model_utils import get_latest_model
 
 
 def parse_arguments():
@@ -52,6 +52,11 @@ def parse_arguments():
     parser.add_argument('--strategy', '-strat', default=False, help='Run strategy with hypothesis config')
 
     return parser.parse_args()
+
+# 'Keys' for running hypothesis
+raw_data_source:str = 'raw_data_source'
+# ...
+strategy:str = 'strategy'
 
 def main():
     args = parse_arguments()
@@ -114,8 +119,10 @@ def main():
             #     # Find the latest model of the specified type
             #     logging.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
             #     evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
-            print("suii")
             evaluation.run()
+        
+        if strategy in conf_keys:
+            _strategy_flow()
     
     if args.plot_data:
         plot_data = PlotData(dataset=args.plot_data, save_plot=False)
@@ -190,6 +197,17 @@ def main():
         strategy = StrategyOrchestrator(hypothesis_config=args.strategy)
         strategy_results = strategy.run()
         logging.info(f"Strategy execution completed: {strategy_results.get('status', 'unknown')}")
+
+
+def _strategy_flow(hypothesis_config: str):
+    """
+    Run strategy flow with hypothesis.
+    
+    Args:
+        - hypothesis_config: Path to the hypothesis configuration file.
+    """
+    strategy = StrategyOrchestrator(hypothesis_config = hypothesis_config)
+
 
 if __name__=="__main__":
     main()

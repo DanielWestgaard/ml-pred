@@ -28,3 +28,25 @@ hypothesis:
 evaluate_model:
     type: stored
     # model_folder: storage/models/2025-07-03_12:45:35  # Dynamic: will use latest model if not specified
+
+strategy:
+    hypothesis_name: session_based_tod_anomalies
+    model_folder: storage/models/2025-07-03_12:45:35
+
+    signal_processing:
+        confidence_threshold: 0.7
+        signal_filters: ['session_filter', 'volatility_filter']
+
+    risk_management:
+        max_position_size: 0.02  # 2% of capital
+        stop_loss_pct: 0.01      # 1% stop loss
+        max_drawdown: 0.05       # 5% max drawdown
+
+    position_management:
+        max_concurrent_positions: 3
+        position_tracking: detailed
+
+    order_management:
+        broker: capital_com
+        order_type: market
+        execution_delay: 0.1

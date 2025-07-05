@@ -2,7 +2,7 @@ import logging
 import os
 import yaml
 
-from utils.model_utils import load_model_metadata
+from utils.model.model_utils import load_model_metadata
 import utils.shared_utils as shared_utils
 from strategy.strategy_factory import StrategyFactory
 
@@ -34,7 +34,7 @@ class StrategyOrchestrator:
         # Create appropriate strategy
         self.strategy = StrategyFactory.create_strategy(
             hypothesis_type=self.hypothesis_type,
-            model_directory=model_directory or shared_utils.handle_hypothesis_source(hypothesis_config).get("model_folder"),
+            model_directory=model_directory or shared_utils.handle_hypothesis_source(hypothesis_config).get("strat_model_folder"),
             save_results=save_results,
             model_type=model_type,
             hypothesis_config=hypothesis_config

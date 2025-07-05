@@ -13,7 +13,7 @@ import datetime
 
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
-from utils import model_utils
+from utils.model import model_utils
 import config.config as config
 
 

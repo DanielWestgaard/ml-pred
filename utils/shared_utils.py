@@ -176,6 +176,9 @@ def handle_hypothesis_source(config_file: str) -> dict:
     except Exception as e:
         logging.warning(f"Unable to extract evaluation from model training, but might also not be there : {e}")
     
+    # Strategy
+    # ...
+    
     return dict
 
 def safely_execute(self:object, function_name:str):  # Similar to the one in features/generation.py

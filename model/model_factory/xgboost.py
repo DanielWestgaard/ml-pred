@@ -7,7 +7,7 @@ from xgboost import XGBRegressor
 from sklearn.datasets import load_iris
 
 from model.model_factory.base_model import BaseModel
-import utils.model_utils as model_utils
+import utils.model.model_utils as model_utils
 
 
 class XgboostModel(BaseModel):

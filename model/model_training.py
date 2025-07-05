@@ -14,8 +14,9 @@ import platform
 # Train-test
 from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
 
-from utils import data_utils, model_utils, shared_utils
+from utils import data_utils, shared_utils
 import config.config as config
+from utils.model import model_utils
 
 
 class ModelTraining():
