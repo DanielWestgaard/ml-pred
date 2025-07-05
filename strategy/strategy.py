@@ -2,7 +2,7 @@ import logging
 import os
 import yaml
 
-from utils.model.model_utils import load_model_metadata
+from utils.model.model_metadata_loader import load_model_metadata
 import utils.shared_utils as shared_utils
 from strategy.strategy_factory import StrategyFactory
 

@@ -16,7 +16,7 @@ hypothesis:
         session_timing_features: []
         session_transition_features: []
 
-# model_training:
+model_training:
     type: xgboost
 
     processed_data: storage/data/capital_com/processed/processed_GBPUSD_m5_20240101_20250101.csv
@@ -25,8 +25,8 @@ hypothesis:
         n_estimators: 100
         max_depth: 12
     
-evaluate_model:
-    type: stored
+# evaluate_model:
+    # type: stored
     # model_folder: storage/models/2025-07-03_12:45:35  # Dynamic: will use latest model if not specified
 
 strategy:

@@ -3,7 +3,7 @@ import os
 import pickle
 import sys
 from abc import ABC, abstractmethod
-from utils.model.model_utils import load_model_metadata, get_latest_model
+from utils.model.model_metadata_loader import load_model_metadata, get_latest_model
 import config.config as config
 import utils.shared_utils as shared_utils
 from strategy.components.signal_processor import SignalProcessor

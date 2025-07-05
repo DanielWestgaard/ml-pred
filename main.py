@@ -17,7 +17,7 @@ from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
 from evaluation.evaluation import ModelEvaluation
 from strategy.strategy import StrategyOrchestrator
-from utils.model.model_utils import get_latest_model
+from utils.model.model_metadata_loader import get_latest_model
 
 
 def parse_arguments():
@@ -121,8 +121,8 @@ def main():
             #     evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
             evaluation.run()
         
-        if strategy in conf_keys:
-            _strategy_flow()
+        # if strategy in conf_keys:
+        #     _strategy_flow()
     
     if args.plot_data:
         plot_data = PlotData(dataset=args.plot_data, save_plot=False)
