@@ -29,6 +29,7 @@ This should serve as an example template to how features are selected to new hyp
 ```yml
 name: <name-of-the-hypothesis>
 
+# Data Pipeline on raw data
 data_pipeline:  # TODO: Now have to change logic for reading required features and possibility for providing data source
     raw_source: <source-to-raw-data>                             # Must have
   
@@ -37,6 +38,7 @@ data_pipeline:  # TODO: Now have to change logic for reading required features a
         feature_name_2: []                                         # All "features" from this feature method
         feature_name_3: ['feature_value_1', 'feature_value_2']     # Only these features from the feature method
 
+# Train a ML Model
 model_training:
     type: <name-of-ml-model>                          # Must have. Eg. 'xgboost'
 
@@ -46,9 +48,33 @@ model_training:
         - n_estimators: 100
         - max_depth: 12
 
+# Evaluate Trained Model
 evaluate_model: 
     type: <stored-or-new>                             # Optional: Keeping it simple: 'stored' means already trained model, 'new' means you just ran model training 'in this run'
     model_folder: <path-to-processed-data>            # Only provide if you are evaluating a 'stored' model. Path to model folder
+
+# WIP: suggestion
+strategy:
+    hypothesis_name: session_based_tod_anomalies
+    model_folder: storage/models/2025-07-03_12:45:35
+
+    signal_processing:
+        confidence_threshold: 0.7
+        signal_filters: ['session_filter', 'volatility_filter']
+
+    risk_management:
+        max_position_size: 0.02  # 2% of capital
+        stop_loss_pct: 0.01      # 1% stop loss
+        max_drawdown: 0.05       # 5% max drawdown
+
+    position_management:
+        max_concurrent_positions: 3
+        position_tracking: detailed
+
+    order_management:
+        broker: capital_com
+        order_type: market
+        execution_delay: 0.1
 ```
 > [!IMPORTANT]
 > The ```name``` of the hypothesis _must match_ the _function name_ in the ```data/hypothesis/target_hypothesis.py```. I plan to make it so you can specify the function-name dynamically in the Data Pipeline, but not yet.<br>
