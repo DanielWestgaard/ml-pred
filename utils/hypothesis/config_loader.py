@@ -139,7 +139,56 @@ class LoadHypothesisConfigMetadata:
             logging.debug(f"Unable to extract evaluation from model training, but might also not be there : {e}")
         
         # Strategy
-        # ...
+        try:
+            strategy = config_h['strategy']
+            dict.update({"strategy": strategy})
+            logging.debug(f"strategy: {strategy}")
+            
+            try:
+                strategy_hypothesis_name = config_h['strategy']['hypothesis_name']
+                dict.update({"strategy_hypothesis_name": strategy_hypothesis_name})
+                logging.debug(f"strategy_hypothesis_name: {strategy_hypothesis_name}")
+            except Exception as e:
+                logging.debug(f"Unable to extract strategy hypothesis_name : {e}")
+            
+            try:
+                strategy_model_folder = config_h['strategy']['model_folder']
+                dict.update({"strategy_model_folder": strategy_model_folder})
+                logging.debug(f"strategy_model_folder: {strategy_model_folder}")
+            except Exception as e:
+                logging.debug(f"Unable to extract strategy model_folder : {e}")
+            
+            try:
+                signal_processing = config_h['strategy']['signal_processing']
+                dict.update({"signal_processing": signal_processing})
+                logging.debug(f"signal_processing: {signal_processing}")
+            except Exception as e:
+                logging.debug(f"Unable to extract signal_processing : {e}")
+            
+            try:
+                risk_management = config_h['strategy']['risk_management']
+                dict.update({"risk_management": risk_management})
+                logging.debug(f"risk_management: {risk_management}")
+            except Exception as e:
+                logging.debug(f"Unable to extract risk_management : {e}")
+            
+            try:
+                position_management = config_h['strategy']['position_management']
+                dict.update({"position_management": position_management})
+                logging.debug(f"position_management: {position_management}")
+            except Exception as e:
+                logging.debug(f"Unable to extract position_management : {e}")
+            
+            try:
+                order_management = config_h['strategy']['order_management']
+                dict.update({"order_management": order_management})
+                logging.debug(f"order_management: {order_management}")
+            except Exception as e:
+                logging.debug(f"Unable to extract order_management : {e}")
+                
+        except Exception as e:
+            logging.debug(f"Unable to extract strategy from configuration, might not be there : {e}")
+        
         
         return dict
 

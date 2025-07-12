@@ -54,10 +54,6 @@ def parse_arguments():
 
     return parser.parse_args()
 
-# 'Keys' for running hypothesis
-raw_data_source:str = 'raw_data_source'
-# ...
-strategy:str = 'strategy'
 
 def main():
     args = parse_arguments()
@@ -81,6 +77,10 @@ def main():
     if args.hypothesis:
         logging.info(f"User using pure hypothesis flow!")
         save_cleaned_data = True
+        # 'Keys' for running hypothesis
+        raw_data_source:str = 'raw_data_source'
+        # ...
+        strategy:str = 'strategy'
         
         # Getting all the configurations
         conf = config_loader.load_model_metadata(args.hypothesis).handle_hypothesis_source()
@@ -122,8 +122,8 @@ def main():
             #     evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
             evaluation.run()
         
-        # if strategy in conf_keys:
-        #     _strategy_flow()
+        if strategy in conf_keys:
+            _strategy_flow()
     
     if args.plot_data:
         plot_data = PlotData(dataset=args.plot_data, save_plot=False)
