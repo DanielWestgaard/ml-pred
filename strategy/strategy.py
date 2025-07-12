@@ -3,7 +3,7 @@ import os
 import yaml
 
 from utils.model.model_metadata_loader import load_model_metadata
-import utils.shared_utils as shared_utils
+import utils.hypothesis.config_loader as config_loader
 from strategy.strategy_factory import StrategyFactory
 
 class StrategyOrchestrator:
@@ -34,7 +34,7 @@ class StrategyOrchestrator:
         # Create appropriate strategy
         self.strategy = StrategyFactory.create_strategy(
             hypothesis_type=self.hypothesis_type,
-            model_directory=model_directory or shared_utils.handle_hypothesis_source(hypothesis_config).get("strat_model_folder"),
+            model_directory=model_directory or config_loader.load_model_metadata(hypothesis_config).handle_hypothesis_source().get("strat_model_folder"),
             save_results=save_results,
             model_type=model_type,
             hypothesis_config=hypothesis_config
@@ -46,7 +46,7 @@ class StrategyOrchestrator:
         """
         # Option 1: From hypothesis config file
         if self.hypothesis_config and os.path.exists(self.hypothesis_config):
-            configuration = shared_utils.handle_hypothesis_source(self.hypothesis_config)
+            configuration = config_loader.load_model_metadata(self.hypothesis_config).handle_hypothesis_source()
             return configuration.get('hypothesis_name')
         
         # Option 2: From model metadata
