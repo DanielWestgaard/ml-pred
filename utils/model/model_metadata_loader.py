@@ -216,7 +216,7 @@ def get_latest_model(models_directory: str, model_type: str = None) -> Optional[
     Returns:
         Path to latest model directory, or None if no models found
     """
-    print("Hello!!")
+    
     latest_model = None
     latest_date = None
     
