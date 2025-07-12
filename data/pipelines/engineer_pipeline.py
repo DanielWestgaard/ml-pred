@@ -13,6 +13,7 @@ from data.features.generation import FeatureGenerator
 from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
 from data.features.target_hypothesis import TargetHypothesis
+import utils.hypothesis.config_loader as config_loader
 
 
 class EngineeringPipeline():
@@ -33,7 +34,7 @@ class EngineeringPipeline():
         self.output_path = output_path
         
         if hypothesis_source is not None:
-            configurations = shared_utils.handle_hypothesis_source(hypothesis_source)
+            configurations = config_loader.load_model_metadata(hypothesis_source).handle_hypothesis_source()
             self.hypothesis_name = configurations.get('hypothesis_name')
             raw_dataset = configurations.get('raw_data_source')
             self.selected_features = configurations.get('features')

@@ -18,6 +18,7 @@ from model.model_training import ModelTraining
 from evaluation.evaluation import ModelEvaluation
 from strategy.strategy import StrategyOrchestrator
 from utils.model.model_metadata_loader import get_latest_model
+import utils.hypothesis.config_loader as config_loader
 
 
 def parse_arguments():
@@ -82,7 +83,7 @@ def main():
         save_cleaned_data = True
         
         # Getting all the configurations
-        conf = shared_utils.handle_hypothesis_source(args.hypothesis)
+        conf = config_loader.load_model_metadata(args.hypothesis).handle_hypothesis_source()
         conf_keys = conf.keys()
         
         if 'raw_data_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?

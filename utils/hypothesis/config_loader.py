@@ -39,7 +39,7 @@ class LoadHypothesisConfigMetadata:
             logging.error(f"Error loading metadata: {e}")
             raise
     
-    def handle_hypothesis_source(config_file: str) -> dict:
+    def handle_hypothesis_source(self) -> dict:
         """
         Function for checking provided config.yml source for hypothesis, and returning the configurations it finds.
         
@@ -51,6 +51,8 @@ class LoadHypothesisConfigMetadata:
                 - Eg: '{'hypothesis_name': 'session_based_tod_anomalies', 'raw_data_source': 'bla/raw_data.csv', 'features': {'time_of_day': [], 'time_of_week': []}'
                 - Can be accessed like this: features = shared_utils.handle_hypothesis_source.get('features') 
         """
+        config_file = self.config_file
+        
         # Load YAML file
         try:
             with open(config_file, 'r') as file:
