@@ -123,7 +123,7 @@ def main():
             evaluation.run()
         
         if strategy in conf_keys:
-            _strategy_flow()
+            _strategy_flow(args.hypothesis)
     
     if args.plot_data:
         plot_data = PlotData(dataset=args.plot_data, save_plot=False)
