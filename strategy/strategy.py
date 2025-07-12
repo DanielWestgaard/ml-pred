@@ -34,7 +34,7 @@ class StrategyOrchestrator:
         # Create appropriate strategy
         self.strategy = StrategyFactory.create_strategy(
             hypothesis_type=self.hypothesis_type,
-            model_directory=model_directory or config_loader.load_model_metadata(hypothesis_config).handle_hypothesis_source().get("strat_model_folder"),
+            model_directory=model_directory or config_loader.load_hypothesis_config(hypothesis_config).handle_hypothesis_source().get("strat_model_folder"),
             save_results=save_results,
             model_type=model_type,
             hypothesis_config=hypothesis_config
@@ -46,7 +46,7 @@ class StrategyOrchestrator:
         """
         # Option 1: From hypothesis config file
         if self.hypothesis_config and os.path.exists(self.hypothesis_config):
-            configuration = config_loader.load_model_metadata(self.hypothesis_config).handle_hypothesis_source()
+            configuration = config_loader.load_hypothesis_config(self.hypothesis_config).handle_hypothesis_source()
             return configuration.get('hypothesis_name')
         
         # Option 2: From model metadata

@@ -83,7 +83,7 @@ def main():
         strategy:str = 'strategy'
         
         # Getting all the configurations
-        conf = config_loader.load_model_metadata(args.hypothesis).handle_hypothesis_source()
+        conf = config_loader.load_hypothesis_config(args.hypothesis).handle_hypothesis_source()
         conf_keys = conf.keys()
         
         if 'raw_data_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?

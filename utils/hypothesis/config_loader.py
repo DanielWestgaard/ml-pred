@@ -1,207 +1,185 @@
-import inspect
 import logging
 import os
-import sys
-from typing import Any, Dict
+from typing import Any, Dict, Optional, List, Union
 import yaml
 
 
+class HypothesisConfigError(Exception):
+    """Custom exception for hypothesis configuration errors."""
+    pass
+
+
 class LoadHypothesisConfigMetadata:
-    """Utility class for loading and accessing hypothesis metadata from YAML files."""
+    """Utility class for loading and accessing hypothesis configuration from YAML files."""
     
     def __init__(self, config_file: str):
         """
-        Initialize with path to metadata file or model directory.
+        Initialize with path to hypothesis config file or directory.
         
         Args:
-            metadata_path: Path to model_metadata.yml file or directory containing it
+            config_file: Path to config.yml file or directory containing it
         """
         if os.path.isdir(config_file):
-            # If directory provided, look for metadata file
-            metadata_file = os.path.join(config_file, 'model_metadata.yml')
+            # If directory provided, look for config file
+            config_path = os.path.join(config_file, 'config.yml')
         else:
-            metadata_file = config_file
+            config_path = config_file
             
-        if not os.path.exists(metadata_file):
-            raise FileNotFoundError(f"Metadata file not found: {metadata_file}")
+        if not os.path.exists(config_path):
+            raise FileNotFoundError(f"Config file not found: {config_path}")
             
-        self.config_file = metadata_file
-        self.metadata = self._load_metadata()
+        self.config_file = config_path
+        self.logger = logging.getLogger(__name__)
+        self.config_data = self._load_config()
     
-    def _load_metadata(self) -> Dict[str, Any]:
-        """Load metadata from YAML file."""
+    def _load_config(self) -> Dict[str, Any]:
+        """Load configuration from YAML file."""
         try:
-            with open(self.config_file, 'r') as file:
-                metadata = yaml.safe_load(file)
-            logging.debug(f"Successfully loaded metadata from {self.config_file}")
-            return metadata
-        except Exception as e:
-            logging.error(f"Error loading metadata: {e}")
-            raise
-    
-    def handle_hypothesis_source(self) -> dict:
-        """
-        Function for checking provided config.yml source for hypothesis, and returning the configurations it finds.
-        
-        Args:
-            - config_file: Path to config.yml, specifying hypothesis (-name), selected features, etc.
-        
-        returns:
-            - list of successfully ectracted 'components'/configurations in Dict format.
-                - Eg: '{'hypothesis_name': 'session_based_tod_anomalies', 'raw_data_source': 'bla/raw_data.csv', 'features': {'time_of_day': [], 'time_of_week': []}'
-                - Can be accessed like this: features = shared_utils.handle_hypothesis_source.get('features') 
-        """
-        config_file = self.config_file
-        
-        # Load YAML file
-        try:
-            with open(config_file, 'r') as file:
-                config_h = yaml.safe_load(file)
-        except FileNotFoundError:
-            logging.error(f"Error: Config file '{config_file}' not found!")
-            sys.exit(1)
-        except yaml.YAMLError as e:
-            logging.error(f"Error parsing YAML file: {e}")
-            sys.exit(1)
-        
-        # Dict to populate with successfully extracted 'values'
-        dict = {}
-        
-        # Hypothesis name - must match with the name of its target method in target_hypothesis.py
-        try:
-            hypothesis_name = config_h['hypothesis']['name']
-            dict.update({'hypothesis_name': hypothesis_name})
-            logging.info(f"hypothesis_name: {hypothesis_name}")
-        except Exception as e:
-            logging.error(f"Unable to get hypothesis name : {e}")
-            sys.exit()
-        
-        # Data Pipeline
-        try:
-            # Raw data
-            raw_data_source = config_h['data_pipeline']['raw_source']
-            dict.update({'raw_data_source': raw_data_source})
-            try:
-                # Provided features
-                features = config_h['data_pipeline']['required_features']
-                dict.update({"features": features})
-                logging.debug(f"Data source: '{raw_data_source}' and required Features: {features}")
-            except Exception as e:
-                logging.warning(f"Unable to extract Required/Selected Features for generation : {e}")
-        except Exception as e:
-            logging.debug(f"Unable to extract Raw Dataset, for Data Pipeline, from configurations (might not exist?) : {e}")
-        
-        # Model Training
-        try:
-            # Model Type
-            model_type = config_h['model_training']['type']
-            dict.update({'model_type': model_type})
-            logging.info(f"model_type: {model_type}")
+            with open(self.config_file, 'r', encoding='utf-8') as file:
+                config = yaml.safe_load(file)
             
-            try:
-                # Potential Processed Data
-                processed_data = config_h['model_training']['processed_data']
-                dict.update({"processed_data": processed_data})
-                logging.debug(f"processed_data: {processed_data}")
-            except Exception as e:
-                logging.debug(f"Unable to extract processed_data for model training, but they might also not be there : {e}")
-            
-            try:
-                # Potential Parameters
-                parameters = config_h['model_training']['parameters']
-                dict.update({"parameters": parameters})
-                logging.debug(f"parameters: {parameters}")
-            except Exception as e:
-                logging.debug(f"Unable to extract Parameters for model training, but they might also not be there : {e}")
-            
-        except Exception as e:
-            logging.debug(f"Unable to get model_type from configuration, might not be there? : {e}")
-
-        # Evaluation
-        try:
-            # Evaluate model
-            evaluate_model = config_h['evaluate_model']
-            dict.update({"evaluate_model": evaluate_model})
-            logging.debug(f"evaluate_model: {evaluate_model}")
-            try:
-                evaluation_type = config_h['evaluate_model']['type']
-                dict.update({"evaluation_type": evaluation_type})
-                logging.debug(f"evaluation_type: {evaluation_type}")
-                try:
-                    evaluation_model_path = config_h['evaluate_model']['model_folder']
-                    dict.update({"model_folder": evaluation_model_path})
-                    logging.debug(f"model_folder: {evaluation_model_path}")
-                except:
-                    logging.debug(f"Unable to get evaluation model folder. Might having type 'new'?")
-            except:
-                logging.warning(f"Unable to get evaluation type.")
-        except Exception as e:
-            logging.debug(f"Unable to extract evaluation from model training, but might also not be there : {e}")
-        
-        # Strategy
-        try:
-            strategy = config_h['strategy']
-            dict.update({"strategy": strategy})
-            logging.debug(f"strategy: {strategy}")
-            
-            try:
-                strategy_hypothesis_name = config_h['strategy']['hypothesis_name']
-                dict.update({"strategy_hypothesis_name": strategy_hypothesis_name})
-                logging.debug(f"strategy_hypothesis_name: {strategy_hypothesis_name}")
-            except Exception as e:
-                logging.debug(f"Unable to extract strategy hypothesis_name : {e}")
-            
-            try:
-                strategy_model_folder = config_h['strategy']['model_folder']
-                dict.update({"strategy_model_folder": strategy_model_folder})
-                logging.debug(f"strategy_model_folder: {strategy_model_folder}")
-            except Exception as e:
-                logging.debug(f"Unable to extract strategy model_folder : {e}")
-            
-            try:
-                signal_processing = config_h['strategy']['signal_processing']
-                dict.update({"signal_processing": signal_processing})
-                logging.debug(f"signal_processing: {signal_processing}")
-            except Exception as e:
-                logging.debug(f"Unable to extract signal_processing : {e}")
-            
-            try:
-                risk_management = config_h['strategy']['risk_management']
-                dict.update({"risk_management": risk_management})
-                logging.debug(f"risk_management: {risk_management}")
-            except Exception as e:
-                logging.debug(f"Unable to extract risk_management : {e}")
-            
-            try:
-                position_management = config_h['strategy']['position_management']
-                dict.update({"position_management": position_management})
-                logging.debug(f"position_management: {position_management}")
-            except Exception as e:
-                logging.debug(f"Unable to extract position_management : {e}")
-            
-            try:
-                order_management = config_h['strategy']['order_management']
-                dict.update({"order_management": order_management})
-                logging.debug(f"order_management: {order_management}")
-            except Exception as e:
-                logging.debug(f"Unable to extract order_management : {e}")
+            if not isinstance(config, dict):
+                raise HypothesisConfigError(f"Config file must contain a dictionary, got {type(config)}")
                 
+            self.logger.debug(f"Successfully loaded config from {self.config_file}")
+            return config
+            
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Config file not found: {self.config_file}")
+        except yaml.YAMLError as e:
+            raise HypothesisConfigError(f"Error parsing YAML file {self.config_file}: {e}")
         except Exception as e:
-            logging.debug(f"Unable to extract strategy from configuration, might not be there : {e}")
+            raise HypothesisConfigError(f"Unexpected error loading config: {e}")
+    
+    def validate_config(self) -> List[str]:
+        """
+        Validate the configuration and return list of validation errors.
         
+        Returns:
+            List of validation error messages (empty if valid)
+        """
+        errors = []
         
-        return dict
+        # Check hypothesis section
+        if not self._safe_get(['hypothesis']):
+            errors.append("Missing required section: 'hypothesis'")
+        elif not self._safe_get(['hypothesis', 'name']):
+            errors.append("Missing required field: 'hypothesis.name'")
+        
+        # Validate data_pipeline if present
+        data_pipeline = self._safe_get(['data_pipeline'])
+        if data_pipeline:
+            if not isinstance(data_pipeline, dict):
+                errors.append("Section 'data_pipeline' must be a dictionary")
+            elif not self._safe_get(['data_pipeline', 'raw_source']):
+                errors.append("Missing required field: 'data_pipeline.raw_source'")
+        
+        # Validate model_training if present
+        model_training = self._safe_get(['model_training'])
+        if model_training:
+            if not isinstance(model_training, dict):
+                errors.append("Section 'model_training' must be a dictionary")
+            elif not self._safe_get(['model_training', 'type']):
+                errors.append("Missing required field: 'model_training.type'")
+        
+        # Validate strategy if present
+        strategy = self._safe_get(['strategy'])
+        if strategy and not isinstance(strategy, dict):
+            errors.append("Section 'strategy' must be a dictionary")
+        
+        # Validate evaluate_model if present
+        evaluate_model = self._safe_get(['evaluate_model'])
+        if evaluate_model and not isinstance(evaluate_model, dict):
+            errors.append("Section 'evaluate_model' must be a dictionary")
+        
+        return errors
+    
+    def _safe_get(self, path: List[str], default: Any = None) -> Any:
+        """Safely get nested dictionary value using path."""
+        current = self.config_data
+        try:
+            for key in path:
+                current = current[key]
+            return current
+        except (KeyError, TypeError):
+            return default
+    
+    def _extract_section(self, section_name: str, required_fields: Optional[List[str]] = None) -> Dict[str, Any]:
+        """Extract a configuration section with optional required field validation."""
+        section_data = {}
+        section_config = self._safe_get([section_name])
+        
+        if section_config is None:
+            self.logger.debug(f"Section '{section_name}' not found in configuration")
+            return section_data
+        
+        if not isinstance(section_config, dict):
+            self.logger.warning(f"Section '{section_name}' is not a dictionary, skipping")
+            return section_data
+        
+        # Check required fields
+        if required_fields:
+            missing_fields = [field for field in required_fields if field not in section_config]
+            if missing_fields:
+                self.logger.warning(f"Missing required fields in '{section_name}': {missing_fields}")
+        
+        # Extract all fields from section
+        for key, value in section_config.items():
+            section_data[f"{section_name}_{key}" if section_name != 'hypothesis' else key] = value
+            self.logger.debug(f"Extracted {section_name}.{key}: {value}")
+        
+        # Also include the full section
+        section_data[section_name] = section_config
+        
+        return section_data
+    
+    def handle_hypothesis_source(self) -> Dict[str, Any]:
+        """
+        Extract configuration from hypothesis config file.
+        
+        Returns:
+            Dict containing successfully extracted configuration components.
+            Example: {'hypothesis_name': 'session_based_tod_anomalies', 'raw_data_source': 'path/to/data.csv'}
+        """
+        config = {}
+        
+        # Extract hypothesis name (required)
+        hypothesis_name = self._safe_get(['hypothesis', 'name'])
+        if not hypothesis_name:
+            raise HypothesisConfigError("Missing required field: hypothesis.name")
+        
+        config['hypothesis_name'] = hypothesis_name
+        self.logger.info(f"Loaded hypothesis: {hypothesis_name}")
+        
+        # Extract all sections using helper method
+        sections_to_extract = [
+            ('data_pipeline', ['raw_source']),  # raw_source is required if section exists
+            ('model_training', ['type']),       # type is required if section exists  
+            ('evaluate_model', None),           # No required fields
+            ('strategy', None)                  # No required fields
+        ]
+        
+        for section_name, required_fields in sections_to_extract:
+            section_data = self._extract_section(section_name, required_fields)
+            config.update(section_data)
+        
+        # Log summary
+        sections_found = [section for section in ['data_pipeline', 'model_training', 'evaluate_model', 'strategy'] 
+                         if section in config]
+        self.logger.info(f"Successfully loaded config sections: {sections_found}")
+        
+        return config
 
 
 # Standalone utility functions
-def load_model_metadata(metadata_path: str) -> LoadHypothesisConfigMetadata:
+def load_hypothesis_config(config_path: str) -> LoadHypothesisConfigMetadata:
     """
-    Convenience function to load hypothesis config.
+    Convenience function to load hypothesis configuration.
     
     Args:
-        metadata_path: Path to metadata file or model directory
+        config_path: Path to config.yml file or directory containing it
         
     Returns:
-        ModelMetadataLoader instance
+        LoadHypothesisConfigMetadata instance
     """
-    return LoadHypothesisConfigMetadata(metadata_path)
+    return LoadHypothesisConfigMetadata(config_path)
