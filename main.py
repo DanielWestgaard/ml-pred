@@ -208,6 +208,7 @@ def _strategy_flow(hypothesis_config: str):
         - hypothesis_config: Path to the hypothesis configuration file.
     """
     strategy = StrategyOrchestrator(hypothesis_config = hypothesis_config)
+    strategy.run()
 
 
 if __name__=="__main__":
