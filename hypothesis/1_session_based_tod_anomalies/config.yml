@@ -2,29 +2,51 @@ hypothesis:
     name: session_based_tod_anomalies
 
 # data_pipeline:
-    raw_source: storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv
+#     raw_source: storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv
   
-    required_features:
-        time_of_day: []  # all features
-        time_of_week: []
-        time_of_month: []
-        day_of_week: []
-        average_true_range: []
-        volatility_regimes: []
-        fx_activity_profile: []
-        fx_trading_sessions: []
-        session_timing_features: []
-        session_transition_features: []
+#     required_features:
+#         time_of_day: []  # all features
+#         time_of_week: []
+#         time_of_month: []
+#         day_of_week: []
+#         average_true_range: []
+#         volatility_regimes: []
+#         fx_activity_profile: []
+#         fx_trading_sessions: []
+#         session_timing_features: []
+#         session_transition_features: []
 
 # model_training:
-    type: xgboost
+#     type: xgboost
 
-    processed_data: storage/data/capital_com/processed/processed_GBPUSD_m5_20240101_20250101.csv
+#     processed_data: storage/data/capital_com/processed/processed_GBPUSD_m5_20240101_20250101.csv
 
-    parameters:
-        n_estimators: 100
-        max_depth: 12
+#     parameters:
+#         n_estimators: 100
+#         max_depth: 12
     
-evaluate_model:
-    type: stored
-    # model_folder: storage/models/2025-07-03_12:45:35  # Dynamic: will use latest model if not specified
+# evaluate_model:
+#     type: stored
+#     model_folder: storage/models/2025-07-03_12:45:35  # Dynamic: will use latest model if not specified
+
+strategy:
+    hypothesis_name: session_based_tod_anomalies
+    model_folder: storage/models/2025-07-03_12:45:35
+
+    signal_processing:
+        confidence_threshold: 0.7
+        signal_filters: ['session_filter', 'volatility_filter']
+
+    risk_management:
+        max_position_size: 0.02  # 2% of capital
+        stop_loss_pct: 0.01      # 1% stop loss
+        max_drawdown: 0.05       # 5% max drawdown
+
+    position_management:
+        max_concurrent_positions: 3
+        position_tracking: detailed
+
+    order_management:
+        broker: capital_com
+        order_type: market
+        execution_delay: 0.1

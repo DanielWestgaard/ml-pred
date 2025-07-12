@@ -2,9 +2,10 @@ import logging
 import os
 import yaml
 
-from utils.model_utils import load_model_metadata
+from utils.model.model_metadata_loader import load_model_metadata
 import utils.shared_utils as shared_utils
 from evaluation.evaluation_factory import EvaluationFactory
+import utils.hypothesis.config_loader as config_loader
 
 class ModelEvaluation:
     """
@@ -34,7 +35,7 @@ class ModelEvaluation:
         # Create appropriate evaluator
         self.evaluator = EvaluationFactory.create_evaluator(
             hypothesis_type=self.hypothesis_type,
-            model_directory=model_directory or shared_utils.handle_hypothesis_source(hypothesis_config).get("model_folder"),
+            model_directory=model_directory or config_loader.load_hypothesis_config(hypothesis_config).handle_hypothesis_source().get("model_folder"),
             save_evaluations=save_evaluations,
             model_type=model_type
         )
@@ -45,7 +46,7 @@ class ModelEvaluation:
         """
         # Option 1: From hypothesis config file
         if self.hypothesis_config and os.path.exists(self.hypothesis_config):
-            configuration = shared_utils.handle_hypothesis_source(self.hypothesis_config)
+            configuration = config_loader.load_hypothesis_config(self.hypothesis_config).handle_hypothesis_source()
             return configuration.get('hypothesis_name')
         
         # Option 2: From model metadata

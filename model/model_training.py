@@ -14,8 +14,10 @@ import platform
 # Train-test
 from sktime.split import temporal_train_test_split  # https://www.sktime.net/en/latest/api_reference/auto_generated/sktime.split.temporal_train_test_split.html
 
-from utils import data_utils, model_utils, shared_utils
+from utils import data_utils, shared_utils
 import config.config as config
+from utils.model import model_utils
+import utils.hypothesis.config_loader as config_loader
 
 
 class ModelTraining():
@@ -38,7 +40,7 @@ class ModelTraining():
                 logging.info(f"Model Training was initialized with Hypothesis configuration!")
                 
                 # Loading in all configurations in the provided config.yml
-                configurations = shared_utils.handle_hypothesis_source(hypothesis_source)
+                configurations = config_loader.load_model_metadata(hypothesis_source).handle_hypothesis_source()
                 
                 self.model_type = configurations.get("model_type")
                 
@@ -87,7 +89,7 @@ class ModelTraining():
                 self.df, self.original_df = data_utils.check_and_return_df(dataset)
             
             # Reading directly from a .csv-file means df will have no index.
-            if (self.df.index.name is not 'date'):
+            if (self.df.index.name != 'date'):
                 # DataFrame has no index (name 'date'), so setting it and dropping the duplicate
                 self.df.index = pd.to_datetime(self.df['date'])  # setting index, but ensure its in datetime format
                 self.df = self.df.drop('date', axis=1)
@@ -382,6 +384,6 @@ def _hypothesis(self):
     """Simple method to check if this model is trained on a hypothesis or not, and returns json ready answer."""
     # If model is trained on hypothesis source: return json of the hypothesis_name
     if self.hypothesis_source is not None:
-        return f"{shared_utils.handle_hypothesis_source(self.hypothesis_source).get('hypothesis_name')}"
+        return f"{config_loader.load_model_metadata(self.hypothesis_source).handle_hypothesis_source().get('hypothesis_name')}"
     else:  # If not, return none
         return f'{None}'

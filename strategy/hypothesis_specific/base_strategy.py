@@ -3,9 +3,9 @@ import os
 import pickle
 import sys
 from abc import ABC, abstractmethod
-from utils.model_utils import load_model_metadata, get_latest_model
+from utils.model.model_metadata_loader import load_model_metadata, get_latest_model
 import config.config as config
-import utils.shared_utils as shared_utils
+import utils.hypothesis.config_loader as config_loader
 from strategy.components.signal_processor import SignalProcessor
 from strategy.components.risk_manager import RiskManager
 from strategy.components.position_manager import PositionManager
@@ -72,7 +72,7 @@ class BaseStrategy(ABC):
     def _load_strategy_config(self, hypothesis_config: str = None):
         """Load strategy configuration from hypothesis config or defaults"""
         if hypothesis_config and os.path.exists(hypothesis_config):
-            configuration = shared_utils.handle_hypothesis_source(hypothesis_config)
+            configuration = config_loader.load_hypothesis_config(hypothesis_config).handle_hypothesis_source()
             return configuration.get('strategy', {})
         return {}
     

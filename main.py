@@ -16,7 +16,9 @@ import utils.shared_utils as shared_utils
 from data.plot.plot_data import PlotData
 from model.model_training import ModelTraining
 from evaluation.evaluation import ModelEvaluation
-from utils.model_utils import get_latest_model
+from strategy.strategy import StrategyOrchestrator
+from utils.model.model_metadata_loader import get_latest_model
+import utils.hypothesis.config_loader as config_loader
 
 
 def parse_arguments():
@@ -46,8 +48,12 @@ def parse_arguments():
     # Model Evaluation
     parser.add_argument('--evaluate-fresh', '-evf', action='store_true', default=False, help='Evaluate Trained model.')
     parser.add_argument('--evaluate-old', '-evo', default=False, help='Evaluate Trained ML Model using this dataset.')
+    
+    # Strategy Execution
+    parser.add_argument('--strategy', '-strat', default=False, help='Run strategy with hypothesis config')
 
     return parser.parse_args()
+
 
 def main():
     args = parse_arguments()
@@ -71,9 +77,13 @@ def main():
     if args.hypothesis:
         logging.info(f"User using pure hypothesis flow!")
         save_cleaned_data = True
+        # 'Keys' for running hypothesis
+        raw_data_source:str = 'raw_data_source'
+        # ...
+        strategy:str = 'strategy'
         
         # Getting all the configurations
-        conf = shared_utils.handle_hypothesis_source(args.hypothesis)
+        conf = config_loader.load_hypothesis_config(args.hypothesis).handle_hypothesis_source()
         conf_keys = conf.keys()
         
         if 'raw_data_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
@@ -110,8 +120,10 @@ def main():
             #     # Find the latest model of the specified type
             #     logging.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
             #     evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
-            print("suii")
             evaluation.run()
+        
+        if strategy in conf_keys:
+            _strategy_flow(args.hypothesis)
     
     if args.plot_data:
         plot_data = PlotData(dataset=args.plot_data, save_plot=False)
@@ -180,6 +192,24 @@ def main():
             evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
         
         evaluation.run()
+    
+    if args.strategy:
+        logging.info(f"Starting strategy execution with config: {args.strategy}")
+        strategy = StrategyOrchestrator(hypothesis_config=args.strategy)
+        strategy_results = strategy.run()
+        logging.info(f"Strategy execution completed: {strategy_results.get('status', 'unknown')}")
+
+
+def _strategy_flow(hypothesis_config: str):
+    """
+    Run strategy flow with hypothesis.
+    
+    Args:
+        - hypothesis_config: Path to the hypothesis configuration file.
+    """
+    strategy = StrategyOrchestrator(hypothesis_config = hypothesis_config)
+    strategy.run()
+
 
 if __name__=="__main__":
     main()
