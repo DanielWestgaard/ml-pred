@@ -42,7 +42,8 @@ class SessionAnomalyStrategy(BaseStrategy):
                 timeframe=data_config.get('timeframe', 'MINUTE'),
                 buffer_size=data_config.get('buffer_size', 500),
                 feature_window=data_config.get('feature_window', 200),
-                selected_features=data_config.get('selected_features', None)
+                selected_features=data_config.get('selected_features', None),
+                use_websocket=data_config.get('use_websocket', True)
             )
             
             # Add callback for new data notifications
