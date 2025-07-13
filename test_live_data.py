@@ -28,7 +28,7 @@ def test_live_data_manager():
         symbol="GBPUSD",
         timeframe="MINUTE", 
         buffer_size=100,
-        feature_window=50,
+        feature_window=35,  # Must be >= 30 for validation
         selected_features=None  # Use all features
     )
     

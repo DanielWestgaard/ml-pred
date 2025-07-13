@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
-import numpy as np
-from datetime import datetime, time
+import time
+from datetime import datetime, time as dt_time
 from typing import Dict, List, Any
 from strategy.hypothesis_specific.base_strategy import BaseStrategy
 from data.live.live_data_manager import LiveDataManager
@@ -67,26 +67,26 @@ class SessionAnomalyStrategy(BaseStrategy):
         """Setup trading session definitions"""
         return {
             'Asian': {
-                'start_time': time(0, 0),   # 00:00 UTC
-                'end_time': time(9, 0),     # 09:00 UTC
+                'start_time': dt_time(0, 0),   # 00:00 UTC
+                'end_time': dt_time(9, 0),     # 09:00 UTC
                 'volatility_multiplier': 0.8,  # Lower volatility session
                 'min_confidence': 0.7
             },
             'European': {
-                'start_time': time(7, 0),   # 07:00 UTC
-                'end_time': time(16, 0),    # 16:00 UTC
+                'start_time': dt_time(7, 0),   # 07:00 UTC
+                'end_time': dt_time(16, 0),    # 16:00 UTC
                 'volatility_multiplier': 1.2,  # Higher volatility session
                 'min_confidence': 0.6
             },
             'US': {
-                'start_time': time(13, 0),  # 13:00 UTC
-                'end_time': time(22, 0),    # 22:00 UTC
+                'start_time': dt_time(13, 0),  # 13:00 UTC
+                'end_time': dt_time(22, 0),    # 22:00 UTC
                 'volatility_multiplier': 1.1,  # High volatility session
                 'min_confidence': 0.6
             },
             'Overlap_EU_US': {
-                'start_time': time(13, 0),  # 13:00 UTC
-                'end_time': time(16, 0),    # 16:00 UTC
+                'start_time': dt_time(13, 0),  # 13:00 UTC
+                'end_time': dt_time(16, 0),    # 16:00 UTC
                 'volatility_multiplier': 1.5,  # Highest volatility
                 'min_confidence': 0.5
             }
@@ -189,7 +189,7 @@ class SessionAnomalyStrategy(BaseStrategy):
         signals['session_info'] = session_info
         return signals
     
-    def _get_current_session(self, current_time: time) -> str:
+    def _get_current_session(self, current_time: dt_time) -> str:
         """
         Determine current trading session
         

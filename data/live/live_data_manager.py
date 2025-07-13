@@ -61,10 +61,6 @@ class LiveDataManager:
         # Callbacks for data updates
         self._data_callbacks = []
         
-        # Components
-        self.cleaner = DataCleaner()
-        self.validator = DataValidator()
-        
         logging.info(f"LiveDataManager initialized - Symbol: {symbol}, "
                     f"Timeframe: {timeframe}, Buffer: {buffer_size}")
     
@@ -191,32 +187,39 @@ class LiveDataManager:
     
     def _simulate_data_worker(self):
         """Worker thread for simulating live data (for testing)"""
-        # Load some historical data for simulation
+        # Start with historical timestamp to avoid "future data" validation issues
         base_price = 1.2500
-        timestamp = datetime.now()
+        timestamp = datetime.now() - timedelta(hours=1)  # Start 1 hour ago
         
         while self._is_streaming:
             try:
-                # Generate realistic OHLCV data
+                # Generate realistic price movement
                 price_change = np.random.normal(0, 0.0001)
-                current_price = base_price + price_change
+                current_close = base_price + price_change
                 
-                # Simple OHLC simulation
-                high = current_price + abs(np.random.normal(0, 0.00005))
-                low = current_price - abs(np.random.normal(0, 0.00005))
+                # Generate proper OHLC relationships
+                open_price = base_price
+                
+                # Generate high and low with proper relationships
+                high_offset = abs(np.random.normal(0, 0.00003))
+                low_offset = abs(np.random.normal(0, 0.00003))
+                
+                high_price = max(open_price, current_close) + high_offset
+                low_price = min(open_price, current_close) - low_offset
+                
                 volume = np.random.randint(50, 500)
                 
                 data_point = {
                     'date': timestamp,
-                    'open': base_price,
-                    'high': high,
-                    'low': low,
-                    'close': current_price,
+                    'open': open_price,
+                    'high': high_price,
+                    'low': low_price,
+                    'close': current_close,
                     'volume': volume
                 }
                 
                 self._data_queue.put(data_point)
-                base_price = current_price
+                base_price = current_close
                 timestamp += timedelta(minutes=1)
                 
                 time.sleep(1)  # Simulate 1-minute intervals
@@ -254,11 +257,13 @@ class LiveDataManager:
             df['date'] = pd.to_datetime(df['date'])
             df.set_index('date', inplace=True)
             
-            # Clean data
-            df_cleaned = self.cleaner.run(df.copy())
+            # Clean data using the existing pipeline pattern
+            cleaner = DataCleaner(df.copy(), save_cleaned_data=False)
+            df_cleaned = cleaner.run()
             
             # Validate data
-            validation_results = self.validator.run(df_cleaned.copy())
+            validator = DataValidator(df_cleaned.copy())
+            validation_results = validator.run()
             if not validation_results.get('is_valid', False):
                 logging.warning("Data validation failed, skipping feature generation")
                 return
