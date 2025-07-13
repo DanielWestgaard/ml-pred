@@ -12,6 +12,7 @@ from broker.capital_com.capitalcom import CapitalCom
 from data.features.generation import FeatureGenerator
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
+import config.config as config
 
 
 class LiveDataManager:
@@ -148,6 +149,7 @@ class LiveDataManager:
             try:
                 self.broker = CapitalCom()
                 self.broker.start_session()
+                self.broker.switch_active_account(account_name = config.VAR_ACCOUNT_NAME_TEST, print_answer=False)
                 self._connection_retries = 0
                 self._last_heartbeat = datetime.now()
                 logging.info("Broker connection established")
