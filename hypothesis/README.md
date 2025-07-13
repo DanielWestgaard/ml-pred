@@ -58,6 +58,18 @@ strategy:
     hypothesis_name: session_based_tod_anomalies
     model_folder: storage/models/2025-07-03_12:45:35
 
+    data:
+        symbol: GBPUSD
+        timeframe: MINUTE
+        buffer_size: 500
+        feature_window: 200
+        dry_run: true  # Set to false for live trading
+        selected_features: null  # null = use all features
+
+    execution:
+        max_loops: 100       # Maximum trading loop iterations
+        loop_interval: 5     # Seconds between loop iterations
+
     signal_processing:
         confidence_threshold: 0.7
         signal_filters: ['session_filter', 'volatility_filter']
@@ -75,6 +87,7 @@ strategy:
         broker: capital_com
         order_type: market
         execution_delay: 0.1
+        dry_run: true  # Set to false for live trading
 ```
 > [!IMPORTANT]
 > The ```name``` of the hypothesis _must match_ the _function name_ in the ```data/hypothesis/target_hypothesis.py```. I plan to make it so you can specify the function-name dynamically in the Data Pipeline, but not yet.<br>
