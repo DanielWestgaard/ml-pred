@@ -64,6 +64,7 @@ strategy:
         buffer_size: 500
         feature_window: 200
         dry_run: true  # Set to false for live trading
+        jumpstart: true  # Preload buffer with historical data
         selected_features: null  # null = use all features
 
     execution:
@@ -88,6 +89,9 @@ strategy:
         order_type: market
         execution_delay: 0.1
         dry_run: true  # Set to false for live trading
+
+    monitoring:
+        update_interval: 1.0  # Position update frequency in seconds
 ```
 > [!IMPORTANT]
 > The ```name``` of the hypothesis _must match_ the _function name_ in the ```data/hypothesis/target_hypothesis.py```. I plan to make it so you can specify the function-name dynamically in the Data Pipeline, but not yet.<br>

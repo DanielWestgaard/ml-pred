@@ -5,6 +5,7 @@ from datetime import datetime, time as dt_time
 from typing import Dict, List, Any
 from strategy.hypothesis_specific.base_strategy import BaseStrategy
 from data.live.live_data_manager import LiveDataManager
+from strategy.monitoring.position_monitor import PositionMonitor
 
 class SessionAnomalyStrategy(BaseStrategy):
     """
@@ -23,6 +24,10 @@ class SessionAnomalyStrategy(BaseStrategy):
         # Live data manager
         self.live_data_manager = None
         self._initialize_live_data()
+        
+        # Position monitor
+        self.position_monitor = None
+        self._initialize_position_monitor()
         
         logging.info("Session anomaly strategy initialized")
     
@@ -62,6 +67,72 @@ class SessionAnomalyStrategy(BaseStrategy):
             
         except Exception as e:
             logging.error(f"Error processing new data callback: {e}")
+    
+    def _initialize_position_monitor(self):
+        """Initialize position monitoring system"""
+        try:
+            # Get monitoring configuration
+            monitoring_config = self.strategy_config.get('monitoring', {})
+            
+            self.position_monitor = PositionMonitor(
+                update_interval=monitoring_config.get('update_interval', 1.0)
+            )
+            
+            # Add callbacks for position events
+            self.position_monitor.add_position_callback(self._on_position_event)
+            self.position_monitor.add_risk_callback(self._on_risk_event)
+            
+            logging.info("Position monitor initialized")
+            
+        except Exception as e:
+            logging.error(f"Failed to initialize position monitor: {e}")
+            self.position_monitor = None
+    
+    def _on_position_event(self, event_type: str, position_data: Dict, extra_data: Dict = None):
+        """Handle position events from monitor"""
+        try:
+            logging.info(f"Position event: {event_type} for {position_data.get('position_id')}")
+            
+            if event_type == 'close_requested':
+                # Handle automatic position closing
+                position_id = position_data['position_id']
+                reason = extra_data.get('reason', 'unknown')
+                
+                # Execute close order via order manager
+                close_order = {
+                    'action': 'close',
+                    'position_id': position_id,
+                    'reason': reason
+                }
+                
+                if self.order_manager.close_position(close_order):
+                    logging.info(f"Successfully closed position {position_id} - Reason: {reason}")
+                else:
+                    logging.error(f"Failed to close position {position_id}")
+            
+        except Exception as e:
+            logging.error(f"Error handling position event: {e}")
+    
+    def _on_risk_event(self, event_type: str, data: Dict):
+        """Handle risk events from monitor"""
+        try:
+            logging.warning(f"Risk event: {event_type} - Data: {data}")
+            
+            if event_type == 'max_drawdown':
+                # Stop trading if max drawdown reached
+                logging.critical("Maximum drawdown reached - halting new positions")
+                # Could implement emergency stop here
+                
+            elif event_type == 'high_exposure':
+                # Reduce position sizes if exposure too high
+                logging.warning("High exposure detected - consider reducing position sizes")
+                
+            elif event_type == 'too_many_positions':
+                # Stop opening new positions if too many active
+                logging.warning("Too many active positions - pausing new entries")
+            
+        except Exception as e:
+            logging.error(f"Error handling risk event: {e}")
     
     def _setup_trading_sessions(self) -> Dict[str, Any]:
         """Setup trading session definitions"""
@@ -271,7 +342,13 @@ class SessionAnomalyStrategy(BaseStrategy):
                 strategy_results['status'] = 'failed'
                 return strategy_results
             
-            # 2. Main trading loop
+            # 2. Start position monitoring
+            if not self._start_position_monitoring():
+                strategy_results['errors'].append("Failed to start position monitoring")
+                strategy_results['status'] = 'failed'
+                return strategy_results
+            
+            # 3. Main trading loop
             strategy_results = self._run_trading_loop(strategy_results)
             
             logging.info("Session anomaly strategy execution completed")
@@ -293,10 +370,11 @@ class SessionAnomalyStrategy(BaseStrategy):
             return False
         
         try:
-            # Start streaming (use dry_run=True for testing)
+            # Start streaming with jumpstart for faster startup
             dry_run = self.strategy_config.get('data', {}).get('dry_run', True)
+            jumpstart = self.strategy_config.get('data', {}).get('jumpstart', True)
             
-            if not self.live_data_manager.start_streaming(dry_run=dry_run):
+            if not self.live_data_manager.start_streaming(dry_run=dry_run, jumpstart=jumpstart):
                 logging.error("Failed to start data streaming")
                 return False
             
@@ -321,6 +399,24 @@ class SessionAnomalyStrategy(BaseStrategy):
             
         except Exception as e:
             logging.error(f"Error starting live data feed: {e}")
+            return False
+    
+    def _start_position_monitoring(self) -> bool:
+        """Start position monitoring system"""
+        if not self.position_monitor:
+            logging.error("Position monitor not initialized")
+            return False
+        
+        try:
+            if not self.position_monitor.start_monitoring():
+                logging.error("Failed to start position monitoring")
+                return False
+            
+            logging.info("Position monitoring started successfully")
+            return True
+            
+        except Exception as e:
+            logging.error(f"Error starting position monitoring: {e}")
             return False
     
     def _run_trading_loop(self, strategy_results: Dict[str, Any]) -> Dict[str, Any]:
@@ -418,6 +514,21 @@ class SessionAnomalyStrategy(BaseStrategy):
                 if self.order_manager.place_order(order_details):
                     position_actions['opened'] += 1
                     logging.info(f"Order placed: {order_details}")
+                    
+                    # Add position to monitoring
+                    if self.position_monitor:
+                        position_id = f"{order_details['symbol']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                        self.position_monitor.add_position(
+                            position_id=position_id,
+                            symbol=order_details['symbol'],
+                            direction=order_details['direction'],
+                            size=order_details['size'],
+                            entry_price=self._get_current_price(order_details['symbol']),
+                            stop_loss=order_details.get('stop_loss'),
+                            take_profit=order_details.get('take_profit'),
+                            session=order_details.get('session'),
+                            signal_confidence=order_details.get('signal_confidence')
+                        )
                 else:
                     logging.warning(f"Failed to place order: {order_details}")
             
@@ -429,20 +540,60 @@ class SessionAnomalyStrategy(BaseStrategy):
     def _monitor_positions(self):
         """Monitor and manage existing positions"""
         try:
-            # Update position status
-            self.position_manager.update_positions()
-            
-            # Check for positions that need closing
-            positions_to_close = self.position_manager.get_positions_to_close()
-            
-            for position in positions_to_close:
-                if self.order_manager.close_position(position):
-                    logging.info(f"Position closed: {position['id']}")
-                else:
-                    logging.warning(f"Failed to close position: {position['id']}")
+            # Update positions with current market prices
+            if self.position_monitor:
+                latest_features = self.live_data_manager.get_latest_features()
+                
+                if latest_features is not None and not latest_features.empty:
+                    # Get current price from latest market data
+                    current_price = self._get_current_price_from_features(latest_features)
+                    
+                    # Update all active positions with current price
+                    portfolio_summary = self.position_monitor.get_portfolio_summary()
+                    
+                    for position_id in portfolio_summary.get('positions', {}):
+                        self.position_monitor.update_position_price(position_id, current_price)
+                    
+                    # Log portfolio status periodically
+                    if portfolio_summary['active_positions'] > 0:
+                        logging.debug(f"Portfolio: {portfolio_summary['active_positions']} positions, "
+                                    f"PnL: {portfolio_summary['unrealized_pnl']:.4f}")
         
         except Exception as e:
             logging.error(f"Error monitoring positions: {e}")
+    
+    def _get_current_price(self, symbol: str) -> float:
+        """Get current market price for symbol"""
+        try:
+            latest_features = self.live_data_manager.get_latest_features()
+            if latest_features is not None and not latest_features.empty:
+                return self._get_current_price_from_features(latest_features)
+            else:
+                # Fallback to a default price if no data available
+                return 1.2500  # Default for GBPUSD
+        except Exception as e:
+            logging.error(f"Error getting current price for {symbol}: {e}")
+            return 1.2500  # Default fallback
+    
+    def _get_current_price_from_features(self, features: pd.DataFrame) -> float:
+        """Extract current price from processed features"""
+        try:
+            # Look for close price in the features
+            if 'close_og' in features.columns:  # Original close price before normalization
+                return float(features['close_og'].iloc[-1])
+            elif 'close' in features.columns:
+                return float(features['close'].iloc[-1])
+            else:
+                # Try to find any price-related column
+                price_cols = [col for col in features.columns if 'price' in col.lower() or 'close' in col.lower()]
+                if price_cols:
+                    return float(features[price_cols[0]].iloc[-1])
+                else:
+                    logging.warning("No price column found in features, using default")
+                    return 1.2500  # Default fallback
+        except Exception as e:
+            logging.error(f"Error extracting price from features: {e}")
+            return 1.2500  # Default fallback
     
     def _get_account_balance(self) -> float:
         """Get current account balance"""
@@ -460,6 +611,11 @@ class SessionAnomalyStrategy(BaseStrategy):
             if self.live_data_manager:
                 self.live_data_manager.stop_streaming()
                 logging.info("Live data streaming stopped")
+            
+            if self.position_monitor:
+                self.position_monitor.stop_monitoring()
+                logging.info("Position monitoring stopped")
+                
         except Exception as e:
             logging.error(f"Error during cleanup: {e}")
     
