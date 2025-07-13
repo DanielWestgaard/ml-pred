@@ -226,7 +226,7 @@ class SessionAnomalyStrategy(BaseStrategy):
             
             # In a real implementation, this would:
             # 1. Get live market data
-              # 1.5. Feed live data to generate features (the ones model is trained on)? - comment added by me
+              # 1.1. Feed live data to generate features (the ones model is trained on)?
             # 2. Generate signals
             # 3. Check risk management
             # 4. Execute trades
