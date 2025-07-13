@@ -6,6 +6,7 @@ from datetime import datetime
 class PositionManager:
     """
     Manages portfolio positions including tracking, updating, and reporting.
+    TODO: Also integrate with the broker to make sure tracking is correct and state is as intended?
     """
     
     def __init__(self, position_tracking: str = 'detailed', 

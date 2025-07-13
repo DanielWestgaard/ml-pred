@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime, time
 from typing import Dict, List, Any
 from strategy.hypothesis_specific.base_strategy import BaseStrategy
+from data.live.live_data_manager import LiveDataManager
 
 class SessionAnomalyStrategy(BaseStrategy):
     """
@@ -19,7 +20,48 @@ class SessionAnomalyStrategy(BaseStrategy):
         self.trading_sessions = self._setup_trading_sessions()
         self.session_filters = self._setup_session_filters()
         
+        # Live data manager
+        self.live_data_manager = None
+        self._initialize_live_data()
+        
         logging.info("Session anomaly strategy initialized")
+    
+    def _initialize_live_data(self):
+        """Initialize live data manager with strategy configuration"""
+        try:
+            # Get data configuration from strategy config
+            data_config = self.strategy_config.get('data', {})
+            
+            self.live_data_manager = LiveDataManager(
+                symbol=data_config.get('symbol', 'GBPUSD'),
+                timeframe=data_config.get('timeframe', 'MINUTE'),
+                buffer_size=data_config.get('buffer_size', 500),
+                feature_window=data_config.get('feature_window', 200),
+                selected_features=data_config.get('selected_features', None)
+            )
+            
+            # Add callback for new data notifications
+            self.live_data_manager.add_data_callback(self._on_new_data)
+            
+            logging.info("Live data manager initialized")
+            
+        except Exception as e:
+            logging.error(f"Failed to initialize live data manager: {e}")
+            self.live_data_manager = None
+    
+    def _on_new_data(self, latest_features: pd.DataFrame):
+        """Callback for when new processed data is available"""
+        try:
+            # This could trigger signal generation in real-time
+            logging.debug("New market data received and processed")
+            
+            # In a more advanced implementation, this could:
+            # 1. Generate signals immediately
+            # 2. Check for position updates
+            # 3. Trigger risk management checks
+            
+        except Exception as e:
+            logging.error(f"Error processing new data callback: {e}")
     
     def _setup_trading_sessions(self) -> Dict[str, Any]:
         """Setup trading session definitions"""
@@ -204,7 +246,7 @@ class SessionAnomalyStrategy(BaseStrategy):
     
     def execute_strategy(self) -> Dict[str, Any]:
         """
-        Execute the complete session anomaly strategy
+        Execute the complete session anomaly strategy with live data integration
         
         Returns:
             Strategy execution results
@@ -216,32 +258,21 @@ class SessionAnomalyStrategy(BaseStrategy):
             'positions_opened': 0,
             'positions_closed': 0,
             'errors': [],
-            'session_analysis': {}
+            'session_analysis': {},
+            'status': 'starting'
         }
         
         try:
-            # Get current market data (this would typically come from a data feed)
-            # For now, we'll simulate with placeholder logic
             logging.info("Session anomaly strategy execution started")
             
-            # In a real implementation, this would:
-            # 1. Get live market data
-              # 1.1. Feed live data to generate features (the ones model is trained on)?
-            # 2. Generate signals
-            # 3. Check risk management
-            # 4. Execute trades
-            # 5. Monitor positions
+            # 1. Initialize and start live data feed
+            if not self._start_live_data_feed():
+                strategy_results['errors'].append("Failed to start live data feed")
+                strategy_results['status'] = 'failed'
+                return strategy_results
             
-            # Placeholder execution logic
-            strategy_results.update({
-                'status': 'executed',
-                'message': 'Session anomaly strategy executed successfully (placeholder)',
-                'recommendations': [
-                    'Integrate with live data feed',
-                    'Implement position monitoring loop',
-                    'Add session transition handling'
-                ]
-            })
+            # 2. Main trading loop
+            strategy_results = self._run_trading_loop(strategy_results)
             
             logging.info("Session anomaly strategy execution completed")
             
@@ -249,8 +280,188 @@ class SessionAnomalyStrategy(BaseStrategy):
             strategy_results['errors'].append(str(e))
             strategy_results['status'] = 'failed'
             logging.error(f"Strategy execution failed: {e}")
+        finally:
+            # Always cleanup
+            self._cleanup_resources()
         
         return strategy_results
+    
+    def _start_live_data_feed(self) -> bool:
+        """Start live data feed and wait for initial data"""
+        if not self.live_data_manager:
+            logging.error("Live data manager not initialized")
+            return False
+        
+        try:
+            # Start streaming (use dry_run=True for testing)
+            dry_run = self.strategy_config.get('data', {}).get('dry_run', True)
+            
+            if not self.live_data_manager.start_streaming(dry_run=dry_run):
+                logging.error("Failed to start data streaming")
+                return False
+            
+            # Wait for initial data buffer to fill
+            logging.info("Waiting for initial data buffer to fill...")
+            max_wait_time = 60  # seconds
+            start_time = datetime.now()
+            
+            while not self.live_data_manager.is_ready_for_trading():
+                if (datetime.now() - start_time).total_seconds() > max_wait_time:
+                    logging.error("Timeout waiting for initial data")
+                    return False
+                
+                status = self.live_data_manager.get_buffer_status()
+                logging.info(f"Buffer status: {status['buffer_size']}/{status['max_buffer_size']} "
+                           f"({status['buffer_utilization']:.1%})")
+                
+                time.sleep(2)
+            
+            logging.info("Live data feed ready for trading")
+            return True
+            
+        except Exception as e:
+            logging.error(f"Error starting live data feed: {e}")
+            return False
+    
+    def _run_trading_loop(self, strategy_results: Dict[str, Any]) -> Dict[str, Any]:
+        """Main trading loop with live data processing"""
+        loop_count = 0
+        max_loops = self.strategy_config.get('execution', {}).get('max_loops', 100)
+        loop_interval = self.strategy_config.get('execution', {}).get('loop_interval', 5)
+        
+        strategy_results['status'] = 'running'
+        
+        while loop_count < max_loops and self.live_data_manager.is_ready_for_trading():
+            try:
+                loop_start = datetime.now()
+                logging.debug(f"Trading loop iteration {loop_count + 1}")
+                
+                # 1. Get latest processed market data
+                latest_features = self.live_data_manager.get_latest_features()
+                if latest_features is None:
+                    logging.warning("No processed data available, skipping iteration")
+                    time.sleep(loop_interval)
+                    continue
+                
+                # 2. Generate trading signals
+                signals = self.generate_signals(latest_features)
+                strategy_results['signals_generated'] += len(signals.get('processed_signals', []))
+                
+                # 3. Process signals and manage positions
+                if signals.get('session_info', {}).get('should_trade', False):
+                    position_actions = self._process_trading_signals(signals)
+                    strategy_results['positions_opened'] += position_actions.get('opened', 0)
+                    strategy_results['positions_closed'] += position_actions.get('closed', 0)
+                
+                # 4. Monitor existing positions
+                self._monitor_positions()
+                
+                # 5. Update session analysis
+                current_session = signals.get('session_info', {}).get('current_session')
+                if current_session:
+                    if current_session not in strategy_results['session_analysis']:
+                        strategy_results['session_analysis'][current_session] = {
+                            'signals': 0, 'trades': 0
+                        }
+                    strategy_results['session_analysis'][current_session]['signals'] += len(
+                        signals.get('processed_signals', []))
+                
+                # 6. Rate limiting
+                loop_duration = (datetime.now() - loop_start).total_seconds()
+                sleep_time = max(0, loop_interval - loop_duration)
+                if sleep_time > 0:
+                    time.sleep(sleep_time)
+                
+                loop_count += 1
+                
+            except Exception as e:
+                strategy_results['errors'].append(f"Trading loop error: {str(e)}")
+                logging.error(f"Error in trading loop iteration {loop_count}: {e}")
+                time.sleep(loop_interval)
+                loop_count += 1
+        
+        strategy_results['status'] = 'completed'
+        strategy_results['total_loops'] = loop_count
+        logging.info(f"Trading loop completed after {loop_count} iterations")
+        
+        return strategy_results
+    
+    def _process_trading_signals(self, signals: Dict[str, Any]) -> Dict[str, int]:
+        """Process trading signals and execute orders"""
+        position_actions = {'opened': 0, 'closed': 0}
+        
+        try:
+            processed_signals = signals.get('processed_signals', [])
+            
+            for signal in processed_signals:
+                # Check risk management
+                if not self.risk_manager.can_open_position(signal):
+                    logging.debug("Signal rejected by risk management")
+                    continue
+                
+                # Calculate position size
+                position_size = self.risk_manager.calculate_position_size(
+                    signal, account_balance=self._get_account_balance())
+                
+                # Create order details
+                order_details = {
+                    'symbol': signal.get('symbol', 'GBPUSD'),
+                    'direction': signal.get('direction', 'BUY'),
+                    'size': position_size,
+                    'signal_confidence': signal.get('confidence'),
+                    'session': signal.get('session'),
+                    'stop_loss': self.risk_manager.calculate_stop_loss(signal),
+                    'take_profit': self.risk_manager.calculate_take_profit(signal)
+                }
+                
+                # Execute order
+                if self.order_manager.place_order(order_details):
+                    position_actions['opened'] += 1
+                    logging.info(f"Order placed: {order_details}")
+                else:
+                    logging.warning(f"Failed to place order: {order_details}")
+            
+        except Exception as e:
+            logging.error(f"Error processing trading signals: {e}")
+        
+        return position_actions
+    
+    def _monitor_positions(self):
+        """Monitor and manage existing positions"""
+        try:
+            # Update position status
+            self.position_manager.update_positions()
+            
+            # Check for positions that need closing
+            positions_to_close = self.position_manager.get_positions_to_close()
+            
+            for position in positions_to_close:
+                if self.order_manager.close_position(position):
+                    logging.info(f"Position closed: {position['id']}")
+                else:
+                    logging.warning(f"Failed to close position: {position['id']}")
+        
+        except Exception as e:
+            logging.error(f"Error monitoring positions: {e}")
+    
+    def _get_account_balance(self) -> float:
+        """Get current account balance"""
+        try:
+            # TODO: This would typically call the broker API
+            # For now, return a default value
+            return 10000.0
+        except Exception as e:
+            logging.error(f"Error getting account balance: {e}")
+            return 10000.0
+    
+    def _cleanup_resources(self):
+        """Cleanup resources when strategy stops"""
+        try:
+            if self.live_data_manager:
+                self.live_data_manager.stop_streaming()
+                logging.info("Live data streaming stopped")
+        except Exception as e:
+            logging.error(f"Error during cleanup: {e}")
     
     def get_session_performance_analysis(self) -> Dict[str, Any]:
         """
