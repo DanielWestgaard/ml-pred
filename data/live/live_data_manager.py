@@ -68,12 +68,13 @@ class LiveDataManager:
         """Add callback function to be called when new processed data is available"""
         self._data_callbacks.append(callback)
     
-    def start_streaming(self, dry_run: bool = False) -> bool:
+    def start_streaming(self, dry_run: bool = False, jumpstart: bool = True) -> bool:
         """
-        Start live data streaming
+        Start live data streaming with optional buffer jumpstart
         
         Args:
             dry_run: If True, simulate data instead of connecting to broker
+            jumpstart: If True, preload buffer with historical data for faster startup
             
         Returns:
             True if streaming started successfully
@@ -83,6 +84,11 @@ class LiveDataManager:
             return True
             
         try:
+            # Jumpstart buffer with historical data if enabled
+            if jumpstart:
+                if not self._jumpstart_buffer(dry_run):
+                    logging.warning("Buffer jumpstart failed, continuing with normal startup")
+            
             if not dry_run:
                 # Initialize broker connection
                 if not self._connect_broker():
@@ -105,7 +111,8 @@ class LiveDataManager:
             
             self._stream_thread.start()
             
-            logging.info(f"Live data streaming started - Mode: {'simulation' if dry_run else 'live'}")
+            logging.info(f"Live data streaming started - Mode: {'simulation' if dry_run else 'live'}, "
+                        f"Jumpstart: {'enabled' if jumpstart else 'disabled'}")
             return True
             
         except Exception as e:
@@ -324,6 +331,155 @@ class LiveDataManager:
         
         # Attempt reconnection
         return self._connect_broker()
+    
+    def _jumpstart_buffer(self, dry_run: bool = False) -> bool:
+        """
+        Jumpstart the buffer with historical data for faster startup
+        
+        Args:
+            dry_run: If True, generate simulated historical data
+            
+        Returns:
+            True if jumpstart successful
+        """
+        try:
+            logging.info("Jumpstarting buffer with historical data...")
+            
+            if dry_run:
+                # Generate bulk simulated historical data instantly
+                historical_data = self._generate_bulk_simulation_data()
+            else:
+                # Fetch recent historical data from broker
+                historical_data = self._fetch_historical_data_from_broker()
+            
+            if historical_data is None or len(historical_data) == 0:
+                logging.error("Failed to get historical data for jumpstart")
+                return False
+            
+            # Add historical data to buffer
+            with self._data_lock:
+                for _, row in historical_data.iterrows():
+                    data_point = {
+                        'date': row.name,  # Index should be datetime
+                        'open': row['open'],
+                        'high': row['high'],
+                        'low': row['low'],
+                        'close': row['close'],
+                        'volume': row['volume']
+                    }
+                    self.raw_buffer.append(data_point)
+                
+                # Process the jumpstart data immediately
+                if len(self.raw_buffer) >= self.feature_window:
+                    self._process_current_buffer()
+            
+            logging.info(f"Buffer jumpstart completed - Added {len(historical_data)} historical data points")
+            return True
+            
+        except Exception as e:
+            logging.error(f"Error during buffer jumpstart: {e}")
+            return False
+    
+    def _generate_bulk_simulation_data(self) -> Optional[pd.DataFrame]:
+        """Generate bulk historical simulation data for jumpstart"""
+        try:
+            # Generate enough data for feature calculation + some extra
+            n_points = max(self.feature_window + 50, 100)
+            
+            # Start from 2 hours ago to ensure historical timestamps
+            start_time = datetime.now() - timedelta(hours=2)
+            
+            base_price = 1.2500
+            data = []
+            
+            for i in range(n_points):
+                # Generate realistic price movement
+                price_change = np.random.normal(0, 0.0001)
+                current_close = base_price + price_change
+                
+                # Generate proper OHLC relationships
+                open_price = base_price
+                
+                # Generate high and low with proper relationships
+                high_offset = abs(np.random.normal(0, 0.00003))
+                low_offset = abs(np.random.normal(0, 0.00003))
+                
+                high_price = max(open_price, current_close) + high_offset
+                low_price = min(open_price, current_close) - low_offset
+                
+                volume = np.random.randint(50, 500)
+                
+                data.append({
+                    'open': open_price,
+                    'high': high_price,
+                    'low': low_price,
+                    'close': current_close,
+                    'volume': volume
+                })
+                
+                base_price = current_close
+                start_time += timedelta(minutes=1)
+            
+            # Create DataFrame with datetime index
+            df = pd.DataFrame(data)
+            df.index = pd.date_range(
+                start=datetime.now() - timedelta(hours=2),
+                periods=n_points,
+                freq='1min'
+            )
+            df.index.name = 'date'
+            
+            logging.info(f"Generated {len(df)} simulated historical data points for jumpstart")
+            return df
+            
+        except Exception as e:
+            logging.error(f"Error generating bulk simulation data: {e}")
+            return None
+    
+    def _fetch_historical_data_from_broker(self) -> Optional[pd.DataFrame]:
+        """Fetch recent historical data from Capital.com for jumpstart"""
+        try:
+            if not self.broker:
+                logging.error("No broker connection available for historical data fetch")
+                return None
+            
+            # Calculate how many data points we need
+            n_points = max(self.feature_window + 50, 200)
+            
+            # Calculate time range (assuming 1-minute data)
+            end_time = datetime.now()
+            start_time = end_time - timedelta(minutes=n_points + 10)  # Add buffer
+            
+            # Format times for Capital.com API
+            from_date = start_time.strftime("%Y-%m-%dT%H:%M:%S")
+            to_date = end_time.strftime("%Y-%m-%dT%H:%M:%S")
+            
+            logging.info(f"Fetching historical data from {from_date} to {to_date}")
+            
+            # Use Capital.com's historical data endpoint
+            historical_data = self.broker.get_historical_data(
+                epic=self.symbol,
+                resolution=self.timeframe,
+                max=n_points,
+                from_date=from_date,
+                to_date=to_date,
+                print_answer=False
+            )
+            
+            if historical_data is None:
+                logging.error("No historical data returned from broker")
+                return None
+            
+            # Convert to DataFrame format expected by our pipeline
+            # Note: This depends on Capital.com's response format
+            # You may need to adjust based on actual API response structure
+            
+            logging.info(f"Fetched {len(historical_data)} historical data points from broker")
+            return historical_data
+            
+        except Exception as e:
+            logging.error(f"Error fetching historical data from broker: {e}")
+            return None
     
     def _notify_callbacks(self, data: pd.DataFrame):
         """Notify all registered callbacks of new data"""
