@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import queue
 
 from broker.capital_com.capitalcom import CapitalCom
+from data.live.websocket_data_manager import WebSocketDataManager
 from data.features.generation import FeatureGenerator
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
@@ -58,6 +59,10 @@ class LiveDataManager:
         self._connection_retries = 0
         self._max_retries = 5
         
+        # WebSocket data manager for real-time feeds
+        self.websocket_manager = None
+        self._use_websocket = kwargs.get('use_websocket', True)
+        
         # Callbacks for data updates
         self._data_callbacks = []
         
@@ -90,9 +95,17 @@ class LiveDataManager:
                     logging.warning("Buffer jumpstart failed, continuing with normal startup")
             
             if not dry_run:
-                # Initialize broker connection
-                if not self._connect_broker():
-                    return False
+                if self._use_websocket:
+                    # Initialize WebSocket data streaming
+                    if not self._initialize_websocket_streaming():
+                        # Fallback to traditional broker connection
+                        logging.warning("WebSocket initialization failed, falling back to traditional broker")
+                        if not self._connect_broker():
+                            return False
+                else:
+                    # Use traditional broker connection
+                    if not self._connect_broker():
+                        return False
             
             # Start data processing thread
             self._is_streaming = True
@@ -104,12 +117,15 @@ class LiveDataManager:
                 # Start simulation thread for testing
                 self._stream_thread = threading.Thread(
                     target=self._simulate_data_worker, daemon=True)
+                self._stream_thread.start()
+            elif self.websocket_manager and self.websocket_manager.is_connected():
+                # WebSocket handles data streaming automatically via callbacks
+                logging.info("Using WebSocket for real-time data streaming")
             else:
-                # Start real data streaming thread
+                # Start traditional data streaming thread
                 self._stream_thread = threading.Thread(
                     target=self._stream_data_worker, daemon=True)
-            
-            self._stream_thread.start()
+                self._stream_thread.start()
             
             logging.info(f"Live data streaming started - Mode: {'simulation' if dry_run else 'live'}, "
                         f"Jumpstart: {'enabled' if jumpstart else 'disabled'}")
@@ -134,6 +150,15 @@ class LiveDataManager:
         
         if self._processing_thread and self._processing_thread.is_alive():
             self._processing_thread.join(timeout=5)
+        
+        # Cleanup WebSocket connection
+        if self.websocket_manager:
+            try:
+                self.websocket_manager.stop_streaming()
+            except Exception as e:
+                logging.error(f"Error stopping WebSocket streaming: {e}")
+            finally:
+                self.websocket_manager = None
         
         # Cleanup broker connection
         if self.broker:
@@ -166,6 +191,53 @@ class LiveDataManager:
         
         logging.error("Failed to establish broker connection after retries")
         return False
+    
+    def _initialize_websocket_streaming(self) -> bool:
+        """Initialize WebSocket data streaming"""
+        try:
+            # Create WebSocket manager
+            self.websocket_manager = WebSocketDataManager(
+                symbols=[self.symbol],
+                timeframe=self.timeframe,
+                buffer_size=self.buffer_size
+            )
+            
+            # Add callback to receive WebSocket data
+            self.websocket_manager.add_data_callback(self._on_websocket_data)
+            
+            # Start WebSocket streaming with jumpstart
+            if self.websocket_manager.start_streaming(jumpstart_buffer=True):
+                logging.info("WebSocket streaming initialized successfully")
+                return True
+            else:
+                logging.error("Failed to start WebSocket streaming")
+                return False
+                
+        except Exception as e:
+            logging.error(f"Error initializing WebSocket streaming: {e}")
+            return False
+    
+    def _on_websocket_data(self, symbol: str, data: Dict[str, Any]):
+        """Callback for WebSocket data updates"""
+        try:
+            if symbol == self.symbol:
+                # Convert WebSocket data to standard format
+                market_data = {
+                    'timestamp': data.get('datetime', datetime.now()),
+                    'open': data.get('open'),
+                    'high': data.get('high'),
+                    'low': data.get('low'),
+                    'close': data.get('close'),
+                    'volume': data.get('volume', 1.0),
+                    'symbol': symbol,
+                    'source': 'websocket'
+                }
+                
+                # Add to data queue for processing
+                self._data_queue.put(market_data, block=False)
+                
+        except Exception as e:
+            logging.error(f"Error processing WebSocket data callback: {e}")
     
     def _stream_data_worker(self):
         """Worker thread for streaming live data from broker"""
@@ -527,7 +599,8 @@ class LiveDataManager:
                 'has_processed_data': self.processed_data is not None,
                 'latest_timestamp': list(self.raw_buffer)[-1]['date'] if self.raw_buffer else None,
                 'is_streaming': self._is_streaming,
-                'connection_healthy': self._check_connection_health()
+                'connection_healthy': self._check_connection_health(),
+                'websocket_connected': self.websocket_manager.is_connected() if self.websocket_manager else False
             }
     
     def is_ready_for_trading(self) -> bool:
