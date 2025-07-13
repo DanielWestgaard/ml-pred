@@ -749,7 +749,7 @@ class FeatureGenerator():
             True
         ]
         choices = ['london_ny_overlap', 'london_primary', 'ny_primary', 'asian_primary', 'off_hours']
-        primary_session = np.select(conditions, choices)
+        primary_session = np.select(conditions, choices, default='off_hours')
         
         # Session intensity mapping
         session_intensity_map = {
