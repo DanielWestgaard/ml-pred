@@ -62,14 +62,15 @@ strategy:
         symbol: GBPUSD
         timeframe: MINUTE
         buffer_size: 500
-        feature_window: 200
+        feature_window: 35  # Must be >= 30 for validation
         dry_run: true  # Set to false for live trading
         jumpstart: true  # Preload buffer with historical data
+        use_websocket: true  # Use WebSocket for real-time data (Capital.com)
         selected_features: null  # null = use all features
 
     execution:
-        max_loops: 100       # Maximum trading loop iterations
-        loop_interval: 5     # Seconds between loop iterations
+        max_loops: 5         # Reduced for testing (was 100)
+        loop_interval: 2     # Reduced for testing (was 5)
 
     signal_processing:
         confidence_threshold: 0.7

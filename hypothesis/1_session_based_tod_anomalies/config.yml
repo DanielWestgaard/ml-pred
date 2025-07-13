@@ -40,6 +40,7 @@ strategy:
         feature_window: 35  # Must be >= 30 for validation
         dry_run: true  # Set to false for live trading
         jumpstart: true  # Preload buffer with historical data
+        use_websocket: true  # Use WebSocket for real-time data (Capital.com)
         selected_features: null  # null = use all features
 
     execution:
