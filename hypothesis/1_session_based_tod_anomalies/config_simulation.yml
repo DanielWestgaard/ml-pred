@@ -13,19 +13,17 @@ strategy:
         dry_run: true  # Pure simulation mode
         jumpstart: true  # Preload buffer with historical data
         use_websocket: false  # Use simulation data
-        selected_features: [  # Use exact features from model metadata
-            "open", "high", "low", "close", "volume", "hour_sin", "hour_cos",
-            "hour_of_week_sin", "hour_of_week_cos", "is_weekend", "month_progress_sin",
-            "month_progress_cos", "month_period", "month_of_year_sin", "month_of_year_cos",
-            "day_of_week_sin", "day_of_week_cos", "is_monday", "is_friday", "is_midweek",
-            "friday_afternoon", "sunday_evening", "atr", "returns", "volatility_short",
-            "volatility_long", "volatility_ratio", "volatility_regime", "volatility_zscore",
-            "volatility_change", "vol_regime_high", "vol_regime_low", "vol_regime_medium",
-            "activity", "asian_session", "london_session", "ny_session", "asian_london_overlap",
-            "london_ny_overlap", "primary_session", "session_intensity", "minutes_since_session_start",
-            "session_progress", "session_progress_sin", "session_progress_cos", "minutes_to_next_session",
-            "session_transition", "pre_london", "pre_ny", "london_close", "session_atr_mean",
-            "session_atr_std", "future_atr", "close_og"
+        selected_features: [  # Use exact features from model metadata - ORDER MATTERS!
+            "average_true_range",
+            "day_of_week", 
+            "fx_activity_profile",
+            "time_of_day",
+            "time_of_month",
+            "time_of_week",
+            "volatility_regimes",
+            "fx_trading_sessions",        # Must come before session_timing_features
+            "session_timing_features",   # Must come before session_transition_features
+            "session_transition_features",
         ]
 
     execution:
