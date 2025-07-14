@@ -13,6 +13,7 @@ from data.live.websocket_data_manager import WebSocketDataManager
 from data.features.generation import FeatureGenerator
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
+from data.features.transformation import FeatureTransformer
 import config.config as config
 
 
@@ -367,6 +368,9 @@ class LiveDataManager:
                 selected_features=selected_features_dict
             )
             df_with_features = feature_generator.run()
+            
+            feature_transformer = FeatureTransformer(df_with_features)
+            df_with_features = feature_transformer.run()
             
             # Store processed data
             self.processed_data = df_with_features
