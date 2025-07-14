@@ -477,10 +477,20 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             self.df['volatility_long'] > 0, 1
         )
         
-        # Volatility z-score
-        vol_mean = self.df['volatility_short'].rolling(window=lookback_long).mean()
-        vol_std = self.df['volatility_short'].rolling(window=lookback_long).std()
-        self.df['volatility_zscore'] = (self.df['volatility_short'] - vol_mean) / vol_std.where(vol_std > 0, 1)
+        # Volatility z-score with adaptive window to reduce NaN values
+        # Use expanding window for early periods, then switch to rolling
+        adaptive_window = min(lookback_long, len(self.df) // 3)  # Use smaller window if dataset is small
+        
+        vol_mean = self.df['volatility_short'].rolling(window=adaptive_window, min_periods=1).mean()
+        vol_std = self.df['volatility_short'].rolling(window=adaptive_window, min_periods=1).std()
+        
+        # Calculate z-score with better handling of division by zero
+        vol_zscore = pd.Series(index=self.df.index, dtype=float)
+        mask = (vol_std > 0) & vol_mean.notna() & vol_std.notna()
+        vol_zscore[mask] = (self.df['volatility_short'][mask] - vol_mean[mask]) / vol_std[mask]
+        vol_zscore[~mask] = 0.0  # Set to 0 where std is zero or data is missing
+        
+        self.df['volatility_zscore'] = vol_zscore
         
         # Volatility change
         self.df['volatility_change'] = self.df['volatility_short'].pct_change()
@@ -500,3 +510,58 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         self.df['vol_regime_low'] = (self.df['volatility_regime'] == 'low').astype(int)
         self.df['vol_regime_medium'] = (self.df['volatility_regime'] == 'medium').astype(int) 
         self.df['vol_regime_high'] = (self.df['volatility_regime'] == 'high').astype(int)
+    
+    @feature_generator(
+        output_features=['session_atr_mean', 'session_atr_std'],
+        dependencies=['average_true_range', 'fx_trading_sessions'],
+        description="Session-based ATR statistics",
+        category="volatility"
+    )
+    def session_atr_features(self):
+        """Calculate ATR statistics by trading session"""
+        # Calculate rolling session-based ATR statistics
+        window = 20  # 20-period window for session statistics
+        
+        # Group by primary session and calculate rolling statistics
+        session_groups = self.df.groupby('primary_session')['atr']
+        
+        # Initialize with NaN
+        self.df['session_atr_mean'] = np.nan
+        self.df['session_atr_std'] = np.nan
+        
+        # Calculate rolling statistics for each session
+        for session_name, group in session_groups:
+            if len(group) > 0:
+                # Rolling mean and std for this session
+                rolling_mean = group.rolling(window=min(window, len(group)), min_periods=1).mean()
+                rolling_std = group.rolling(window=min(window, len(group)), min_periods=1).std()
+                
+                # Assign back to the main dataframe
+                self.df.loc[group.index, 'session_atr_mean'] = rolling_mean
+                self.df.loc[group.index, 'session_atr_std'] = rolling_std
+        
+        # Fill any remaining NaN values with global ATR statistics as fallback
+        global_atr_mean = self.df['atr'].rolling(window=window, min_periods=1).mean()
+        global_atr_std = self.df['atr'].rolling(window=window, min_periods=1).std()
+        
+        self.df['session_atr_mean'] = self.df['session_atr_mean'].fillna(global_atr_mean)
+        self.df['session_atr_std'] = self.df['session_atr_std'].fillna(global_atr_std)
+    
+    @feature_generator(
+        output_features=['future_atr'],
+        dependencies=['average_true_range'],
+        description="Forward-looking ATR values",
+        category="volatility"
+    )
+    def future_atr_features(self):
+        """Calculate forward-looking ATR features"""
+        # Calculate future ATR by shifting current ATR forward
+        # This represents the ATR that will be realized in the future
+        lookforward_periods = 5  # Look 5 periods ahead
+        
+        # Shift ATR backward to get "future" values from current perspective
+        self.df['future_atr'] = self.df['atr'].shift(-lookforward_periods)
+        
+        # For the last few rows where we don't have future data,
+        # fill with the current ATR as a reasonable approximation
+        self.df['future_atr'] = self.df['future_atr'].fillna(self.df['atr'])
