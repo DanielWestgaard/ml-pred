@@ -32,6 +32,18 @@ class ModelMetadataLoader:
     def _load_metadata(self) -> Dict[str, Any]:
         """Load metadata from YAML file."""
         try:
+            # Add numpy scalar constructor to handle numpy serialization issues
+            def numpy_scalar_constructor(loader, node):
+                """Handle numpy scalars in YAML"""
+                value = loader.construct_yaml_object(node, deep=True)
+                # Convert numpy scalars to Python native types
+                if hasattr(value, 'item'):
+                    return value.item()
+                return value
+            
+            # Add constructor for numpy scalars
+            yaml.SafeLoader.add_constructor('tag:yaml.org,2002:python/object/apply:numpy.core.multiarray.scalar', numpy_scalar_constructor)
+            
             with open(self.metadata_path, 'r') as file:
                 metadata = yaml.safe_load(file)
             logging.debug(f"Successfully loaded metadata from {self.metadata_path}")
