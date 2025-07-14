@@ -186,9 +186,12 @@ class SessionAnomalyStrategy(BaseStrategy):
         # Make predictions using the loaded model
         # Assume market_data has the same features as training data
         try:
-            # Prepare features for prediction (exclude target columns and non-feature columns)
-            feature_columns = [col for col in market_data.columns 
-                             if not col.startswith('target_') and col not in ['date', 'close_og']]
+            # Prepare features for prediction using model-aware feature selection
+            # Load the model features directly from metadata file
+            from utils.model.model_metadata_loader import load_model_metadata
+            loader = load_model_metadata(self.model_directory)
+            expected_features = loader.get_features()
+            feature_columns = [col for col in expected_features if col in market_data.columns]
             
             if not feature_columns:
                 logging.error("No valid feature columns found in market data")
