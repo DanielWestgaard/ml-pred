@@ -14,6 +14,9 @@
 
 
 ## Configuration files 🗂️
+- ✅ config_minimal.yml - Working simulation (tested & confirmed)
+- 🔧 config_fixed.yml - WebSocket with real Capital.com data
+- 🔧 config_simulation.yml - Pure simulation backup
 
 ### For WebSocket Testing: `config_fixed.yml`
 - `data.dry_run`: false (real WebSocket data)

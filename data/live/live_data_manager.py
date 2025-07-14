@@ -348,9 +348,17 @@ class LiveDataManager:
                 return
             
             # Generate features
+            # Convert list of selected features to dict format expected by FeatureGenerator
+            selected_features_dict = None
+            if self.selected_features and isinstance(self.selected_features, list):
+                # Convert list to dict with feature names as keys and empty values
+                selected_features_dict = {feature: [] for feature in self.selected_features}
+            elif self.selected_features:
+                selected_features_dict = self.selected_features
+            
             feature_generator = FeatureGenerator(
                 df_cleaned.copy(), 
-                selected_features=self.selected_features
+                selected_features=selected_features_dict
             )
             df_with_features = feature_generator.run()
             
@@ -382,6 +390,11 @@ class LiveDataManager:
     
     def _check_connection_health(self) -> bool:
         """Check if broker connection is healthy"""
+        # In simulation mode (no WebSocket), always return True if streaming
+        if self._use_websocket == False and self._is_streaming:
+            return True
+        
+        # For real broker/WebSocket connections
         if not self.broker or not self._last_heartbeat:
             return False
         
@@ -611,9 +624,15 @@ class LiveDataManager:
             True if ready (streaming, enough data, features available)
         """
         with self._data_lock:
-            return (
-                self._is_streaming and
-                len(self.raw_buffer) >= self.feature_window and
-                self.latest_features is not None and
-                self._check_connection_health()
-            )
+            streaming_ok = self._is_streaming
+            buffer_ok = len(self.raw_buffer) >= self.feature_window
+            features_ok = self.latest_features is not None
+            connection_ok = self._check_connection_health()
+            
+            # Debug logging to see what's failing
+            if not (streaming_ok and buffer_ok and features_ok and connection_ok):
+                logging.debug(f"Ready check failed - Streaming: {streaming_ok}, "
+                            f"Buffer: {buffer_ok} ({len(self.raw_buffer)}>={self.feature_window}), "
+                            f"Features: {features_ok}, Connection: {connection_ok}")
+            
+            return streaming_ok and buffer_ok and features_ok and connection_ok
