@@ -15,6 +15,7 @@ from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.transformation import FeatureTransformer
 import config.config as config
+from data.features.enhanced_generation import ModelAwareFeatureGenerator
 
 
 class LiveDataManager:
@@ -363,11 +364,10 @@ class LiveDataManager:
             elif self.selected_features:
                 selected_features_dict = self.selected_features
             
-            feature_generator = FeatureGenerator(
-                df_cleaned.copy(), 
-                selected_features=selected_features_dict
+            feature_generator = ModelAwareFeatureGenerator(df_cleaned.copy())
+            df_with_features = feature_generator.generate_for_model(
+                model_metadata_path="storage/models/2025-07-03_12:45:35/model_metadata.yml"
             )
-            df_with_features = feature_generator.run()
             
             feature_transformer = FeatureTransformer(df_with_features)
             df_with_features = feature_transformer.run()

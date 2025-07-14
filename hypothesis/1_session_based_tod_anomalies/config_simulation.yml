@@ -13,18 +13,7 @@ strategy:
         dry_run: true  # Pure simulation mode
         jumpstart: true  # Preload buffer with historical data
         use_websocket: false  # Use simulation data
-        selected_features: [  # Use exact features from model metadata - ORDER MATTERS!
-            "average_true_range",
-            "day_of_week", 
-            "fx_activity_profile",
-            "time_of_day",
-            "time_of_month",
-            "time_of_week",
-            "volatility_regimes",
-            "fx_trading_sessions",        # Must come before session_timing_features
-            "session_timing_features",   # Must come before session_transition_features
-            "session_transition_features",
-        ]
+        selected_features: null  # Let the system auto-generate for the model
 
     execution:
         max_loops: 5         # Very short for testing 
