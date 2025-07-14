@@ -10,7 +10,7 @@ import queue
 
 from broker.capital_com.capitalcom import CapitalCom
 from data.live.websocket_data_manager import WebSocketDataManager
-from data.features.generation import FeatureGenerator
+from data.features.integration_adapter import FeatureGenerator
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.transformation import FeatureTransformer
