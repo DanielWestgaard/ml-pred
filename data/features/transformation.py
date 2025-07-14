@@ -8,10 +8,23 @@ from utils import data_utils
 
 
 class FeatureTransformer(BaseProcessor):
-    def __init__(self, data):
+    def __init__(self, data, model_metadata_path=None):
         """Class for transforming- (handling nan's, encoding categorical variables, etc.) and normalizing features."""
         # Load dataset based on format
         self.df, self.original_df = data_utils.check_and_return_df(data)
+        self.model_metadata_path = model_metadata_path
+        self.required_features = self._load_required_features() if model_metadata_path else None
+    
+    def _load_required_features(self):
+        """Load required features from model metadata"""
+        try:
+            import yaml
+            with open(self.model_metadata_path, 'r') as f:
+                metadata = yaml.safe_load(f)
+            return set(metadata.get('dataset', {}).get('features', []))
+        except Exception as e:
+            logging.warning(f"Could not load model features from {self.model_metadata_path}: {e}")
+            return None
     
     def run(self, preserve_original=False, window=20):
         """
@@ -62,10 +75,30 @@ class FeatureTransformer(BaseProcessor):
         logging.debug("Starting to filter features based on missing values...")
         
         nan_percentage = self.df.isna().mean()  # Calculate the percentage of NaN values in each column
-        # Firstly dropping features with many missing values
-        self.df = self.df.drop(columns=nan_percentage[nan_percentage > threshold].index)
+        
+        # Smart filtering: be more lenient with model-required features
+        columns_to_drop = []
+        for col in nan_percentage.index:
+            if nan_percentage[col] > threshold:
+                # If we know what features the model needs, be more lenient with them
+                if self.required_features and col in self.required_features:
+                    # Use higher threshold for required features (75% instead of 50%)
+                    if nan_percentage[col] > 0.75:
+                        logging.warning(f"Dropping required feature '{col}' due to excessive NaN values ({nan_percentage[col]:.2%})")
+                        columns_to_drop.append(col)
+                    else:
+                        logging.debug(f"Keeping required feature '{col}' despite {nan_percentage[col]:.2%} NaN values")
+                else:
+                    columns_to_drop.append(col)
+        
+        # Drop features that exceeded thresholds
+        if columns_to_drop:
+            self.df = self.df.drop(columns=columns_to_drop)
+            logging.debug(f"Dropped {len(columns_to_drop)} columns that exceeded NaN threshold: {columns_to_drop}")
+        else:
+            logging.debug("No columns exceeded NaN threshold")
+        
         removed = self.original_df.columns.difference(self.df.columns)
-        logging.debug(f"Dropped {len(removed)} columns that exceeded threshold for NaN's: {removed}")
 
         # Secondly, drop first rows based on the highest window size
         if max_window_size is None:
