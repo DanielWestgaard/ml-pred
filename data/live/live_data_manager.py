@@ -333,6 +333,12 @@ class LiveDataManager:
         try:
             # Convert buffer to DataFrame
             df = pd.DataFrame(list(self.raw_buffer))
+            
+            # Ensure date column exists and is properly formatted
+            if 'date' not in df.columns:
+                logging.error("No 'date' column found in the dataframe")
+                return
+                
             df['date'] = pd.to_datetime(df['date'])
             df.set_index('date', inplace=True)
             
