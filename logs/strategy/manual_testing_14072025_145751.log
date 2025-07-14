@@ -1,0 +1,1313 @@
+14-07-2025 14:57:51 - INFO - Logging system initialized. Environment: development
+14-07-2025 14:57:51 - INFO - Starting strategy execution with config: hypothesis/1_session_based_tod_anomalies/config_simulation.yml
+14-07-2025 14:57:51 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_simulation.yml
+14-07-2025 14:57:51 - INFO - Loaded hypothesis: session_based_tod_anomalies
+14-07-2025 14:57:51 - DEBUG - Section 'data_pipeline' not found in configuration
+14-07-2025 14:57:51 - DEBUG - Section 'model_training' not found in configuration
+14-07-2025 14:57:51 - DEBUG - Section 'evaluate_model' not found in configuration
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 350, 'feature_window': 35, 'dry_run': True, 'jumpstart': True, 'use_websocket': False, 'selected_features': None}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.execution: {'max_loops': 5, 'loop_interval': 2}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.7, 'signal_filters': ['session_filter', 'volatility_filter']}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+14-07-2025 14:57:51 - INFO - Successfully loaded config sections: ['strategy']
+14-07-2025 14:57:51 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_simulation.yml
+14-07-2025 14:57:51 - INFO - Loaded hypothesis: session_based_tod_anomalies
+14-07-2025 14:57:51 - DEBUG - Section 'data_pipeline' not found in configuration
+14-07-2025 14:57:51 - DEBUG - Section 'model_training' not found in configuration
+14-07-2025 14:57:51 - DEBUG - Section 'evaluate_model' not found in configuration
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 350, 'feature_window': 35, 'dry_run': True, 'jumpstart': True, 'use_websocket': False, 'selected_features': None}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.execution: {'max_loops': 5, 'loop_interval': 2}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.7, 'signal_filters': ['session_filter', 'volatility_filter']}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+14-07-2025 14:57:51 - INFO - Successfully loaded config sections: ['strategy']
+14-07-2025 14:57:51 - INFO - ---------- Initializing SessionAnomalyStrategy ----------
+14-07-2025 14:57:51 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+14-07-2025 14:57:51 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-14_17:42:57/model_metadata.yml
+14-07-2025 14:57:51 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-09_22:09:38/model_metadata.yml
+14-07-2025 14:57:51 - ERROR - Error loading metadata: SafeConstructor.construct_yaml_object() got an unexpected keyword argument 'deep'
+14-07-2025 14:57:51 - WARNING - Could not load metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-09_20:19:29: SafeConstructor.construct_yaml_object() got an unexpected keyword argument 'deep'
+14-07-2025 14:57:51 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:27:50/model_metadata.yml
+14-07-2025 14:57:51 - DEBUG - Utility function, get_latest_model(), found the latest trained model: /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35
+14-07-2025 14:57:51 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+14-07-2025 14:57:51 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_simulation.yml
+14-07-2025 14:57:51 - INFO - Loaded hypothesis: session_based_tod_anomalies
+14-07-2025 14:57:51 - DEBUG - Section 'data_pipeline' not found in configuration
+14-07-2025 14:57:51 - DEBUG - Section 'model_training' not found in configuration
+14-07-2025 14:57:51 - DEBUG - Section 'evaluate_model' not found in configuration
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 350, 'feature_window': 35, 'dry_run': True, 'jumpstart': True, 'use_websocket': False, 'selected_features': None}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.execution: {'max_loops': 5, 'loop_interval': 2}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.7, 'signal_filters': ['session_filter', 'volatility_filter']}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+14-07-2025 14:57:51 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+14-07-2025 14:57:51 - INFO - Successfully loaded config sections: ['strategy']
+14-07-2025 14:57:51 - INFO - Signal processor initialized with confidence threshold: 0.7
+14-07-2025 14:57:51 - INFO - Risk manager initialized - Max position: 2.0%, Stop loss: 1.0%, Max drawdown: 5.0%
+14-07-2025 14:57:51 - INFO - Position manager initialized - Tracking: detailed, Max positions: 3
+14-07-2025 14:57:51 - INFO - Running in dry run mode - no actual orders will be placed
+14-07-2025 14:57:51 - INFO - Order manager initialized - Broker: capital_com, Order type: market, Dry run: True
+14-07-2025 14:57:51 - INFO - LiveDataManager initialized - Symbol: GBPUSD, Timeframe: MINUTE, Buffer: 350
+14-07-2025 14:57:51 - INFO - Live data manager initialized
+14-07-2025 14:57:51 - INFO - Position monitor initialized - Update interval: 1.0s
+14-07-2025 14:57:51 - INFO - Position monitor initialized
+14-07-2025 14:57:51 - INFO - Session anomaly strategy initialized
+14-07-2025 14:57:51 - INFO - Running strategy for hypothesis type: session_based_tod_anomalies
+14-07-2025 14:57:51 - INFO - Starting strategy execution for session_based_tod_anomalies
+14-07-2025 14:57:51 - INFO - Session anomaly strategy execution started
+14-07-2025 14:57:51 - INFO - Jumpstarting buffer with historical data...
+14-07-2025 14:57:51 - INFO - Generated 250 simulated historical data points for jumpstart
+14-07-2025 14:57:51 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:02:51.666349  1.249295  1.249313  1.249067  1.249116   413.0
+2025-07-14 13:03:51.666349  1.249116  1.249176  1.249035  1.249036   374.0
+2025-07-14 13:04:51.666349  1.249036  1.249047  1.249030  1.249046   283.0
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013   207.0
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827   188.0
+
+[250 rows x 5 columns]
+14-07-2025 14:57:51 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:51 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:51 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:51 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:51 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:02:51.666349  1.249295  1.249313  1.249067  1.249116     413
+2025-07-14 13:03:51.666349  1.249116  1.249176  1.249035  1.249036     374
+2025-07-14 13:04:51.666349  1.249036  1.249047  1.249030  1.249046     283
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013     207
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827     188
+
+[250 rows x 5 columns]
+14-07-2025 14:57:51 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:51 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:02:51.666349  1.249295  1.249313  1.249067  1.249116     413
+2025-07-14 13:03:51.666349  1.249116  1.249176  1.249035  1.249036     374
+2025-07-14 13:04:51.666349  1.249036  1.249047  1.249030  1.249046     283
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013     207
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827     188
+
+[250 rows x 5 columns]
+14-07-2025 14:57:51 - INFO - Enhanced FeatureGenerator initialized with 250 rows
+14-07-2025 14:57:51 - INFO - Model requires 54 features
+14-07-2025 14:57:51 - INFO - Generating 54 selected features...
+14-07-2025 14:57:51 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:51 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:51 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:51 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:51 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:51 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:51 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:51 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:51 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:51 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:51 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:51 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:51 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:51 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:51 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:51 - INFO - Successfully generated 48 features
+14-07-2025 14:57:51 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:51 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 13:02:51.666349  1.249295  1.249313  ...       1             0
+2025-07-14 13:03:51.666349  1.249116  1.249176  ...       1             0
+2025-07-14 13:04:51.666349  1.249036  1.249047  ...       1             0
+2025-07-14 13:05:51.666349  1.249046  1.249052  ...       1             0
+2025-07-14 13:06:51.666349  1.249013  1.249033  ...       1             0
+
+[250 rows x 53 columns]
+14-07-2025 14:57:51 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:51 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:51 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:51 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:51 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 250
+14-07-2025 14:57:51 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:51 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:51 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:51 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:51 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:51 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:51 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:51 - DEBUG - New market data received and processed
+14-07-2025 14:57:51 - INFO - Buffer jumpstart completed - Added 250 historical data points
+14-07-2025 14:57:51 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:03:51.666349  1.249116  1.249176  1.249035  1.249036   374.0
+2025-07-14 13:04:51.666349  1.249036  1.249047  1.249030  1.249046   283.0
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013   207.0
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827   188.0
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951   430.0
+
+[251 rows x 5 columns]
+14-07-2025 14:57:51 - INFO - Live data streaming started - Mode: simulation, Jumpstart: enabled
+14-07-2025 14:57:51 - INFO - Waiting for initial data buffer to fill...
+14-07-2025 14:57:51 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:51 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:51 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:51 - DEBUG - Found 1 outliers in high using IQR method
+14-07-2025 14:57:51 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:51 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:03:51.666349  1.249116  1.249176  1.249035  1.249036     374
+2025-07-14 13:04:51.666349  1.249036  1.249047  1.249030  1.249046     283
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013     207
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827     188
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+
+[251 rows x 5 columns]
+14-07-2025 14:57:51 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:51 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:57:51 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:57:51 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:03:51.666349  1.249116  1.249176  1.249035  1.249036     374
+2025-07-14 13:04:51.666349  1.249036  1.249047  1.249030  1.249046     283
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013     207
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827     188
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+
+[251 rows x 5 columns]
+14-07-2025 14:57:51 - INFO - Enhanced FeatureGenerator initialized with 251 rows
+14-07-2025 14:57:51 - INFO - Model requires 54 features
+14-07-2025 14:57:51 - INFO - Generating 54 selected features...
+14-07-2025 14:57:51 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:51 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:51 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:51 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:51 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:51 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:51 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:51 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:51 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:51 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:51 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:51 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:51 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:51 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:51 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:51 - INFO - Successfully generated 48 features
+14-07-2025 14:57:51 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:51 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 13:03:51.666349  1.249116  1.249176  ...       1             0
+2025-07-14 13:04:51.666349  1.249036  1.249047  ...       1             0
+2025-07-14 13:05:51.666349  1.249046  1.249052  ...       1             0
+2025-07-14 13:06:51.666349  1.249013  1.249033  ...       1             0
+2025-07-14 13:57:51.759041  1.250000  1.250035  ...       0             0
+
+[251 rows x 53 columns]
+14-07-2025 14:57:51 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:51 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:51 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:51 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:51 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 251
+14-07-2025 14:57:51 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:51 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:51 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:51 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:51 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:51 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:51 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:51 - DEBUG - New market data received and processed
+14-07-2025 14:57:51 - INFO - Live data feed ready for trading
+14-07-2025 14:57:51 - INFO - Position monitoring started
+14-07-2025 14:57:51 - INFO - Position monitoring started successfully
+14-07-2025 14:57:51 - DEBUG - Trading loop iteration 1
+14-07-2025 14:57:51 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+14-07-2025 14:57:51 - ERROR - Error generating signals: could not convert string to float: 'mid_month'
+14-07-2025 14:57:52 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:04:51.666349  1.249036  1.249047  1.249030  1.249046   283.0
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013   207.0
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827   188.0
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951   430.0
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803   186.0
+
+[252 rows x 5 columns]
+14-07-2025 14:57:52 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:52 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:52 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:52 - DEBUG - Found 2 outliers in high using IQR method
+14-07-2025 14:57:52 - DEBUG - Found 1 outliers in close using IQR method
+14-07-2025 14:57:52 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:52 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:04:51.666349  1.249036  1.249047  1.249030  1.249046     283
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013     207
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248829     188
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+
+[252 rows x 5 columns]
+14-07-2025 14:57:52 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:52 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:57:52 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:57:52 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:04:51.666349  1.249036  1.249047  1.249030  1.249046     283
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013     207
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248829     188
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+
+[252 rows x 5 columns]
+14-07-2025 14:57:52 - INFO - Enhanced FeatureGenerator initialized with 252 rows
+14-07-2025 14:57:52 - INFO - Model requires 54 features
+14-07-2025 14:57:52 - INFO - Generating 54 selected features...
+14-07-2025 14:57:52 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:52 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:52 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:52 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:52 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:52 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:52 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:52 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:52 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:52 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:52 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:52 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:52 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:52 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:52 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:52 - INFO - Successfully generated 48 features
+14-07-2025 14:57:52 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:52 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 13:04:51.666349  1.249036  1.249047  ...       1             0
+2025-07-14 13:05:51.666349  1.249046  1.249052  ...       1             0
+2025-07-14 13:06:51.666349  1.249013  1.249033  ...       1             0
+2025-07-14 13:57:51.759041  1.250000  1.250035  ...       0             0
+2025-07-14 13:58:51.759041  1.249951  1.250021  ...       0             0
+
+[252 rows x 53 columns]
+14-07-2025 14:57:52 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:52 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:52 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:52 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:52 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 252
+14-07-2025 14:57:52 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:52 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:52 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:52 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:52 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:52 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:52 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:52 - DEBUG - New market data received and processed
+14-07-2025 14:57:53 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013   207.0
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827   188.0
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951   430.0
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803   186.0
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642   455.0
+
+[253 rows x 5 columns]
+14-07-2025 14:57:53 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:53 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:53 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:53 - DEBUG - Found 2 outliers in high using IQR method
+14-07-2025 14:57:53 - DEBUG - Found 1 outliers in close using IQR method
+14-07-2025 14:57:53 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:53 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013     207
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248837     188
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+
+[253 rows x 5 columns]
+14-07-2025 14:57:53 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:53 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:57:53 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:57:53 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:05:51.666349  1.249046  1.249052  1.248985  1.249013     207
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248837     188
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+
+[253 rows x 5 columns]
+14-07-2025 14:57:53 - INFO - Enhanced FeatureGenerator initialized with 253 rows
+14-07-2025 14:57:53 - INFO - Model requires 54 features
+14-07-2025 14:57:53 - INFO - Generating 54 selected features...
+14-07-2025 14:57:53 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:53 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:53 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:53 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:53 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:53 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:53 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:53 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:53 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:53 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:53 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:53 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:53 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:53 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:53 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:53 - INFO - Successfully generated 48 features
+14-07-2025 14:57:53 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:53 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 13:05:51.666349  1.249046  1.249052  ...       1             0
+2025-07-14 13:06:51.666349  1.249013  1.249033  ...       1             0
+2025-07-14 13:57:51.759041  1.250000  1.250035  ...       0             0
+2025-07-14 13:58:51.759041  1.249951  1.250021  ...       0             0
+2025-07-14 13:59:51.759041  1.249803  1.249804  ...       0             0
+
+[253 rows x 53 columns]
+14-07-2025 14:57:53 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:53 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:53 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:53 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:53 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 253
+14-07-2025 14:57:53 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:53 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:53 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:53 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:53 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:53 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:53 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:53 - DEBUG - New market data received and processed
+14-07-2025 14:57:53 - DEBUG - Trading loop iteration 2
+14-07-2025 14:57:53 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+14-07-2025 14:57:53 - ERROR - Error generating signals: could not convert string to float: 'mid_month'
+14-07-2025 14:57:54 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827   188.0
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951   430.0
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803   186.0
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642   455.0
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587   479.0
+
+[254 rows x 5 columns]
+14-07-2025 14:57:54 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:54 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:54 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:54 - DEBUG - Found 2 outliers in high using IQR method
+14-07-2025 14:57:54 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:54 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827     188
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+
+[254 rows x 5 columns]
+14-07-2025 14:57:54 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:54 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:57:54 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:57:54 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:06:51.666349  1.249013  1.249033  1.248791  1.248827     188
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+
+[254 rows x 5 columns]
+14-07-2025 14:57:54 - INFO - Enhanced FeatureGenerator initialized with 254 rows
+14-07-2025 14:57:54 - INFO - Model requires 54 features
+14-07-2025 14:57:54 - INFO - Generating 54 selected features...
+14-07-2025 14:57:54 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:54 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:54 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:54 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:54 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:54 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:54 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:54 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:54 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:54 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:54 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:54 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:54 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:54 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:54 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:54 - INFO - Successfully generated 48 features
+14-07-2025 14:57:54 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:54 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 13:06:51.666349  1.249013  1.249033  ...       1             0
+2025-07-14 13:57:51.759041  1.250000  1.250035  ...       0             0
+2025-07-14 13:58:51.759041  1.249951  1.250021  ...       0             0
+2025-07-14 13:59:51.759041  1.249803  1.249804  ...       0             0
+2025-07-14 14:00:51.759041  1.249642  1.249701  ...       0             0
+
+[254 rows x 53 columns]
+14-07-2025 14:57:54 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:54 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:54 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:54 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:54 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 254
+14-07-2025 14:57:54 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:54 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:54 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:54 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:54 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:54 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:54 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:54 - DEBUG - New market data received and processed
+14-07-2025 14:57:55 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951   430.0
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803   186.0
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642   455.0
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587   479.0
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524   249.0
+
+[255 rows x 5 columns]
+14-07-2025 14:57:55 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:55 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:55 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:55 - DEBUG - Found 2 outliers in high using IQR method
+14-07-2025 14:57:55 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:55 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+
+[255 rows x 5 columns]
+14-07-2025 14:57:55 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:55 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:57:55 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:57:55 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:57:51.759041  1.250000  1.250035  1.249912  1.249951     430
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+
+[255 rows x 5 columns]
+14-07-2025 14:57:55 - INFO - Enhanced FeatureGenerator initialized with 255 rows
+14-07-2025 14:57:55 - INFO - Model requires 54 features
+14-07-2025 14:57:55 - INFO - Generating 54 selected features...
+14-07-2025 14:57:55 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:55 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:55 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:55 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:55 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:55 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:55 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:55 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:55 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:55 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:55 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:55 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:55 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:55 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:55 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:55 - INFO - Successfully generated 48 features
+14-07-2025 14:57:55 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:55 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 13:57:51.759041  1.250000  1.250035  ...       0             0
+2025-07-14 13:58:51.759041  1.249951  1.250021  ...       0             0
+2025-07-14 13:59:51.759041  1.249803  1.249804  ...       0             0
+2025-07-14 14:00:51.759041  1.249642  1.249701  ...       0             0
+2025-07-14 14:01:51.759041  1.249587  1.249604  ...       0             0
+
+[255 rows x 53 columns]
+14-07-2025 14:57:55 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:55 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:55 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:55 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:55 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 255
+14-07-2025 14:57:55 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:55 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:55 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:55 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:55 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:55 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:55 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:55 - DEBUG - New market data received and processed
+14-07-2025 14:57:55 - DEBUG - Trading loop iteration 3
+14-07-2025 14:57:55 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+14-07-2025 14:57:55 - ERROR - Error generating signals: could not convert string to float: 'mid_month'
+14-07-2025 14:57:56 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803   186.0
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642   455.0
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587   479.0
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524   249.0
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534   481.0
+
+[256 rows x 5 columns]
+14-07-2025 14:57:56 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:56 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:56 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:56 - DEBUG - Found 2 outliers in high using IQR method
+14-07-2025 14:57:56 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:56 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+
+[256 rows x 5 columns]
+14-07-2025 14:57:56 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:56 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:57:56 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:57:56 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:58:51.759041  1.249951  1.250021  1.249782  1.249803     186
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+
+[256 rows x 5 columns]
+14-07-2025 14:57:56 - INFO - Enhanced FeatureGenerator initialized with 256 rows
+14-07-2025 14:57:56 - INFO - Model requires 54 features
+14-07-2025 14:57:56 - INFO - Generating 54 selected features...
+14-07-2025 14:57:56 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:56 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:56 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:56 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:56 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:56 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:56 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:56 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:56 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:56 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:56 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:56 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:56 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:56 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:56 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:56 - INFO - Successfully generated 48 features
+14-07-2025 14:57:56 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:56 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 13:58:51.759041  1.249951  1.250021  ...       0             0
+2025-07-14 13:59:51.759041  1.249803  1.249804  ...       0             0
+2025-07-14 14:00:51.759041  1.249642  1.249701  ...       0             0
+2025-07-14 14:01:51.759041  1.249587  1.249604  ...       0             0
+2025-07-14 14:02:51.759041  1.249524  1.249553  ...       0             0
+
+[256 rows x 53 columns]
+14-07-2025 14:57:56 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:56 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:56 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:56 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:56 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 256
+14-07-2025 14:57:56 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:56 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:56 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:56 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:56 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:56 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:56 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:56 - DEBUG - New market data received and processed
+14-07-2025 14:57:57 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642   455.0
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587   479.0
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524   249.0
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534   481.0
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221   359.0
+
+[257 rows x 5 columns]
+14-07-2025 14:57:57 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:57 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:57 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:57 - DEBUG - Found 3 outliers in high using IQR method
+14-07-2025 14:57:57 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:57 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+
+[257 rows x 5 columns]
+14-07-2025 14:57:57 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:57 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:57:57 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:57:57 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 13:59:51.759041  1.249803  1.249804  1.249620  1.249642     455
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+
+[257 rows x 5 columns]
+14-07-2025 14:57:57 - INFO - Enhanced FeatureGenerator initialized with 257 rows
+14-07-2025 14:57:57 - INFO - Model requires 54 features
+14-07-2025 14:57:57 - INFO - Generating 54 selected features...
+14-07-2025 14:57:57 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:57 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:57 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:57 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:57 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:57 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:57 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:57 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:57 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:57 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:57 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:57 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:57 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:57 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:57 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:57 - INFO - Successfully generated 48 features
+14-07-2025 14:57:57 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:57 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 13:59:51.759041  1.249803  1.249804  ...       0             0
+2025-07-14 14:00:51.759041  1.249642  1.249701  ...       0             0
+2025-07-14 14:01:51.759041  1.249587  1.249604  ...       0             0
+2025-07-14 14:02:51.759041  1.249524  1.249553  ...       0             0
+2025-07-14 14:03:51.759041  1.249534  1.249560  ...       0             0
+
+[257 rows x 53 columns]
+14-07-2025 14:57:57 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:57 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:57 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:57 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:57 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 257
+14-07-2025 14:57:57 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:57 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:57 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:57 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:57 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:57 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:57 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:57 - DEBUG - New market data received and processed
+14-07-2025 14:57:57 - DEBUG - Trading loop iteration 4
+14-07-2025 14:57:57 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+14-07-2025 14:57:57 - ERROR - Error generating signals: could not convert string to float: 'mid_month'
+14-07-2025 14:57:58 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587   479.0
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524   249.0
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534   481.0
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221   359.0
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111    79.0
+
+[258 rows x 5 columns]
+14-07-2025 14:57:58 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:58 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:58 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:58 - DEBUG - Found 3 outliers in high using IQR method
+14-07-2025 14:57:58 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:58 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111      79
+
+[258 rows x 5 columns]
+14-07-2025 14:57:58 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:58 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:57:58 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:57:58 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:00:51.759041  1.249642  1.249701  1.249549  1.249587     479
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111      79
+
+[258 rows x 5 columns]
+14-07-2025 14:57:58 - INFO - Enhanced FeatureGenerator initialized with 258 rows
+14-07-2025 14:57:58 - INFO - Model requires 54 features
+14-07-2025 14:57:58 - INFO - Generating 54 selected features...
+14-07-2025 14:57:58 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:58 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:58 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:58 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:58 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:58 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:58 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:58 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:58 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:58 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:58 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:58 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:58 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:58 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:58 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:58 - INFO - Successfully generated 48 features
+14-07-2025 14:57:58 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:58 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 14:00:51.759041  1.249642  1.249701  ...       0             0
+2025-07-14 14:01:51.759041  1.249587  1.249604  ...       0             0
+2025-07-14 14:02:51.759041  1.249524  1.249553  ...       0             0
+2025-07-14 14:03:51.759041  1.249534  1.249560  ...       0             0
+2025-07-14 14:04:51.759041  1.249221  1.249230  ...       0             0
+
+[258 rows x 53 columns]
+14-07-2025 14:57:58 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:58 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:58 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:58 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:58 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 258
+14-07-2025 14:57:58 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:58 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:58 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:58 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:58 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:58 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:58 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:58 - DEBUG - New market data received and processed
+14-07-2025 14:57:59 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524   249.0
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534   481.0
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221   359.0
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111    79.0
+2025-07-14 14:05:51.759041  1.249111  1.249116  1.248961  1.248986   307.0
+
+[259 rows x 5 columns]
+14-07-2025 14:57:59 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:57:59 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:57:59 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:57:59 - DEBUG - Found 2 outliers in high using IQR method
+14-07-2025 14:57:59 - INFO - No OHLC relationship issues found!
+14-07-2025 14:57:59 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111      79
+2025-07-14 14:05:51.759041  1.249111  1.249116  1.248961  1.248986     307
+
+[259 rows x 5 columns]
+14-07-2025 14:57:59 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:57:59 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:57:59 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:57:59 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:01:51.759041  1.249587  1.249604  1.249497  1.249524     249
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111      79
+2025-07-14 14:05:51.759041  1.249111  1.249116  1.248961  1.248986     307
+
+[259 rows x 5 columns]
+14-07-2025 14:57:59 - INFO - Enhanced FeatureGenerator initialized with 259 rows
+14-07-2025 14:57:59 - INFO - Model requires 54 features
+14-07-2025 14:57:59 - INFO - Generating 54 selected features...
+14-07-2025 14:57:59 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:57:59 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:57:59 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:57:59 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:57:59 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:57:59 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:57:59 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:57:59 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:57:59 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:57:59 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:57:59 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:57:59 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:57:59 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:57:59 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:57:59 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:57:59 - INFO - Successfully generated 48 features
+14-07-2025 14:57:59 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:57:59 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 14:01:51.759041  1.249587  1.249604  ...       0             0
+2025-07-14 14:02:51.759041  1.249524  1.249553  ...       0             0
+2025-07-14 14:03:51.759041  1.249534  1.249560  ...       0             0
+2025-07-14 14:04:51.759041  1.249221  1.249230  ...       0             0
+2025-07-14 14:05:51.759041  1.249111  1.249116  ...       0             0
+
+[259 rows x 53 columns]
+14-07-2025 14:57:59 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:57:59 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:57:59 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:57:59 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:57:59 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 259
+14-07-2025 14:57:59 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:57:59 - INFO - Forward fill imputed 0 values
+14-07-2025 14:57:59 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:57:59 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:57:59 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:57:59 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:57:59 - DEBUG - After transformation: 54 columns
+14-07-2025 14:57:59 - DEBUG - New market data received and processed
+14-07-2025 14:57:59 - DEBUG - Trading loop iteration 5
+14-07-2025 14:57:59 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+14-07-2025 14:57:59 - ERROR - Error generating signals: could not convert string to float: 'mid_month'
+14-07-2025 14:58:00 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534   481.0
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221   359.0
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111    79.0
+2025-07-14 14:05:51.759041  1.249111  1.249116  1.248961  1.248986   307.0
+2025-07-14 14:06:51.759041  1.248986  1.248987  1.248958  1.248969   434.0
+
+[260 rows x 5 columns]
+14-07-2025 14:58:00 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:58:00 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:58:00 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:58:00 - DEBUG - Found 2 outliers in high using IQR method
+14-07-2025 14:58:00 - INFO - No OHLC relationship issues found!
+14-07-2025 14:58:00 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111      79
+2025-07-14 14:05:51.759041  1.249111  1.249116  1.248961  1.248986     307
+2025-07-14 14:06:51.759041  1.248986  1.248987  1.248958  1.248969     434
+
+[260 rows x 5 columns]
+14-07-2025 14:58:00 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:58:00 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:58:00 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:58:00 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:02:51.759041  1.249524  1.249553  1.249524  1.249534     481
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111      79
+2025-07-14 14:05:51.759041  1.249111  1.249116  1.248961  1.248986     307
+2025-07-14 14:06:51.759041  1.248986  1.248987  1.248958  1.248969     434
+
+[260 rows x 5 columns]
+14-07-2025 14:58:00 - INFO - Enhanced FeatureGenerator initialized with 260 rows
+14-07-2025 14:58:00 - INFO - Model requires 54 features
+14-07-2025 14:58:00 - INFO - Generating 54 selected features...
+14-07-2025 14:58:00 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:58:00 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:58:00 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:58:00 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:58:00 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:58:00 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:58:00 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:58:00 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:58:00 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:58:00 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:58:00 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:58:00 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:58:00 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:58:00 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:58:00 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:58:00 - INFO - Successfully generated 48 features
+14-07-2025 14:58:00 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:58:00 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 14:02:51.759041  1.249524  1.249553  ...       0             0
+2025-07-14 14:03:51.759041  1.249534  1.249560  ...       0             0
+2025-07-14 14:04:51.759041  1.249221  1.249230  ...       0             0
+2025-07-14 14:05:51.759041  1.249111  1.249116  ...       0             0
+2025-07-14 14:06:51.759041  1.248986  1.248987  ...       0             0
+
+[260 rows x 53 columns]
+14-07-2025 14:58:00 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:58:00 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:58:00 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:58:00 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:58:00 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 260
+14-07-2025 14:58:00 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:58:00 - INFO - Forward fill imputed 0 values
+14-07-2025 14:58:00 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:58:00 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:58:00 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:58:00 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:58:00 - DEBUG - After transformation: 54 columns
+14-07-2025 14:58:00 - DEBUG - New market data received and processed
+14-07-2025 14:58:01 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111   448.0
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213   202.0
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185   377.0
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960    97.0
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942   130.0
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221   359.0
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111    79.0
+2025-07-14 14:05:51.759041  1.249111  1.249116  1.248961  1.248986   307.0
+2025-07-14 14:06:51.759041  1.248986  1.248987  1.248958  1.248969   434.0
+2025-07-14 14:07:51.759041  1.248969  1.248974  1.248820  1.248851   426.0
+
+[261 rows x 5 columns]
+14-07-2025 14:58:01 - INFO - ---------- Running Data Cleaner ----------
+14-07-2025 14:58:01 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+14-07-2025 14:58:01 - ERROR - No 'date' column found in the dataframe
+14-07-2025 14:58:01 - DEBUG - Found 2 outliers in high using IQR method
+14-07-2025 14:58:01 - INFO - No OHLC relationship issues found!
+14-07-2025 14:58:01 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111      79
+2025-07-14 14:05:51.759041  1.249111  1.249116  1.248961  1.248986     307
+2025-07-14 14:06:51.759041  1.248986  1.248987  1.248958  1.248969     434
+2025-07-14 14:07:51.759041  1.248969  1.248974  1.248820  1.248851     426
+
+[261 rows x 5 columns]
+14-07-2025 14:58:01 - INFO - ---------- Running Data Validator ----------
+14-07-2025 14:58:01 - WARNING - Data validation failed: [{'type': 'Time Series Gaps', 'description': 'Found 1 large gaps in time series', 'details': {'2025-07-14 13:57:51.759041': '0 days 00:51:00.092692'}}]
+14-07-2025 14:58:01 - WARNING - Proceeding with feature generation despite validation issues (live streaming mode)
+14-07-2025 14:58:01 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  1.249987  1.250111     448
+2025-07-14 08:58:51.666349  1.250111  1.250274  1.250101  1.250213     202
+2025-07-14 08:59:51.666349  1.250213  1.250233  1.250158  1.250185     377
+2025-07-14 09:00:51.666349  1.250185  1.250217  1.249911  1.249960      97
+2025-07-14 09:01:51.666349  1.249960  1.250015  1.249938  1.249942     130
+...                              ...       ...       ...       ...     ...
+2025-07-14 14:03:51.759041  1.249534  1.249560  1.249205  1.249221     359
+2025-07-14 14:04:51.759041  1.249221  1.249230  1.249099  1.249111      79
+2025-07-14 14:05:51.759041  1.249111  1.249116  1.248961  1.248986     307
+2025-07-14 14:06:51.759041  1.248986  1.248987  1.248958  1.248969     434
+2025-07-14 14:07:51.759041  1.248969  1.248974  1.248820  1.248851     426
+
+[261 rows x 5 columns]
+14-07-2025 14:58:01 - INFO - Enhanced FeatureGenerator initialized with 261 rows
+14-07-2025 14:58:01 - INFO - Model requires 54 features
+14-07-2025 14:58:01 - INFO - Generating 54 selected features...
+14-07-2025 14:58:01 - INFO - Basic columns already available: ['open', 'high', 'low', 'close', 'volume']
+14-07-2025 14:58:01 - WARNING - Cannot generate features: ['close_og']
+14-07-2025 14:58:01 - DEBUG - Execution order: ['day_of_week', 'average_true_range', 'time_of_week', 'time_of_day', 'time_of_month', 'fx_trading_sessions', 'fx_activity_profile', 'volatility_regimes', 'future_atr_features', 'session_timing_features', 'session_atr_features', 'session_transition_features']
+14-07-2025 14:58:01 - DEBUG - Executing generator: day_of_week
+14-07-2025 14:58:01 - DEBUG - Executing generator: average_true_range
+14-07-2025 14:58:01 - DEBUG - Executing generator: time_of_week
+14-07-2025 14:58:01 - DEBUG - Executing generator: time_of_day
+14-07-2025 14:58:01 - DEBUG - Executing generator: time_of_month
+14-07-2025 14:58:01 - DEBUG - Executing generator: fx_trading_sessions
+14-07-2025 14:58:01 - DEBUG - Executing generator: fx_activity_profile
+14-07-2025 14:58:01 - DEBUG - Executing generator: volatility_regimes
+14-07-2025 14:58:01 - DEBUG - Executing generator: future_atr_features
+14-07-2025 14:58:01 - DEBUG - Executing generator: session_timing_features
+14-07-2025 14:58:01 - DEBUG - Executing generator: session_atr_features
+14-07-2025 14:58:01 - DEBUG - Executing generator: session_transition_features
+14-07-2025 14:58:01 - INFO - Successfully generated 48 features
+14-07-2025 14:58:01 - DEBUG - After feature generation: 53 columns
+14-07-2025 14:58:01 - DEBUG - Loading                                 open      high  ...  pre_ny  london_close
+date                                            ...                      
+2025-07-14 08:57:51.666349  1.250000  1.250144  ...       0             0
+2025-07-14 08:58:51.666349  1.250111  1.250274  ...       0             0
+2025-07-14 08:59:51.666349  1.250213  1.250233  ...       0             0
+2025-07-14 09:00:51.666349  1.250185  1.250217  ...       0             0
+2025-07-14 09:01:51.666349  1.249960  1.250015  ...       0             0
+...                              ...       ...  ...     ...           ...
+2025-07-14 14:03:51.759041  1.249534  1.249560  ...       0             0
+2025-07-14 14:04:51.759041  1.249221  1.249230  ...       0             0
+2025-07-14 14:05:51.759041  1.249111  1.249116  ...       0             0
+2025-07-14 14:06:51.759041  1.248986  1.248987  ...       0             0
+2025-07-14 14:07:51.759041  1.248969  1.248974  ...       0             0
+
+[261 rows x 53 columns]
+14-07-2025 14:58:01 - INFO - ---------- Running Feature Transformer ----------
+14-07-2025 14:58:01 - WARNING - Dataset has features containing empty values. Will drop relevant features.
+14-07-2025 14:58:01 - DEBUG - Starting to filter features based on missing values...
+14-07-2025 14:58:01 - DEBUG - No columns exceeded NaN threshold
+14-07-2025 14:58:01 - INFO - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 261
+14-07-2025 14:58:01 - INFO - Applying forward fill to 9 columns with scattered NaNs
+14-07-2025 14:58:01 - INFO - Forward fill imputed 0 values
+14-07-2025 14:58:01 - WARNING - After forward fill, 210 NaN values remain
+14-07-2025 14:58:01 - WARNING - These are likely at the beginning of the series - consider additional treatment
+14-07-2025 14:58:01 - DEBUG - Columns still containing NaNs: ['atr', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_change', 'future_atr', 'session_atr_mean', 'session_atr_std']
+14-07-2025 14:58:01 - INFO - Filled beginning NaNs with first valid values
+14-07-2025 14:58:01 - DEBUG - After transformation: 54 columns
+14-07-2025 14:58:01 - DEBUG - New market data received and processed
+14-07-2025 14:58:01 - INFO - Trading loop completed after 5 iterations
+14-07-2025 14:58:01 - INFO - Session anomaly strategy execution completed
+14-07-2025 14:58:01 - INFO - Stopping live data streaming...
+14-07-2025 14:58:02 - INFO - Live data streaming stopped
+14-07-2025 14:58:02 - INFO - Live data streaming stopped
+14-07-2025 14:58:02 - INFO - Stopping position monitoring...
+14-07-2025 14:58:02 - INFO - Position monitoring stopped
+14-07-2025 14:58:02 - INFO - Position monitoring stopped
+14-07-2025 14:58:02 - INFO - Strategy results saved to: /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/strategy/strategy_results.json
+14-07-2025 14:58:02 - INFO - Strategy execution completed: completed
