@@ -42,6 +42,9 @@ class FeatureTransformer(BaseProcessor):
         # Handle duplicates
         self.handle_duplicates()
         
+        # Encode categorical variables
+        self.encode_categorical_variables()
+        
         # Normalization
         self.normalize(preserve_original=preserve_original, window=window)
         
@@ -184,9 +187,52 @@ class FeatureTransformer(BaseProcessor):
                     self.df.columns.values[idx] = new_name
                     logging.debug(f"Renamed duplicate column '{col}' to '{new_name}'")
     
+    def encode_categorical_variables(self):
+        """
+        Encode categorical variables to numeric values.
+        Handles specific categorical features that need to be converted to numeric format.
+        """
+        # Identify categorical columns
+        categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns.tolist()
+        
+        if not categorical_cols:
+            logging.debug("No categorical columns found to encode")
+            return
+        
+        logging.info(f"Encoding {len(categorical_cols)} categorical columns: {categorical_cols}")
+        
+        # Handle month_period specifically with label encoding
+        if 'month_period' in categorical_cols:
+            # Define the mapping for month_period
+            month_period_mapping = {
+                'start_of_month': 0,
+                'mid_month': 1,
+                'end_of_month': 2
+            }
+            
+            # Apply the mapping
+            self.df['month_period'] = self.df['month_period'].map(month_period_mapping)
+            logging.debug("Encoded month_period: start_of_month=0, mid_month=1, end_of_month=2")
+            categorical_cols.remove('month_period')
+        
+        # Handle any other categorical columns (if they exist)
+        for col in categorical_cols:
+            if col not in self.df.columns:
+                continue
+                
+            # Use label encoding for other categorical features
+            unique_values = self.df[col].unique()
+            if len(unique_values) <= 10:  # Only for small number of categories
+                value_mapping = {val: idx for idx, val in enumerate(unique_values)}
+                self.df[col] = self.df[col].map(value_mapping)
+                logging.debug(f"Label encoded column '{col}' with mapping: {value_mapping}")
+            else:
+                logging.warning(f"Skipping categorical column '{col}' with too many unique values ({len(unique_values)})")
+    
     def normalize(self, preserve_original=False, window=20):
         """Perform normalization. Excludes columns that starts with 'target_ (among aother things).'"""
         # First identify categorical columns to exclude from normalization
+        # Note: After encoding, most categorical columns are now numeric
         categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns.tolist()
         
         # Also identify binary/regime columns (that might be numeric but shouldn't be normalized)
@@ -196,8 +242,12 @@ class FeatureTransformer(BaseProcessor):
         # Exclude target columns from normalization
         target_columns = [col for col in self.df.columns if col.startswith('target_')]
         
+        # Exclude encoded categorical features that should remain as discrete values
+        # month_period is now numeric (0, 1, 2) but should be treated as discrete, not normalized
+        discrete_encoded_features = ['month_period']
+        
         # Combine all exclusions
-        exclude_from_normalization = categorical_cols + regime_indicators + target_columns
+        exclude_from_normalization = categorical_cols + regime_indicators + target_columns + discrete_encoded_features
         
         # Group 1: Price data (OHLC) - Z-score normalize
         price_cols = ['open', 'high', 'low', 'close']
