@@ -204,6 +204,81 @@ class RiskManager:
         
         return close_info
     
+    def can_open_position(self, signal: Dict[str, Any]) -> bool:
+        """
+        Check if a position can be opened based on the signal and risk management rules
+        
+        Args:
+            signal: Trading signal dictionary containing confidence, direction, symbol, etc.
+            
+        Returns:
+            Boolean indicating if position can be opened
+        """
+        try:
+            # Extract signal information
+            signal_strength = signal.get('confidence', 0.5)
+            current_price = signal.get('current_price', 1.0)
+            
+            # Use placeholder values for validation - in practice these would come from portfolio state
+            account_balance = 10000.0  # This should ideally come from account state
+            current_positions = []  # This should come from position manager
+            
+            # Calculate position size
+            position_info = self.calculate_position_size(
+                signal_strength=signal_strength,
+                account_balance=account_balance,
+                current_price=current_price
+            )
+            
+            # Validate the trade
+            validation_result = self.validate_trade(
+                position_info=position_info,
+                current_positions=current_positions,
+                account_balance=account_balance
+            )
+            
+            return validation_result['approved']
+            
+        except Exception as e:
+            logging.error(f"Error in can_open_position: {e}")
+            return False
+
+    def calculate_stop_loss(self, signal: Dict[str, Any]) -> float:
+        """
+        Calculate stop loss price for a signal
+        
+        Args:
+            signal: Trading signal dictionary
+            
+        Returns:
+            Stop loss price
+        """
+        current_price = signal.get('current_price', 1.0)
+        direction = signal.get('direction', 'BUY')
+        
+        if direction == 'BUY':
+            return current_price * (1 - self.stop_loss_pct)
+        else:  # SELL
+            return current_price * (1 + self.stop_loss_pct)
+
+    def calculate_take_profit(self, signal: Dict[str, Any]) -> float:
+        """
+        Calculate take profit price for a signal
+        
+        Args:
+            signal: Trading signal dictionary
+            
+        Returns:
+            Take profit price
+        """
+        current_price = signal.get('current_price', 1.0)
+        direction = signal.get('direction', 'BUY')
+        
+        if direction == 'BUY':
+            return current_price * (1 + self.take_profit_pct)
+        else:  # SELL
+            return current_price * (1 - self.take_profit_pct)
+
     def get_risk_summary(self) -> Dict[str, Any]:
         """
         Get current risk summary

@@ -501,7 +501,10 @@ class SessionAnomalyStrategy(BaseStrategy):
                 
                 # Calculate position size
                 position_size = self.risk_manager.calculate_position_size(
-                    signal, account_balance=self._get_account_balance())
+                    signal_strength=signal.get('confidence', 0.5),
+                    account_balance=self._get_account_balance(),
+                    current_price=signal.get('current_price', 1.0)
+                )
                 
                 # Create order details
                 order_details = {

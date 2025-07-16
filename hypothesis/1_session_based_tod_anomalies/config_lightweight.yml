@@ -8,20 +8,12 @@ strategy:
     data:
         symbol: GBPUSD
         timeframe: MINUTE
-        buffer_size: 100       # Much smaller buffer for testing
+        buffer_size: 350       # Much smaller buffer for testing
         feature_window: 30     # Minimum for validation (down from 35)
         dry_run: true          # Pure simulation mode
         jumpstart: true        # Preload buffer with historical data
         use_websocket: false   # Use simulation data
-        selected_features: [   # Only essential features - no seasonal decomposition
-            "sma_5", "sma_10", "sma_20", "ema_5", "ema_10", "ema_20",
-            "roc_1", "roc_5", "atr", "upper_band", "lower_band", 
-            "vma_7", "relative_volume_7", "rsi_14", "macd_line",
-            "hour_sin", "hour_cos", "day_of_week_sin", "day_of_week_cos",
-            "is_monday", "is_friday", "asian_session", "london_session", 
-            "ny_session", "primary_session", "session_intensity",
-            "volatility_short", "volatility_long", "returns"
-        ]
+        selected_features: null
 
     execution:
         max_loops: 3         # Very short for testing 
