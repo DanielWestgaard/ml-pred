@@ -13,7 +13,7 @@ strategy:
         dry_run: false  # Set to false for live WebSocket testing  
         jumpstart: true  # Preload buffer with historical data
         use_websocket: true  # Use WebSocket for real-time data (Capital.com)
-        selected_features: null  # null = use all features
+        selected_features: null
 
     execution:
         max_loops: 10        # Reduced for testing (was 100)
