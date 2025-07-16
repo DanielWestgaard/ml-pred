@@ -90,11 +90,7 @@ class LiveDataManager:
             return True
             
         try:
-            # Jumpstart buffer with historical data if enabled
-            if jumpstart:
-                if not self._jumpstart_buffer(dry_run):
-                    logging.warning("Buffer jumpstart failed, continuing with normal startup")
-            
+            # For live mode, establish broker connection first (needed for jumpstart historical data)
             if not dry_run:
                 if self._use_websocket:
                     # Initialize WebSocket data streaming
@@ -107,6 +103,11 @@ class LiveDataManager:
                     # Use traditional broker connection
                     if not self._connect_broker():
                         return False
+            
+            # Jumpstart buffer with historical data if enabled (now after broker connection)
+            if jumpstart:
+                if not self._jumpstart_buffer(dry_run):
+                    logging.warning("Buffer jumpstart failed, continuing with normal startup")
             
             # Start data processing thread
             self._is_streaming = True
