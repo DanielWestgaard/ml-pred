@@ -547,7 +547,7 @@ class SessionAnomalyStrategy(BaseStrategy):
                             position_id=position_id,
                             symbol=order_details['symbol'],
                             direction=order_details['direction'],
-                            size=order_details['size'],
+                            size=order_details['size_usd'],
                             entry_price=self._get_current_price(order_details['symbol']),
                             stop_loss=order_details.get('stop_loss'),
                             take_profit=order_details.get('take_profit'),
