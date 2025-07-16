@@ -506,19 +506,37 @@ class SessionAnomalyStrategy(BaseStrategy):
                     current_price=signal.get('current_price', 1.0)
                 )
                 
-                # Create order details
+                # Extract order parameters
+                symbol = signal.get('symbol', 'GBPUSD')
+                direction = signal.get('direction', 'BUY')
+                size_usd = position_size.get('position_size_usd', 0)
+                current_price = signal.get('current_price', 1.0)
+                stop_loss = self.risk_manager.calculate_stop_loss(signal)
+                take_profit = self.risk_manager.calculate_take_profit(signal)
+                
+                # Create order details for logging
                 order_details = {
-                    'symbol': signal.get('symbol', 'GBPUSD'),
-                    'direction': signal.get('direction', 'BUY'),
-                    'size': position_size,
+                    'symbol': symbol,
+                    'direction': direction,
+                    'size_usd': size_usd,
+                    'current_price': current_price,
                     'signal_confidence': signal.get('confidence'),
                     'session': signal.get('session'),
-                    'stop_loss': self.risk_manager.calculate_stop_loss(signal),
-                    'take_profit': self.risk_manager.calculate_take_profit(signal)
+                    'stop_loss': stop_loss,
+                    'take_profit': take_profit
                 }
                 
-                # Execute order
-                if self.order_manager.place_order(order_details):
+                # Execute order with correct arguments
+                order_result = self.order_manager.place_order(
+                    symbol=symbol,
+                    direction=direction,
+                    size_usd=size_usd,
+                    current_price=current_price,
+                    stop_loss=stop_loss,
+                    take_profit=take_profit
+                )
+                
+                if order_result and order_result.get('status') == 'executed':
                     position_actions['opened'] += 1
                     logging.info(f"Order placed: {order_details}")
                     
