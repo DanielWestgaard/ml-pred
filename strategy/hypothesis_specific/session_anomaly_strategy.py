@@ -338,7 +338,7 @@ class SessionAnomalyStrategy(BaseStrategy):
         }
         
         try:
-            logging.info("Session anomaly strategy execution started")
+            logging.info(f"{'='*10} Session anomaly strategy execution started {'='*10}")
             
             # 1. Initialize and start live data feed
             if not self._start_live_data_feed():
