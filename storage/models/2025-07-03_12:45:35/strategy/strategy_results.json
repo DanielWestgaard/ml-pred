@@ -1,13 +1,13 @@
 {
     "strategy_type": "session_anomaly",
-    "execution_time": "2025-07-16 13:26:37.170652",
-    "signals_generated": 2,
+    "execution_time": "2025-07-16 14:00:13.549991",
+    "signals_generated": 0,
     "positions_opened": 0,
     "positions_closed": 0,
     "errors": [],
     "session_analysis": {
         "European": {
-            "signals": 2,
+            "signals": 0,
             "trades": 0
         }
     },

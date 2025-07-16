@@ -35,7 +35,12 @@ class ModelMetadataLoader:
             # Add numpy scalar constructor to handle numpy serialization issues
             def numpy_scalar_constructor(loader, node):
                 """Handle numpy scalars in YAML"""
-                value = loader.construct_yaml_object(node, deep=True)
+                try:
+                    # Try new PyYAML API first (v6.0+)
+                    value = loader.construct_yaml_object(node)
+                except TypeError:
+                    # Fall back to old PyYAML API (< v6.0)
+                    value = loader.construct_yaml_object(node, deep=True)
                 # Convert numpy scalars to Python native types
                 if hasattr(value, 'item'):
                     return value.item()
