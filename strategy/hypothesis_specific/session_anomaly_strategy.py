@@ -494,8 +494,37 @@ class SessionAnomalyStrategy(BaseStrategy):
             processed_signals = signals.get('processed_signals', [])
             
             for signal in processed_signals:
+                symbol = signal.get('symbol', 'GBPUSD')
+                direction = signal.get('direction', 'BUY')
+                
+                # Check if we already have a position for this symbol
+                existing_positions = self.position_manager.get_position_by_symbol(symbol)
+                
+                if existing_positions:
+                    # Check if we have a position in the same direction
+                    same_direction_positions = [pos for pos in existing_positions if pos['direction'] == direction]
+                    
+                    if same_direction_positions:
+                        logging.debug(f"Already have {direction} position for {symbol}, skipping new order")
+                        continue
+                    
+                    # Check if we have a position in the opposite direction
+                    opposite_direction_positions = [pos for pos in existing_positions if pos['direction'] != direction]
+                    
+                    if opposite_direction_positions:
+                        # Close opposite position and open new one
+                        for pos in opposite_direction_positions:
+                            current_price = signal.get('current_price', 1.0)
+                            self.position_manager.close_position(
+                                position_id=pos['position_id'],
+                                close_price=current_price,
+                                close_reason='signal_reversal'
+                            )
+                            position_actions['closed'] += 1
+                            logging.info(f"Closed {pos['direction']} position for {symbol} due to signal reversal")
+                
                 # Check risk management
-                if not self.risk_manager.can_open_position(signal):
+                if not self.risk_manager.can_open_position(signal, self.position_manager):
                     logging.debug("Signal rejected by risk management")
                     continue
                 
@@ -538,11 +567,19 @@ class SessionAnomalyStrategy(BaseStrategy):
                 
                 if order_result and order_result.get('status') == 'executed':
                     position_actions['opened'] += 1
-                    logging.info(f"Order placed: {order_details}")
+                    logging.info(f"Order executed: {direction} {symbol} at {current_price}")
+                    
+                    # Add position to position manager
+                    position_id = f"{order_details['symbol']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                    self.position_manager.open_position(
+                        signal_info=signal,
+                        position_size_info=position_size,
+                        current_price=current_price,
+                        symbol=symbol
+                    )
                     
                     # Add position to monitoring
                     if self.position_monitor:
-                        position_id = f"{order_details['symbol']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
                         self.position_monitor.add_position(
                             position_id=position_id,
                             symbol=order_details['symbol'],

@@ -204,12 +204,13 @@ class RiskManager:
         
         return close_info
     
-    def can_open_position(self, signal: Dict[str, Any]) -> bool:
+    def can_open_position(self, signal: Dict[str, Any], position_manager=None) -> bool:
         """
         Check if a position can be opened based on the signal and risk management rules
         
         Args:
             signal: Trading signal dictionary containing confidence, direction, symbol, etc.
+            position_manager: Position manager instance to get current positions
             
         Returns:
             Boolean indicating if position can be opened
@@ -219,9 +220,15 @@ class RiskManager:
             signal_strength = signal.get('confidence', 0.5)
             current_price = signal.get('current_price', 1.0)
             
-            # Use placeholder values for validation - in practice these would come from portfolio state
-            account_balance = 10000.0  # This should ideally come from account state
-            current_positions = []  # This should come from position manager
+            # Get actual position data if available
+            if position_manager:
+                current_positions = position_manager.get_open_positions()
+                # Use placeholder account balance for now - should be integrated with broker
+                account_balance = 10000.0
+            else:
+                # Fallback to placeholder values
+                account_balance = 10000.0
+                current_positions = []
             
             # Calculate position size
             position_info = self.calculate_position_size(
