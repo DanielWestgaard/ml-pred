@@ -109,9 +109,13 @@ class LiveDataManager:
                         return False
             
             # Jumpstart buffer with historical data if enabled (now after broker connection)
-            if jumpstart:
+            # Skip jumpstart if using WebSocket mode since WebSocketDataManager already did it
+            if jumpstart and not self._use_websocket:
                 if not self._jumpstart_buffer(dry_run):
                     logging.warning("Buffer jumpstart failed, continuing with normal startup")
+            elif jumpstart and self._use_websocket:
+                logging.info("Transferring historical data from WebSocketDataManager to LiveDataManager buffer")
+                self._transfer_websocket_buffer_data()
             
             # Start data processing thread
             self._is_streaming = True
@@ -580,29 +584,41 @@ class LiveDataManager:
                 return None
             
             # Convert Capital.com API response to DataFrame format
-            if isinstance(historical_data, dict) and 'prices' in historical_data:
-                prices_data = historical_data['prices']
-                if not prices_data:
-                    logging.error("No price data in historical response")
-                    return None
+            if isinstance(historical_data, dict):
+                # Log the structure for debugging
+                logging.debug(f"Historical data keys: {list(historical_data.keys())}")
                 
-                # Convert to DataFrame
-                df_data = []
-                for price_point in prices_data:
-                    df_data.append({
-                        'date': pd.to_datetime(price_point['snapshotTimeUTC']),
-                        'open': price_point['openPrice']['ask'],
-                        'high': price_point['highPrice']['ask'], 
-                        'low': price_point['lowPrice']['ask'],
-                        'close': price_point['closePrice']['ask'],
-                        'volume': price_point.get('lastTradedVolume', 0)
-                    })
-                
-                df = pd.DataFrame(df_data)
-                df.set_index('date', inplace=True)
-                
-                logging.info(f"Fetched {len(df)} historical data points from broker")
-                return df
+                if 'prices' in historical_data:
+                    prices_data = historical_data['prices']
+                    if not prices_data:
+                        logging.error("No price data in historical response")
+                        return None
+                    
+                    # Convert to DataFrame
+                    df_data = []
+                    for price_point in prices_data:
+                        df_data.append({
+                            'date': pd.to_datetime(price_point['snapshotTimeUTC']),
+                            'open': price_point['openPrice']['ask'],
+                            'high': price_point['highPrice']['ask'], 
+                            'low': price_point['lowPrice']['ask'],
+                            'close': price_point['closePrice']['ask'],
+                            'volume': price_point.get('lastTradedVolume', 0)
+                        })
+                    
+                    df = pd.DataFrame(df_data)
+                    df.set_index('date', inplace=True)
+                    
+                    logging.info(f"Fetched {len(df)} historical data points from broker")
+                    return df
+                else:
+                    # Check if it's an error response
+                    if 'errorCode' in historical_data:
+                        logging.error(f"API Error in historical data: {historical_data['errorCode']}")
+                        return None
+                    else:
+                        logging.error(f"Unexpected historical data format - missing 'prices' key. Keys: {list(historical_data.keys())}")
+                        return None
             else:
                 logging.error(f"Unexpected historical data format: {type(historical_data)}")
                 return None
@@ -618,6 +634,42 @@ class LiveDataManager:
                 callback(data)
             except Exception as e:
                 logging.error(f"Error in data callback: {e}")
+    
+    def _transfer_websocket_buffer_data(self):
+        """Transfer historical data from WebSocketDataManager to LiveDataManager buffer"""
+        try:
+            if not self.websocket_manager:
+                logging.warning("No WebSocket manager available for data transfer")
+                return
+            
+            # Get historical data from WebSocket buffer
+            historical_data = self.websocket_manager.get_buffer_data(
+                symbol=self.symbol, 
+                count=self.buffer_size
+            )
+            
+            if not historical_data:
+                logging.warning("No historical data available in WebSocket buffer")
+                return
+            
+            # Add to LiveDataManager buffer
+            with self._data_lock:
+                for data_point in historical_data:
+                    # Convert from WebSocket format to LiveDataManager format
+                    formatted_data = {
+                        'date': data_point.get('timestamp', data_point.get('date')),
+                        'open': data_point.get('open'),
+                        'high': data_point.get('high'),
+                        'low': data_point.get('low'),
+                        'close': data_point.get('close'),
+                        'volume': data_point.get('volume', 1.0)
+                    }
+                    self.raw_buffer.append(formatted_data)
+            
+            logging.info(f"Transferred {len(historical_data)} historical data points to LiveDataManager buffer")
+            
+        except Exception as e:
+            logging.error(f"Error transferring WebSocket buffer data: {e}")
     
     def get_latest_features(self) -> Optional[pd.DataFrame]:
         """
