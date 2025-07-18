@@ -40,7 +40,7 @@ class ModelTraining():
                 logging.info(f"Model Training was initialized with Hypothesis configuration!")
                 
                 # Loading in all configurations in the provided config.yml
-                configurations = config_loader.load_model_metadata(hypothesis_source).handle_hypothesis_source()
+                configurations = config_loader.load_hypothesis_config(hypothesis_source).handle_hypothesis_source()
                 
                 self.model_type = configurations.get("model_type")
                 

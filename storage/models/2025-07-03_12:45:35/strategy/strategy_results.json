@@ -1,16 +1,16 @@
 {
     "strategy_type": "session_anomaly",
-    "execution_time": "2025-07-12 14:10:45.260430",
+    "execution_time": "2025-07-16 14:00:13.549991",
     "signals_generated": 0,
     "positions_opened": 0,
     "positions_closed": 0,
     "errors": [],
-    "session_analysis": {},
-    "status": "executed",
-    "message": "Session anomaly strategy executed successfully (placeholder)",
-    "recommendations": [
-        "Integrate with live data feed",
-        "Implement position monitoring loop",
-        "Add session transition handling"
-    ]
+    "session_analysis": {
+        "European": {
+            "signals": 0,
+            "trades": 0
+        }
+    },
+    "status": "completed",
+    "total_loops": 5
 }

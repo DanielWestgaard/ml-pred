@@ -34,9 +34,9 @@ class EngineeringPipeline():
         self.output_path = output_path
         
         if hypothesis_source is not None:
-            configurations = config_loader.load_model_metadata(hypothesis_source).handle_hypothesis_source()
+            configurations = config_loader.load_hypothesis_config(hypothesis_source).handle_hypothesis_source()
             self.hypothesis_name = configurations.get('hypothesis_name')
-            raw_dataset = configurations.get('raw_data_source')
+            raw_dataset = configurations.get('data_pipeline_raw_source')
             self.selected_features = configurations.get('features')
         else:
             self.selected_features = None

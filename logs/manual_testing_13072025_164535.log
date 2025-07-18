@@ -1,0 +1,901 @@
+13-07-2025 16:45:35 - INFO - Logging system initialized. Environment: development
+13-07-2025 16:45:35 - INFO - User using pure hypothesis flow!
+13-07-2025 16:45:35 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_minimal.yml
+13-07-2025 16:45:35 - INFO - Loaded hypothesis: session_based_tod_anomalies
+13-07-2025 16:45:35 - DEBUG - Section 'data_pipeline' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Section 'model_training' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Section 'evaluate_model' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 100, 'feature_window': 30, 'dry_run': True, 'jumpstart': True, 'use_websocket': False, 'selected_features': None}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.execution: {'max_loops': 3, 'loop_interval': 2}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.3, 'signal_filters': []}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+13-07-2025 16:45:35 - INFO - Successfully loaded config sections: ['strategy']
+13-07-2025 16:45:35 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_minimal.yml
+13-07-2025 16:45:35 - INFO - Loaded hypothesis: session_based_tod_anomalies
+13-07-2025 16:45:35 - DEBUG - Section 'data_pipeline' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Section 'model_training' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Section 'evaluate_model' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 100, 'feature_window': 30, 'dry_run': True, 'jumpstart': True, 'use_websocket': False, 'selected_features': None}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.execution: {'max_loops': 3, 'loop_interval': 2}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.3, 'signal_filters': []}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+13-07-2025 16:45:35 - INFO - Successfully loaded config sections: ['strategy']
+13-07-2025 16:45:35 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_minimal.yml
+13-07-2025 16:45:35 - INFO - Loaded hypothesis: session_based_tod_anomalies
+13-07-2025 16:45:35 - DEBUG - Section 'data_pipeline' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Section 'model_training' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Section 'evaluate_model' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 100, 'feature_window': 30, 'dry_run': True, 'jumpstart': True, 'use_websocket': False, 'selected_features': None}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.execution: {'max_loops': 3, 'loop_interval': 2}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.3, 'signal_filters': []}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+13-07-2025 16:45:35 - INFO - Successfully loaded config sections: ['strategy']
+13-07-2025 16:45:35 - INFO - ---------- Initializing SessionAnomalyStrategy ----------
+13-07-2025 16:45:35 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+13-07-2025 16:45:35 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-14_17:42:57/model_metadata.yml
+13-07-2025 16:45:35 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-09_22:09:38/model_metadata.yml
+13-07-2025 16:45:35 - ERROR - Error loading metadata: could not determine a constructor for the tag 'tag:yaml.org,2002:python/object/apply:numpy.core.multiarray.scalar'
+  in "/Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-09_20:19:29/model_metadata.yml", line 76, column 21
+13-07-2025 16:45:35 - WARNING - Could not load metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-09_20:19:29: could not determine a constructor for the tag 'tag:yaml.org,2002:python/object/apply:numpy.core.multiarray.scalar'
+  in "/Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-09_20:19:29/model_metadata.yml", line 76, column 21
+13-07-2025 16:45:35 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:27:50/model_metadata.yml
+13-07-2025 16:45:35 - DEBUG - Utility function, get_latest_model(), found the latest trained model: /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35
+13-07-2025 16:45:35 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+13-07-2025 16:45:35 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_minimal.yml
+13-07-2025 16:45:35 - INFO - Loaded hypothesis: session_based_tod_anomalies
+13-07-2025 16:45:35 - DEBUG - Section 'data_pipeline' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Section 'model_training' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Section 'evaluate_model' not found in configuration
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 100, 'feature_window': 30, 'dry_run': True, 'jumpstart': True, 'use_websocket': False, 'selected_features': None}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.execution: {'max_loops': 3, 'loop_interval': 2}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.3, 'signal_filters': []}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+13-07-2025 16:45:35 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+13-07-2025 16:45:35 - INFO - Successfully loaded config sections: ['strategy']
+13-07-2025 16:45:35 - INFO - Signal processor initialized with confidence threshold: 0.3
+13-07-2025 16:45:35 - INFO - Risk manager initialized - Max position: 2.0%, Stop loss: 1.0%, Max drawdown: 5.0%
+13-07-2025 16:45:35 - INFO - Position manager initialized - Tracking: detailed, Max positions: 3
+13-07-2025 16:45:35 - INFO - Running in dry run mode - no actual orders will be placed
+13-07-2025 16:45:35 - INFO - Order manager initialized - Broker: capital_com, Order type: market, Dry run: True
+13-07-2025 16:45:35 - INFO - LiveDataManager initialized - Symbol: GBPUSD, Timeframe: MINUTE, Buffer: 100
+13-07-2025 16:45:35 - INFO - Live data manager initialized
+13-07-2025 16:45:35 - INFO - Position monitor initialized - Update interval: 1.0s
+13-07-2025 16:45:35 - INFO - Position monitor initialized
+13-07-2025 16:45:35 - INFO - Session anomaly strategy initialized
+13-07-2025 16:45:35 - INFO - Running strategy for hypothesis type: session_based_tod_anomalies
+13-07-2025 16:45:35 - INFO - Starting strategy execution for session_based_tod_anomalies
+13-07-2025 16:45:35 - INFO - Session anomaly strategy execution started
+13-07-2025 16:45:35 - INFO - Jumpstarting buffer with historical data...
+13-07-2025 16:45:35 - INFO - Generated 100 simulated historical data points for jumpstart
+13-07-2025 16:45:35 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:45:35.364140  1.250000  1.250269  1.249993  1.250241   357.0
+2025-07-13 14:46:35.364140  1.250241  1.250242  1.250201  1.250217    66.0
+2025-07-13 14:47:35.364140  1.250217  1.250248  1.250166  1.250214    74.0
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366   281.0
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340   479.0
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:20:35.364140  1.249729  1.249921  1.249703  1.249869   293.0
+2025-07-13 16:21:35.364140  1.249869  1.250031  1.249844  1.250023   256.0
+2025-07-13 16:22:35.364140  1.250023  1.250233  1.249991  1.250229   272.0
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254   258.0
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254    63.0
+
+[100 rows x 5 columns]
+13-07-2025 16:45:35 - INFO - ---------- Running Data Cleaner ----------
+13-07-2025 16:45:35 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+13-07-2025 16:45:35 - ERROR - No 'date' column found in the dataframe
+13-07-2025 16:45:35 - INFO - No OHLC relationship issues found!
+13-07-2025 16:45:35 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:45:35.364140  1.250000  1.250269  1.249993  1.250241     357
+2025-07-13 14:46:35.364140  1.250241  1.250242  1.250201  1.250217      66
+2025-07-13 14:47:35.364140  1.250217  1.250248  1.250166  1.250214      74
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366     281
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:20:35.364140  1.249729  1.249921  1.249703  1.249869     293
+2025-07-13 16:21:35.364140  1.249869  1.250031  1.249844  1.250023     256
+2025-07-13 16:22:35.364140  1.250023  1.250233  1.249991  1.250229     272
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254     258
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+
+[100 rows x 5 columns]
+13-07-2025 16:45:35 - INFO - ---------- Running Data Validator ----------
+13-07-2025 16:45:35 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:45:35.364140  1.250000  1.250269  1.249993  1.250241     357
+2025-07-13 14:46:35.364140  1.250241  1.250242  1.250201  1.250217      66
+2025-07-13 14:47:35.364140  1.250217  1.250248  1.250166  1.250214      74
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366     281
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:20:35.364140  1.249729  1.249921  1.249703  1.249869     293
+2025-07-13 16:21:35.364140  1.249869  1.250031  1.249844  1.250023     256
+2025-07-13 16:22:35.364140  1.250023  1.250233  1.249991  1.250229     272
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254     258
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+
+[100 rows x 5 columns]
+13-07-2025 16:45:35 - WARNING - Dataset contains only 100 rows. Some features requiring longer lookback periods may not be generated properly.
+13-07-2025 16:45:35 - INFO - ---------- Running Feature Generator ----------
+13-07-2025 16:45:35 - DEBUG - Starting to generate all features...
+13-07-2025 16:45:35 - DEBUG - Feature Moving Averages took 0.0012290477752685547 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Rate of Change took 0.0006840229034423828 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Average True Range took 0.0006000995635986328 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Bollinger Bands took 0.0004169940948486328 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Support and Resistance took 0.0006289482116699219 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Finished calculating Price Action Features
+13-07-2025 16:45:35 - DEBUG - Feature Volume Moving Averages took 0.0004811286926269531 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Volume Rate of Change took 0.0006310939788818359 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature On Balance Volume took 0.0008749961853027344 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Volume Profile took 0.03320789337158203 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Activity Profile (tick volume) took 0.00022792816162109375 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature VWAP took 0.0005750656127929688 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Money Flow Index took 0.0006692409515380859 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Finished calculating Volume-Based Features
+13-07-2025 16:45:35 - DEBUG - Feature Relative Strength Index took 0.0014100074768066406 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature MACD took 0.0005390644073486328 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Average Directional Index took 0.008357763290405273 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Stochastic Oscillator took 0.0006630420684814453 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Commodity Channel Index took 0.00047397613525390625 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Finished calculating Technical Indicators
+13-07-2025 16:45:35 - DEBUG - ----- Inside check_feature_specification() to determine how to generate hypotheses feature: time_of_day -----
+13-07-2025 16:45:35 - DEBUG - selected_features (the whole list) is empty. All features are to be generated of method time_of_day
+13-07-2025 16:45:35 - DEBUG - Feature Time of Day took 0.0007081031799316406 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Day of Week took 0.001216888427734375 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Time of Week took 0.0004951953887939453 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Time of Month took 0.0012652873992919922 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Trading Sessions took 0.0005786418914794922 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Session timing features took 0.002274036407470703 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Session Transition Features took 0.0011742115020751953 seconds to calculate.
+13-07-2025 16:45:35 - WARNING - Not enough data for seasonal decomposition (need 320, have 100)
+13-07-2025 16:45:35 - DEBUG - Feature Seasonal Decomposition took 0.00011706352233886719 seconds to calculate.
+13-07-2025 16:45:35 - WARNING - Not enough data for STL decomposition (need 320, have 100)
+13-07-2025 16:45:35 - DEBUG - Feature STL Decomposition took 7.772445678710938e-05 seconds to calculate.
+13-07-2025 16:45:35 - WARNING - Not enough data for MSTL decomposition (need 320, have 100)
+13-07-2025 16:45:35 - DEBUG - Feature MSTL Decomposition took 7.128715515136719e-05 seconds to calculate.
+13-07-2025 16:45:35 - WARNING - Error calculating holiday features: Can only use .dt accessor with datetimelike values
+13-07-2025 16:45:35 - DEBUG - Feature Holiday Features took 0.00889897346496582 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Finished calculating Time-based Features
+13-07-2025 16:45:35 - DEBUG - Feature Volatility Regimes took 0.002238035202026367 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Trend Strength Indicators took 0.0063648223876953125 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Market State Indicators took 0.007229804992675781 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Log Returns took 0.0005831718444824219 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Fast Fourier Transforms took 0.0019299983978271484 seconds to calculate.
+13-07-2025 16:45:35 - INFO - Generated 136 features.
+13-07-2025 16:45:35 - DEBUG - Generated features are: ['sma_5', 'ema_5', 'sma_10', 'ema_10', 'sma_20', 'ema_20', 'sma_50', 'ema_50', 'sma_200', 'ema_200', 'roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60', 'atr', 'upper_band', 'lower_band', 'bb_width', 'distance_from_high', 'distance_from_low', 'vma_7', 'relative_volume_7', 'vma_15', 'relative_volume_15', 'vma_30', 'relative_volume_30', 'vma_60', 'relative_volume_60', 'vroc_1', 'vroc_5', 'vroc_10', 'vroc_20', 'obv', 'vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration', 'activity', 'vwap', 'mfi', 'rsi_14', 'macd_line', 'macd_signal', 'macd_histogram', '+di', '-di', 'adx', 'stoch_k', 'stoch_d', 'cci', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening', 'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend', 'month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos', 'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity', 'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos', 'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_medium', 'adx_trend_regime', 'adx_regime_ranging', 'dist_from_sma_20', 'sma_20_slope', 'dist_from_sma_50', 'sma_50_slope', 'dist_from_sma_200', 'sma_200_slope', 'ma_cross_50_200', 'regression_slope', 'r_squared', 'norm_regression_slope', 'trend_strength', 'trend_regime', 'trend_regime_ranging', 'vol_regime_num', 'trend_regime_num', 'market_state', 'market_state_desc', 'state_medium_vol_ranging', 'state_duration', 'log_return', 'fft_sin_8', 'fft_cos_8', 'fft_sin_5', 'fft_cos_5', 'fft_sin_12', 'fft_cos_12', 'fft_sin_3', 'fft_cos_3', 'fft_dominant_periods']
+13-07-2025 16:45:35 - DEBUG - New market data received and processed
+13-07-2025 16:45:35 - INFO - Buffer jumpstart completed - Added 100 historical data points
+13-07-2025 16:45:35 - INFO - Live data streaming started - Mode: simulation, Jumpstart: enabled
+13-07-2025 16:45:35 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:46:35.364140  1.250241  1.250242  1.250201  1.250217    66.0
+2025-07-13 14:47:35.364140  1.250217  1.250248  1.250166  1.250214    74.0
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366   281.0
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340   479.0
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427    87.0
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:21:35.364140  1.249869  1.250031  1.249844  1.250023   256.0
+2025-07-13 16:22:35.364140  1.250023  1.250233  1.249991  1.250229   272.0
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254   258.0
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254    63.0
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198   273.0
+
+[100 rows x 5 columns]
+13-07-2025 16:45:35 - INFO - Waiting for initial data buffer to fill...
+13-07-2025 16:45:35 - INFO - ---------- Running Data Cleaner ----------
+13-07-2025 16:45:35 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+13-07-2025 16:45:35 - ERROR - No 'date' column found in the dataframe
+13-07-2025 16:45:35 - INFO - No OHLC relationship issues found!
+13-07-2025 16:45:35 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:46:35.364140  1.250241  1.250242  1.250201  1.250217      66
+2025-07-13 14:47:35.364140  1.250217  1.250248  1.250166  1.250214      74
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366     281
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:21:35.364140  1.249869  1.250031  1.249844  1.250023     256
+2025-07-13 16:22:35.364140  1.250023  1.250233  1.249991  1.250229     272
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254     258
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+
+[100 rows x 5 columns]
+13-07-2025 16:45:35 - INFO - ---------- Running Data Validator ----------
+13-07-2025 16:45:35 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:46:35.364140  1.250241  1.250242  1.250201  1.250217      66
+2025-07-13 14:47:35.364140  1.250217  1.250248  1.250166  1.250214      74
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366     281
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:21:35.364140  1.249869  1.250031  1.249844  1.250023     256
+2025-07-13 16:22:35.364140  1.250023  1.250233  1.249991  1.250229     272
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254     258
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+
+[100 rows x 5 columns]
+13-07-2025 16:45:35 - WARNING - Dataset contains only 100 rows. Some features requiring longer lookback periods may not be generated properly.
+13-07-2025 16:45:35 - INFO - ---------- Running Feature Generator ----------
+13-07-2025 16:45:35 - DEBUG - Starting to generate all features...
+13-07-2025 16:45:35 - DEBUG - Feature Moving Averages took 0.0006651878356933594 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Rate of Change took 0.000644683837890625 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Average True Range took 0.0005650520324707031 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Bollinger Bands took 0.0003788471221923828 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Support and Resistance took 0.00041604042053222656 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Finished calculating Price Action Features
+13-07-2025 16:45:35 - DEBUG - Feature Volume Moving Averages took 0.0004558563232421875 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Volume Rate of Change took 0.0006010532379150391 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature On Balance Volume took 0.0007722377777099609 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Volume Profile took 0.03247213363647461 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Activity Profile (tick volume) took 0.0002129077911376953 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature VWAP took 0.0005450248718261719 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Money Flow Index took 0.0008840560913085938 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Finished calculating Volume-Based Features
+13-07-2025 16:45:35 - DEBUG - Feature Relative Strength Index took 0.0014269351959228516 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature MACD took 0.0003781318664550781 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Average Directional Index took 0.009443998336791992 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Stochastic Oscillator took 0.000823974609375 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Commodity Channel Index took 0.00047588348388671875 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Finished calculating Technical Indicators
+13-07-2025 16:45:35 - DEBUG - ----- Inside check_feature_specification() to determine how to generate hypotheses feature: time_of_day -----
+13-07-2025 16:45:35 - DEBUG - selected_features (the whole list) is empty. All features are to be generated of method time_of_day
+13-07-2025 16:45:35 - DEBUG - Feature Time of Day took 0.00036716461181640625 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Day of Week took 0.0004131793975830078 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Time of Week took 0.0003619194030761719 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Time of Month took 0.0007538795471191406 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Trading Sessions took 0.0005421638488769531 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Session timing features took 0.0018680095672607422 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Session Transition Features took 0.0011038780212402344 seconds to calculate.
+13-07-2025 16:45:35 - WARNING - Not enough data for seasonal decomposition (need 320, have 100)
+13-07-2025 16:45:35 - DEBUG - Feature Seasonal Decomposition took 0.0001227855682373047 seconds to calculate.
+13-07-2025 16:45:35 - WARNING - Not enough data for STL decomposition (need 320, have 100)
+13-07-2025 16:45:35 - DEBUG - Feature STL Decomposition took 7.677078247070312e-05 seconds to calculate.
+13-07-2025 16:45:35 - WARNING - Not enough data for MSTL decomposition (need 320, have 100)
+13-07-2025 16:45:35 - DEBUG - Feature MSTL Decomposition took 7.390975952148438e-05 seconds to calculate.
+13-07-2025 16:45:35 - WARNING - Error calculating holiday features: Can only use .dt accessor with datetimelike values
+13-07-2025 16:45:35 - DEBUG - Feature Holiday Features took 7.987022399902344e-05 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Finished calculating Time-based Features
+13-07-2025 16:45:35 - DEBUG - Feature Volatility Regimes took 0.0014331340789794922 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Trend Strength Indicators took 0.006258964538574219 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Market State Indicators took 0.007579803466796875 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Log Returns took 0.00045180320739746094 seconds to calculate.
+13-07-2025 16:45:35 - DEBUG - Feature Fast Fourier Transforms took 0.0008242130279541016 seconds to calculate.
+13-07-2025 16:45:35 - INFO - Generated 136 features.
+13-07-2025 16:45:35 - DEBUG - Generated features are: ['sma_5', 'ema_5', 'sma_10', 'ema_10', 'sma_20', 'ema_20', 'sma_50', 'ema_50', 'sma_200', 'ema_200', 'roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60', 'atr', 'upper_band', 'lower_band', 'bb_width', 'distance_from_high', 'distance_from_low', 'vma_7', 'relative_volume_7', 'vma_15', 'relative_volume_15', 'vma_30', 'relative_volume_30', 'vma_60', 'relative_volume_60', 'vroc_1', 'vroc_5', 'vroc_10', 'vroc_20', 'obv', 'vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration', 'activity', 'vwap', 'mfi', 'rsi_14', 'macd_line', 'macd_signal', 'macd_histogram', '+di', '-di', 'adx', 'stoch_k', 'stoch_d', 'cci', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening', 'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend', 'month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos', 'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity', 'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos', 'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_medium', 'adx_trend_regime', 'adx_regime_ranging', 'dist_from_sma_20', 'sma_20_slope', 'dist_from_sma_50', 'sma_50_slope', 'dist_from_sma_200', 'sma_200_slope', 'ma_cross_50_200', 'regression_slope', 'r_squared', 'norm_regression_slope', 'trend_strength', 'trend_regime', 'trend_regime_ranging', 'vol_regime_num', 'trend_regime_num', 'market_state', 'market_state_desc', 'state_medium_vol_ranging', 'state_duration', 'log_return', 'fft_sin_8', 'fft_cos_8', 'fft_sin_5', 'fft_cos_5', 'fft_sin_12', 'fft_cos_12', 'fft_sin_3', 'fft_cos_3', 'fft_dominant_periods']
+13-07-2025 16:45:35 - DEBUG - New market data received and processed
+13-07-2025 16:45:35 - INFO - Live data feed ready for trading
+13-07-2025 16:45:35 - INFO - Position monitoring started
+13-07-2025 16:45:35 - INFO - Position monitoring started successfully
+13-07-2025 16:45:35 - DEBUG - Trading loop iteration 1
+13-07-2025 16:45:35 - ERROR - Error generating signals: Feature shape mismatch, expected: 54, got 141
+13-07-2025 16:45:36 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:47:35.364140  1.250217  1.250248  1.250166  1.250214    74.0
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366   281.0
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340   479.0
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427    87.0
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291   394.0
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:22:35.364140  1.250023  1.250233  1.249991  1.250229   272.0
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254   258.0
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254    63.0
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198   273.0
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039   469.0
+
+[100 rows x 5 columns]
+13-07-2025 16:45:36 - INFO - ---------- Running Data Cleaner ----------
+13-07-2025 16:45:36 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+13-07-2025 16:45:36 - ERROR - No 'date' column found in the dataframe
+13-07-2025 16:45:36 - INFO - No OHLC relationship issues found!
+13-07-2025 16:45:36 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:47:35.364140  1.250217  1.250248  1.250166  1.250214      74
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366     281
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:22:35.364140  1.250023  1.250233  1.249991  1.250229     272
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254     258
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+
+[100 rows x 5 columns]
+13-07-2025 16:45:36 - INFO - ---------- Running Data Validator ----------
+13-07-2025 16:45:36 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:47:35.364140  1.250217  1.250248  1.250166  1.250214      74
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366     281
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:22:35.364140  1.250023  1.250233  1.249991  1.250229     272
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254     258
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+
+[100 rows x 5 columns]
+13-07-2025 16:45:36 - WARNING - Dataset contains only 100 rows. Some features requiring longer lookback periods may not be generated properly.
+13-07-2025 16:45:36 - INFO - ---------- Running Feature Generator ----------
+13-07-2025 16:45:36 - DEBUG - Starting to generate all features...
+13-07-2025 16:45:36 - DEBUG - Feature Moving Averages took 0.0007150173187255859 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Rate of Change took 0.0007350444793701172 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Average True Range took 0.0006289482116699219 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Bollinger Bands took 0.00042319297790527344 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Support and Resistance took 0.0004508495330810547 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Finished calculating Price Action Features
+13-07-2025 16:45:36 - DEBUG - Feature Volume Moving Averages took 0.00048279762268066406 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Volume Rate of Change took 0.0006301403045654297 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature On Balance Volume took 0.0005931854248046875 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Volume Profile took 0.032560110092163086 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Activity Profile (tick volume) took 0.00020122528076171875 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature VWAP took 0.00045490264892578125 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Money Flow Index took 0.0006227493286132812 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Finished calculating Volume-Based Features
+13-07-2025 16:45:36 - DEBUG - Feature Relative Strength Index took 0.001310110092163086 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature MACD took 0.0003571510314941406 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Average Directional Index took 0.007955074310302734 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Stochastic Oscillator took 0.0005917549133300781 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Commodity Channel Index took 0.0004520416259765625 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Finished calculating Technical Indicators
+13-07-2025 16:45:36 - DEBUG - ----- Inside check_feature_specification() to determine how to generate hypotheses feature: time_of_day -----
+13-07-2025 16:45:36 - DEBUG - selected_features (the whole list) is empty. All features are to be generated of method time_of_day
+13-07-2025 16:45:36 - DEBUG - Feature Time of Day took 0.0003762245178222656 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Day of Week took 0.00039386749267578125 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Time of Week took 0.0006041526794433594 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Time of Month took 0.0008549690246582031 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Trading Sessions took 0.0005900859832763672 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Session timing features took 0.0020780563354492188 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Session Transition Features took 0.0011441707611083984 seconds to calculate.
+13-07-2025 16:45:36 - WARNING - Not enough data for seasonal decomposition (need 320, have 100)
+13-07-2025 16:45:36 - DEBUG - Feature Seasonal Decomposition took 0.00012683868408203125 seconds to calculate.
+13-07-2025 16:45:36 - WARNING - Not enough data for STL decomposition (need 320, have 100)
+13-07-2025 16:45:36 - DEBUG - Feature STL Decomposition took 7.891654968261719e-05 seconds to calculate.
+13-07-2025 16:45:36 - WARNING - Not enough data for MSTL decomposition (need 320, have 100)
+13-07-2025 16:45:36 - DEBUG - Feature MSTL Decomposition took 7.176399230957031e-05 seconds to calculate.
+13-07-2025 16:45:36 - WARNING - Error calculating holiday features: Can only use .dt accessor with datetimelike values
+13-07-2025 16:45:36 - DEBUG - Feature Holiday Features took 8.296966552734375e-05 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Finished calculating Time-based Features
+13-07-2025 16:45:36 - DEBUG - Feature Volatility Regimes took 0.0015239715576171875 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Trend Strength Indicators took 0.0059680938720703125 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Market State Indicators took 0.00789189338684082 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Log Returns took 0.0005209445953369141 seconds to calculate.
+13-07-2025 16:45:36 - DEBUG - Feature Fast Fourier Transforms took 0.0008399486541748047 seconds to calculate.
+13-07-2025 16:45:36 - INFO - Generated 136 features.
+13-07-2025 16:45:36 - DEBUG - Generated features are: ['sma_5', 'ema_5', 'sma_10', 'ema_10', 'sma_20', 'ema_20', 'sma_50', 'ema_50', 'sma_200', 'ema_200', 'roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60', 'atr', 'upper_band', 'lower_band', 'bb_width', 'distance_from_high', 'distance_from_low', 'vma_7', 'relative_volume_7', 'vma_15', 'relative_volume_15', 'vma_30', 'relative_volume_30', 'vma_60', 'relative_volume_60', 'vroc_1', 'vroc_5', 'vroc_10', 'vroc_20', 'obv', 'vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration', 'activity', 'vwap', 'mfi', 'rsi_14', 'macd_line', 'macd_signal', 'macd_histogram', '+di', '-di', 'adx', 'stoch_k', 'stoch_d', 'cci', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening', 'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend', 'month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos', 'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity', 'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos', 'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_medium', 'adx_trend_regime', 'adx_regime_ranging', 'dist_from_sma_20', 'sma_20_slope', 'dist_from_sma_50', 'sma_50_slope', 'dist_from_sma_200', 'sma_200_slope', 'ma_cross_50_200', 'regression_slope', 'r_squared', 'norm_regression_slope', 'trend_strength', 'trend_regime', 'trend_regime_ranging', 'vol_regime_num', 'trend_regime_num', 'market_state', 'market_state_desc', 'state_medium_vol_ranging', 'state_duration', 'log_return', 'fft_sin_2', 'fft_cos_2', 'fft_sin_3', 'fft_cos_3', 'fft_sin_5', 'fft_cos_5', 'fft_sin_12', 'fft_cos_12', 'fft_dominant_periods']
+13-07-2025 16:45:36 - DEBUG - New market data received and processed
+13-07-2025 16:45:37 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366   281.0
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340   479.0
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427    87.0
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291   394.0
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322   191.0
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254   258.0
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254    63.0
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198   273.0
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039   469.0
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139   267.0
+
+[100 rows x 5 columns]
+13-07-2025 16:45:37 - INFO - ---------- Running Data Cleaner ----------
+13-07-2025 16:45:37 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+13-07-2025 16:45:37 - ERROR - No 'date' column found in the dataframe
+13-07-2025 16:45:37 - INFO - No OHLC relationship issues found!
+13-07-2025 16:45:37 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366     281
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254     258
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+
+[100 rows x 5 columns]
+13-07-2025 16:45:37 - INFO - ---------- Running Data Validator ----------
+13-07-2025 16:45:37 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:48:35.364140  1.250214  1.250401  1.250196  1.250366     281
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:23:35.364140  1.250229  1.250281  1.250226  1.250254     258
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+
+[100 rows x 5 columns]
+13-07-2025 16:45:37 - WARNING - Dataset contains only 100 rows. Some features requiring longer lookback periods may not be generated properly.
+13-07-2025 16:45:37 - INFO - ---------- Running Feature Generator ----------
+13-07-2025 16:45:37 - DEBUG - Starting to generate all features...
+13-07-2025 16:45:37 - DEBUG - Feature Moving Averages took 0.0009772777557373047 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Rate of Change took 0.0009510517120361328 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Average True Range took 0.0008111000061035156 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Bollinger Bands took 0.0005109310150146484 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Support and Resistance took 0.0005629062652587891 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Finished calculating Price Action Features
+13-07-2025 16:45:37 - DEBUG - Feature Volume Moving Averages took 0.00061798095703125 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Volume Rate of Change took 0.0008177757263183594 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature On Balance Volume took 0.0006971359252929688 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Volume Profile took 0.034583091735839844 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Activity Profile (tick volume) took 0.0002257823944091797 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature VWAP took 0.0004699230194091797 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Money Flow Index took 0.0006351470947265625 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Finished calculating Volume-Based Features
+13-07-2025 16:45:37 - DEBUG - Feature Relative Strength Index took 0.0013718605041503906 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature MACD took 0.00046515464782714844 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Average Directional Index took 0.007943868637084961 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Stochastic Oscillator took 0.000682830810546875 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Commodity Channel Index took 0.00047397613525390625 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Finished calculating Technical Indicators
+13-07-2025 16:45:37 - DEBUG - ----- Inside check_feature_specification() to determine how to generate hypotheses feature: time_of_day -----
+13-07-2025 16:45:37 - DEBUG - selected_features (the whole list) is empty. All features are to be generated of method time_of_day
+13-07-2025 16:45:37 - DEBUG - Feature Time of Day took 0.0003840923309326172 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Day of Week took 0.0004038810729980469 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Time of Week took 0.00037097930908203125 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Time of Month took 0.0007159709930419922 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Trading Sessions took 0.0005319118499755859 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Session timing features took 0.0018990039825439453 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Session Transition Features took 0.0011048316955566406 seconds to calculate.
+13-07-2025 16:45:37 - WARNING - Not enough data for seasonal decomposition (need 320, have 100)
+13-07-2025 16:45:37 - DEBUG - Feature Seasonal Decomposition took 0.0001270771026611328 seconds to calculate.
+13-07-2025 16:45:37 - WARNING - Not enough data for STL decomposition (need 320, have 100)
+13-07-2025 16:45:37 - DEBUG - Feature STL Decomposition took 7.224082946777344e-05 seconds to calculate.
+13-07-2025 16:45:37 - WARNING - Not enough data for MSTL decomposition (need 320, have 100)
+13-07-2025 16:45:37 - DEBUG - Feature MSTL Decomposition took 6.866455078125e-05 seconds to calculate.
+13-07-2025 16:45:37 - WARNING - Error calculating holiday features: Can only use .dt accessor with datetimelike values
+13-07-2025 16:45:37 - DEBUG - Feature Holiday Features took 7.605552673339844e-05 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Finished calculating Time-based Features
+13-07-2025 16:45:37 - DEBUG - Feature Volatility Regimes took 0.0014431476593017578 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Trend Strength Indicators took 0.006087779998779297 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Market State Indicators took 0.007375955581665039 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Log Returns took 0.00036787986755371094 seconds to calculate.
+13-07-2025 16:45:37 - DEBUG - Feature Fast Fourier Transforms took 0.0007841587066650391 seconds to calculate.
+13-07-2025 16:45:37 - INFO - Generated 136 features.
+13-07-2025 16:45:37 - DEBUG - Generated features are: ['sma_5', 'ema_5', 'sma_10', 'ema_10', 'sma_20', 'ema_20', 'sma_50', 'ema_50', 'sma_200', 'ema_200', 'roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60', 'atr', 'upper_band', 'lower_band', 'bb_width', 'distance_from_high', 'distance_from_low', 'vma_7', 'relative_volume_7', 'vma_15', 'relative_volume_15', 'vma_30', 'relative_volume_30', 'vma_60', 'relative_volume_60', 'vroc_1', 'vroc_5', 'vroc_10', 'vroc_20', 'obv', 'vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration', 'activity', 'vwap', 'mfi', 'rsi_14', 'macd_line', 'macd_signal', 'macd_histogram', '+di', '-di', 'adx', 'stoch_k', 'stoch_d', 'cci', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening', 'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend', 'month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos', 'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity', 'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos', 'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_medium', 'adx_trend_regime', 'adx_regime_ranging', 'dist_from_sma_20', 'sma_20_slope', 'dist_from_sma_50', 'sma_50_slope', 'dist_from_sma_200', 'sma_200_slope', 'ma_cross_50_200', 'regression_slope', 'r_squared', 'norm_regression_slope', 'trend_strength', 'trend_regime', 'trend_regime_ranging', 'vol_regime_num', 'trend_regime_num', 'market_state', 'market_state_desc', 'state_medium_vol_ranging', 'state_duration', 'log_return', 'fft_sin_16', 'fft_cos_16', 'fft_sin_5', 'fft_cos_5', 'fft_sin_3', 'fft_cos_3', 'fft_sin_12', 'fft_cos_12', 'fft_dominant_periods']
+13-07-2025 16:45:37 - DEBUG - New market data received and processed
+13-07-2025 16:45:37 - DEBUG - Trading loop iteration 2
+13-07-2025 16:45:37 - ERROR - Error generating signals: Feature shape mismatch, expected: 54, got 141
+13-07-2025 16:45:38 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340   479.0
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427    87.0
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291   394.0
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322   191.0
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271   237.0
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254    63.0
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198   273.0
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039   469.0
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139   267.0
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202   185.0
+
+[100 rows x 5 columns]
+13-07-2025 16:45:38 - INFO - ---------- Running Data Cleaner ----------
+13-07-2025 16:45:38 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+13-07-2025 16:45:38 - ERROR - No 'date' column found in the dataframe
+13-07-2025 16:45:38 - INFO - No OHLC relationship issues found!
+13-07-2025 16:45:38 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271     237
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202     185
+
+[100 rows x 5 columns]
+13-07-2025 16:45:38 - INFO - ---------- Running Data Validator ----------
+13-07-2025 16:45:38 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:49:35.364140  1.250366  1.250370  1.250285  1.250340     479
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271     237
+...                              ...       ...       ...       ...     ...
+2025-07-13 16:24:35.364140  1.250254  1.250299  1.250229  1.250254      63
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202     185
+
+[100 rows x 5 columns]
+13-07-2025 16:45:38 - WARNING - Dataset contains only 100 rows. Some features requiring longer lookback periods may not be generated properly.
+13-07-2025 16:45:38 - INFO - ---------- Running Feature Generator ----------
+13-07-2025 16:45:38 - DEBUG - Starting to generate all features...
+13-07-2025 16:45:38 - DEBUG - Feature Moving Averages took 0.0008258819580078125 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Rate of Change took 0.0008492469787597656 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Average True Range took 0.00067901611328125 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Bollinger Bands took 0.0004611015319824219 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Support and Resistance took 0.0005040168762207031 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Finished calculating Price Action Features
+13-07-2025 16:45:38 - DEBUG - Feature Volume Moving Averages took 0.0005466938018798828 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Volume Rate of Change took 0.0007300376892089844 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature On Balance Volume took 0.0006170272827148438 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Volume Profile took 0.06249189376831055 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Activity Profile (tick volume) took 0.00029778480529785156 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature VWAP took 0.0004830360412597656 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Money Flow Index took 0.0006678104400634766 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Finished calculating Volume-Based Features
+13-07-2025 16:45:38 - DEBUG - Feature Relative Strength Index took 0.0014200210571289062 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature MACD took 0.0003657341003417969 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Average Directional Index took 0.008100032806396484 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Stochastic Oscillator took 0.0008177757263183594 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Commodity Channel Index took 0.0004780292510986328 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Finished calculating Technical Indicators
+13-07-2025 16:45:38 - DEBUG - ----- Inside check_feature_specification() to determine how to generate hypotheses feature: time_of_day -----
+13-07-2025 16:45:38 - DEBUG - selected_features (the whole list) is empty. All features are to be generated of method time_of_day
+13-07-2025 16:45:38 - DEBUG - Feature Time of Day took 0.00036787986755371094 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Day of Week took 0.00040793418884277344 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Time of Week took 0.0003559589385986328 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Time of Month took 0.0007297992706298828 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Trading Sessions took 0.0005218982696533203 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Session timing features took 0.0018689632415771484 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Session Transition Features took 0.0013308525085449219 seconds to calculate.
+13-07-2025 16:45:38 - WARNING - Not enough data for seasonal decomposition (need 320, have 100)
+13-07-2025 16:45:38 - DEBUG - Feature Seasonal Decomposition took 0.00013899803161621094 seconds to calculate.
+13-07-2025 16:45:38 - WARNING - Not enough data for STL decomposition (need 320, have 100)
+13-07-2025 16:45:38 - DEBUG - Feature STL Decomposition took 7.987022399902344e-05 seconds to calculate.
+13-07-2025 16:45:38 - WARNING - Not enough data for MSTL decomposition (need 320, have 100)
+13-07-2025 16:45:38 - DEBUG - Feature MSTL Decomposition took 7.224082946777344e-05 seconds to calculate.
+13-07-2025 16:45:38 - WARNING - Error calculating holiday features: Can only use .dt accessor with datetimelike values
+13-07-2025 16:45:38 - DEBUG - Feature Holiday Features took 9.131431579589844e-05 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Finished calculating Time-based Features
+13-07-2025 16:45:38 - DEBUG - Feature Volatility Regimes took 0.0016379356384277344 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Trend Strength Indicators took 0.005739688873291016 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Market State Indicators took 0.007023811340332031 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Log Returns took 0.0003230571746826172 seconds to calculate.
+13-07-2025 16:45:38 - DEBUG - Feature Fast Fourier Transforms took 0.0007338523864746094 seconds to calculate.
+13-07-2025 16:45:38 - INFO - Generated 136 features.
+13-07-2025 16:45:38 - DEBUG - Generated features are: ['sma_5', 'ema_5', 'sma_10', 'ema_10', 'sma_20', 'ema_20', 'sma_50', 'ema_50', 'sma_200', 'ema_200', 'roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60', 'atr', 'upper_band', 'lower_band', 'bb_width', 'distance_from_high', 'distance_from_low', 'vma_7', 'relative_volume_7', 'vma_15', 'relative_volume_15', 'vma_30', 'relative_volume_30', 'vma_60', 'relative_volume_60', 'vroc_1', 'vroc_5', 'vroc_10', 'vroc_20', 'obv', 'vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration', 'activity', 'vwap', 'mfi', 'rsi_14', 'macd_line', 'macd_signal', 'macd_histogram', '+di', '-di', 'adx', 'stoch_k', 'stoch_d', 'cci', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening', 'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend', 'month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos', 'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity', 'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos', 'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_medium', 'adx_trend_regime', 'adx_regime_ranging', 'dist_from_sma_20', 'sma_20_slope', 'dist_from_sma_50', 'sma_50_slope', 'dist_from_sma_200', 'sma_200_slope', 'ma_cross_50_200', 'regression_slope', 'r_squared', 'norm_regression_slope', 'trend_strength', 'trend_regime', 'trend_regime_ranging', 'vol_regime_num', 'trend_regime_num', 'market_state', 'market_state_desc', 'state_medium_vol_ranging', 'state_duration', 'log_return', 'fft_sin_11', 'fft_cos_11', 'fft_sin_12', 'fft_cos_12', 'fft_sin_5', 'fft_cos_5', 'fft_sin_3', 'fft_cos_3', 'fft_dominant_periods']
+13-07-2025 16:45:38 - DEBUG - New market data received and processed
+13-07-2025 16:45:39 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427    87.0
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291   394.0
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322   191.0
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271   237.0
+2025-07-13 14:54:35.364140  1.250271  1.250379  1.250234  1.250351   336.0
+...                              ...       ...       ...       ...     ...
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198   273.0
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039   469.0
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139   267.0
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202   185.0
+2025-07-13 15:49:35.485325  1.250202  1.250224  1.250157  1.250161   111.0
+
+[100 rows x 5 columns]
+13-07-2025 16:45:39 - INFO - ---------- Running Data Cleaner ----------
+13-07-2025 16:45:39 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+13-07-2025 16:45:39 - ERROR - No 'date' column found in the dataframe
+13-07-2025 16:45:39 - INFO - No OHLC relationship issues found!
+13-07-2025 16:45:39 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271     237
+2025-07-13 14:54:35.364140  1.250271  1.250379  1.250234  1.250351     336
+...                              ...       ...       ...       ...     ...
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202     185
+2025-07-13 15:49:35.485325  1.250202  1.250224  1.250157  1.250161     111
+
+[100 rows x 5 columns]
+13-07-2025 16:45:39 - INFO - ---------- Running Data Validator ----------
+13-07-2025 16:45:39 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:50:35.364140  1.250340  1.250470  1.250331  1.250427      87
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271     237
+2025-07-13 14:54:35.364140  1.250271  1.250379  1.250234  1.250351     336
+...                              ...       ...       ...       ...     ...
+2025-07-13 15:45:35.485325  1.250000  1.250242  1.249971  1.250198     273
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202     185
+2025-07-13 15:49:35.485325  1.250202  1.250224  1.250157  1.250161     111
+
+[100 rows x 5 columns]
+13-07-2025 16:45:39 - WARNING - Dataset contains only 100 rows. Some features requiring longer lookback periods may not be generated properly.
+13-07-2025 16:45:39 - INFO - ---------- Running Feature Generator ----------
+13-07-2025 16:45:39 - DEBUG - Starting to generate all features...
+13-07-2025 16:45:39 - DEBUG - Feature Moving Averages took 0.0007338523864746094 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Rate of Change took 0.0010917186737060547 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Average True Range took 0.0008161067962646484 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Bollinger Bands took 0.0004987716674804688 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Support and Resistance took 0.0005209445953369141 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Finished calculating Price Action Features
+13-07-2025 16:45:39 - DEBUG - Feature Volume Moving Averages took 0.0005979537963867188 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Volume Rate of Change took 0.0007467269897460938 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature On Balance Volume took 0.0008130073547363281 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Volume Profile took 0.033763885498046875 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Activity Profile (tick volume) took 0.00020194053649902344 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature VWAP took 0.000431060791015625 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Money Flow Index took 0.0009980201721191406 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Finished calculating Volume-Based Features
+13-07-2025 16:45:39 - DEBUG - Feature Relative Strength Index took 0.0014667510986328125 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature MACD took 0.00038313865661621094 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Average Directional Index took 0.007862091064453125 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Stochastic Oscillator took 0.0007128715515136719 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Commodity Channel Index took 0.000476837158203125 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Finished calculating Technical Indicators
+13-07-2025 16:45:39 - DEBUG - ----- Inside check_feature_specification() to determine how to generate hypotheses feature: time_of_day -----
+13-07-2025 16:45:39 - DEBUG - selected_features (the whole list) is empty. All features are to be generated of method time_of_day
+13-07-2025 16:45:39 - DEBUG - Feature Time of Day took 0.00039005279541015625 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Day of Week took 0.0004100799560546875 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Time of Week took 0.0003600120544433594 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Time of Month took 0.0008440017700195312 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Trading Sessions took 0.0005598068237304688 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Session timing features took 0.0018758773803710938 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Session Transition Features took 0.0010879039764404297 seconds to calculate.
+13-07-2025 16:45:39 - WARNING - Not enough data for seasonal decomposition (need 320, have 100)
+13-07-2025 16:45:39 - DEBUG - Feature Seasonal Decomposition took 0.00011801719665527344 seconds to calculate.
+13-07-2025 16:45:39 - WARNING - Not enough data for STL decomposition (need 320, have 100)
+13-07-2025 16:45:39 - DEBUG - Feature STL Decomposition took 7.915496826171875e-05 seconds to calculate.
+13-07-2025 16:45:39 - WARNING - Not enough data for MSTL decomposition (need 320, have 100)
+13-07-2025 16:45:39 - DEBUG - Feature MSTL Decomposition took 7.104873657226562e-05 seconds to calculate.
+13-07-2025 16:45:39 - WARNING - Error calculating holiday features: Can only use .dt accessor with datetimelike values
+13-07-2025 16:45:39 - DEBUG - Feature Holiday Features took 8.797645568847656e-05 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Finished calculating Time-based Features
+13-07-2025 16:45:39 - DEBUG - Feature Volatility Regimes took 0.0014641284942626953 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Trend Strength Indicators took 0.006442070007324219 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Market State Indicators took 0.007424116134643555 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Log Returns took 0.0003879070281982422 seconds to calculate.
+13-07-2025 16:45:39 - DEBUG - Feature Fast Fourier Transforms took 0.0007908344268798828 seconds to calculate.
+13-07-2025 16:45:39 - INFO - Generated 136 features.
+13-07-2025 16:45:39 - DEBUG - Generated features are: ['sma_5', 'ema_5', 'sma_10', 'ema_10', 'sma_20', 'ema_20', 'sma_50', 'ema_50', 'sma_200', 'ema_200', 'roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60', 'atr', 'upper_band', 'lower_band', 'bb_width', 'distance_from_high', 'distance_from_low', 'vma_7', 'relative_volume_7', 'vma_15', 'relative_volume_15', 'vma_30', 'relative_volume_30', 'vma_60', 'relative_volume_60', 'vroc_1', 'vroc_5', 'vroc_10', 'vroc_20', 'obv', 'vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration', 'activity', 'vwap', 'mfi', 'rsi_14', 'macd_line', 'macd_signal', 'macd_histogram', '+di', '-di', 'adx', 'stoch_k', 'stoch_d', 'cci', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening', 'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend', 'month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos', 'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity', 'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos', 'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_medium', 'adx_trend_regime', 'adx_regime_ranging', 'dist_from_sma_20', 'sma_20_slope', 'dist_from_sma_50', 'sma_50_slope', 'dist_from_sma_200', 'sma_200_slope', 'ma_cross_50_200', 'regression_slope', 'r_squared', 'norm_regression_slope', 'trend_strength', 'trend_regime', 'trend_regime_ranging', 'vol_regime_num', 'trend_regime_num', 'market_state', 'market_state_desc', 'state_medium_vol_ranging', 'state_duration', 'log_return', 'fft_sin_16', 'fft_cos_16', 'fft_sin_5', 'fft_cos_5', 'fft_sin_12', 'fft_cos_12', 'fft_sin_3', 'fft_cos_3', 'fft_dominant_periods']
+13-07-2025 16:45:39 - DEBUG - New market data received and processed
+13-07-2025 16:45:39 - DEBUG - Trading loop iteration 3
+13-07-2025 16:45:39 - ERROR - Error generating signals: Feature shape mismatch, expected: 54, got 141
+13-07-2025 16:45:40 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291   394.0
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322   191.0
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271   237.0
+2025-07-13 14:54:35.364140  1.250271  1.250379  1.250234  1.250351   336.0
+2025-07-13 14:55:35.364140  1.250351  1.250450  1.250326  1.250387   171.0
+...                              ...       ...       ...       ...     ...
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039   469.0
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139   267.0
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202   185.0
+2025-07-13 15:49:35.485325  1.250202  1.250224  1.250157  1.250161   111.0
+2025-07-13 15:50:35.485325  1.250161  1.250350  1.250111  1.250299   338.0
+
+[100 rows x 5 columns]
+13-07-2025 16:45:40 - INFO - ---------- Running Data Cleaner ----------
+13-07-2025 16:45:40 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+13-07-2025 16:45:40 - ERROR - No 'date' column found in the dataframe
+13-07-2025 16:45:40 - INFO - No OHLC relationship issues found!
+13-07-2025 16:45:40 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271     237
+2025-07-13 14:54:35.364140  1.250271  1.250379  1.250234  1.250351     336
+2025-07-13 14:55:35.364140  1.250351  1.250450  1.250326  1.250387     171
+...                              ...       ...       ...       ...     ...
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202     185
+2025-07-13 15:49:35.485325  1.250202  1.250224  1.250157  1.250161     111
+2025-07-13 15:50:35.485325  1.250161  1.250350  1.250111  1.250299     338
+
+[100 rows x 5 columns]
+13-07-2025 16:45:40 - INFO - ---------- Running Data Validator ----------
+13-07-2025 16:45:40 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:51:35.364140  1.250427  1.250479  1.250285  1.250291     394
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271     237
+2025-07-13 14:54:35.364140  1.250271  1.250379  1.250234  1.250351     336
+2025-07-13 14:55:35.364140  1.250351  1.250450  1.250326  1.250387     171
+...                              ...       ...       ...       ...     ...
+2025-07-13 15:46:35.485325  1.250198  1.250211  1.250033  1.250039     469
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202     185
+2025-07-13 15:49:35.485325  1.250202  1.250224  1.250157  1.250161     111
+2025-07-13 15:50:35.485325  1.250161  1.250350  1.250111  1.250299     338
+
+[100 rows x 5 columns]
+13-07-2025 16:45:40 - WARNING - Dataset contains only 100 rows. Some features requiring longer lookback periods may not be generated properly.
+13-07-2025 16:45:40 - INFO - ---------- Running Feature Generator ----------
+13-07-2025 16:45:40 - DEBUG - Starting to generate all features...
+13-07-2025 16:45:40 - DEBUG - Feature Moving Averages took 0.0012826919555664062 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Rate of Change took 0.0009770393371582031 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Average True Range took 0.0008368492126464844 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Bollinger Bands took 0.0005590915679931641 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Support and Resistance took 0.0006070137023925781 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Finished calculating Price Action Features
+13-07-2025 16:45:40 - DEBUG - Feature Volume Moving Averages took 0.0006742477416992188 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Volume Rate of Change took 0.0008749961853027344 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature On Balance Volume took 0.0007278919219970703 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Volume Profile took 0.03874993324279785 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Activity Profile (tick volume) took 0.0002319812774658203 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature VWAP took 0.0004901885986328125 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Money Flow Index took 0.0006711483001708984 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Finished calculating Volume-Based Features
+13-07-2025 16:45:40 - DEBUG - Feature Relative Strength Index took 0.001608133316040039 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature MACD took 0.00041031837463378906 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Average Directional Index took 0.007539987564086914 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Stochastic Oscillator took 0.0005919933319091797 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Commodity Channel Index took 0.00045490264892578125 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Finished calculating Technical Indicators
+13-07-2025 16:45:40 - DEBUG - ----- Inside check_feature_specification() to determine how to generate hypotheses feature: time_of_day -----
+13-07-2025 16:45:40 - DEBUG - selected_features (the whole list) is empty. All features are to be generated of method time_of_day
+13-07-2025 16:45:40 - DEBUG - Feature Time of Day took 0.0003490447998046875 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Day of Week took 0.0007469654083251953 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Time of Week took 0.0005140304565429688 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Time of Month took 0.0008549690246582031 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Trading Sessions took 0.0005507469177246094 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Session timing features took 0.0019168853759765625 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Session Transition Features took 0.001116037368774414 seconds to calculate.
+13-07-2025 16:45:40 - WARNING - Not enough data for seasonal decomposition (need 320, have 100)
+13-07-2025 16:45:40 - DEBUG - Feature Seasonal Decomposition took 0.00011801719665527344 seconds to calculate.
+13-07-2025 16:45:40 - WARNING - Not enough data for STL decomposition (need 320, have 100)
+13-07-2025 16:45:40 - DEBUG - Feature STL Decomposition took 7.605552673339844e-05 seconds to calculate.
+13-07-2025 16:45:40 - WARNING - Not enough data for MSTL decomposition (need 320, have 100)
+13-07-2025 16:45:40 - DEBUG - Feature MSTL Decomposition took 6.890296936035156e-05 seconds to calculate.
+13-07-2025 16:45:40 - WARNING - Error calculating holiday features: Can only use .dt accessor with datetimelike values
+13-07-2025 16:45:40 - DEBUG - Feature Holiday Features took 7.82012939453125e-05 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Finished calculating Time-based Features
+13-07-2025 16:45:40 - DEBUG - Feature Volatility Regimes took 0.0016319751739501953 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Trend Strength Indicators took 0.00623321533203125 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Market State Indicators took 0.0070629119873046875 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Log Returns took 0.00040602684020996094 seconds to calculate.
+13-07-2025 16:45:40 - DEBUG - Feature Fast Fourier Transforms took 0.0006999969482421875 seconds to calculate.
+13-07-2025 16:45:40 - INFO - Generated 134 features.
+13-07-2025 16:45:40 - DEBUG - Generated features are: ['sma_5', 'ema_5', 'sma_10', 'ema_10', 'sma_20', 'ema_20', 'sma_50', 'ema_50', 'sma_200', 'ema_200', 'roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60', 'atr', 'upper_band', 'lower_band', 'bb_width', 'distance_from_high', 'distance_from_low', 'vma_7', 'relative_volume_7', 'vma_15', 'relative_volume_15', 'vma_30', 'relative_volume_30', 'vma_60', 'relative_volume_60', 'vroc_1', 'vroc_5', 'vroc_10', 'vroc_20', 'obv', 'vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration', 'activity', 'vwap', 'mfi', 'rsi_14', 'macd_line', 'macd_signal', 'macd_histogram', '+di', '-di', 'adx', 'stoch_k', 'stoch_d', 'cci', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening', 'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend', 'month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos', 'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity', 'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos', 'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_medium', 'adx_trend_regime', 'adx_regime_ranging', 'dist_from_sma_20', 'sma_20_slope', 'dist_from_sma_50', 'sma_50_slope', 'dist_from_sma_200', 'sma_200_slope', 'ma_cross_50_200', 'regression_slope', 'r_squared', 'norm_regression_slope', 'trend_strength', 'trend_regime', 'trend_regime_ranging', 'vol_regime_num', 'trend_regime_num', 'market_state', 'market_state_desc', 'state_medium_vol_ranging', 'state_duration', 'log_return', 'fft_sin_11', 'fft_cos_11', 'fft_sin_3', 'fft_cos_3', 'fft_sin_12', 'fft_cos_12', 'fft_dominant_periods']
+13-07-2025 16:45:40 - DEBUG - New market data received and processed
+13-07-2025 16:45:41 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322   191.0
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271   237.0
+2025-07-13 14:54:35.364140  1.250271  1.250379  1.250234  1.250351   336.0
+2025-07-13 14:55:35.364140  1.250351  1.250450  1.250326  1.250387   171.0
+2025-07-13 14:56:35.364140  1.250387  1.250399  1.250316  1.250349   222.0
+...                              ...       ...       ...       ...     ...
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139   267.0
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202   185.0
+2025-07-13 15:49:35.485325  1.250202  1.250224  1.250157  1.250161   111.0
+2025-07-13 15:50:35.485325  1.250161  1.250350  1.250111  1.250299   338.0
+2025-07-13 15:51:35.485325  1.250299  1.250389  1.250275  1.250352   259.0
+
+[100 rows x 5 columns]
+13-07-2025 16:45:41 - INFO - ---------- Running Data Cleaner ----------
+13-07-2025 16:45:41 - WARNING - No 'date' column found for deduplication, removing completely identical rows
+13-07-2025 16:45:41 - ERROR - No 'date' column found in the dataframe
+13-07-2025 16:45:41 - INFO - No OHLC relationship issues found!
+13-07-2025 16:45:41 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271     237
+2025-07-13 14:54:35.364140  1.250271  1.250379  1.250234  1.250351     336
+2025-07-13 14:55:35.364140  1.250351  1.250450  1.250326  1.250387     171
+2025-07-13 14:56:35.364140  1.250387  1.250399  1.250316  1.250349     222
+...                              ...       ...       ...       ...     ...
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202     185
+2025-07-13 15:49:35.485325  1.250202  1.250224  1.250157  1.250161     111
+2025-07-13 15:50:35.485325  1.250161  1.250350  1.250111  1.250299     338
+2025-07-13 15:51:35.485325  1.250299  1.250389  1.250275  1.250352     259
+
+[100 rows x 5 columns]
+13-07-2025 16:45:41 - INFO - ---------- Running Data Validator ----------
+13-07-2025 16:45:41 - DEBUG - Loading                                 open      high       low     close  volume
+date                                                                      
+2025-07-13 14:52:35.364140  1.250291  1.250335  1.250265  1.250322     191
+2025-07-13 14:53:35.364140  1.250322  1.250339  1.250231  1.250271     237
+2025-07-13 14:54:35.364140  1.250271  1.250379  1.250234  1.250351     336
+2025-07-13 14:55:35.364140  1.250351  1.250450  1.250326  1.250387     171
+2025-07-13 14:56:35.364140  1.250387  1.250399  1.250316  1.250349     222
+...                              ...       ...       ...       ...     ...
+2025-07-13 15:47:35.485325  1.250039  1.250150  1.249986  1.250139     267
+2025-07-13 15:48:35.485325  1.250139  1.250292  1.250107  1.250202     185
+2025-07-13 15:49:35.485325  1.250202  1.250224  1.250157  1.250161     111
+2025-07-13 15:50:35.485325  1.250161  1.250350  1.250111  1.250299     338
+2025-07-13 15:51:35.485325  1.250299  1.250389  1.250275  1.250352     259
+
+[100 rows x 5 columns]
+13-07-2025 16:45:41 - WARNING - Dataset contains only 100 rows. Some features requiring longer lookback periods may not be generated properly.
+13-07-2025 16:45:41 - INFO - ---------- Running Feature Generator ----------
+13-07-2025 16:45:41 - DEBUG - Starting to generate all features...
+13-07-2025 16:45:41 - DEBUG - Feature Moving Averages took 0.0006949901580810547 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Rate of Change took 0.0009169578552246094 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Average True Range took 0.0008397102355957031 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Bollinger Bands took 0.00045609474182128906 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Support and Resistance took 0.0005040168762207031 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Finished calculating Price Action Features
+13-07-2025 16:45:41 - DEBUG - Feature Volume Moving Averages took 0.0005350112915039062 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Volume Rate of Change took 0.0006878376007080078 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature On Balance Volume took 0.0006220340728759766 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Volume Profile took 0.0334169864654541 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Activity Profile (tick volume) took 0.00022292137145996094 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature VWAP took 0.00047397613525390625 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Money Flow Index took 0.0006301403045654297 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Finished calculating Volume-Based Features
+13-07-2025 16:45:41 - DEBUG - Feature Relative Strength Index took 0.001344919204711914 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature MACD took 0.0003578662872314453 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Average Directional Index took 0.007841825485229492 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Stochastic Oscillator took 0.0006289482116699219 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Commodity Channel Index took 0.0004558563232421875 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Finished calculating Technical Indicators
+13-07-2025 16:45:41 - DEBUG - ----- Inside check_feature_specification() to determine how to generate hypotheses feature: time_of_day -----
+13-07-2025 16:45:41 - DEBUG - selected_features (the whole list) is empty. All features are to be generated of method time_of_day
+13-07-2025 16:45:41 - DEBUG - Feature Time of Day took 0.0003628730773925781 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Day of Week took 0.00039386749267578125 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Time of Week took 0.0003447532653808594 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Time of Month took 0.0007250308990478516 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Trading Sessions took 0.0005218982696533203 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Session timing features took 0.0018339157104492188 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Session Transition Features took 0.0014109611511230469 seconds to calculate.
+13-07-2025 16:45:41 - WARNING - Not enough data for seasonal decomposition (need 320, have 100)
+13-07-2025 16:45:41 - DEBUG - Feature Seasonal Decomposition took 0.00014066696166992188 seconds to calculate.
+13-07-2025 16:45:41 - WARNING - Not enough data for STL decomposition (need 320, have 100)
+13-07-2025 16:45:41 - DEBUG - Feature STL Decomposition took 7.987022399902344e-05 seconds to calculate.
+13-07-2025 16:45:41 - WARNING - Not enough data for MSTL decomposition (need 320, have 100)
+13-07-2025 16:45:41 - DEBUG - Feature MSTL Decomposition took 7.009506225585938e-05 seconds to calculate.
+13-07-2025 16:45:41 - WARNING - Error calculating holiday features: Can only use .dt accessor with datetimelike values
+13-07-2025 16:45:41 - DEBUG - Feature Holiday Features took 0.000102996826171875 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Finished calculating Time-based Features
+13-07-2025 16:45:41 - DEBUG - Feature Volatility Regimes took 0.0017349720001220703 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Trend Strength Indicators took 0.005950927734375 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Market State Indicators took 0.007255077362060547 seconds to calculate.
+13-07-2025 16:45:41 - DEBUG - Feature Log Returns took 0.00040411949157714844 seconds to calculate.
+13-07-2025 16:45:41 - INFO - Trading loop completed after 3 iterations
+13-07-2025 16:45:41 - DEBUG - Feature Fast Fourier Transforms took 0.0008440017700195312 seconds to calculate.
+13-07-2025 16:45:41 - INFO - Session anomaly strategy execution completed
+13-07-2025 16:45:41 - INFO - Generated 134 features.
+13-07-2025 16:45:41 - INFO - Stopping live data streaming...
+13-07-2025 16:45:41 - DEBUG - Generated features are: ['sma_5', 'ema_5', 'sma_10', 'ema_10', 'sma_20', 'ema_20', 'sma_50', 'ema_50', 'sma_200', 'ema_200', 'roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60', 'atr', 'upper_band', 'lower_band', 'bb_width', 'distance_from_high', 'distance_from_low', 'vma_7', 'relative_volume_7', 'vma_15', 'relative_volume_15', 'vma_30', 'relative_volume_30', 'vma_60', 'relative_volume_60', 'vroc_1', 'vroc_5', 'vroc_10', 'vroc_20', 'obv', 'vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration', 'activity', 'vwap', 'mfi', 'rsi_14', 'macd_line', 'macd_signal', 'macd_histogram', '+di', '-di', 'adx', 'stoch_k', 'stoch_d', 'cci', 'hour_sin', 'hour_cos', 'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening', 'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend', 'month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos', 'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity', 'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos', 'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close', 'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_medium', 'adx_trend_regime', 'adx_regime_ranging', 'dist_from_sma_20', 'sma_20_slope', 'dist_from_sma_50', 'sma_50_slope', 'dist_from_sma_200', 'sma_200_slope', 'ma_cross_50_200', 'regression_slope', 'r_squared', 'norm_regression_slope', 'trend_strength', 'trend_regime', 'trend_regime_ranging', 'vol_regime_num', 'trend_regime_num', 'market_state', 'market_state_desc', 'state_medium_vol_ranging', 'state_duration', 'log_return', 'fft_sin_11', 'fft_cos_11', 'fft_sin_3', 'fft_cos_3', 'fft_sin_12', 'fft_cos_12', 'fft_dominant_periods']
+13-07-2025 16:45:41 - DEBUG - New market data received and processed
+13-07-2025 16:45:42 - INFO - Live data streaming stopped
+13-07-2025 16:45:42 - INFO - Live data streaming stopped
+13-07-2025 16:45:42 - INFO - Stopping position monitoring...
+13-07-2025 16:45:42 - INFO - Position monitoring stopped
+13-07-2025 16:45:42 - INFO - Position monitoring stopped
+13-07-2025 16:45:42 - INFO - Strategy results saved to: /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/strategy/strategy_results.json

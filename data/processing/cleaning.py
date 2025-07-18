@@ -117,8 +117,12 @@ class DataCleaner(BaseProcessor):
         # Check if 'date' column exists for subset-based deduplication
         if 'date' in self.df.columns:
             self.df = self.df.drop_duplicates(subset=['date'])
+        elif pd.api.types.is_datetime64_any_dtype(self.df.index):
+            # Date is in the index, remove duplicates based on index
+            logging.debug("Using datetime index for deduplication")
+            self.df = self.df[~self.df.index.duplicated(keep='first')]
         else:
-            # If no date column, just remove completely identical rows
+            # If no date column or datetime index, just remove completely identical rows
             logging.warning("No 'date' column found for deduplication, removing completely identical rows")
             self.df = self.df.drop_duplicates()
         
@@ -132,10 +136,15 @@ class DataCleaner(BaseProcessor):
         3. Timezone normalization to UTC
         4. Identifying and FILLING gaps in time series  # ← IMPROVED
         """
-        # Check if 'date' column exists
+        # Check if 'date' column exists or if we already have a datetime index
         if 'date' not in self.df.columns:
-            logging.error("No 'date' column found in the dataframe")
-            return
+            if pd.api.types.is_datetime64_any_dtype(self.df.index):
+                # Date is already in the index, no need to process
+                logging.debug("Date information already in index, skipping timestamp alignment")
+                return
+            else:
+                logging.error("No 'date' column found in the dataframe")
+                return
             
         # Convert date column to datetime if it's not already
         if not pd.api.types.is_datetime64_any_dtype(self.df['date']):

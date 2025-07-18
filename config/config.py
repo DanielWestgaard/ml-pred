@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # ml-pre
 BASE_STORAGE_DIR = os.path.join(BASE_DIR, 'storage')
 BASE_DATA_STORAGE_DIR = os.path.join(BASE_STORAGE_DIR, 'data')
 # Logging dirs
-DIFFERENT_LOG_DIRS = ['training', 'data', 'trash', "trades", "performance", "backtesting"]
+DIFFERENT_LOG_DIRS = ['training', 'data', 'trash', "trades", "performance", "backtesting", "strategy"]
 BASE_LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 # Capital.com API
 CAPCOM_BASE_STORAGE_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'capital_com')

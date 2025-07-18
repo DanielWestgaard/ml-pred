@@ -35,6 +35,9 @@ Will also use this for planning.
 ├── plot/                       # Functionality for plotting datasets
 │   └── plot_data.py            # Simple plotting
 │
+├── live/                       # Live data integration module
+│   └── live_data_manager.py
+│
 └── README.md
 ```
 
@@ -253,3 +256,12 @@ python main.py --plot-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250515_2
 ## Challenges
 - Plotting 1-minute candles the **datasets can get very large**, making the plotting and interaction _slow_, and also incredibly _difficult to see what's going on_. Current solution is a little improved ```plotly.graph_objects``` implementation in the method ```simple_small_go_candle_plot()```. Though this can easily be even more improved. Perhaps splitting up the plotting?
 - **Plotting engineered data**: As most of the data has been _normalized_ (even ohlcv), I can't really check to see if the cleaning was done correctly. Solution is to _plot and save dataset after cleaning_ it, as part of the Data Pipeline.
+
+
+
+# About live/live_data_manager.py 📺
+- **Streams live market data** from Capital.com WebSocket or simulation
+- **Maintains rolling buffer** of recent OHLCV data
+- **Reuses existing feature pipeline** (cleaning → validation → feature generation)
+- **Thread-safe** with proper error handling and reconnection logic
+- **Callback system** for real-time data notifications

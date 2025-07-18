@@ -1,0 +1,42 @@
+hypothesis:
+    name: session_based_tod_anomalies
+
+strategy:
+    hypothesis_name: session_based_tod_anomalies
+    model_folder: storage/models/2025-07-03_12:45:35
+
+    data:
+        symbol: GBPUSD
+        timeframe: MINUTE
+        buffer_size: 350
+        feature_window: 35  # Must be >= 30 for validation
+        dry_run: false  # Set to false for live WebSocket testing  
+        jumpstart: true  # Preload buffer with historical data
+        use_websocket: true  # Use WebSocket for real-time data (Capital.com)
+        selected_features: null
+
+    execution:
+        max_loops: 999999    # Run indefinitely (practically infinite)
+        loop_interval: 5     # 5 seconds between decisions
+
+    signal_processing:
+        confidence_threshold: 0.3
+        signal_filters: ['session_filter', 'volatility_filter']
+
+    risk_management:
+        max_position_size: 0.02  # 2% of capital
+        stop_loss_pct: 0.01      # 1% stop loss
+        max_drawdown: 0.05       # 5% max drawdown
+
+    position_management:
+        max_concurrent_positions: 3
+        position_tracking: detailed
+
+    order_management:
+        broker: capital_com
+        order_type: market
+        execution_delay: 0.1
+        dry_run: true  # Keep as true for testing - no real orders
+
+    monitoring:
+        update_interval: 1.0  # Position update frequency in seconds

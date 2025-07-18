@@ -1,0 +1,804 @@
+16-07-2025 14:21:06 - INFO - Logging system initialized. Environment: development
+16-07-2025 14:21:06 - INFO - User using pure hypothesis flow!
+16-07-2025 14:21:06 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_fixed.yml
+16-07-2025 14:21:06 - INFO - Loaded hypothesis: session_based_tod_anomalies
+16-07-2025 14:21:06 - DEBUG - Section 'data_pipeline' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Section 'model_training' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Section 'evaluate_model' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 350, 'feature_window': 35, 'dry_run': False, 'jumpstart': True, 'use_websocket': True, 'selected_features': None}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.execution: {'max_loops': 10, 'loop_interval': 5}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.7, 'signal_filters': ['session_filter', 'volatility_filter']}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+16-07-2025 14:21:06 - INFO - Successfully loaded config sections: ['strategy']
+16-07-2025 14:21:06 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_fixed.yml
+16-07-2025 14:21:06 - INFO - Loaded hypothesis: session_based_tod_anomalies
+16-07-2025 14:21:06 - DEBUG - Section 'data_pipeline' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Section 'model_training' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Section 'evaluate_model' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 350, 'feature_window': 35, 'dry_run': False, 'jumpstart': True, 'use_websocket': True, 'selected_features': None}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.execution: {'max_loops': 10, 'loop_interval': 5}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.7, 'signal_filters': ['session_filter', 'volatility_filter']}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+16-07-2025 14:21:06 - INFO - Successfully loaded config sections: ['strategy']
+16-07-2025 14:21:06 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_fixed.yml
+16-07-2025 14:21:06 - INFO - Loaded hypothesis: session_based_tod_anomalies
+16-07-2025 14:21:06 - DEBUG - Section 'data_pipeline' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Section 'model_training' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Section 'evaluate_model' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 350, 'feature_window': 35, 'dry_run': False, 'jumpstart': True, 'use_websocket': True, 'selected_features': None}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.execution: {'max_loops': 10, 'loop_interval': 5}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.7, 'signal_filters': ['session_filter', 'volatility_filter']}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+16-07-2025 14:21:06 - INFO - Successfully loaded config sections: ['strategy']
+16-07-2025 14:21:06 - INFO - ---------- Initializing SessionAnomalyStrategy ----------
+16-07-2025 14:21:06 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+16-07-2025 14:21:06 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-14_17:42:57/model_metadata.yml
+16-07-2025 14:21:06 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-09_22:09:38/model_metadata.yml
+16-07-2025 14:21:06 - ERROR - Error loading metadata: SafeConstructor.construct_yaml_object() got an unexpected keyword argument 'deep'
+16-07-2025 14:21:06 - WARNING - Could not load metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-06-09_20:19:29: SafeConstructor.construct_yaml_object() got an unexpected keyword argument 'deep'
+16-07-2025 14:21:06 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:27:50/model_metadata.yml
+16-07-2025 14:21:06 - DEBUG - Utility function, get_latest_model(), found the latest trained model: /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35
+16-07-2025 14:21:06 - DEBUG - Successfully loaded metadata from /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-03_12:45:35/model_metadata.yml
+16-07-2025 14:21:06 - DEBUG - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config_fixed.yml
+16-07-2025 14:21:06 - INFO - Loaded hypothesis: session_based_tod_anomalies
+16-07-2025 14:21:06 - DEBUG - Section 'data_pipeline' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Section 'model_training' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Section 'evaluate_model' not found in configuration
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.hypothesis_name: session_based_tod_anomalies
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.model_folder: storage/models/2025-07-03_12:45:35
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.data: {'symbol': 'GBPUSD', 'timeframe': 'MINUTE', 'buffer_size': 350, 'feature_window': 35, 'dry_run': False, 'jumpstart': True, 'use_websocket': True, 'selected_features': None}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.execution: {'max_loops': 10, 'loop_interval': 5}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.signal_processing: {'confidence_threshold': 0.7, 'signal_filters': ['session_filter', 'volatility_filter']}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.risk_management: {'max_position_size': 0.02, 'stop_loss_pct': 0.01, 'max_drawdown': 0.05}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.position_management: {'max_concurrent_positions': 3, 'position_tracking': 'detailed'}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.order_management: {'broker': 'capital_com', 'order_type': 'market', 'execution_delay': 0.1, 'dry_run': True}
+16-07-2025 14:21:06 - DEBUG - Extracted strategy.monitoring: {'update_interval': 1.0}
+16-07-2025 14:21:06 - INFO - Successfully loaded config sections: ['strategy']
+16-07-2025 14:21:06 - INFO - Signal processor initialized with confidence threshold: 0.7
+16-07-2025 14:21:06 - INFO - Risk manager initialized - Max position: 2.0%, Stop loss: 1.0%, Max drawdown: 5.0%
+16-07-2025 14:21:06 - INFO - Position manager initialized - Tracking: detailed, Max positions: 3
+16-07-2025 14:21:06 - INFO - Running in dry run mode - no actual orders will be placed
+16-07-2025 14:21:06 - INFO - Order manager initialized - Broker: capital_com, Order type: market, Dry run: True
+16-07-2025 14:21:06 - INFO - LiveDataManager initialized - Symbol: GBPUSD, Timeframe: MINUTE, Buffer: 350
+16-07-2025 14:21:06 - INFO - Live data manager initialized
+16-07-2025 14:21:06 - INFO - Position monitor initialized - Update interval: 1.0s
+16-07-2025 14:21:06 - INFO - Position monitor initialized
+16-07-2025 14:21:06 - INFO - Session anomaly strategy initialized
+16-07-2025 14:21:06 - INFO - Running strategy for hypothesis type: session_based_tod_anomalies
+16-07-2025 14:21:06 - INFO - Starting strategy execution for session_based_tod_anomalies
+16-07-2025 14:21:06 - INFO - Session anomaly strategy execution started
+16-07-2025 14:21:06 - INFO - Jumpstarting buffer with historical data...
+16-07-2025 14:21:06 - ERROR - No broker connection available for historical data fetch
+16-07-2025 14:21:06 - ERROR - Failed to get historical data for jumpstart
+16-07-2025 14:21:06 - WARNING - Buffer jumpstart failed, continuing with normal startup
+16-07-2025 14:21:06 - INFO - WebSocket data manager initialized for symbols: ['GBPUSD']
+16-07-2025 14:21:06 - INFO - Loaded credentials. Length: 3
+16-07-2025 14:21:06 - INFO - About to start a new session.
+16-07-2025 14:21:06 - DEBUG - Using encrypted password to start session.
+16-07-2025 14:21:06 - INFO - AccountID and/or all_accounts is None. Initializing them now.
+16-07-2025 14:21:07 - INFO - Will not print out response of all accounts.
+16-07-2025 14:21:07 - INFO - Found accountId matching account USD_testing!
+16-07-2025 14:21:07 - INFO - Successfully switched to account USD_testing!
+16-07-2025 14:21:07 - INFO - Loaded credentials. Length: 3
+16-07-2025 14:21:07 - INFO - About to start a new session.
+16-07-2025 14:21:07 - DEBUG - Using encrypted password to start session.
+16-07-2025 14:21:07 - INFO - Capital.com broker connection established
+16-07-2025 14:21:07 - INFO - Jumpstarting buffers with historical data...
+16-07-2025 14:21:07 - INFO - Attempting to fetch maximum available data for GBPUSD
+16-07-2025 14:21:07 - INFO - Requested range: 2025-07-16T12:21:07 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - INFO - Fetching historical data for GBPUSD from 2025-07-16T12:21:07 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - INFO - Using chunk size of 15:00:00 for resolution MINUTE
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 12:21 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T12:21:07 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: expected string or bytes-like object
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T12:21:07 to 2025-07-16T13:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T12:21:07 to 2025-07-16T12:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 12:51 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T12:51:07 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T12:51:07 to 2025-07-16T13:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T12:51:07 to 2025-07-16T13:13:37
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 13:13 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T13:13:37 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T13:13:37 to 2025-07-16T13:47:22
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T13:13:37 to 2025-07-16T13:30:29
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 13:30 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T13:30:29 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T13:30:29 to 2025-07-16T13:55:48
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T13:30:29 to 2025-07-16T13:43:08
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 13:43 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T13:43:08 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T13:43:08 to 2025-07-16T14:02:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T13:43:08 to 2025-07-16T13:52:38
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 13:52 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T13:52:38 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T13:52:38 to 2025-07-16T14:06:52
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T13:52:38 to 2025-07-16T13:59:45
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 13:59 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T13:59:45 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T13:59:45 to 2025-07-16T14:10:26
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T13:59:45 to 2025-07-16T14:05:05
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:05 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:05:05 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:05:05 to 2025-07-16T14:13:06
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:05:05 to 2025-07-16T14:09:06
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:09 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:09:06 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:09:06 to 2025-07-16T14:15:06
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:09:06 to 2025-07-16T14:12:06
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:12 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:12:06 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:12:06 to 2025-07-16T14:16:36
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:12:06 to 2025-07-16T14:14:21
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:14 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:14:21 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:14:21 to 2025-07-16T14:17:44
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:14:21 to 2025-07-16T14:16:02
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:16 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:16:02 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:16:02 to 2025-07-16T14:18:34
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:16:02 to 2025-07-16T14:17:18
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:17 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:17:18 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:17:18 to 2025-07-16T14:19:12
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:17:18 to 2025-07-16T14:18:15
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:18 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:18:18 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:18:18 to 2025-07-16T14:19:42
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:18:18 to 2025-07-16T14:19:00
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:19 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:19:18 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:19:18 to 2025-07-16T14:20:12
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:19:18 to 2025-07-16T14:19:45
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:20 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:20:18 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:20:18 to 2025-07-16T14:20:42
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:20:18 to 2025-07-16T14:20:30
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Fetching completed: 0 successful chunks, 16 failed chunks
+16-07-2025 14:21:07 - INFO - Total data points collected: 0
+16-07-2025 14:21:07 - ERROR - No data to save.
+16-07-2025 14:21:07 - WARNING - No data was collected for the requested period
+16-07-2025 14:21:07 - INFO - Trying to fetch recent data from 2025-07-09T14:21:07 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - INFO - Fetching historical data for GBPUSD from 2025-07-09T14:21:07 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - INFO - Using chunk size of 15:00:00 for resolution MINUTE
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-09 14:21 to 2025-07-10 05:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-09T14:21:07 to 2025-07-10T05:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-09T14:21:07 to 2025-07-09T21:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-09T14:21:07 to 2025-07-09T18:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-09 18:06 to 2025-07-10 09:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-09T18:06:07 to 2025-07-10T09:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-09T18:06:07 to 2025-07-10T01:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-09T18:06:07 to 2025-07-09T21:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-09 21:51 to 2025-07-10 12:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-09T21:51:07 to 2025-07-10T12:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-09T21:51:07 to 2025-07-10T05:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-09T21:51:07 to 2025-07-10T01:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-10 01:36 to 2025-07-10 16:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-10T01:36:07 to 2025-07-10T16:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-10T01:36:07 to 2025-07-10T09:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-10T01:36:07 to 2025-07-10T05:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-10 05:21 to 2025-07-10 20:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-10T05:21:07 to 2025-07-10T20:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-10T05:21:07 to 2025-07-10T12:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-10T05:21:07 to 2025-07-10T09:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-10 09:06 to 2025-07-11 00:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-10T09:06:07 to 2025-07-11T00:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-10T09:06:07 to 2025-07-10T16:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-10T09:06:07 to 2025-07-10T12:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-10 12:51 to 2025-07-11 03:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-10T12:51:07 to 2025-07-11T03:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-10T12:51:07 to 2025-07-10T20:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-10T12:51:07 to 2025-07-10T16:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-10 16:36 to 2025-07-11 07:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-10T16:36:07 to 2025-07-11T07:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-10T16:36:07 to 2025-07-11T00:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-10T16:36:07 to 2025-07-10T20:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-10 20:21 to 2025-07-11 11:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-10T20:21:07 to 2025-07-11T11:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-10T20:21:07 to 2025-07-11T03:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-10T20:21:07 to 2025-07-11T00:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-11 00:06 to 2025-07-11 15:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-11T00:06:07 to 2025-07-11T15:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-11T00:06:07 to 2025-07-11T07:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-11T00:06:07 to 2025-07-11T03:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-11 03:51 to 2025-07-11 18:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-11T03:51:07 to 2025-07-11T18:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-11T03:51:07 to 2025-07-11T11:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-11T03:51:07 to 2025-07-11T07:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-11 07:36 to 2025-07-11 22:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-11T07:36:07 to 2025-07-11T22:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-11T07:36:07 to 2025-07-11T15:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-11T07:36:07 to 2025-07-11T11:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-11 11:21 to 2025-07-12 02:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-11T11:21:07 to 2025-07-12T02:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-11T11:21:07 to 2025-07-11T18:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-11T11:21:07 to 2025-07-11T15:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-11 15:06 to 2025-07-12 06:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-11T15:06:07 to 2025-07-12T06:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-11T15:06:07 to 2025-07-11T22:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-11T15:06:07 to 2025-07-11T18:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-11 18:51 to 2025-07-12 09:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-11T18:51:07 to 2025-07-12T09:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-11T18:51:07 to 2025-07-12T02:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-11T18:51:07 to 2025-07-11T22:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-11 22:36 to 2025-07-12 13:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-11T22:36:07 to 2025-07-12T13:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-11T22:36:07 to 2025-07-12T06:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-11T22:36:07 to 2025-07-12T02:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-12 02:21 to 2025-07-12 17:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-12T02:21:07 to 2025-07-12T17:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-12T02:21:07 to 2025-07-12T09:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-12T02:21:07 to 2025-07-12T06:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-12 06:06 to 2025-07-12 21:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-12T06:06:07 to 2025-07-12T21:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-12T06:06:07 to 2025-07-12T13:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-12T06:06:07 to 2025-07-12T09:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-12 09:51 to 2025-07-13 00:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-12T09:51:07 to 2025-07-13T00:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-12T09:51:07 to 2025-07-12T17:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-12T09:51:07 to 2025-07-12T13:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-12 13:36 to 2025-07-13 04:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-12T13:36:07 to 2025-07-13T04:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-12T13:36:07 to 2025-07-12T21:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-12T13:36:07 to 2025-07-12T17:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-12 17:21 to 2025-07-13 08:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-12T17:21:07 to 2025-07-13T08:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-12T17:21:07 to 2025-07-13T00:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-12T17:21:07 to 2025-07-12T21:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-12 21:06 to 2025-07-13 12:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-12T21:06:07 to 2025-07-13T12:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-12T21:06:07 to 2025-07-13T04:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-12T21:06:07 to 2025-07-13T00:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-13 00:51 to 2025-07-13 15:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-13T00:51:07 to 2025-07-13T15:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-13T00:51:07 to 2025-07-13T08:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-13T00:51:07 to 2025-07-13T04:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-13 04:36 to 2025-07-13 19:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-13T04:36:07 to 2025-07-13T19:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-13T04:36:07 to 2025-07-13T12:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-13T04:36:07 to 2025-07-13T08:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-13 08:21 to 2025-07-13 23:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-13T08:21:07 to 2025-07-13T23:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-13T08:21:07 to 2025-07-13T15:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-13T08:21:07 to 2025-07-13T12:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-13 12:06 to 2025-07-14 03:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-13T12:06:07 to 2025-07-14T03:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-13T12:06:07 to 2025-07-13T19:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-13T12:06:07 to 2025-07-13T15:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-13 15:51 to 2025-07-14 06:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-13T15:51:07 to 2025-07-14T06:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-13T15:51:07 to 2025-07-13T23:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-13T15:51:07 to 2025-07-13T19:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-13 19:36 to 2025-07-14 10:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-13T19:36:07 to 2025-07-14T10:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-13T19:36:07 to 2025-07-14T03:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-13T19:36:07 to 2025-07-13T23:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-13 23:21 to 2025-07-14 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-13T23:21:07 to 2025-07-14T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-13T23:21:07 to 2025-07-14T06:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-13T23:21:07 to 2025-07-14T03:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-14 03:06 to 2025-07-14 18:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-14T03:06:07 to 2025-07-14T18:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-14T03:06:07 to 2025-07-14T10:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-14T03:06:07 to 2025-07-14T06:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-14 06:51 to 2025-07-14 21:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-14T06:51:07 to 2025-07-14T21:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-14T06:51:07 to 2025-07-14T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-14T06:51:07 to 2025-07-14T10:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-14 10:36 to 2025-07-15 01:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-14T10:36:07 to 2025-07-15T01:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-14T10:36:07 to 2025-07-14T18:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-14T10:36:07 to 2025-07-14T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-14 14:21 to 2025-07-15 05:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-14T14:21:07 to 2025-07-15T05:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-14T14:21:07 to 2025-07-14T21:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-14T14:21:07 to 2025-07-14T18:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-14 18:06 to 2025-07-15 09:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-14T18:06:07 to 2025-07-15T09:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-14T18:06:07 to 2025-07-15T01:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-14T18:06:07 to 2025-07-14T21:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-14 21:51 to 2025-07-15 12:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-14T21:51:07 to 2025-07-15T12:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-14T21:51:07 to 2025-07-15T05:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-14T21:51:07 to 2025-07-15T01:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-15 01:36 to 2025-07-15 16:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-15T01:36:07 to 2025-07-15T16:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-15T01:36:07 to 2025-07-15T09:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-15T01:36:07 to 2025-07-15T05:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-15 05:21 to 2025-07-15 20:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-15T05:21:07 to 2025-07-15T20:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-15T05:21:07 to 2025-07-15T12:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-15T05:21:07 to 2025-07-15T09:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-15 09:06 to 2025-07-16 00:06
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-15T09:06:07 to 2025-07-16T00:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-15T09:06:07 to 2025-07-15T16:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-15T09:06:07 to 2025-07-15T12:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-15 12:51 to 2025-07-16 03:51
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-15T12:51:07 to 2025-07-16T03:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-15T12:51:07 to 2025-07-15T20:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-15T12:51:07 to 2025-07-15T16:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-15 16:36 to 2025-07-16 07:36
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-15T16:36:07 to 2025-07-16T07:36:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-15T16:36:07 to 2025-07-16T00:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-15T16:36:07 to 2025-07-15T20:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-15 20:21 to 2025-07-16 11:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-15T20:21:07 to 2025-07-16T11:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-15T20:21:07 to 2025-07-16T03:51:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-15T20:21:07 to 2025-07-16T00:06:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 00:06 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T00:06:07 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T00:06:07 to 2025-07-16T07:13:37
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T00:06:07 to 2025-07-16T03:39:52
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 03:39 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T03:39:52 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T03:39:52 to 2025-07-16T09:00:29
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T03:39:52 to 2025-07-16T06:20:10
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 06:20 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T06:20:10 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T06:20:10 to 2025-07-16T10:20:38
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T06:20:10 to 2025-07-16T08:20:24
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 08:20 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T08:20:24 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T08:20:24 to 2025-07-16T11:20:45
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T08:20:24 to 2025-07-16T09:50:35
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 09:50 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T09:50:35 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T09:50:35 to 2025-07-16T12:05:51
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T09:50:35 to 2025-07-16T10:58:13
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 10:58 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T10:58:13 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T10:58:13 to 2025-07-16T12:39:40
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T10:58:13 to 2025-07-16T11:48:56
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 11:48 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T11:48:56 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T11:48:56 to 2025-07-16T13:05:01
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T11:48:56 to 2025-07-16T12:26:59
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 12:26 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T12:26:59 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T12:26:59 to 2025-07-16T13:24:03
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T12:26:59 to 2025-07-16T12:55:31
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 12:55 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T12:55:31 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T12:55:31 to 2025-07-16T13:38:19
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T12:55:31 to 2025-07-16T13:16:55
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 13:16 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T13:16:55 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T13:16:55 to 2025-07-16T13:49:01
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T13:16:55 to 2025-07-16T13:32:58
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 13:32 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T13:32:58 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T13:32:58 to 2025-07-16T13:57:02
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T13:32:58 to 2025-07-16T13:45:00
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 13:45 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T13:45:00 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T13:45:00 to 2025-07-16T14:03:03
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T13:45:00 to 2025-07-16T13:54:02
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 13:54 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T13:54:02 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T13:54:02 to 2025-07-16T14:07:34
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T13:54:02 to 2025-07-16T14:00:48
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:00 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:00:48 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:00:48 to 2025-07-16T14:10:57
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:00:48 to 2025-07-16T14:05:52
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:05 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:05:52 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:05:52 to 2025-07-16T14:13:29
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:05:52 to 2025-07-16T14:09:41
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:09 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:09:41 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:09:41 to 2025-07-16T14:15:24
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:09:41 to 2025-07-16T14:12:32
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:12 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:12:32 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:12:32 to 2025-07-16T14:16:49
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:12:32 to 2025-07-16T14:14:41
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:14 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:14:41 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:14:41 to 2025-07-16T14:17:54
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:14:41 to 2025-07-16T14:16:17
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:16 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:16:17 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:16:17 to 2025-07-16T14:18:42
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:16:17 to 2025-07-16T14:17:30
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:17 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:17:30 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:17:30 to 2025-07-16T14:19:18
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:17:30 to 2025-07-16T14:18:24
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:18 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:18:30 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:18:30 to 2025-07-16T14:19:48
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:18:30 to 2025-07-16T14:19:09
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:19 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:19:30 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:19:30 to 2025-07-16T14:20:18
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:19:30 to 2025-07-16T14:19:54
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Processing chunk from 2025-07-16 14:20 to 2025-07-16 14:21
+16-07-2025 14:21:07 - DEBUG - Attempt 1: Fetching from 2025-07-16T14:20:30 to 2025-07-16T14:21:07
+16-07-2025 14:21:07 - ERROR - Error in attempt 1: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 2: Fetching from 2025-07-16T14:20:30 to 2025-07-16T14:20:48
+16-07-2025 14:21:07 - ERROR - Error in attempt 2: Request-started
+16-07-2025 14:21:07 - DEBUG - Attempt 3: Fetching from 2025-07-16T14:20:30 to 2025-07-16T14:20:39
+16-07-2025 14:21:07 - ERROR - Error in attempt 3: Request-started
+16-07-2025 14:21:07 - WARNING - ✗ Unexpected response format: {'error': 'Request-started'}
+16-07-2025 14:21:07 - INFO - Fetching completed: 0 successful chunks, 64 failed chunks
+16-07-2025 14:21:07 - INFO - Total data points collected: 0
+16-07-2025 14:21:07 - ERROR - No data to save.
+16-07-2025 14:21:07 - INFO - Added 0 historical records to GBPUSD buffer
+16-07-2025 14:21:07 - INFO - About to initiate subscribtion to live market data...
+16-07-2025 14:21:07 - INFO - Websocket connected
+16-07-2025 14:21:07 - DEBUG - Received WebSocket message: OHLCMarketData.subscribe
+16-07-2025 14:21:08 - INFO - Automatic ping scheduled every 60 seconds
+16-07-2025 14:21:08 - INFO - Subscribed to WebSocket data for GBPUSD
+16-07-2025 14:21:08 - INFO - Successfully subscribed to 1 symbols
+16-07-2025 14:21:08 - INFO - WebSocket streaming started successfully
+16-07-2025 14:21:08 - INFO - WebSocket streaming initialized successfully
+16-07-2025 14:21:08 - INFO - Using WebSocket for real-time data streaming
+16-07-2025 14:21:08 - INFO - Live data streaming started - Mode: live, Jumpstart: enabled
+16-07-2025 14:21:08 - INFO - Waiting for initial data buffer to fill...
+16-07-2025 14:21:08 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:08 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:10 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:10 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:12 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:12 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:14 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:14 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:16 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:16 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:18 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:18 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:20 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:20 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:22 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:22 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:24 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:24 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:26 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:26 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:28 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:28 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:30 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:30 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:32 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:32 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:34 - DEBUG - Ready check failed - Streaming: True, Buffer: False (0>=35), Features: False, Connection: False
+16-07-2025 14:21:34 - INFO - Buffer status: 0/350 (0.0%)
+16-07-2025 14:21:34 - INFO - Stopping live data streaming...
+16-07-2025 14:21:35 - INFO - Stopping WebSocket streaming...
+16-07-2025 14:21:35 - INFO - Successfully ended session: {"status":"SUCCESS"}
+16-07-2025 14:21:35 - INFO - WebSocket streaming stopped - Uptime: 0:00:27.183988, Messages received: 0
+16-07-2025 14:21:35 - INFO - Live data streaming stopped
+16-07-2025 14:21:35 - INFO - Live data streaming stopped
+16-07-2025 14:21:35 - INFO - Position monitoring stopped
+16-07-2025 14:22:07 - ERROR - Connection to remote host was lost. - goodbye
+16-07-2025 14:22:08 - ERROR - WebSocket is not connected. Cannot send ping.
