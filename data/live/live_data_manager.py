@@ -352,6 +352,13 @@ class LiveDataManager:
             df['date'] = pd.to_datetime(df['date'])
             df.set_index('date', inplace=True)
             
+            # Filter out metadata columns that shouldn't be features
+            metadata_columns = ['symbol', 'source']
+            columns_to_drop = [col for col in metadata_columns if col in df.columns]
+            if columns_to_drop:
+                df = df.drop(columns=columns_to_drop)
+                logging.debug(f"Filtered out metadata columns: {columns_to_drop}")
+            
             # Clean data using the existing pipeline pattern
             cleaner = DataCleaner(df.copy(), save_cleaned_data=False)
             df_cleaned = cleaner.run()
