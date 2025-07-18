@@ -200,6 +200,9 @@ class SessionAnomalyStrategy(BaseStrategy):
             X = market_data[feature_columns].iloc[-1:].values  # Get latest row
             predictions = self.model.predict(X)
             
+            # Debug logging to understand prediction values
+            logging.debug(f"Model predictions: {predictions}")
+            
             # Convert predictions to signals using signal processor
             signals = self.signal_processor.process(predictions, market_data)
             

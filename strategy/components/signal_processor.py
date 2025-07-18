@@ -47,11 +47,16 @@ class SignalProcessor:
         for i, prediction in enumerate(predictions):
             signal_info = self._convert_prediction_to_signal(prediction, market_data, i)
             
+            # Debug logging for confidence filtering
+            logging.debug(f"Prediction {i}: value={prediction:.4f}, confidence={signal_info['confidence']:.4f}, threshold={self.confidence_threshold}")
+            
             if signal_info['confidence'] >= self.confidence_threshold:
                 signals['processed_signals'].append(signal_info)
                 signals['signal_strength'].append(signal_info['strength'])
                 signals['signal_direction'].append(signal_info['direction'])
                 signals['confidence_scores'].append(signal_info['confidence'])
+            else:
+                logging.debug(f"Signal rejected: confidence {signal_info['confidence']:.4f} < threshold {self.confidence_threshold}")
         
         # Apply filters
         signals = self._apply_filters(signals, market_data)
@@ -134,11 +139,13 @@ class SignalProcessor:
         """
         Filter signals based on trading session
         """
-        # Example session filter - placeholder for session-specific logic
+        # Extended session filter for testing - covers main FX trading hours
         current_hour = pd.Timestamp.now().hour
         
-        # Only trade during active market hours (example: 8-16 UTC)
-        if not (8 <= current_hour <= 16):
+        # Trade during extended market hours (covers major FX sessions)
+        # Asian: 21-06 UTC, London: 07-16 UTC, NY: 12-21 UTC
+        # This allows trading almost 24/7 except for brief quiet periods
+        if not (6 <= current_hour <= 22):  # Allow trading 6 AM - 10 PM UTC
             signals['processed_signals'] = []
             signals['signal_strength'] = []
             signals['signal_direction'] = []
