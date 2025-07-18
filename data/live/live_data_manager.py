@@ -229,7 +229,7 @@ class LiveDataManager:
             if symbol == self.symbol:
                 # Convert WebSocket data to standard format
                 market_data = {
-                    'timestamp': data.get('datetime', datetime.now()),
+                    'date': data.get('datetime', datetime.now()),
                     'open': data.get('open'),
                     'high': data.get('high'),
                     'low': data.get('low'),
@@ -579,12 +579,33 @@ class LiveDataManager:
                 logging.error("No historical data returned from broker")
                 return None
             
-            # Convert to DataFrame format expected by our pipeline
-            # Note: This depends on Capital.com's response format
-            # You may need to adjust based on actual API response structure
-            
-            logging.info(f"Fetched {len(historical_data)} historical data points from broker")
-            return historical_data
+            # Convert Capital.com API response to DataFrame format
+            if isinstance(historical_data, dict) and 'prices' in historical_data:
+                prices_data = historical_data['prices']
+                if not prices_data:
+                    logging.error("No price data in historical response")
+                    return None
+                
+                # Convert to DataFrame
+                df_data = []
+                for price_point in prices_data:
+                    df_data.append({
+                        'date': pd.to_datetime(price_point['snapshotTimeUTC']),
+                        'open': price_point['openPrice']['ask'],
+                        'high': price_point['highPrice']['ask'], 
+                        'low': price_point['lowPrice']['ask'],
+                        'close': price_point['closePrice']['ask'],
+                        'volume': price_point.get('lastTradedVolume', 0)
+                    })
+                
+                df = pd.DataFrame(df_data)
+                df.set_index('date', inplace=True)
+                
+                logging.info(f"Fetched {len(df)} historical data points from broker")
+                return df
+            else:
+                logging.error(f"Unexpected historical data format: {type(historical_data)}")
+                return None
             
         except Exception as e:
             logging.error(f"Error fetching historical data from broker: {e}")
