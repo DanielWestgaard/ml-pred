@@ -421,7 +421,11 @@ class LiveDataManager:
         if self._use_websocket == False and self._is_streaming:
             return True
         
-        # For real broker/WebSocket connections
+        # For WebSocket mode, check WebSocket connection health
+        if self._use_websocket and self.websocket_manager:
+            return self.websocket_manager.is_connected()
+        
+        # For traditional broker connections
         if not self.broker or not self._last_heartbeat:
             return False
         
