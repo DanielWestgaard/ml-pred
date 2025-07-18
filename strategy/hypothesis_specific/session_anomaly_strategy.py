@@ -431,7 +431,7 @@ class SessionAnomalyStrategy(BaseStrategy):
         
         strategy_results['status'] = 'running'
         
-        while loop_count < max_loops and self.live_data_manager.is_ready_for_trading():
+        while (max_loops <= 0 or loop_count < max_loops) and self.live_data_manager.is_ready_for_trading():
             try:
                 loop_start = datetime.now()
                 logging.debug(f"Trading loop iteration {loop_count + 1}")
