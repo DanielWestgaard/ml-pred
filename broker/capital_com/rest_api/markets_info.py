@@ -89,9 +89,11 @@ def fetch_chunk_with_retry(X_SECURITY_TOKEN, CST, epic, resolution,
     
     for attempt in range(max_retries):
         try:
-            # Format dates for API call
-            from_str = current_from.strftime("%Y-%m-%dT%H:%M:%S")
-            to_str = current_to.strftime("%Y-%m-%dT%H:%M:%S")
+            # Format dates for API call (round down seconds to :00 as Capital.com API requires)
+            from_rounded = current_from.replace(second=0, microsecond=0)
+            to_rounded = current_to.replace(second=0, microsecond=0)
+            from_str = from_rounded.strftime("%Y-%m-%dT%H:%M:%S")
+            to_str = to_rounded.strftime("%Y-%m-%dT%H:%M:%S")
             
             logging.debug(f"Attempt {attempt + 1}: Fetching from {from_str} to {to_str}")
             
