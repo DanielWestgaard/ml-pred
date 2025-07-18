@@ -99,6 +99,10 @@ class LiveDataManager:
                         logging.warning("WebSocket initialization failed, falling back to traditional broker")
                         if not self._connect_broker():
                             return False
+                    else:
+                        # WebSocket initialized successfully, but we still need broker connection for historical data
+                        if not self._connect_broker():
+                            logging.warning("Failed to establish broker connection for historical data, jumpstart will be disabled")
                 else:
                     # Use traditional broker connection
                     if not self._connect_broker():
