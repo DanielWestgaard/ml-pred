@@ -374,6 +374,9 @@ class SessionAnomalyStrategy(BaseStrategy):
             return False
         
         try:
+            # Add callback to be notified when new data arrives
+            self.live_data_manager.add_data_callback(self._on_new_data)
+            
             # Start streaming with jumpstart for faster startup
             dry_run = self.strategy_config.get('data', {}).get('dry_run', True)
             jumpstart = self.strategy_config.get('data', {}).get('jumpstart', True)
@@ -412,6 +415,9 @@ class SessionAnomalyStrategy(BaseStrategy):
             return False
         
         try:
+            # Add callback to sync position closures with position manager
+            self.position_monitor.add_position_callback(self._on_position_event)
+            
             if not self.position_monitor.start_monitoring():
                 logging.error("Failed to start position monitoring")
                 return False
@@ -667,6 +673,59 @@ class SessionAnomalyStrategy(BaseStrategy):
             logging.error(f"Error getting account balance: {e}")
             return 10000.0
     
+    def _on_new_data(self, data: pd.DataFrame):
+        """Callback for when new data arrives from live data manager"""
+        try:
+            # This is triggered whenever new processed data is available
+            # Instead of running in a loop, we process signals only when new data arrives
+            logging.debug("New data received, processing signals...")
+            
+            # Generate signals from the new data
+            signals = self.generate_signals(data)
+            
+            # Process trading signals
+            if signals and signals.get('processed_signals'):
+                self._process_trading_signals(signals)
+            
+            # Monitor existing positions
+            self._monitor_positions()
+            
+        except Exception as e:
+            logging.error(f"Error processing new data callback: {e}")
+
+    def _on_position_event(self, event_type: str, position_data: Dict[str, Any], extra_data: Dict[str, Any] = None):
+        """Callback to handle position events from position monitor"""
+        try:
+            position_id = position_data.get('position_id')
+            
+            if event_type == 'close_requested':
+                # Sync position closure with position manager
+                reason = extra_data.get('reason', 'monitor_close') if extra_data else 'monitor_close'
+                current_price = position_data.get('current_price', 1.0)
+                
+                # Close position in position manager
+                closed_position = self.position_manager.close_position(
+                    position_id=position_id,
+                    close_price=current_price,
+                    close_reason=reason
+                )
+                
+                if closed_position:
+                    logging.info(f"Position closed for {{'action': 'close', 'position_id': '{position_id}', 'reason': '{reason}'}}")
+                    logging.info(f"Successfully closed position {position_id} - Reason: {reason}")
+                else:
+                    logging.warning(f"Failed to close position {position_id} in position manager")
+            
+            elif event_type == 'position_opened':
+                logging.info(f"Position event: {event_type} for {position_id}")
+            
+            elif event_type == 'position_closed':
+                # Position already closed in monitor, just log
+                logging.debug(f"Position {position_id} closed in monitor")
+                
+        except Exception as e:
+            logging.error(f"Error handling position event {event_type}: {e}")
+
     def _cleanup_resources(self):
         """Cleanup resources when strategy stops"""
         try:
