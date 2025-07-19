@@ -2,7 +2,7 @@ hypothesis:
     name: session_based_tod_anomalies
 
 data_pipeline:
-    raw_source: storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv
+    raw_source: storage/data/capital_com/raw/raw_BTCUSD_m_20250501_20250718.csv
   
     required_features:
         time_of_day: []  # all features
