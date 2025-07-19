@@ -6,7 +6,7 @@ strategy:
     model_folder: storage/models/2025-07-03_12:45:35
 
     data:
-        symbol: GBPUSD
+        symbol: BTCUSD
         timeframe: MINUTE
         buffer_size: 350
         feature_window: 35  # Must be >= 30 for validation
