@@ -3,7 +3,7 @@ hypothesis:
 
 strategy:
     hypothesis_name: session_based_tod_anomalies
-    model_folder: storage/models/2025-07-03_12:45:35
+    model_folder: storage/models/2025-07-19_15:42:16
 
     data:
         symbol: BTCUSD
