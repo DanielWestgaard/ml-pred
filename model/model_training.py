@@ -396,6 +396,6 @@ def _hypothesis(self):
     """Simple method to check if this model is trained on a hypothesis or not, and returns json ready answer."""
     # If model is trained on hypothesis source: return json of the hypothesis_name
     if self.hypothesis_source is not None:
-        return f"{config_loader.load_model_metadata(self.hypothesis_source).handle_hypothesis_source().get('hypothesis_name')}"
+        return f"{config_loader.load_hypothesis_config(self.hypothesis_source).handle_hypothesis_source().get('hypothesis_name')}"
     else:  # If not, return none
         return f'{None}'
