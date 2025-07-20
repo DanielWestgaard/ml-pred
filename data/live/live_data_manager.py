@@ -193,6 +193,14 @@ class LiveDataManager:
         """Establish broker connection with retry logic"""
         for attempt in range(self._max_retries):
             try:
+                # Clean up any existing broker connection first to avoid session conflicts
+                if self.broker:
+                    try:
+                        self.broker.end_session()
+                    except:
+                        pass
+                    self.broker = None
+                
                 self.broker = CapitalCom()
                 self.broker.start_session()
                 self.broker.switch_active_account(account_name = config.VAR_ACCOUNT_NAME_TEST, print_answer=False)  # TODO: Should be more dynamic. Maybe provide this in the config?
@@ -200,6 +208,20 @@ class LiveDataManager:
                 self._last_heartbeat = datetime.now()
                 logging.info("Broker connection established")
                 return True
+                
+            except RuntimeError as e:
+                # Handle specific "Request-started" errors
+                if "Request-started" in str(e):
+                    self._connection_retries += 1
+                    logging.warning(f"Broker connection attempt {attempt + 1} failed with 'Request-started' error: {e}")
+                    if attempt < self._max_retries - 1:
+                        # Longer delay for "Request-started" errors
+                        delay = 3 + (2 ** attempt)
+                        logging.info(f"Waiting {delay} seconds before retry due to session conflict...")
+                        time.sleep(delay)
+                    continue
+                else:
+                    raise
                 
             except Exception as e:
                 self._connection_retries += 1

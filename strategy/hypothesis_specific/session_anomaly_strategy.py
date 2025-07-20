@@ -185,8 +185,15 @@ class SessionAnomalyStrategy(BaseStrategy):
                 self._last_risk_log_time[event_type] = current_time
             
             if event_type == 'max_drawdown':
-                # Critical events always get logged regardless of rate limiting
-                logging.critical("Maximum drawdown reached - halting new positions")
+                # Rate limit critical max_drawdown events to avoid spam (every 30 seconds)
+                should_log_critical = True
+                if 'max_drawdown_critical' in self._last_risk_log_time:
+                    time_since_last_critical = (current_time - self._last_risk_log_time['max_drawdown_critical']).total_seconds()
+                    should_log_critical = time_since_last_critical >= 30  # 30 seconds for critical messages
+                
+                if should_log_critical:
+                    logging.critical("Maximum drawdown reached - halting new positions")
+                    self._last_risk_log_time['max_drawdown_critical'] = current_time
                 # Could implement emergency stop here
                 
             elif event_type == 'high_exposure' and should_log:
@@ -804,6 +811,11 @@ class SessionAnomalyStrategy(BaseStrategy):
         except Exception as e:
             logging.error(f"Error handling position event {event_type}: {e}")
 
+    def stop(self):
+        """Stop the strategy gracefully"""
+        logging.info("Stopping session anomaly strategy...")
+        self._cleanup_resources()
+    
     def _cleanup_resources(self):
         """Cleanup resources when strategy stops"""
         try:
