@@ -64,18 +64,35 @@ class SessionAnomalyStrategy(BaseStrategy):
             self.live_data_manager = None
     
     def _on_new_data(self, latest_features: pd.DataFrame):
-        """Callback for when new processed data is available"""
+        """Callback for when new processed data is available - triggers event-driven strategy execution"""
         try:
-            # This could trigger signal generation in real-time
-            logging.debug("New market data received and processed")
+            logging.debug("New data received, processing signals...")
             
-            # In a more advanced implementation, this could:
-            # 1. Generate signals immediately
-            # 2. Check for position updates
-            # 3. Trigger risk management checks
+            # Event-driven strategy execution:
+            # 1. Generate signals immediately when new data arrives
+            signals = self.generate_signals(latest_features)
+            
+            # Update strategy results if available
+            if hasattr(self, '_strategy_results'):
+                self._strategy_results['signals_generated'] += len(signals.get('processed_signals', []))
+            
+            # 2. Process signals and execute trades if conditions are met
+            if signals.get('session_info', {}).get('should_trade', False):
+                position_actions = self._process_trading_signals(signals)
+                logging.debug(f"Position actions: {position_actions}")
+                
+                # Update position counts
+                if hasattr(self, '_strategy_results'):
+                    self._strategy_results['positions_opened'] += position_actions.get('opened', 0)
+                    self._strategy_results['positions_closed'] += position_actions.get('closed', 0)
+            
+            # 3. Monitor existing positions
+            self._monitor_positions()
             
         except Exception as e:
             logging.error(f"Error processing new data callback: {e}")
+            if hasattr(self, '_strategy_results'):
+                self._strategy_results['errors'].append(f"Callback error: {str(e)}")
     
     def _initialize_position_monitor(self):
         """Initialize position monitoring system"""
@@ -213,6 +230,13 @@ class SessionAnomalyStrategy(BaseStrategy):
             
             # Convert predictions to signals using signal processor
             signals = self.signal_processor.process(predictions, market_data)
+            
+            # Add symbol to all signals
+            for signal in signals.get('processed_signals', []):
+                signal['symbol'] = self.symbol
+                # Add current price for order execution
+                if not market_data.empty:
+                    signal['current_price'] = market_data['close'].iloc[-1]
             
             # Apply session-specific logic
             session_signals = self._apply_session_logic(signals, market_data)
@@ -441,65 +465,51 @@ class SessionAnomalyStrategy(BaseStrategy):
             return False
     
     def _run_trading_loop(self, strategy_results: Dict[str, Any]) -> Dict[str, Any]:
-        """Main trading loop with live data processing"""
-        loop_count = 0
-        max_loops = self.strategy_config.get('execution', {}).get('max_loops', 100)
-        loop_interval = self.strategy_config.get('execution', {}).get('loop_interval', 5)
+        """Event-driven trading loop - waits for data callbacks instead of polling"""
+        max_runtime = self.strategy_config.get('execution', {}).get('max_loops', 100) * 60  # Convert loops to minutes
+        start_time = datetime.now()
         
         strategy_results['status'] = 'running'
+        strategy_results['event_driven'] = True
         
-        while (max_loops <= 0 or loop_count < max_loops) and self.live_data_manager.is_ready_for_trading():
+        logging.info(f"Starting event-driven trading for {max_runtime/60:.1f} minutes...")
+        logging.info(f"Strategy will react to new data via callbacks for symbol: {self.symbol}")
+        
+        # Store strategy results reference for callbacks to update
+        self._strategy_results = strategy_results
+        
+        # Event-driven loop - just wait and let callbacks handle the work
+        while self.live_data_manager.is_ready_for_trading():
             try:
-                loop_start = datetime.now()
-                logging.debug(f"Trading loop iteration {loop_count + 1}")
+                current_time = datetime.now()
+                elapsed = (current_time - start_time).total_seconds()
                 
-                # 1. Get latest processed market data
-                latest_features = self.live_data_manager.get_latest_features()
-                if latest_features is None:
-                    logging.warning("No processed data available, skipping iteration")
-                    time.sleep(loop_interval)
-                    continue
+                # Check if we should stop (time-based)
+                if max_runtime > 0 and elapsed >= max_runtime:
+                    logging.info(f"Trading session completed after {elapsed/60:.1f} minutes")
+                    break
                 
-                # 2. Generate trading signals
-                signals = self.generate_signals(latest_features)
-                strategy_results['signals_generated'] += len(signals.get('processed_signals', []))
+                # Log status periodically
+                if int(elapsed) % 300 == 0 and int(elapsed) > 0:  # Every 5 minutes
+                    logging.info(f"Strategy running for {elapsed/60:.1f} minutes. "
+                               f"Signals: {strategy_results.get('signals_generated', 0)}, "
+                               f"Positions: {strategy_results.get('positions_opened', 0)}")
                 
-                # 3. Process signals and manage positions
-                if signals.get('session_info', {}).get('should_trade', False):
-                    position_actions = self._process_trading_signals(signals)
-                    strategy_results['positions_opened'] += position_actions.get('opened', 0)
-                    strategy_results['positions_closed'] += position_actions.get('closed', 0)
+                # Minimal sleep - callbacks do the real work
+                time.sleep(10)  # Check every 10 seconds for status updates
                 
-                # 4. Monitor existing positions
-                self._monitor_positions()
-                
-                # 5. Update session analysis
-                current_session = signals.get('session_info', {}).get('current_session')
-                if current_session:
-                    if current_session not in strategy_results['session_analysis']:
-                        strategy_results['session_analysis'][current_session] = {
-                            'signals': 0, 'trades': 0
-                        }
-                    strategy_results['session_analysis'][current_session]['signals'] += len(
-                        signals.get('processed_signals', []))
-                
-                # 6. Rate limiting
-                loop_duration = (datetime.now() - loop_start).total_seconds()
-                sleep_time = max(0, loop_interval - loop_duration)
-                if sleep_time > 0:
-                    time.sleep(sleep_time)
-                
-                loop_count += 1
-                
+            except KeyboardInterrupt:
+                logging.info("Trading session interrupted by user")
+                break
             except Exception as e:
                 strategy_results['errors'].append(f"Trading loop error: {str(e)}")
-                logging.error(f"Error in trading loop iteration {loop_count}: {e}")
-                time.sleep(loop_interval)
-                loop_count += 1
+                logging.error(f"Error in event-driven trading loop: {e}")
+                time.sleep(30)  # Wait before continuing
         
         strategy_results['status'] = 'completed'
-        strategy_results['total_loops'] = loop_count
-        logging.info(f"Trading loop completed after {loop_count} iterations")
+        elapsed_minutes = (datetime.now() - start_time).total_seconds() / 60
+        strategy_results['runtime_minutes'] = elapsed_minutes
+        logging.info(f"Event-driven trading completed after {elapsed_minutes:.1f} minutes")
         
         return strategy_results
     
