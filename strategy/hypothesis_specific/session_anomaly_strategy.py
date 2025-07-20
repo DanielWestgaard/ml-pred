@@ -17,6 +17,14 @@ class SessionAnomalyStrategy(BaseStrategy):
         """Initialize session anomaly strategy"""
         super().__init__(**kwargs)
         
+        # Get and store symbol from configuration
+        data_config = self.strategy_config.get('data', {})
+        self.symbol = data_config.get('symbol')
+        if not self.symbol:
+            raise ValueError("Symbol must be specified in strategy configuration")
+        
+        logging.info(f"Strategy initialized for symbol: {self.symbol}")
+        
         # Session-specific configuration
         self.trading_sessions = self._setup_trading_sessions()
         self.session_filters = self._setup_session_filters()
@@ -38,7 +46,7 @@ class SessionAnomalyStrategy(BaseStrategy):
             data_config = self.strategy_config.get('data', {})
             
             self.live_data_manager = LiveDataManager(
-                symbol=data_config.get('symbol', 'GBPUSD'),
+                symbol=self.symbol,
                 timeframe=data_config.get('timeframe', 'MINUTE'),
                 buffer_size=data_config.get('buffer_size', 500),
                 feature_window=data_config.get('feature_window', 200),
@@ -503,7 +511,7 @@ class SessionAnomalyStrategy(BaseStrategy):
             processed_signals = signals.get('processed_signals', [])
             
             for signal in processed_signals:
-                symbol = signal.get('symbol', 'GBPUSD')
+                symbol = signal.get('symbol', self.symbol)
                 direction = signal.get('direction', 'BUY')
                 
                 # Check if we already have a position for this symbol
@@ -545,7 +553,7 @@ class SessionAnomalyStrategy(BaseStrategy):
                 )
                 
                 # Extract order parameters
-                symbol = signal.get('symbol', 'GBPUSD')
+                symbol = signal.get('symbol', self.symbol)
                 direction = signal.get('direction', 'BUY')
                 size_usd = position_size.get('position_size_usd', 0)
                 current_price = signal.get('current_price', 1.0)
@@ -641,7 +649,13 @@ class SessionAnomalyStrategy(BaseStrategy):
                 return self._get_current_price_from_features(latest_features)
             else:
                 # Fallback to a default price if no data available
-                return 1.2500  # Default for GBPUSD
+                # Return appropriate default based on symbol
+                if 'BTC' in self.symbol:
+                    return 50000.0  # Default for BTCUSD
+                elif 'GBP' in self.symbol:
+                    return 1.2500   # Default for GBPUSD
+                else:
+                    return 1.0      # Generic default
         except Exception as e:
             logging.error(f"Error getting current price for {symbol}: {e}")
             return 1.2500  # Default fallback
