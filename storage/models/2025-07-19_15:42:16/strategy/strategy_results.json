@@ -1,12 +1,12 @@
 {
     "strategy_type": "session_anomaly",
-    "execution_time": "2025-07-19 16:24:26.105011",
+    "execution_time": "2025-07-20 12:58:04.940517",
     "signals_generated": 0,
     "positions_opened": 0,
     "positions_closed": 0,
-    "errors": [
-        "Failed to start live data feed"
-    ],
+    "errors": [],
     "session_analysis": {},
-    "status": "failed"
+    "status": "completed",
+    "event_driven": true,
+    "runtime_minutes": 2.0304790333333336
 }

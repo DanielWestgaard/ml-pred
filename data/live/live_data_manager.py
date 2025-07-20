@@ -50,6 +50,9 @@ class LiveDataManager:
         # Deduplication tracking
         self._last_processed_buffer_timestamp = None
         
+        # Rate limiting for repetitive log messages (avoid log spam)
+        self._last_ready_check_log = None
+        
         # Threading and synchronization
         self._data_lock = threading.RLock()
         self._is_streaming = False
@@ -758,10 +761,19 @@ class LiveDataManager:
             features_ok = self.latest_features is not None
             connection_ok = self._check_connection_health()
             
-            # Debug logging to see what's failing
+            # Debug logging to see what's failing (rate limited to avoid spam)
             if not (streaming_ok and buffer_ok and features_ok and connection_ok):
-                logging.debug(f"Ready check failed - Streaming: {streaming_ok}, "
-                            f"Buffer: {buffer_ok} ({len(self.raw_buffer)}>={self.feature_window}), "
-                            f"Features: {features_ok}, Connection: {connection_ok}")
+                current_time = datetime.now()
+                should_log = True
+                
+                if self._last_ready_check_log:
+                    time_since_last = (current_time - self._last_ready_check_log).total_seconds()
+                    should_log = time_since_last >= 30  # 30 seconds
+                
+                if should_log:
+                    logging.debug(f"Ready check failed - Streaming: {streaming_ok}, "
+                                f"Buffer: {buffer_ok} ({len(self.raw_buffer)}>={self.feature_window}), "
+                                f"Features: {features_ok}, Connection: {connection_ok}")
+                    self._last_ready_check_log = current_time
             
             return streaming_ok and buffer_ok and features_ok and connection_ok

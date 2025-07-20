@@ -28,6 +28,10 @@ class SessionAnomalyStrategy(BaseStrategy):
         # Initialize timestamp tracking for deduplication
         self._last_processed_timestamp = None
         
+        # Rate limiting for repetitive log messages (avoid log spam)
+        self._last_risk_log_time = {}  # Track last log time per risk event type
+        self._last_buffer_status_log = None
+        
         # Session-specific configuration
         self.trading_sessions = self._setup_trading_sessions()
         self.session_filters = self._setup_session_filters()
@@ -168,15 +172,25 @@ class SessionAnomalyStrategy(BaseStrategy):
     def _on_risk_event(self, event_type: str, data: Dict):
         """Handle risk events from monitor"""
         try:
-            logging.warning(f"Risk event: {event_type} - Data: {data}")
+            # Rate limiting: only log each risk event type once per minute to avoid spam
+            current_time = datetime.now()
+            should_log = True
+            
+            if event_type in self._last_risk_log_time:
+                time_since_last = (current_time - self._last_risk_log_time[event_type]).total_seconds()
+                should_log = time_since_last >= 60  # 60 seconds = 1 minute
+            
+            if should_log:
+                logging.warning(f"Risk event: {event_type} - Data: {data}")
+                self._last_risk_log_time[event_type] = current_time
             
             if event_type == 'max_drawdown':
-                # Stop trading if max drawdown reached
+                # Critical events always get logged regardless of rate limiting
                 logging.critical("Maximum drawdown reached - halting new positions")
                 # Could implement emergency stop here
                 
-            elif event_type == 'high_exposure':
-                # Reduce position sizes if exposure too high
+            elif event_type == 'high_exposure' and should_log:
+                # Only log the follow-up message if we logged the main event
                 logging.warning("High exposure detected - consider reducing position sizes")
                 
             elif event_type == 'too_many_positions':
@@ -457,8 +471,19 @@ class SessionAnomalyStrategy(BaseStrategy):
                     return False
                 
                 status = self.live_data_manager.get_buffer_status()
-                logging.info(f"Buffer status: {status['buffer_size']}/{status['max_buffer_size']} "
-                           f"({status['buffer_utilization']:.1%})")
+                
+                # Rate limiting: only log buffer status once every 30 seconds to avoid spam
+                current_time = datetime.now()
+                should_log_buffer = True
+                
+                if self._last_buffer_status_log:
+                    time_since_last = (current_time - self._last_buffer_status_log).total_seconds()
+                    should_log_buffer = time_since_last >= 30  # 30 seconds
+                
+                if should_log_buffer:
+                    logging.info(f"Buffer status: {status['buffer_size']}/{status['max_buffer_size']} "
+                               f"({status['buffer_utilization']:.1%})")
+                    self._last_buffer_status_log = current_time
                 
                 time.sleep(2)
             
