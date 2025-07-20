@@ -291,9 +291,9 @@ class SessionAnomalyStrategy(BaseStrategy):
             # Add symbol to all signals
             for signal in signals.get('processed_signals', []):
                 signal['symbol'] = self.symbol
-                # Add current price for order execution
+                # Add current price for order execution (use original price for position sizing)
                 if not market_data.empty:
-                    signal['current_price'] = market_data['close'].iloc[-1]
+                    signal['current_price'] = self._get_current_price_from_features(market_data)
             
             # Apply session-specific logic
             session_signals = self._apply_session_logic(signals, market_data)
