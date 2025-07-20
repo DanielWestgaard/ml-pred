@@ -47,6 +47,9 @@ class LiveDataManager:
         self.processed_data = None
         self.latest_features = None
         
+        # Deduplication tracking
+        self._last_processed_buffer_timestamp = None
+        
         # Threading and synchronization
         self._data_lock = threading.RLock()
         self._is_streaming = False
@@ -345,6 +348,19 @@ class LiveDataManager:
         try:
             # Convert buffer to DataFrame
             df = pd.DataFrame(list(self.raw_buffer))
+            
+            # Add timestamp-based deduplication to prevent processing same data multiple times
+            if not df.empty and 'date' in df.columns:
+                latest_timestamp = df['date'].iloc[-1]
+                
+                # Check if we've already processed this exact timestamp
+                if hasattr(self, '_last_processed_buffer_timestamp') and latest_timestamp == self._last_processed_buffer_timestamp:
+                    logging.debug(f"Buffer already processed for timestamp {latest_timestamp}, skipping duplicate processing")
+                    return
+                
+                # Mark this timestamp as processed
+                self._last_processed_buffer_timestamp = latest_timestamp
+                logging.debug(f"Processing buffer with latest timestamp: {latest_timestamp}")
             
             # Ensure date column exists and is properly formatted
             if 'date' not in df.columns:
