@@ -125,14 +125,16 @@ class LiveDataManager:
             
             if dry_run:
                 # Start simulation thread for testing
+                logging.info("SIMULATION MODE: Starting simulated data generation")
                 self._stream_thread = threading.Thread(
                     target=self._simulate_data_worker, daemon=True)
                 self._stream_thread.start()
             elif self.websocket_manager and self.websocket_manager.is_connected():
                 # WebSocket handles data streaming automatically via callbacks
-                logging.info("Using WebSocket for real-time data streaming")
+                logging.info("LIVE MODE: Using WebSocket for real-time BTCUSD data from Capital.com")
             else:
                 # Start traditional data streaming thread
+                logging.info("LIVE MODE: Using traditional broker polling for real-time data")
                 self._stream_thread = threading.Thread(
                     target=self._stream_data_worker, daemon=True)
                 self._stream_thread.start()
@@ -571,12 +573,13 @@ class LiveDataManager:
             n_points = max(self.feature_window + 50, 200)
             
             # Calculate time range (assuming 1-minute data)
-            end_time = datetime.now()
+            # Use a buffer to avoid querying too recent data which might not be available yet
+            end_time = datetime.now() - timedelta(minutes=2)  # 2 minutes ago to avoid real-time data issues
             start_time = end_time - timedelta(minutes=n_points + 10)  # Add buffer
             
-            # Format times for Capital.com API
-            from_date = start_time.strftime("%Y-%m-%dT%H:%M:%S")
-            to_date = end_time.strftime("%Y-%m-%dT%H:%M:%S")
+            # Format times for Capital.com API (ensure UTC format)
+            from_date = start_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            to_date = end_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
             
             logging.info(f"Fetching historical data from {from_date} to {to_date}")
             
@@ -636,6 +639,8 @@ class LiveDataManager:
             
         except Exception as e:
             logging.error(f"Error fetching historical data from broker: {e}")
+            # In live mode, do NOT fallback to simulation data
+            # Return None to indicate failure rather than generating fake data
             return None
     
     def _notify_callbacks(self, data: pd.DataFrame):
