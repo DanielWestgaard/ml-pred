@@ -170,40 +170,50 @@ class SessionAnomalyStrategy(BaseStrategy):
             logging.error(f"Error handling position event: {e}")
     
     def _on_risk_event(self, event_type: str, data: Dict):
-        """Handle risk events from monitor"""
+        """Handle risk events from monitor with log rate limiting"""
         try:
-            # Rate limiting: only log each risk event type once per minute to avoid spam
             current_time = datetime.now()
             should_log = True
-            
+
+            # Default cooldowns (in seconds) per risk type
+            log_cooldowns = {
+                'max_drawdown': 60,
+                'max_drawdown_critical': 30,
+                'high_exposure': 60,
+                'too_many_positions': 60,
+            }
+
+            cooldown = log_cooldowns.get(event_type, 30)  # default to 60 seconds if not specified
+
             if event_type in self._last_risk_log_time:
                 time_since_last = (current_time - self._last_risk_log_time[event_type]).total_seconds()
-                should_log = time_since_last >= 60  # 60 seconds = 1 minute
-            
+                should_log = time_since_last >= cooldown
+            else:
+                should_log = True
+
             if should_log:
-                logging.warning(f"Risk event: {event_type} - Data: {data}")
                 self._last_risk_log_time[event_type] = current_time
-            
-            if event_type == 'max_drawdown':
-                # Rate limit critical max_drawdown events to avoid spam (every 30 seconds)
-                should_log_critical = True
-                if 'max_drawdown_critical' in self._last_risk_log_time:
-                    time_since_last_critical = (current_time - self._last_risk_log_time['max_drawdown_critical']).total_seconds()
-                    should_log_critical = time_since_last_critical >= 30  # 30 seconds for critical messages
-                
-                if should_log_critical:
-                    logging.critical("Maximum drawdown reached - halting new positions")
-                    self._last_risk_log_time['max_drawdown_critical'] = current_time
-                # Could implement emergency stop here
-                
-            elif event_type == 'high_exposure' and should_log:
-                # Only log the follow-up message if we logged the main event
-                logging.warning("High exposure detected - consider reducing position sizes")
-                
-            elif event_type == 'too_many_positions':
-                # Stop opening new positions if too many active
-                logging.warning("Too many active positions - pausing new entries")
-            
+
+                if event_type == 'max_drawdown':
+                    logging.warning(f"Risk event: {event_type} - Data: {data}")
+                    # Also rate-limit critical version
+                    critical_key = 'max_drawdown_critical'
+                    time_since_critical = (current_time - self._last_risk_log_time.get(critical_key, datetime.min)).total_seconds()
+                    if time_since_critical >= log_cooldowns[critical_key]:
+                        logging.critical("Maximum drawdown reached - halting new positions")
+                        self._last_risk_log_time[critical_key] = current_time
+
+                elif event_type == 'high_exposure':
+                    logging.warning(f"Risk event: {event_type} - Data: {data}")
+                    logging.warning("High exposure detected - consider reducing position sizes")
+
+                elif event_type == 'too_many_positions':
+                    logging.warning(f"Risk event: {event_type} - Data: {data}")
+                    logging.warning("Too many active positions - pausing new entries")
+
+                else:
+                    logging.warning(f"Risk event: {event_type} - Data: {data}")
+
         except Exception as e:
             logging.error(f"Error handling risk event: {e}")
     
