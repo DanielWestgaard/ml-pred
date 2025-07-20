@@ -131,7 +131,8 @@ class SessionAnomalyStrategy(BaseStrategy):
             monitoring_config = self.strategy_config.get('monitoring', {})
             
             self.position_monitor = PositionMonitor(
-                update_interval=monitoring_config.get('update_interval', 1.0)
+                update_interval=monitoring_config.get('update_interval', 1.0),
+                account_balance=self._get_account_balance()
             )
             
             # Add callbacks for position events
@@ -627,7 +628,8 @@ class SessionAnomalyStrategy(BaseStrategy):
                 position_size = self.risk_manager.calculate_position_size(
                     signal_strength=signal.get('confidence', 0.5),
                     account_balance=self._get_account_balance(),
-                    current_price=signal.get('current_price', 1.0)
+                    current_price=signal.get('current_price', 1.0),
+                    direction=signal.get('direction', 'BUY')
                 )
                 
                 # Extract order parameters

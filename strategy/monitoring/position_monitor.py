@@ -31,14 +31,16 @@ class PositionMonitor:
     Handles position tracking, risk monitoring, and automated trade management.
     """
     
-    def __init__(self, update_interval: float = 1.0, **kwargs):
+    def __init__(self, update_interval: float = 1.0, account_balance: float = 10000.0, **kwargs):
         """
         Initialize position monitor
         
         Args:
             update_interval: Seconds between position updates
+            account_balance: Account balance for calculating exposure percentages
         """
         self.update_interval = update_interval
+        self.account_balance = account_balance
         
         # Position tracking
         self.active_positions: Dict[str, PositionStatus] = {}
@@ -273,11 +275,15 @@ class PositionMonitor:
     def _check_risk_limits(self):
         """Check portfolio-level risk limits"""
         try:
-            # Check total exposure
-            if abs(self.total_exposure) > 0.1:  # 10% max exposure
+            # Check total exposure as percentage of account balance
+            exposure_pct = abs(self.total_exposure) / self.account_balance if self.account_balance > 0 else 0
+            max_exposure_pct = 0.1  # 10% max exposure
+            if exposure_pct > max_exposure_pct:
                 self._notify_risk_callbacks('high_exposure', {
                     'exposure': self.total_exposure,
-                    'limit': 0.1
+                    'exposure_pct': exposure_pct,
+                    'limit_pct': max_exposure_pct,
+                    'account_balance': self.account_balance
                 })
             
             # Check drawdown

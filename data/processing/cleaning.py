@@ -113,18 +113,33 @@ class DataCleaner(BaseProcessor):
             self.df['volume'] = self.df['volume'].bfill().fillna(0)
         
     def _remove_duplicates(self):
-        """Removes duplicates."""
+        """Removes duplicates with enhanced handling for live data scenarios."""
+        initial_count = len(self.df)
+        
         # Check if 'date' column exists for subset-based deduplication
         if 'date' in self.df.columns:
             self.df = self.df.drop_duplicates(subset=['date'])
         elif pd.api.types.is_datetime64_any_dtype(self.df.index):
             # Date is in the index, remove duplicates based on index
             logging.debug("Using datetime index for deduplication")
-            self.df = self.df[~self.df.index.duplicated(keep='first')]
+            
+            # For live data, we might have exact timestamp duplicates with slightly different OHLC
+            # In this case, keep the last occurrence (most recent data)
+            duplicated_idx = self.df.index.duplicated(keep='last')
+            
+            if duplicated_idx.any():
+                duplicate_count = duplicated_idx.sum()
+                logging.info(f"Found {duplicate_count} duplicate timestamps - keeping most recent data")
+                self.df = self.df[~duplicated_idx]
+            
         else:
             # If no date column or datetime index, just remove completely identical rows
             logging.warning("No 'date' column found for deduplication, removing completely identical rows")
             self.df = self.df.drop_duplicates()
+        
+        removed_count = initial_count - len(self.df)
+        if removed_count > 0:
+            logging.info(f"Removed {removed_count} duplicate records")
         
     def _timestamp_alignment(self):
         """

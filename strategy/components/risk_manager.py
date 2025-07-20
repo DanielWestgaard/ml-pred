@@ -35,7 +35,7 @@ class RiskManager:
                     f"Stop loss: {stop_loss_pct*100}%, Max drawdown: {max_drawdown*100}%")
     
     def calculate_position_size(self, signal_strength: float, account_balance: float,
-                              current_price: float, volatility: float = None) -> Dict[str, Any]:
+                              current_price: float, direction: str = 'BUY', volatility: float = None) -> Dict[str, Any]:
         """
         Calculate appropriate position size based on risk parameters
         
@@ -43,6 +43,7 @@ class RiskManager:
             signal_strength: Strength of the trading signal (0-1)
             account_balance: Current account balance. TODO: Make dynamic with provider.
             current_price: Current market price
+            direction: Trade direction ('BUY' or 'SELL')
             volatility: Current market volatility (optional)
             
         Returns:
@@ -63,9 +64,13 @@ class RiskManager:
         # Convert to units
         position_units = strength_adjusted_size / current_price
         
-        # Calculate stop loss and take profit levels
-        stop_loss_price = current_price * (1 - self.stop_loss_pct)
-        take_profit_price = current_price * (1 + self.take_profit_pct)
+        # Calculate stop loss and take profit levels based on direction
+        if direction == 'BUY':
+            stop_loss_price = current_price * (1 - self.stop_loss_pct)
+            take_profit_price = current_price * (1 + self.take_profit_pct)
+        else:  # SELL
+            stop_loss_price = current_price * (1 + self.stop_loss_pct)
+            take_profit_price = current_price * (1 - self.take_profit_pct)
         
         return {
             'position_size_usd': strength_adjusted_size,
