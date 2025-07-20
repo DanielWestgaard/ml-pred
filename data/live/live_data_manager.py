@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from collections import deque
 from typing import Dict, List, Any, Optional, Callable
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import queue
 
 from broker.capital_com.capitalcom import CapitalCom
@@ -613,14 +613,14 @@ class LiveDataManager:
             # Calculate how many data points we need
             n_points = max(self.feature_window + 50, 200)
             
-            # Calculate time range (assuming 1-minute data)
-            # Use a buffer to avoid querying too recent data which might not be available yet
-            end_time = datetime.now() - timedelta(minutes=2)  # 2 minutes ago to avoid real-time data issues
-            start_time = end_time - timedelta(minutes=n_points + 10)  # Add buffer
+            # Calculate time range using UTC timestamps (Capital.com API expects UTC)
+            now_utc = datetime.now(timezone.utc)
+            end_time = now_utc - timedelta(minutes=2)  # 2 minutes ago in UTC
+            start_time = end_time - timedelta(minutes=n_points + 10)  # Add buffer - TODO: Dynamic with the type of timeframe user has configured, now it only works with a minute data
             
-            # Format times for Capital.com API (ensure UTC format)
-            from_date = start_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
-            to_date = end_time.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            # Format times for Capital.com API (UTC format)
+            from_date = start_time.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            to_date = end_time.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.000Z")
             
             logging.info(f"Fetching historical data from {from_date} to {to_date}")
             
