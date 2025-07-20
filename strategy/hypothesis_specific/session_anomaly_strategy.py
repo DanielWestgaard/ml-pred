@@ -25,6 +25,9 @@ class SessionAnomalyStrategy(BaseStrategy):
         
         logging.info(f"Strategy initialized for symbol: {self.symbol}")
         
+        # Initialize timestamp tracking for deduplication
+        self._last_processed_timestamp = None
+        
         # Session-specific configuration
         self.trading_sessions = self._setup_trading_sessions()
         self.session_filters = self._setup_session_filters()
@@ -66,7 +69,20 @@ class SessionAnomalyStrategy(BaseStrategy):
     def _on_new_data(self, latest_features: pd.DataFrame):
         """Callback for when new processed data is available - triggers event-driven strategy execution"""
         try:
-            logging.debug("New data received, processing signals...")
+            # Add timestamp-based deduplication to prevent processing same data multiple times
+            if latest_features is None or latest_features.empty:
+                logging.debug("Received empty data callback, skipping")
+                return
+                
+            current_timestamp = latest_features.index[-1] if hasattr(latest_features.index[-1], 'timestamp') else str(latest_features.index[-1])
+            
+            # Check if we've already processed this timestamp
+            if hasattr(self, '_last_processed_timestamp') and current_timestamp == self._last_processed_timestamp:
+                logging.debug(f"Already processed data for timestamp {current_timestamp}, skipping duplicate callback")
+                return
+                
+            logging.debug(f"New data received for timestamp {current_timestamp}, processing signals...")
+            self._last_processed_timestamp = current_timestamp
             
             # Event-driven strategy execution:
             # 1. Generate signals immediately when new data arrives
@@ -409,8 +425,8 @@ class SessionAnomalyStrategy(BaseStrategy):
             return False
         
         try:
-            # Add callback to be notified when new data arrives
-            self.live_data_manager.add_data_callback(self._on_new_data)
+            # Callback already registered in _initialize_live_data()
+            # No need to register again
             
             # Start streaming with jumpstart for faster startup
             dry_run = self.strategy_config.get('data', {}).get('dry_run', True)
