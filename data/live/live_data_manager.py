@@ -100,15 +100,20 @@ class LiveDataManager:
             if not dry_run:
                 if self._use_websocket:
                     # Initialize WebSocket data streaming
-                    if not self._initialize_websocket_streaming():
-                        # Fallback to traditional broker connection
+                    websocket_initialized = self._initialize_websocket_streaming()
+                    if not websocket_initialized:
                         logging.warning("WebSocket initialization failed, falling back to traditional broker")
                         if not self._connect_broker():
                             return False
                     else:
-                        # WebSocket initialized successfully, but we still need broker connection for historical data
-                        if not self._connect_broker():
-                            logging.warning("Failed to establish broker connection for historical data, jumpstart will be disabled")
+                        # WebSocket initialized successfully,
+                        # ONLY connect broker if WebSocketDataManager didn't establish it already
+                        # or if historical data jumpstart specifically requires it
+                        if not self.websocket_manager.is_connected(): # Assuming is_connected() exists or similar check
+                            if not self._connect_broker():
+                                logging.warning("Failed to establish broker connection for historical data, jumpstart will be disabled")
+                        else:
+                            logging.info("Broker connection already established by WebSocketDataManager, skipping redundant connection.")
                 else:
                     # Use traditional broker connection
                     if not self._connect_broker():
