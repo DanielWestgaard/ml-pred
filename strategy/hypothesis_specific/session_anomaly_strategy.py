@@ -804,6 +804,11 @@ class SessionAnomalyStrategy(BaseStrategy):
         except Exception as e:
             logging.error(f"Error handling position event {event_type}: {e}")
 
+    def stop(self):
+        """Stop the strategy gracefully"""
+        logging.info("Stopping session anomaly strategy...")
+        self._cleanup_resources()
+    
     def _cleanup_resources(self):
         """Cleanup resources when strategy stops"""
         try:
