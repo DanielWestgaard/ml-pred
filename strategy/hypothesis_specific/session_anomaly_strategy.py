@@ -74,7 +74,17 @@ class SessionAnomalyStrategy(BaseStrategy):
                 logging.debug("Received empty data callback, skipping")
                 return
                 
-            current_timestamp = latest_features.index[-1] if hasattr(latest_features.index[-1], 'timestamp') else str(latest_features.index[-1])
+            # Extract timestamp more reliably
+            try:
+                current_timestamp = latest_features.index[-1]
+                # Convert to string for comparison if it's a datetime-like object
+                if hasattr(current_timestamp, 'strftime'):
+                    current_timestamp = current_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    current_timestamp = str(current_timestamp)
+            except Exception as e:
+                logging.debug(f"Error extracting timestamp: {e}")
+                current_timestamp = str(datetime.now())
             
             # Check if we've already processed this timestamp
             if hasattr(self, '_last_processed_timestamp') and current_timestamp == self._last_processed_timestamp:

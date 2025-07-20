@@ -311,7 +311,7 @@ class LiveDataManager:
                 base_price = current_close
                 timestamp += timedelta(minutes=1)
                 
-                time.sleep(1)  # Simulate 1-minute intervals
+                time.sleep(60)  # Simulate 1-minute intervals (60 seconds)
                 
             except Exception as e:
                 logging.error(f"Error in data simulation: {e}")
