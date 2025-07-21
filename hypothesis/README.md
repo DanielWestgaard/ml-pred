@@ -19,7 +19,38 @@ Each new (and all existing) hypotheses should follow _this_ structure.<br>
 3. Optionally, though recommended, a `README.md` describing the hypothesis in more detail and with better formulations.
 4. Add a method in the (`data/features/`)`target_hypothesis.py` that calculates the target column, representing the hypothesis (that a model will predict).
 5. If you want to be able to **evaluate the model** trained on your hypothesis, you must also create a **dedicated hypothesis evaluation file**, `evaluation/hypothesis_specific/`, and (same as with the calculation of the target) must name (the file) the same as hypothesis_name in the config-file (matching).
-6. TODO: To use strategy component
+6. **For strategy execution support**: If you want to use the strategy component with your hypothesis, you must:
+   - Create a **hypothesis-specific strategy implementation** in `strategy/hypothesis_specific/` that inherits from `BaseStrategy`
+   - Add your hypothesis type and strategy class to the `STRATEGIES` dictionary in `strategy/strategy_factory.py`
+   - Ensure your _hypothesis name matches exactly_ between the config file, target calculation method, evaluation file, and strategy factory
+
+> [!IMPORTANT] 
+> **Hypothesis Name Consistency**: The `name` field in your hypothesis config file must exactly match:
+> - Function name in `data/features/target_hypothesis.py`
+> - File name (without .py) in `evaluation/hypothesis_specific/` 
+> - Key in `EVALUATORS` dictionary in `evaluation/evaluation_factory.py`
+> - Key in `STRATEGIES` dictionary in `strategy/strategy_factory.py` 
+> 
+> **Example**: If your hypothesis is named `momentum_breakout`, ensure:
+> ```python
+> # In config.yml
+> name: momentum_breakout
+> 
+> # In target_hypothesis.py  
+> def momentum_breakout(self, df): # Method name matches
+> 
+> # In evaluation/hypothesis_specific/momentum_breakout.py # File name matches
+> 
+> # In evaluation_factory.py
+> EVALUATORS = {
+>     'momentum_breakout': MomentumBreakoutEvaluation,  # Key matches
+> }
+> 
+> # In strategy_factory.py  
+> STRATEGIES = {
+>     'momentum_breakout': MomentumBreakoutStrategy,  # Key matches
+> }
+> ```
 
 ## config.yml structure - WIP
 These are the different componentes/sections you can specify in the configuration-file. None of these are required (I think), but could be thought of as flags when running `main.py`, to tell the main orchestrator what components to run, and potentially specify how (features, parameters, etc.).
