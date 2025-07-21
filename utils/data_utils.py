@@ -2,12 +2,8 @@ import datetime
 import logging
 import re
 import os
-from pathlib import Path
 import pandas as pd
 import sys
-import pandas as pd
-
-import config.config as config
 
 
 def parse_timestamp_robust(timestamp_value, logger=None):

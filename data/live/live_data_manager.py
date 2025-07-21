@@ -399,14 +399,14 @@ class LiveDataManager:
                 return
                 
             try:
-                df['date'] = parse_timestamp_series(df['date'], self.logger)
+                df['date'] = parse_timestamp_series(df['date'], logging.getLogger(__name__))
             except Exception as e:
-                self.logger.error(f"Error parsing timestamps in dataframe: {e}")
+                logging.error(f"Error parsing timestamps in dataframe: {e}")
                 # Fallback to original method with error handling
                 try:
                     df['date'] = pd.to_datetime(df['date'], format='mixed', errors='coerce')
                 except Exception as fallback_e:
-                    self.logger.error(f"Fallback timestamp parsing also failed: {fallback_e}")
+                    logging.error(f"Fallback timestamp parsing also failed: {fallback_e}")
                     return
             df.set_index('date', inplace=True)
             
@@ -680,14 +680,14 @@ class LiveDataManager:
                     
                     # Parse timestamps robustly
                     try:
-                        df['date'] = parse_timestamp_series(df['date'], self.logger)
+                        df['date'] = parse_timestamp_series(df['date'], logging.getLogger(__name__))
                     except Exception as e:
-                        self.logger.error(f"Error parsing timestamps in historical data: {e}")
+                        logging.error(f"Error parsing timestamps in historical data: {e}")
                         # Fallback to pandas with error handling
                         try:
                             df['date'] = pd.to_datetime(df['date'], format='mixed', errors='coerce')
                         except Exception as fallback_e:
-                            self.logger.error(f"Fallback timestamp parsing failed: {fallback_e}")
+                            logging.error(f"Fallback timestamp parsing failed: {fallback_e}")
                             return None
                     df.set_index('date', inplace=True)
                     
