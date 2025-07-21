@@ -34,20 +34,85 @@ class ModelMetadataLoader:
         try:
             # Add numpy scalar constructor to handle numpy serialization issues
             def numpy_scalar_constructor(loader, node):
-                """Handle numpy scalars in YAML"""
+                """Handle numpy scalars in YAML by reconstructing the numpy scalar safely"""
                 try:
-                    # Try old PyYAML API first (< v6.0)
-                    value = loader.construct_yaml_object(node, deep=True)
-                except TypeError:
-                    # Fall back to new PyYAML API (v6.0+)
-                    value = loader.construct_yaml_object(node)
-                # Convert numpy scalars to Python native types
-                if hasattr(value, 'item'):
-                    return value.item()
-                return value
+                    import numpy as np
+                except ImportError:
+                    # If numpy is not available, return a sensible default
+                    logging.warning("numpy not available for YAML scalar construction, using default value 0")
+                    return 0
+                    
+                try:
+                    # For numpy.core.multiarray.scalar, we expect a sequence with dtype and data
+                    if isinstance(node, yaml.SequenceNode):
+                        # Construct the arguments: [dtype, raw_data]
+                        args = loader.construct_sequence(node)
+                        if len(args) >= 2:
+                            # First arg is the dtype, second is the raw data
+                            dtype_info = args[0] 
+                            raw_data = args[1]
+                            
+                            # Handle dtype construction
+                            if hasattr(dtype_info, 'item'):  # Already constructed
+                                dtype = dtype_info
+                            else:
+                                # Try to construct a simple dtype from the type info
+                                if isinstance(dtype_info, (str, bytes)):
+                                    dtype = np.dtype(dtype_info.decode() if isinstance(dtype_info, bytes) else dtype_info)
+                                else:
+                                    # Default to int64 if we can't parse the dtype
+                                    dtype = np.dtype('int64')
+                            
+                            # Convert raw data to numpy scalar
+                            if isinstance(raw_data, bytes):
+                                # Reconstruct scalar from bytes
+                                scalar_value = np.frombuffer(raw_data, dtype=dtype)[0]
+                            else:
+                                # Use the raw data directly
+                                scalar_value = np.array(raw_data, dtype=dtype)
+                            
+                            # Convert to Python native type
+                            return scalar_value.item() if hasattr(scalar_value, 'item') else scalar_value
+                        
+                    # Fallback: return 0 for missing values (common case)
+                    return 0
+                    
+                except Exception as e:
+                    # If all else fails, return a sensible default
+                    logging.warning(f"Failed to construct numpy scalar, using default value 0: {e}")
+                    return 0
             
-            # Add constructor for numpy scalars
+            # Add numpy dtype constructor to handle numpy dtype serialization issues  
+            def numpy_dtype_constructor(loader, node):
+                """Handle numpy dtypes in YAML safely"""
+                try:
+                    import numpy as np
+                except ImportError:
+                    logging.warning("numpy not available for YAML dtype construction, using default")
+                    return 'int64'
+                    
+                try:
+                    # For numpy.dtype, we expect arguments for dtype construction
+                    if isinstance(node, yaml.SequenceNode):
+                        args = loader.construct_sequence(node)
+                        if args:
+                            # First argument is usually the dtype string
+                            dtype_str = args[0]
+                            if isinstance(dtype_str, str):
+                                return np.dtype(dtype_str)
+                            elif isinstance(dtype_str, bytes):
+                                return np.dtype(dtype_str.decode())
+                    
+                    # Fallback to int64 dtype
+                    return np.dtype('int64')
+                    
+                except Exception as e:
+                    logging.warning(f"Failed to construct numpy dtype, using default: {e}")
+                    return np.dtype('int64')
+            
+            # Add constructors for numpy objects
             yaml.SafeLoader.add_constructor('tag:yaml.org,2002:python/object/apply:numpy.core.multiarray.scalar', numpy_scalar_constructor)
+            yaml.SafeLoader.add_constructor('tag:yaml.org,2002:python/object/apply:numpy.dtype', numpy_dtype_constructor)
             
             with open(self.metadata_path, 'r') as file:
                 metadata = yaml.safe_load(file)
