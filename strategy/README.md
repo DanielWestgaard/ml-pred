@@ -5,7 +5,7 @@ The strategy component is a **complete trading system orchestrator** that transf
 
 ## Key Features 🚀
 - **Full Trading System**: Complete end-to-end trading system from data ingestion to trade execution
-- **Live & Simulation Modes**: Support for both paper trading (simulation) and live market execution (TODO?)
+- **Live & Simulation Modes**: Support for both paper trading (simulation) and live market execution
 - **Real-time Data Integration**: Live market data streaming via WebSocket and REST APIs
 - **Hypothesis-Driven Architecture**: Each market hypothesis gets its own specialized strategy implementation. This must be manually implemented for the hypothesis.
 - **Comprehensive Risk Management**: Multi-layer risk controls with position sizing, stop-losses, and drawdown protection
