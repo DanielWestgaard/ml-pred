@@ -11,7 +11,9 @@ class EvaluationFactory:
         'session_based_tod_anomalies': SessionVolumeAnomalyEvaluation,  #session_volume_anomaly
         'price_prediction': PricePredictionEvaluation,
         #'volatility_prediction': VolatilityPredictionEvaluation,
-        # Add more hypothesis types as you develop them
+        # Add more hypothesis types here as you develop them
+        # Format: 'hypothesis_name_from_config': HypothesisEvaluationClass,
+        # Example: 'momentum_breakout': MomentumBreakoutEvaluation,
     }
     
     @classmethod
