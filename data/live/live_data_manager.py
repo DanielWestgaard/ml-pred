@@ -13,6 +13,7 @@ from data.live.websocket_data_manager import WebSocketDataManager
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.transformation import FeatureTransformer
+from utils.data_utils import parse_timestamp_series
 import config.config as config
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
 
@@ -397,7 +398,16 @@ class LiveDataManager:
                 logging.error("No 'date' column found in the dataframe")
                 return
                 
-            df['date'] = pd.to_datetime(df['date'])
+            try:
+                df['date'] = parse_timestamp_series(df['date'], logging.getLogger(__name__))
+            except Exception as e:
+                logging.error(f"Error parsing timestamps in dataframe: {e}")
+                # Fallback to original method with error handling
+                try:
+                    df['date'] = pd.to_datetime(df['date'], format='mixed', errors='coerce')
+                except Exception as fallback_e:
+                    logging.error(f"Fallback timestamp parsing also failed: {fallback_e}")
+                    return
             df.set_index('date', inplace=True)
             
             # Filter out metadata columns that shouldn't be features
@@ -658,7 +668,7 @@ class LiveDataManager:
                     df_data = []
                     for price_point in prices_data:
                         df_data.append({
-                            'date': pd.to_datetime(price_point['snapshotTimeUTC']),
+                            'date': price_point['snapshotTimeUTC'],
                             'open': price_point['openPrice']['ask'],
                             'high': price_point['highPrice']['ask'], 
                             'low': price_point['lowPrice']['ask'],
@@ -667,6 +677,18 @@ class LiveDataManager:
                         })
                     
                     df = pd.DataFrame(df_data)
+                    
+                    # Parse timestamps robustly
+                    try:
+                        df['date'] = parse_timestamp_series(df['date'], logging.getLogger(__name__))
+                    except Exception as e:
+                        logging.error(f"Error parsing timestamps in historical data: {e}")
+                        # Fallback to pandas with error handling
+                        try:
+                            df['date'] = pd.to_datetime(df['date'], format='mixed', errors='coerce')
+                        except Exception as fallback_e:
+                            logging.error(f"Fallback timestamp parsing failed: {fallback_e}")
+                            return None
                     df.set_index('date', inplace=True)
                     
                     logging.info(f"Fetched {len(df)} historical data points from broker")

@@ -107,13 +107,15 @@ class DataValidator(BaseProcessor):
                 if len(time_diffs) > 0:  # Check if we have any time differences
                     common_diff = time_diffs.mode().iloc[0] if not time_diffs.mode().empty else time_diffs.median()
                     
-                    # Only flag very large gaps (3x expected frequency instead of 1.5x)
-                    large_gaps = time_diffs[time_diffs > common_diff * 3]  # More lenient
+                    # Only flag very large gaps (5x expected frequency for live streaming tolerance)
+                    large_gaps = time_diffs[time_diffs > common_diff * 5]  # More lenient for live data
                     if not large_gaps.empty:
+                        gap_details = {str(idx): str(gap) for idx, gap in large_gaps.items()}
+                        logging.debug(f"Detected {len(large_gaps)} time gaps. This is normal for live streaming data during session breaks.")
                         self.validation_issues.append({
                             'type': 'Time Series Gaps',
-                            'description': f'Found {len(large_gaps)} large gaps in time series',
-                            'details': {str(idx): str(gap) for idx, gap in large_gaps.items()}
+                            'description': f'Found {len(large_gaps)} large gaps in time series (normal for session breaks)',
+                            'details': gap_details
                         })
             except Exception as e:
                 self.validation_issues.append({

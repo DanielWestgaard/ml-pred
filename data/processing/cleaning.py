@@ -5,6 +5,7 @@ import numpy as np
 from data.processing.base_processor import BaseProcessor
 import utils.data_utils as data_utils
 from data.plot.plot_data import PlotData
+from utils.data_utils import parse_timestamp_series
 
 
 class DataCleaner(BaseProcessor):
@@ -113,18 +114,33 @@ class DataCleaner(BaseProcessor):
             self.df['volume'] = self.df['volume'].bfill().fillna(0)
         
     def _remove_duplicates(self):
-        """Removes duplicates."""
+        """Removes duplicates with enhanced handling for live data scenarios."""
+        initial_count = len(self.df)
+        
         # Check if 'date' column exists for subset-based deduplication
         if 'date' in self.df.columns:
             self.df = self.df.drop_duplicates(subset=['date'])
         elif pd.api.types.is_datetime64_any_dtype(self.df.index):
             # Date is in the index, remove duplicates based on index
             logging.debug("Using datetime index for deduplication")
-            self.df = self.df[~self.df.index.duplicated(keep='first')]
+            
+            # For live data, we might have exact timestamp duplicates with slightly different OHLC
+            # In this case, keep the last occurrence (most recent data)
+            duplicated_idx = self.df.index.duplicated(keep='last')
+            
+            if duplicated_idx.any():
+                duplicate_count = duplicated_idx.sum()
+                logging.info(f"Found {duplicate_count} duplicate timestamps - keeping most recent data")
+                self.df = self.df[~duplicated_idx]
+            
         else:
             # If no date column or datetime index, just remove completely identical rows
             logging.warning("No 'date' column found for deduplication, removing completely identical rows")
             self.df = self.df.drop_duplicates()
+        
+        removed_count = initial_count - len(self.df)
+        if removed_count > 0:
+            logging.info(f"Removed {removed_count} duplicate records")
         
     def _timestamp_alignment(self):
         """
@@ -149,10 +165,15 @@ class DataCleaner(BaseProcessor):
         # Convert date column to datetime if it's not already
         if not pd.api.types.is_datetime64_any_dtype(self.df['date']):
             try:
-                self.df['date'] = pd.to_datetime(self.df['date'])
+                self.df['date'] = parse_timestamp_series(self.df['date'], logging.getLogger(__name__))
             except Exception as e:
-                logging.error(f"Failed to convert date column to datetime: {e}")
-                return
+                logging.error(f"Failed to convert date column to datetime with robust parser: {e}")
+                # Fallback to original method
+                try:
+                    self.df['date'] = pd.to_datetime(self.df['date'], format='mixed', errors='coerce')
+                except Exception as fallback_e:
+                    logging.error(f"Fallback timestamp parsing also failed: {fallback_e}")
+                    return
         
         # Sort by date
         self.df = self.df.sort_values('date')        
@@ -294,8 +315,16 @@ class DataCleaner(BaseProcessor):
         # Ensure index is datetime if not done in timestamp_alignment
         if not isinstance(self.df.index, pd.DatetimeIndex):
             try:
-                self.df.index = pd.to_datetime(self.df.index)
+                self.df.index = parse_timestamp_series(self.df.index, logging.getLogger(__name__))
                 logging.debug("Converted index to datetime")
+            except Exception as e:
+                logging.error(f"Failed to convert index to datetime with robust parser: {e}")
+                # Fallback to original method
+                try:
+                    self.df.index = pd.to_datetime(self.df.index, format='mixed', errors='coerce')
+                    logging.debug("Converted index to datetime using fallback method")
+                except Exception as fallback_e:
+                    logging.error(f"Fallback index timestamp parsing also failed: {fallback_e}")
             except Exception as e:
                 logging.error(f"Failed to convert index to datetime: {e}")
         
