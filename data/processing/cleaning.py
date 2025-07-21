@@ -5,6 +5,7 @@ import numpy as np
 from data.processing.base_processor import BaseProcessor
 import utils.data_utils as data_utils
 from data.plot.plot_data import PlotData
+from utils.data_utils import parse_timestamp_series
 
 
 class DataCleaner(BaseProcessor):
@@ -164,10 +165,15 @@ class DataCleaner(BaseProcessor):
         # Convert date column to datetime if it's not already
         if not pd.api.types.is_datetime64_any_dtype(self.df['date']):
             try:
-                self.df['date'] = pd.to_datetime(self.df['date'])
+                self.df['date'] = parse_timestamp_series(self.df['date'], logging.getLogger(__name__))
             except Exception as e:
-                logging.error(f"Failed to convert date column to datetime: {e}")
-                return
+                logging.error(f"Failed to convert date column to datetime with robust parser: {e}")
+                # Fallback to original method
+                try:
+                    self.df['date'] = pd.to_datetime(self.df['date'], format='mixed', errors='coerce')
+                except Exception as fallback_e:
+                    logging.error(f"Fallback timestamp parsing also failed: {fallback_e}")
+                    return
         
         # Sort by date
         self.df = self.df.sort_values('date')        
@@ -309,8 +315,16 @@ class DataCleaner(BaseProcessor):
         # Ensure index is datetime if not done in timestamp_alignment
         if not isinstance(self.df.index, pd.DatetimeIndex):
             try:
-                self.df.index = pd.to_datetime(self.df.index)
+                self.df.index = parse_timestamp_series(self.df.index, logging.getLogger(__name__))
                 logging.debug("Converted index to datetime")
+            except Exception as e:
+                logging.error(f"Failed to convert index to datetime with robust parser: {e}")
+                # Fallback to original method
+                try:
+                    self.df.index = pd.to_datetime(self.df.index, format='mixed', errors='coerce')
+                    logging.debug("Converted index to datetime using fallback method")
+                except Exception as fallback_e:
+                    logging.error(f"Fallback index timestamp parsing also failed: {fallback_e}")
             except Exception as e:
                 logging.error(f"Failed to convert index to datetime: {e}")
         
