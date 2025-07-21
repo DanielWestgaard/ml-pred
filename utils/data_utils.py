@@ -10,6 +10,135 @@ import pandas as pd
 import config.config as config
 
 
+def parse_timestamp_robust(timestamp_value, logger=None):
+    """
+    Robust timestamp parsing function that handles multiple formats:
+    - Unix timestamps (seconds and milliseconds)
+    - ISO 8601 strings
+    - Other common datetime formats
+    
+    Args:
+        timestamp_value: The timestamp to parse (str, int, or float)
+        logger: Optional logger instance for debugging
+        
+    Returns:
+        pd.Timestamp: Parsed timestamp
+        
+    Raises:
+        ValueError: If timestamp cannot be parsed
+    """
+    if logger is None:
+        logger = logging.getLogger(__name__)
+        
+    if pd.isna(timestamp_value):
+        return pd.NaT
+        
+    # Convert to string for consistent processing
+    timestamp_str = str(timestamp_value).strip()
+    
+    # Handle empty or 'nan' strings
+    if not timestamp_str or timestamp_str.lower() in ['nan', 'nat', 'none']:
+        return pd.NaT
+    
+    try:
+        # Try to convert to numeric (Unix timestamp)
+        if timestamp_str.replace('.', '').isdigit():
+            timestamp_numeric = float(timestamp_str)
+            
+            # Check if it's milliseconds (13+ digits) or seconds (10 digits)
+            if timestamp_numeric > 1e12:  # Milliseconds
+                logger.debug(f"Parsing Unix millisecond timestamp: {timestamp_str}")
+                return pd.to_datetime(timestamp_numeric, unit='ms')
+            elif timestamp_numeric > 1e9:  # Seconds
+                logger.debug(f"Parsing Unix second timestamp: {timestamp_str}")
+                return pd.to_datetime(timestamp_numeric, unit='s')
+            else:
+                # Too small to be a valid Unix timestamp, might be a different format
+                raise ValueError(f"Numeric timestamp too small: {timestamp_numeric}")
+        
+        # Try common datetime string formats
+        datetime_formats = [
+            '%Y-%m-%dT%H:%M:%S',      # ISO 8601 basic
+            '%Y-%m-%dT%H:%M:%S.%f',   # ISO 8601 with microseconds
+            '%Y-%m-%dT%H:%M:%SZ',     # ISO 8601 with Z
+            '%Y-%m-%dT%H:%M:%S.%fZ',  # ISO 8601 with microseconds and Z
+            '%Y-%m-%d %H:%M:%S',      # Standard datetime
+            '%Y-%m-%d %H:%M:%S.%f',   # Standard datetime with microseconds
+            '%Y-%m-%d',               # Date only
+            '%Y/%m/%d %H:%M:%S',      # Alternative format
+            '%m/%d/%Y %H:%M:%S',      # US format
+        ]
+        
+        for fmt in datetime_formats:
+            try:
+                parsed = datetime.datetime.strptime(timestamp_str, fmt)
+                logger.debug(f"Parsed timestamp with format {fmt}: {timestamp_str}")
+                return pd.Timestamp(parsed)
+            except ValueError:
+                continue
+        
+        # Last resort: let pandas handle it with mixed format
+        logger.debug(f"Using pandas mixed format parsing for: {timestamp_str}")
+        return pd.to_datetime(timestamp_str, format='mixed')
+        
+    except Exception as e:
+        logger.error(f"Failed to parse timestamp '{timestamp_str}': {e}")
+        raise ValueError(f"Unable to parse timestamp: {timestamp_str}")
+
+
+def parse_timestamp_series(series, logger=None):
+    """
+    Apply robust timestamp parsing to an entire pandas Series.
+    
+    Args:
+        series: pandas Series containing timestamps
+        logger: Optional logger instance
+        
+    Returns:
+        pd.Series: Series with parsed timestamps
+    """
+    if logger is None:
+        logger = logging.getLogger(__name__)
+    
+    logger.debug(f"Parsing timestamp series with {len(series)} values")
+    
+    # Try vectorized approach first for performance
+    try:
+        # Check if all values are numeric (Unix timestamps)
+        if series.dtype in ['int64', 'float64']:
+            # Check if values are in millisecond range
+            sample_value = float(str(series.iloc[0]))
+            if sample_value > 1e12:
+                logger.debug("Series appears to be Unix millisecond timestamps")
+                return pd.to_datetime(series, unit='ms')
+            elif sample_value > 1e9:
+                logger.debug("Series appears to be Unix second timestamps")
+                return pd.to_datetime(series, unit='s')
+        elif series.astype(str).str.replace('.', '').str.isdigit().all():
+            # All string values are numeric
+            numeric_series = pd.to_numeric(series, errors='coerce')
+            sample_value = numeric_series.iloc[0]
+            if sample_value > 1e12:
+                logger.debug("Series appears to be Unix millisecond timestamps (string format)")
+                return pd.to_datetime(numeric_series, unit='ms')
+            elif sample_value > 1e9:
+                logger.debug("Series appears to be Unix second timestamps (string format)")  
+                return pd.to_datetime(numeric_series, unit='s')
+    except (ValueError, TypeError, IndexError):
+        pass
+    
+    # Try pandas mixed format parsing
+    try:
+        logger.debug("Attempting pandas mixed format parsing")
+        return pd.to_datetime(series, format='mixed', errors='coerce')
+    except Exception as e:
+        logger.warning(f"Mixed format parsing failed: {e}")
+    
+    # Fallback to element-wise parsing
+    logger.debug("Falling back to element-wise timestamp parsing")
+    return series.apply(lambda x: parse_timestamp_robust(x, logger))
+
+
 def generate_filename(symbol, timeframe, start_date, end_date, is_raw=True, 
                      data_source=None, processing_info=None, extension='csv'):
     """
