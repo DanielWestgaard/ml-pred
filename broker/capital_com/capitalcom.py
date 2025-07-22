@@ -1,5 +1,4 @@
 from abc import ABC
-import logging
 import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 import pandas as pd
@@ -14,6 +13,9 @@ import broker.capital_com.rest_api.session as session
 import broker.capital_com.rest_api.trading as trading
 import broker.capital_com.rest_api.markets_info as markets_info
 import broker.capital_com.web_socket.web_socket as web_socket
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class CapitalCom(BaseBroker):
@@ -35,9 +37,9 @@ class CapitalCom(BaseBroker):
                 # Encrypting password
                 self.enc_pass = session.encrypt_password(self.password, self.api_key)
             except Exception as e:
-                logging.warning(f"Could not initiate BaseBroker with encrypted password. Using plain password. Error: {e}")
+                logger.warning(f"Could not initiate BaseBroker with encrypted password. Using plain password. Error: {e}")
         except Exception as e:
-            logging.warning(f"Could not initiate BaseBroker with secrets. Error: {e}")
+            logger.warning(f"Could not initiate BaseBroker with secrets. Error: {e}")
             
     # =================== SESSION METHODS ==================
     
@@ -57,7 +59,7 @@ class CapitalCom(BaseBroker):
         # Automatically switch to the desired account after session establishment
         target_account = account_name or config.VAR_ACCOUNT_NAME_TEST
         self.switch_active_account(account_name=target_account, print_answer=False)
-        logging.info(f"Session started and switched to account: {target_account}")
+        logger.info(f"Session started and switched to account: {target_account}")
         
         return self.body, self.headers_dict, self.x_security_token, self.cst  # Just in case I need to use them outside
         
@@ -70,11 +72,11 @@ class CapitalCom(BaseBroker):
     
     def switch_active_account(self, account_id=None, account_name=None, X_SECURITY_TOKEN=None, CST=None, print_answer=False):
         if account_id is None or self.all_accounts is None:
-            logging.info("AccountID and/or all_accounts is None. Initializing them now.")
+            logger.info("AccountID and/or all_accounts is None. Initializing them now.")
             self.all_accounts = account.list_all_accounts(X_SECURITY_TOKEN=X_SECURITY_TOKEN or self.x_security_token, CST=CST or self.cst, print_answer=print_answer)
             self.account_id, self.account_name = br_util.get_account_id_by_name(self.all_accounts, account_name=account_name or config.VAR_ACCOUNT_NAME_TEST)
         if self.account_id is None and self.account_name is None:
-            logging.error("Error switching active account! Unable to switch!")
+            logger.error("Error switching active account! Unable to switch!")
             return None
         return session.switch_active_account(self.account_id, self.account_name, X_SECURITY_TOKEN=X_SECURITY_TOKEN or self.x_security_token, CST=CST or self.cst, print_answer=print_answer)
             
@@ -135,17 +137,17 @@ class CapitalCom(BaseBroker):
             if self.all_accounts is not None:  # Will throw error if now initialized
                 return br_util.get_capital_from_json(json_data=self.all_accounts, account_name=self.account_name)
         except Exception as e:
-            logging.error("Unable to fetch account capital! Must switch active account first! ")
+            logger.error("Unable to fetch account capital! Must switch active account first! ")
             return None
     
     def get_positions(self) -> List[Dict]:
         """Get current open positions."""
-        logging.info("Getting positions")
+        logger.info("Getting positions")
         return []  # Return empty list
     
     def get_orders(self) -> List[Dict]:
         """Get current pending orders."""
-        logging.info("Getting orders")
+        logger.info("Getting orders")
         return []  # Return empty list
     
     # ==================== TRADING METHODS ====================
@@ -184,12 +186,12 @@ class CapitalCom(BaseBroker):
                          take_profit: Optional[float] = None,
                          stop_loss: Optional[float] = None) -> Dict:
         """Place a limit order."""
-        logging.info(f"Placing limit order for {symbol}")
+        logger.info(f"Placing limit order for {symbol}")
         return {}  # Return empty dict
     
     def close_order(self, X_SECURITY_TOKEN=None, CST=None, print_answer=True) -> bool:
         """Close an existing order. This går ut ifra that the model/we only have one active trade open at a time."""
-        logging.error("Not made yet")
+        logger.error("Not made yet")
         return False
     
     def close_all_orders(self, X_SECURITY_TOKEN=None, CST=None, print_answer=True) -> bool:
@@ -199,15 +201,15 @@ class CapitalCom(BaseBroker):
             
             dealIds = br_util.process_positions(all_positions_after_new)
             
-            logging.info(f"About to close ALL active positions...")
+            logger.info(f"About to close ALL active positions...")
             
             for dealId in dealIds:
-                logging.info(f"Closing trade/position with dealId: {dealId}")
+                logger.info(f"Closing trade/position with dealId: {dealId}")
                 trading.close_position(X_SECURITY_TOKEN=X_SECURITY_TOKEN or self.x_security_token, CST=CST or self.cst, print_answer=print_answer,
                                        dealID=dealId)
             return True
         except Exception as e:
-            logging.error(f"Unable to close all positions. Error: {e}")
+            logger.error(f"Unable to close all positions. Error: {e}")
             return False
     
     def modify_position(self, dealId=None, stop_amount=None, profit_amount=None, stop_level=None, profit_level=None,
@@ -222,7 +224,7 @@ class CapitalCom(BaseBroker):
                 
                 dealIds = br_util.process_positions(all_positions_after_new)  # Getting all dealIDs
                 if len(dealIds) >= 2:
-                    logging.error(f"There are {len(dealIds)} active positions, which is more than 1! Will not confinue to modify! Either specify the dealId, or close not-relevant positions.")
+                    logger.error(f"There are {len(dealIds)} active positions, which is more than 1! Will not confinue to modify! Either specify the dealId, or close not-relevant positions.")
                     return False
                 for deal_ID in dealIds:
                     dealId = deal_ID
@@ -230,14 +232,14 @@ class CapitalCom(BaseBroker):
                                     stop_amount=stop_amount, profit_amount=profit_amount, stop_level=stop_level, profit_level=profit_level, dealID=dealId)
             return True
         except Exception as e:
-            logging.error(f"Unable to modify position: {e}")
+            logger.error(f"Unable to modify position: {e}")
             return False
         
     # ==================== LIVE DATA ====================
     
     def sub_live_market_data(self, symbol, timeframe, message_handler=None, X_SECURITY_TOKEN=None, CST=None):
         try:
-            logging.info("About to initiate subscribtion to live market data...")
+            logger.info("About to initiate subscribtion to live market data...")
             
             # Initiating the subscription
             ws = web_socket.sub_live_market_data(X_SECURITY_TOKEN=X_SECURITY_TOKEN or self.x_security_token,
@@ -259,6 +261,6 @@ class CapitalCom(BaseBroker):
             
             return True
         except Exception as e:
-            logging.error(f"Error occured: {e}")
+            logger.error(f"Error occured: {e}")
             
             return False
