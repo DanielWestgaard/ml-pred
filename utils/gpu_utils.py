@@ -276,19 +276,19 @@ class GPUDetector:
     def print_gpu_info(self):
         """Print detailed GPU information."""
         info = self.gpu_info
-        print(f"\n🚀 GPU Detection Results:")
-        print(f"├── Type: {info.gpu_type.value.upper()}")
-        print(f"├── Device: {info.device_name}")
-        print(f"├── Count: {info.device_count}")
+        logger.info(f"\n🚀 GPU Detection Results:")
+        logger.info(f"├── Type: {info.gpu_type.value.upper()}")
+        logger.info(f"├── Device: {info.device_name}")
+        logger.info(f"├── Count: {info.device_count}")
         if info.memory_gb:
-            print(f"├── Memory: {info.memory_gb} GB")
+            logger.info(f"├── Memory: {info.memory_gb} GB")
         if info.compute_capability:
-            print(f"├── Capability: {info.compute_capability}")
+            logger.info(f"├── Capability: {info.compute_capability}")
         
-        print(f"└── Framework Support:")
+        logger.info(f"└── Framework Support:")
         for framework, supported in info.framework_support.items():
             status = "✅" if supported else "❌"
-            print(f"    ├── {framework}: {status}")
+            logger.info(f"    ├── {framework}: {status}")
 
 
 # Global GPU detector instance
