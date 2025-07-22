@@ -2,7 +2,6 @@ import http.client
 import json
 import os
 import sys
-import logging
 import time
 import base64
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -10,6 +9,9 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 
 import config.config as config
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 # Note: Using connection-per-request instead of global connection to avoid state conflicts
@@ -29,16 +31,16 @@ def start_session(email, password, api_key, use_encryption=True, print_answer=Fa
     Returns:
         Path to the trained model run
     """
-    logging.info("About to start a new session.")
+    logger.info("About to start a new session.")
     if use_encryption:
-        logging.debug("Using encrypted password to start session.")
+        logger.debug("Using encrypted password to start session.")
         payload = json.dumps({
             "identifier": email,
             "password": password,
             "encryptedPassword": "true"
         })
     else:
-        logging.warning("Using unecnrypted password to start session!")
+        logger.warning("Using unecnrypted password to start session!")
         payload = json.dumps({
             "identifier": email,
             "password": password,
@@ -62,7 +64,7 @@ def start_session(email, password, api_key, use_encryption=True, print_answer=Fa
                 
                 # Check for "Request-started" error
                 if "Request-started" in body:
-                    logging.warning(f"Capital.com 'Request-started' error on attempt {attempt + 1}, retrying...")
+                    logger.warning(f"Capital.com 'Request-started' error on attempt {attempt + 1}, retrying...")
                     if attempt < max_retries - 1:
                         time.sleep(1 + attempt)  # Exponential backoff
                         # Create new connection for retry
@@ -70,7 +72,7 @@ def start_session(email, password, api_key, use_encryption=True, print_answer=Fa
                         conn = http.client.HTTPSConnection(config.CAPCOM_DEMO_URL)
                         continue
                     else:
-                        logging.error("Max retries exceeded for 'Request-started' error")
+                        logger.error("Max retries exceeded for 'Request-started' error")
                         raise RuntimeError("Unable to start session: Request-started error persists")
                 
                 # Success - extract response headers
@@ -80,16 +82,16 @@ def start_session(email, password, api_key, use_encryption=True, print_answer=Fa
                 cst = headers_dict.get('CST')
                 
                 if print_answer:
-                    logging.info("Response Body:")
-                    logging.info(body)
-                    logging.info("\nResponse Headers:")
+                    logger.info("Response Body:")
+                    logger.info(body)
+                    logger.info("\nResponse Headers:")
                     for header, value in headers_dict.items():
-                        logging.info(f"{header}: {value}")
+                        logger.info(f"{header}: {value}")
 
                 return body, headers_dict, x_security_token, cst
                 
             except Exception as e:
-                logging.error(f"Session start attempt {attempt + 1} failed: {e}")
+                logger.error(f"Session start attempt {attempt + 1} failed: {e}")
                 if attempt < max_retries - 1:
                     time.sleep(1 + attempt)
                     # Create new connection for retry
@@ -121,10 +123,10 @@ def end_session(X_SECURITY_TOKEN, CST):
         conn.request("DELETE", "/api/v1/session", payload, headers)
         res = conn.getresponse()
         data = res.read()
-        logging.info(f"Successfully ended session: {data.decode('utf-8')}")
+        logger.info(f"Successfully ended session: {data.decode('utf-8')}")
         
     except Exception as e:
-        logging.error(f"Unable to properly end_session(): {e}")
+        logger.error(f"Unable to properly end_session(): {e}")
         
     finally:
         # Always close the connection
@@ -147,7 +149,7 @@ def session_details(X_SECURITY_TOKEN, CST, print_answer):
         data = res.read()
         if print_answer:
             parsed_data = json.loads(data.decode("utf-8"))
-            print(json.dumps(parsed_data, indent=4))
+            logger.debug(f"Session response: {json.dumps(parsed_data, indent=4)}")
             
     finally:
         # Always close the connection
@@ -253,8 +255,8 @@ def switch_active_account(account_id, account_name, X_SECURITY_TOKEN, CST, print
         data = res.read()
         if print_answer:
             parsed_data = json.loads(data.decode("utf-8"))
-            print(json.dumps(parsed_data, indent=4))
-        logging.info(f"Successfully switched to account {account_name}!")
+            logger.debug(f"Session response: {json.dumps(parsed_data, indent=4)}")
+        logger.info(f"Successfully switched to account {account_name}!")
         
     finally:
         # Always close the connection

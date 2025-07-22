@@ -2,11 +2,13 @@ import http.client
 import json
 import os
 import sys
-import logging
 import time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config.config as config
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 # Global variables
 conn = http.client.HTTPSConnection(config.CAPCOM_DEMO_URL)
@@ -23,7 +25,7 @@ def list_all_accounts(X_SECURITY_TOKEN, CST, print_answer):
     data = res.read()
     if print_answer:
         parsed_data = json.loads(data.decode("utf-8"))
-        print(json.dumps(parsed_data, indent=4))
+        logger.debug(f"Account response: {json.dumps(parsed_data, indent=4)}")
     else:
-        logging.info("Will not print out response of all accounts.")
+        logger.debug("Response not printed for all accounts")
     return data.decode("utf-8")
