@@ -8,7 +8,7 @@ from utils import shared_utils
 import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
-from data.features.generation import FeatureGenerator
+from data.features.integration_adapter import EnhancedFeatureGeneratorAdapter as FeatureGenerator
 from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
 from data.features.target_hypothesis import TargetHypothesis
