@@ -1,4 +1,3 @@
-import logging
 import pandas as pd
 import time
 from datetime import datetime, time as dt_time
@@ -6,6 +5,9 @@ from typing import Dict, List, Any
 from strategy.hypothesis_specific.base_strategy import BaseStrategy
 from data.live.live_data_manager import LiveDataManager
 from strategy.monitoring.position_monitor import PositionMonitor
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class SessionAnomalyStrategy(BaseStrategy):
     """
@@ -23,7 +25,7 @@ class SessionAnomalyStrategy(BaseStrategy):
         if not self.symbol:
             raise ValueError("Symbol must be specified in strategy configuration")
         
-        logging.info(f"Strategy initialized for symbol: {self.symbol}")
+        logger.info(f"Strategy initialized for symbol: {self.symbol}")
         
         # Initialize timestamp tracking for deduplication
         self._last_processed_timestamp = None
@@ -44,7 +46,7 @@ class SessionAnomalyStrategy(BaseStrategy):
         self.position_monitor = None
         self._initialize_position_monitor()
         
-        logging.info("Session anomaly strategy initialized")
+        logger.info("Session anomaly strategy initialized")
     
     def _initialize_live_data(self):
         """Initialize live data manager with strategy configuration"""
@@ -64,10 +66,10 @@ class SessionAnomalyStrategy(BaseStrategy):
             # Add callback for new data notifications
             self.live_data_manager.add_data_callback(self._on_new_data)
             
-            logging.info("Live data manager initialized")
+            logger.info("Live data manager initialized")
             
         except Exception as e:
-            logging.error(f"Failed to initialize live data manager: {e}")
+            logger.error(f"Failed to initialize live data manager: {e}")
             self.live_data_manager = None
     
     def _on_new_data(self, latest_features: pd.DataFrame):
@@ -75,7 +77,7 @@ class SessionAnomalyStrategy(BaseStrategy):
         try:
             # Add timestamp-based deduplication to prevent processing same data multiple times
             if latest_features is None or latest_features.empty:
-                logging.debug("Received empty data callback, skipping")
+                logger.debug("Received empty data callback, skipping")
                 return
                 
             # Extract timestamp more reliably
@@ -87,15 +89,15 @@ class SessionAnomalyStrategy(BaseStrategy):
                 else:
                     current_timestamp = str(current_timestamp)
             except Exception as e:
-                logging.debug(f"Error extracting timestamp: {e}")
+                logger.debug(f"Error extracting timestamp: {e}")
                 current_timestamp = str(datetime.now())
             
             # Check if we've already processed this timestamp
             if hasattr(self, '_last_processed_timestamp') and current_timestamp == self._last_processed_timestamp:
-                logging.debug(f"Already processed data for timestamp {current_timestamp}, skipping duplicate callback")
+                logger.debug(f"Already processed data for timestamp {current_timestamp}, skipping duplicate callback")
                 return
                 
-            logging.debug(f"New data received for timestamp {current_timestamp}, processing signals...")
+            logger.debug(f"New data received for timestamp {current_timestamp}, processing signals...")
             self._last_processed_timestamp = current_timestamp
             
             # Event-driven strategy execution:
@@ -109,7 +111,7 @@ class SessionAnomalyStrategy(BaseStrategy):
             # 2. Process signals and execute trades if conditions are met
             if signals.get('session_info', {}).get('should_trade', False):
                 position_actions = self._process_trading_signals(signals)
-                logging.debug(f"Position actions: {position_actions}")
+                logger.debug(f"Position actions: {position_actions}")
                 
                 # Update position counts
                 if hasattr(self, '_strategy_results'):
@@ -120,7 +122,7 @@ class SessionAnomalyStrategy(BaseStrategy):
             self._monitor_positions()
             
         except Exception as e:
-            logging.error(f"Error processing new data callback: {e}")
+            logger.error(f"Error processing new data callback: {e}")
             if hasattr(self, '_strategy_results'):
                 self._strategy_results['errors'].append(f"Callback error: {str(e)}")
     
@@ -139,16 +141,16 @@ class SessionAnomalyStrategy(BaseStrategy):
             self.position_monitor.add_position_callback(self._on_position_event)
             self.position_monitor.add_risk_callback(self._on_risk_event)
             
-            logging.info("Position monitor initialized")
+            logger.info("Position monitor initialized")
             
         except Exception as e:
-            logging.error(f"Failed to initialize position monitor: {e}")
+            logger.error(f"Failed to initialize position monitor: {e}")
             self.position_monitor = None
     
     def _on_position_event(self, event_type: str, position_data: Dict, extra_data: Dict = None):
         """Handle position events from monitor"""
         try:
-            logging.info(f"Position event: {event_type} for {position_data.get('position_id')}")
+            logger.info(f"Position event: {event_type} for {position_data.get('position_id')}")
             
             if event_type == 'close_requested':
                 # Handle automatic position closing
@@ -163,12 +165,12 @@ class SessionAnomalyStrategy(BaseStrategy):
                 }
                 
                 if self.order_manager.close_position(close_order):
-                    logging.info(f"Successfully closed position {position_id} - Reason: {reason}")
+                    logger.info(f"Successfully closed position {position_id} - Reason: {reason}")
                 else:
-                    logging.error(f"Failed to close position {position_id}")
+                    logger.error(f"Failed to close position {position_id}")
             
         except Exception as e:
-            logging.error(f"Error handling position event: {e}")
+            logger.error(f"Error handling position event: {e}")
     
     def _on_risk_event(self, event_type: str, data: Dict):
         """Handle risk events from monitor with log rate limiting"""
@@ -196,27 +198,27 @@ class SessionAnomalyStrategy(BaseStrategy):
                 self._last_risk_log_time[event_type] = current_time
 
                 if event_type == 'max_drawdown':
-                    logging.warning(f"Risk event: {event_type} - Data: {data}")
+                    logger.warning(f"Risk event: {event_type} - Data: {data}")
                     # Also rate-limit critical version
                     critical_key = 'max_drawdown_critical'
                     time_since_critical = (current_time - self._last_risk_log_time.get(critical_key, datetime.min)).total_seconds()
                     if time_since_critical >= log_cooldowns[critical_key]:
-                        logging.critical("Maximum drawdown reached - halting new positions")
+                        logger.critical("Maximum drawdown reached - halting new positions")
                         self._last_risk_log_time[critical_key] = current_time
 
                 elif event_type == 'high_exposure':
-                    logging.warning(f"Risk event: {event_type} - Data: {data}")
-                    logging.warning("High exposure detected - consider reducing position sizes")
+                    logger.warning(f"Risk event: {event_type} - Data: {data}")
+                    logger.warning("High exposure detected - consider reducing position sizes")
 
                 elif event_type == 'too_many_positions':
-                    logging.warning(f"Risk event: {event_type} - Data: {data}")
-                    logging.warning("Too many active positions - pausing new entries")
+                    logger.warning(f"Risk event: {event_type} - Data: {data}")
+                    logger.warning("Too many active positions - pausing new entries")
 
                 else:
-                    logging.warning(f"Risk event: {event_type} - Data: {data}")
+                    logger.warning(f"Risk event: {event_type} - Data: {data}")
 
         except Exception as e:
-            logging.error(f"Error handling risk event: {e}")
+            logger.error(f"Error handling risk event: {e}")
     
     def _setup_trading_sessions(self) -> Dict[str, Any]:
         """Setup trading session definitions"""
@@ -277,14 +279,14 @@ class SessionAnomalyStrategy(BaseStrategy):
             feature_columns = [col for col in expected_features if col in market_data.columns]
             
             if not feature_columns:
-                logging.error("No valid feature columns found in market data")
+                logger.error("No valid feature columns found in market data")
                 return {'signals': [], 'session_info': {}}
             
             X = market_data[feature_columns].iloc[-1:].values  # Get latest row
             predictions = self.model.predict(X)
             
-            # Debug logging to understand prediction values
-            logging.debug(f"Model predictions: {predictions}")
+            # Debug logger to understand prediction values
+            logger.debug(f"Model predictions: {predictions}")
             
             # Convert predictions to signals using signal processor
             signals = self.signal_processor.process(predictions, market_data)
@@ -302,7 +304,7 @@ class SessionAnomalyStrategy(BaseStrategy):
             return session_signals
             
         except Exception as e:
-            logging.error(f"Error generating signals: {e}")
+            logger.error(f"Error generating signals: {e}")
             return {'signals': [], 'session_info': {}, 'error': str(e)}
     
     def _apply_session_logic(self, signals: Dict[str, Any], 
@@ -401,13 +403,13 @@ class SessionAnomalyStrategy(BaseStrategy):
             volume_multiplier = self.session_filters['volume_threshold_multiplier']
             
             if recent_volume < avg_volume * volume_multiplier:
-                logging.debug("Signal filtered out: insufficient volume")
+                logger.debug("Signal filtered out: insufficient volume")
                 return False
         
         # Check anomaly strength
         anomaly_threshold = self.session_filters['anomaly_strength_threshold']
         if signal.get('adjusted_strength', signal['strength']) < anomaly_threshold:
-            logging.debug("Signal filtered out: insufficient anomaly strength")
+            logger.debug("Signal filtered out: insufficient anomaly strength")
             return False
         
         return True
@@ -431,7 +433,7 @@ class SessionAnomalyStrategy(BaseStrategy):
         }
         
         try:
-            logging.info(f"{'='*10} Session anomaly strategy execution started {'='*10}")
+            logger.info(f"{'='*10} Session anomaly strategy execution started {'='*10}")
             
             # 1. Initialize and start live data feed
             if not self._start_live_data_feed():
@@ -448,12 +450,12 @@ class SessionAnomalyStrategy(BaseStrategy):
             # 3. Main trading loop
             strategy_results = self._run_trading_loop(strategy_results)
             
-            logging.info("Session anomaly strategy execution completed")
+            logger.info("Session anomaly strategy execution completed")
             
         except Exception as e:
             strategy_results['errors'].append(str(e))
             strategy_results['status'] = 'failed'
-            logging.error(f"Strategy execution failed: {e}")
+            logger.error(f"Strategy execution failed: {e}")
         finally:
             # Always cleanup
             self._cleanup_resources()
@@ -463,7 +465,7 @@ class SessionAnomalyStrategy(BaseStrategy):
     def _start_live_data_feed(self) -> bool:
         """Start live data feed and wait for initial data"""
         if not self.live_data_manager:
-            logging.error("Live data manager not initialized")
+            logger.error("Live data manager not initialized")
             return False
         
         try:
@@ -475,17 +477,17 @@ class SessionAnomalyStrategy(BaseStrategy):
             jumpstart = self.strategy_config.get('data', {}).get('jumpstart', True)
             
             if not self.live_data_manager.start_streaming(dry_run=dry_run, jumpstart=jumpstart):
-                logging.error("Failed to start data streaming")
+                logger.error("Failed to start data streaming")
                 return False
             
             # Wait for initial data buffer to fill
-            logging.info("Waiting for initial data buffer to fill...")
+            logger.info("Waiting for initial data buffer to fill...")
             max_wait_time = 60  # seconds
             start_time = datetime.now()
             
             while not self.live_data_manager.is_ready_for_trading():
                 if (datetime.now() - start_time).total_seconds() > max_wait_time:
-                    logging.error("Timeout waiting for initial data")
+                    logger.error("Timeout waiting for initial data")
                     return False
                 
                 status = self.live_data_manager.get_buffer_status()
@@ -499,23 +501,23 @@ class SessionAnomalyStrategy(BaseStrategy):
                     should_log_buffer = time_since_last >= 30  # 30 seconds
                 
                 if should_log_buffer:
-                    logging.info(f"Buffer status: {status['buffer_size']}/{status['max_buffer_size']} "
+                    logger.info(f"Buffer status: {status['buffer_size']}/{status['max_buffer_size']} "
                                f"({status['buffer_utilization']:.1%})")
                     self._last_buffer_status_log = current_time
                 
                 time.sleep(2)
             
-            logging.info("Live data feed ready for trading")
+            logger.info("Live data feed ready for trading")
             return True
             
         except Exception as e:
-            logging.error(f"Error starting live data feed: {e}")
+            logger.error(f"Error starting live data feed: {e}")
             return False
     
     def _start_position_monitoring(self) -> bool:
         """Start position monitoring system"""
         if not self.position_monitor:
-            logging.error("Position monitor not initialized")
+            logger.error("Position monitor not initialized")
             return False
         
         try:
@@ -523,14 +525,14 @@ class SessionAnomalyStrategy(BaseStrategy):
             self.position_monitor.add_position_callback(self._on_position_event)
             
             if not self.position_monitor.start_monitoring():
-                logging.error("Failed to start position monitoring")
+                logger.error("Failed to start position monitoring")
                 return False
             
-            logging.info("Position monitoring started successfully")
+            logger.info("Position monitoring started successfully")
             return True
             
         except Exception as e:
-            logging.error(f"Error starting position monitoring: {e}")
+            logger.error(f"Error starting position monitoring: {e}")
             return False
     
     def _run_trading_loop(self, strategy_results: Dict[str, Any]) -> Dict[str, Any]:
@@ -541,8 +543,8 @@ class SessionAnomalyStrategy(BaseStrategy):
         strategy_results['status'] = 'running'
         strategy_results['event_driven'] = True
         
-        logging.info(f"Starting event-driven trading for {max_runtime/60:.1f} minutes...")
-        logging.info(f"Strategy will react to new data via callbacks for symbol: {self.symbol}")
+        logger.info(f"Starting event-driven trading for {max_runtime/60:.1f} minutes...")
+        logger.info(f"Strategy will react to new data via callbacks for symbol: {self.symbol}")
         
         # Store strategy results reference for callbacks to update
         self._strategy_results = strategy_results
@@ -555,12 +557,12 @@ class SessionAnomalyStrategy(BaseStrategy):
                 
                 # Check if we should stop (time-based)
                 if max_runtime > 0 and elapsed >= max_runtime:
-                    logging.info(f"Trading session completed after {elapsed/60:.1f} minutes")
+                    logger.info(f"Trading session completed after {elapsed/60:.1f} minutes")
                     break
                 
                 # Log status periodically
                 if int(elapsed) % 300 == 0 and int(elapsed) > 0:  # Every 5 minutes
-                    logging.info(f"Strategy running for {elapsed/60:.1f} minutes. "
+                    logger.info(f"Strategy running for {elapsed/60:.1f} minutes. "
                                f"Signals: {strategy_results.get('signals_generated', 0)}, "
                                f"Positions: {strategy_results.get('positions_opened', 0)}")
                 
@@ -568,17 +570,17 @@ class SessionAnomalyStrategy(BaseStrategy):
                 time.sleep(10)  # Check every 10 seconds for status updates
                 
             except KeyboardInterrupt:
-                logging.info("Trading session interrupted by user")
+                logger.info("Trading session interrupted by user")
                 break
             except Exception as e:
                 strategy_results['errors'].append(f"Trading loop error: {str(e)}")
-                logging.error(f"Error in event-driven trading loop: {e}")
+                logger.error(f"Error in event-driven trading loop: {e}")
                 time.sleep(30)  # Wait before continuing
         
         strategy_results['status'] = 'completed'
         elapsed_minutes = (datetime.now() - start_time).total_seconds() / 60
         strategy_results['runtime_minutes'] = elapsed_minutes
-        logging.info(f"Event-driven trading completed after {elapsed_minutes:.1f} minutes")
+        logger.info(f"Event-driven trading completed after {elapsed_minutes:.1f} minutes")
         
         return strategy_results
     
@@ -601,7 +603,7 @@ class SessionAnomalyStrategy(BaseStrategy):
                     same_direction_positions = [pos for pos in existing_positions if pos['direction'] == direction]
                     
                     if same_direction_positions:
-                        logging.debug(f"Already have {direction} position for {symbol}, skipping new order")
+                        logger.debug(f"Already have {direction} position for {symbol}, skipping new order")
                         continue
                     
                     # Check if we have a position in the opposite direction
@@ -617,11 +619,11 @@ class SessionAnomalyStrategy(BaseStrategy):
                                 close_reason='signal_reversal'
                             )
                             position_actions['closed'] += 1
-                            logging.info(f"Closed {pos['direction']} position for {symbol} due to signal reversal")
+                            logger.info(f"Closed {pos['direction']} position for {symbol} due to signal reversal")
                 
                 # Check risk management
                 if not self.risk_manager.can_open_position(signal, self.position_manager):
-                    logging.debug("Signal rejected by risk management")
+                    logger.debug("Signal rejected by risk management")
                     continue
                 
                 # Calculate position size
@@ -640,7 +642,7 @@ class SessionAnomalyStrategy(BaseStrategy):
                 stop_loss = self.risk_manager.calculate_stop_loss(signal)
                 take_profit = self.risk_manager.calculate_take_profit(signal)
                 
-                # Create order details for logging
+                # Create order details for logger
                 order_details = {
                     'symbol': symbol,
                     'direction': direction,
@@ -664,7 +666,7 @@ class SessionAnomalyStrategy(BaseStrategy):
                 
                 if order_result and order_result.get('status') == 'executed':
                     position_actions['opened'] += 1
-                    logging.info(f"Order executed: {direction} {symbol} at {current_price}")
+                    logger.info(f"Order executed: {direction} {symbol} at {current_price}")
                     
                     # Add position to position manager
                     position_id = f"{order_details['symbol']}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -689,10 +691,10 @@ class SessionAnomalyStrategy(BaseStrategy):
                             signal_confidence=order_details.get('signal_confidence')
                         )
                 else:
-                    logging.warning(f"Failed to place order: {order_details}")
+                    logger.warning(f"Failed to place order: {order_details}")
             
         except Exception as e:
-            logging.error(f"Error processing trading signals: {e}")
+            logger.error(f"Error processing trading signals: {e}")
         
         return position_actions
     
@@ -715,11 +717,11 @@ class SessionAnomalyStrategy(BaseStrategy):
                     
                     # Log portfolio status periodically
                     if portfolio_summary['active_positions'] > 0:
-                        logging.debug(f"Portfolio: {portfolio_summary['active_positions']} positions, "
+                        logger.debug(f"Portfolio: {portfolio_summary['active_positions']} positions, "
                                     f"PnL: {portfolio_summary['unrealized_pnl']:.4f}")
         
         except Exception as e:
-            logging.error(f"Error monitoring positions: {e}")
+            logger.error(f"Error monitoring positions: {e}")
     
     def _get_current_price(self, symbol: str) -> float:
         """Get current market price for symbol"""
@@ -737,7 +739,7 @@ class SessionAnomalyStrategy(BaseStrategy):
                 else:
                     return 1.0      # Generic default
         except Exception as e:
-            logging.error(f"Error getting current price for {symbol}: {e}")
+            logger.error(f"Error getting current price for {symbol}: {e}")
             return 1.2500  # Default fallback
     
     def _get_current_price_from_features(self, features: pd.DataFrame) -> float:
@@ -754,10 +756,10 @@ class SessionAnomalyStrategy(BaseStrategy):
                 if price_cols:
                     return float(features[price_cols[0]].iloc[-1])
                 else:
-                    logging.warning("No price column found in features, using default")
+                    logger.warning("No price column found in features, using default")
                     return 1.2500  # Default fallback
         except Exception as e:
-            logging.error(f"Error extracting price from features: {e}")
+            logger.error(f"Error extracting price from features: {e}")
             return 1.2500  # Default fallback
     
     def _get_account_balance(self) -> float:
@@ -767,7 +769,7 @@ class SessionAnomalyStrategy(BaseStrategy):
             # For now, return a default value
             return 10000.0
         except Exception as e:
-            logging.error(f"Error getting account balance: {e}")
+            logger.error(f"Error getting account balance: {e}")
             return 10000.0
     
     def _on_new_data(self, data: pd.DataFrame):
@@ -775,7 +777,7 @@ class SessionAnomalyStrategy(BaseStrategy):
         try:
             # This is triggered whenever new processed data is available
             # Instead of running in a loop, we process signals only when new data arrives
-            logging.debug("New data received, processing signals...")
+            logger.debug("New data received, processing signals...")
             
             # Generate signals from the new data
             signals = self.generate_signals(data)
@@ -788,7 +790,7 @@ class SessionAnomalyStrategy(BaseStrategy):
             self._monitor_positions()
             
         except Exception as e:
-            logging.error(f"Error processing new data callback: {e}")
+            logger.error(f"Error processing new data callback: {e}")
 
     def _on_position_event(self, event_type: str, position_data: Dict[str, Any], extra_data: Dict[str, Any] = None):
         """Callback to handle position events from position monitor"""
@@ -808,24 +810,24 @@ class SessionAnomalyStrategy(BaseStrategy):
                 )
                 
                 if closed_position:
-                    logging.info(f"Position closed for {{'action': 'close', 'position_id': '{position_id}', 'reason': '{reason}'}}")
-                    logging.info(f"Successfully closed position {position_id} - Reason: {reason}")
+                    logger.info(f"Position closed for {{'action': 'close', 'position_id': '{position_id}', 'reason': '{reason}'}}")
+                    logger.info(f"Successfully closed position {position_id} - Reason: {reason}")
                 else:
-                    logging.warning(f"Failed to close position {position_id} in position manager")
+                    logger.warning(f"Failed to close position {position_id} in position manager")
             
             elif event_type == 'position_opened':
-                logging.info(f"Position event: {event_type} for {position_id}")
+                logger.info(f"Position event: {event_type} for {position_id}")
             
             elif event_type == 'position_closed':
                 # Position already closed in monitor, just log
-                logging.debug(f"Position {position_id} closed in monitor")
+                logger.debug(f"Position {position_id} closed in monitor")
                 
         except Exception as e:
-            logging.error(f"Error handling position event {event_type}: {e}")
+            logger.error(f"Error handling position event {event_type}: {e}")
 
     def stop(self):
         """Stop the strategy gracefully"""
-        logging.info("Stopping session anomaly strategy...")
+        logger.info("Stopping session anomaly strategy...")
         self._cleanup_resources()
     
     def _cleanup_resources(self):
@@ -834,19 +836,19 @@ class SessionAnomalyStrategy(BaseStrategy):
             # Stop data streaming first
             if self.live_data_manager:
                 self.live_data_manager.stop_streaming()
-                logging.info("Live data streaming stopped")
+                logger.info("Live data streaming stopped")
             
             # Stop position monitoring
             if self.position_monitor:
                 self.position_monitor.stop_monitoring()
-                logging.info("Position monitoring stopped")
+                logger.info("Position monitoring stopped")
             
             # CRITICAL: Close all positions and cleanup broker connection (live trading safety)
             if self.order_manager:
                 self.order_manager.cleanup(close_all_positions=True)
                 
         except Exception as e:
-            logging.error(f"Error during cleanup: {e}")
+            logger.error(f"Error during cleanup: {e}")
     
     def get_session_performance_analysis(self) -> Dict[str, Any]:
         """

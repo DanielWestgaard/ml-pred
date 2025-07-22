@@ -1,5 +1,4 @@
 import datetime
-import logging
 import plotly.graph_objects as go
 import pandas as pd
 import sys
@@ -9,7 +8,9 @@ from utils import data_utils
 from data.processing.base_processor import BaseProcessor
 from utils import shared_utils
 import config.config as config
+from utils.logging_utils import get_logger
 
+logger = get_logger()
 
 class PlotData(BaseProcessor):
     """Plot simple candlestick data"""
@@ -39,7 +40,7 @@ class PlotData(BaseProcessor):
             self.plot_storage_path = storage_path
             self.output_file = output_file or f"{self.plot_storage_path}/plot_{datetime.datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.png"
         except Exception as e:
-            logging.error(f"Error initializing PlotData: {str(e)}")
+            logger.error(f"Error initializing PlotData: {str(e)}")
             raise
     
     def run(self):
@@ -99,7 +100,7 @@ class PlotData(BaseProcessor):
             # self.df = self.df[['date', 'open', 'high', 'low', 'close']]
             self.df['date'] = pd.to_datetime(self.df['date'])
         except Exception as e:
-            logging.error(f"Unable to plot dataset because of error reading date column. Must be datetime format: {e}")
+            logger.error(f"Unable to plot dataset because of error reading date column. Must be datetime format: {e}")
         
         # Set the date column as index
         self.df = self.df.set_index('date')

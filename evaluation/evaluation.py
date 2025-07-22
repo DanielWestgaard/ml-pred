@@ -1,4 +1,3 @@
-import logging
 import os
 import yaml
 
@@ -6,6 +5,9 @@ from utils.model.model_metadata_loader import load_model_metadata
 import utils.shared_utils as shared_utils
 from evaluation.evaluation_factory import EvaluationFactory
 import utils.hypothesis.config_loader as config_loader
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class ModelEvaluation:
     """
@@ -58,10 +60,10 @@ class ModelEvaluation:
                 pass
         
         # Option 3: Default fallback
-        logging.warning("Could not determine hypothesis type, defaulting to 'session_based_tod_anomalies'")
+        logger.warning("Could not determine hypothesis type, defaulting to 'session_based_tod_anomalies'")
         return 'session_based_tod_anomalies'
     
     def run(self):
         """Run the appropriate evaluation"""
-        logging.info(f"Running evaluation for hypothesis type: {self.hypothesis_type}")
+        logger.info(f"Running evaluation for hypothesis type: {self.hypothesis_type}")
         return self.evaluator.run()

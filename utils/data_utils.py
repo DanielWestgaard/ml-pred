@@ -1,12 +1,14 @@
 import datetime
-import logging
 import re
 import os
 import pandas as pd
 import sys
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
-def parse_timestamp_robust(timestamp_value, logger=None):
+def parse_timestamp_robust(timestamp_value):
     """
     Robust timestamp parsing function that handles multiple formats:
     - Unix timestamps (seconds and milliseconds)
@@ -22,10 +24,7 @@ def parse_timestamp_robust(timestamp_value, logger=None):
         
     Raises:
         ValueError: If timestamp cannot be parsed
-    """
-    if logger is None:
-        logger = logging.getLogger(__name__)
-        
+    """        
     if pd.isna(timestamp_value):
         return pd.NaT
         
@@ -82,7 +81,7 @@ def parse_timestamp_robust(timestamp_value, logger=None):
         raise ValueError(f"Unable to parse timestamp: {timestamp_str}")
 
 
-def parse_timestamp_series(series, logger=None):
+def parse_timestamp_series(series):
     """
     Apply robust timestamp parsing to an entire pandas Series.
     
@@ -93,9 +92,6 @@ def parse_timestamp_series(series, logger=None):
     Returns:
         pd.Series: Series with parsed timestamps
     """
-    if logger is None:
-        logger = logging.getLogger(__name__)
-    
     logger.debug(f"Parsing timestamp series with {len(series)} values")
     
     # Try vectorized approach first for performance
@@ -249,26 +245,26 @@ def check_input_type(input_data):
     if isinstance(input_data, str):
         # Check if the string has a .csv extension
         if not input_data.lower().endswith('.csv'):
-            logging.error(f"Provided input must be a (string) path to a CSV file (with .csv extension). You provided: {input_data}  ... exiting!")
+            logger.error(f"Provided input must be a (string) path to a CSV file (with .csv extension). You provided: {input_data}  ... exiting!")
             sys.exit()
         
         # Check if the file exists
         if not os.path.isfile(input_data):
-            logging.error(f"CSV file does not exist: {input_data}  ... exiting!")
+            logger.error(f"CSV file does not exist: {input_data}  ... exiting!")
             sys.exit()
         
         return 'csv_path'
     elif isinstance(input_data, pd.DataFrame):
         return 'dataframe'
     else:
-        logging.error(f"Input must be either a string (CSV path) or a pandas DataFrame. You provided {input_data}  ... exiting!")
+        logger.error(f"Input must be either a string (CSV path) or a pandas DataFrame. You provided {input_data}  ... exiting!")
         sys.exit()
     
 def check_and_return_df(input_data) -> pd.DataFrame:
     """
     Method that checks what kind of input type it is, and returns a DataFrame if it exists.
     """
-    logging.debug(f"Loading {input_data}")
+    logger.debug(f"Loading {input_data}")
     # Load dataset based on format
     try:
         input_type = check_input_type(input_data)
@@ -276,29 +272,29 @@ def check_and_return_df(input_data) -> pd.DataFrame:
         if input_type == 'csv_path':
             # Load data from CSV file
             data = pd.read_csv(input_data, index_col=False)
-            # logging.debug("Provided raw dataset was an existing csv-file.")
+            # logger.debug("Provided raw dataset was an existing csv-file.")
         else:  # input_type == 'dataframe'
             # Use DataFrame directly
             data = input_data.copy()
-            # logging.debug("Provided raw dataset was a DataFrame.")
+            # logger.debug("Provided raw dataset was a DataFrame.")
         original_data = data.copy()
         return data, original_data
     except (TypeError, ValueError) as e:
-        logging.error(f"Error checking/loading df: {e}")
+        logger.error(f"Error checking/loading df: {e}")
         return None
     
 
 def check_validation(validation_results_is_valid : bool, validation_results_issues):
     """
     Method specifically designed to check the validation.py's results and gives 
-    a descriptive logging based on the results.
+    a descriptive logger based on the results.
     """
     
     if validation_results_is_valid:
-        logging.info("Validation of cleaned data was valid!")
+        logger.info("Validation of cleaned data was valid!")
     else:
-        logging.warning("Validation of data was not valid!")
-        logging.warning(f"Validation issues: {validation_results_issues}")
+        logger.warning("Validation of data was not valid!")
+        logger.warning(f"Validation issues: {validation_results_issues}")
         
 
 def save_processed_file(filepath, processed_data : pd.DataFrame):
@@ -318,7 +314,7 @@ def save_processed_file(filepath, processed_data : pd.DataFrame):
     Returns:
         str: Path where the processed file was saved
     """
-    logging.info("Saving processed file ...")
+    logger.info("Saving processed file ...")
     
     # Extract filename from filepath
     filename = os.path.basename(filepath)
@@ -348,7 +344,7 @@ def save_processed_file(filepath, processed_data : pd.DataFrame):
     except:  # Might be failing because date is not the index? Saving standard just in case
         processed_data.to_csv(output_path, index=True)
     
-    logging.info(f"Successfully saved file! {output_path}")
+    logger.info(f"Successfully saved file! {output_path}")
     
     return output_path
 
@@ -380,17 +376,17 @@ def check_feature_specification(selected_features : list, method : str):
         - values of feature: list of the features values, selected_features[method]. Eg. selected_features['time_of_day']
             If the selected_features is empty, method returns None. If it exists, we just return that list.
     """
-    logging.debug(f"----- Inside check_feature_specification() to determine how to generate hypotheses feature: {method} -----")
+    logger.debug(f"----- Inside check_feature_specification() to determine how to generate hypotheses feature: {method} -----")
     # First, check if the whole list is full or empty.
     if selected_features is None:  # List is empty ->  All features are to be generated
-        logging.debug(f"selected_features (the whole list) is empty. All features are to be generated of method {method}")
+        logger.debug(f"selected_features (the whole list) is empty. All features are to be generated of method {method}")
         return True, None
     else:  # List has specified features to generate
         # As the method has been (manually) called, I'm ASSUMING this feature is in the list (so won't check)
         values = selected_features[method]
         if not values:  # List of feature values is empty -> Not (granularly) specified features, meaning all features in that feature method will be generated
-            logging.debug(f"List of feature ({method}) values is empty: {values}. Will still generate all features.")
+            logger.debug(f"List of feature ({method}) values is empty: {values}. Will still generate all features.")
             return True, values
         else:  # Not all features are to be generated, but specified ones
-            logging.debug(f"List of feature ({method}) values contains values: {values}. Will only generate those.")
+            logger.debug(f"List of feature ({method}) values contains values: {values}. Will only generate those.")
             return False, values

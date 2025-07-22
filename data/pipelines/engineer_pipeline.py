@@ -1,5 +1,4 @@
 import inspect
-import logging
 import os
 import sys
 import pandas as pd
@@ -14,6 +13,9 @@ from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
 from data.features.target_hypothesis import TargetHypothesis
 import utils.hypothesis.config_loader as config_loader
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class EngineeringPipeline():
@@ -44,7 +46,7 @@ class EngineeringPipeline():
         self.raw_data_path = raw_dataset
         # Loading data
         self.df, self.original_df = data_utils.check_and_return_df(raw_dataset)
-        logging.debug("Engineering Pipeline - Successfully loaded data!")
+        logger.debug("Engineering Pipeline - Successfully loaded data!")
         
         # Potentially save cleaned dataset
         self.save_cleaned_data = save_cleaned_data
@@ -59,7 +61,7 @@ class EngineeringPipeline():
         returns:
             pd.DataFrame: Engineered data ready to use for training.
         """
-        logging.info("---------- Running Data Pipeline ----------")
+        logger.info("---------- Running Data Pipeline ----------")
         
         # Clean the data
         self.df = self.cleaner.run()
@@ -68,12 +70,12 @@ class EngineeringPipeline():
         self.validator = DataValidator(self.df)
         self.validator_results = self.validator.run()
         self.df = self.validator_results["validated_data"]
-        # Logging results
+        # logger results
         data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
         # Feature Generation
         if self.selected_features is not None:
-            logging.debug(f"User provided specific features to be generated: {self.selected_features}")
+            logger.debug(f"User provided specific features to be generated: {self.selected_features}")
             self.skip_selection = True
             self.feature_generator = FeatureGenerator(self.df, selected_features=self.selected_features)
             self.df = self.feature_generator.run()
@@ -82,7 +84,7 @@ class EngineeringPipeline():
             self.hypo = TargetHypothesis(self.df, self.hypothesis_name or "session_based_tod_anomalies_X")
             self.df = self.hypo.run()
         else:
-            logging.debug("User did not provide any specific features to be generated - generating all features.")
+            logger.debug("User did not provide any specific features to be generated - generating all features.")
             self.skip_selection = False
             self.feature_generator = FeatureGenerator(self.df)
             self.df = self.feature_generator.run()
@@ -93,20 +95,20 @@ class EngineeringPipeline():
         
         # Feature Selection
         if self.skip_selection:
-            logging.info("As selected features were provided, pipeline will skip Feature Selection.")
+            logger.info("As selected features were provided, pipeline will skip Feature Selection.")
         else:
             self.selector = FeatureSelector(self.df)
             self.df = self.selector.run()
         
-        logging.info("---------- Data Pipeline finished all 'data steps'! ----------")
+        logger.info("---------- Data Pipeline finished all 'data steps'! ----------")
         
         # Save Engineered data
         try:
             data_utils.save_processed_file(filepath=self.raw_data_path, processed_data=self.df)
         except Exception as e:
-            logging.error(f"Unable to save file 'dynamically', will store as {os.getcwd()}, : {e}")
+            logger.error(f"Unable to save file 'dynamically', will store as {os.getcwd()}, : {e}")
             self.df.to_csv('testing.csv', index=True)
         
-        logging.info("---------- Data Pipeline Finished ----------")
+        logger.info("---------- Data Pipeline Finished ----------")
         
         return self.df

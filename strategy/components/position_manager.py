@@ -1,7 +1,10 @@
-import logging
 import pandas as pd
 from typing import Dict, List, Any, Optional
 from datetime import datetime
+
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class PositionManager:
     """
@@ -33,7 +36,7 @@ class PositionManager:
         self.winning_trades = 0
         self.losing_trades = 0
         
-        logging.info(f"Position manager initialized - Tracking: {position_tracking}, "
+        logger.info(f"Position manager initialized - Tracking: {position_tracking}, "
                     f"Max positions: {max_concurrent_positions}")
     
     def open_position(self, signal_info: Dict[str, Any], position_size_info: Dict[str, Any],
@@ -83,7 +86,7 @@ class PositionManager:
         self.open_positions.append(position)
         self.position_history.append(position.copy())
         
-        logging.info(f"Opened {position['direction']} position for {symbol} at {current_price} "
+        logger.info(f"Opened {position['direction']} position for {symbol} at {current_price} "
                     f"(Size: ${position_size_info['position_size_usd']:.2f})")
         
         return position
@@ -129,7 +132,7 @@ class PositionManager:
                 
                 return position
         
-        logging.warning(f"Position {position_id} not found for update")
+        logger.warning(f"Position {position_id} not found for update")
         return None
     
     def close_position(self, position_id: str, close_price: float, 
@@ -182,12 +185,12 @@ class PositionManager:
                 self.closed_positions.append(position)
                 self.open_positions.pop(i)
                 
-                logging.info(f"Closed {position['direction']} position for {position['symbol']} "
+                logger.info(f"Closed {position['direction']} position for {position['symbol']} "
                             f"at {close_price} (P&L: ${final_pnl:.2f}, Reason: {close_reason})")
                 
                 return position
         
-        logging.warning(f"Position {position_id} not found for closing")
+        logger.warning(f"Position {position_id} not found for closing")
         return None
     
     def get_open_positions(self) -> List[Dict[str, Any]]:

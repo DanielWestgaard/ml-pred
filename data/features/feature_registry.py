@@ -9,12 +9,14 @@ This module provides a robust, model-aware feature generation system that:
 - Provides clear error handling and validation
 """
 
-import logging
 import inspect
 from dataclasses import dataclass, field
 from typing import Dict, List, Set, Callable, Optional, Any, Tuple
 from collections import defaultdict, deque
 import pandas as pd
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 @dataclass
@@ -53,7 +55,7 @@ class FeatureRegistry:
         # Index by category
         self._category_index[definition.category].add(definition.name)
         
-        logging.debug(f"Registered feature generator '{definition.name}' producing {definition.output_features}")
+        logger.debug(f"Registered feature generator '{definition.name}' producing {definition.output_features}")
     
     def get_available_features(self) -> List[str]:
         """Get all features that can be generated"""

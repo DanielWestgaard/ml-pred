@@ -6,6 +6,8 @@ import sys
 from logging.handlers import RotatingFileHandler, TimedRotatingFileHandler
 import json
 import traceback
+import inspect
+from typing import Optional, Dict, Any
 
 import config.config as config
 
@@ -20,7 +22,7 @@ def get_timestamp():
 def setup_logging(
     name='logging',
     type='logging_utils',
-    log_level=config.DEFAULT_LOG_LEVEL,
+    log_level=config.DEBUG_LOG_LEVEL,
     log_format=config.DEFAULT_LOG_FORMAT,
     date_format=config.DEFAULT_DATE_FORMAT,
     log_to_console=True,
@@ -98,6 +100,22 @@ def setup_logging(
     # Set the configured flag
     _is_configured = True
     
+    # Suppress noisy loggers from external libraries
+    noisy_loggers = [
+        'asyncio',
+        'kaleido',
+        'choreographer',
+        'urllib3',
+        'matplotlib',
+        'plotly',
+        'selenium',
+        'browser_proc'
+        #'root'  # optional: this avoids logs from libraries using root logger
+    ]
+    
+    for logger_name in noisy_loggers:
+        logging.getLogger(logger_name).setLevel(logging.ERROR)
+    
     # Log startup
     logger = get_logger(type)
     logger.info(f"Logging system initialized. Environment: {environment}")
@@ -117,20 +135,66 @@ def _log_uncaught_exception(exc_type, exc_value, exc_traceback):
     logger = get_logger("uncaught_exception")
     logger.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
-def get_logger(name=None):
+def get_logger(name: Optional[str] = None) -> logging.Logger:
     """
-    Get a logger instance. If logging system isn't configured yet, it will be configured
-    with default settings.
+    Get a logger instance with auto-detection of caller module name.
+    If logging system isn't configured yet, it will be configured with default settings.
     
     Args:
-        name: Logger name (usually __name__ of the calling module)
+        name: Logger name. If None, automatically detects the calling module name
         
     Returns:
-        Logger instance
+        Logger instance configured with centralized settings
+        
+    Examples:
+        # Auto-detect caller module name
+        logger = get_logger()
+        
+        # Explicit name
+        logger = get_logger(__name__)
+        logger = get_logger('custom_logger')
     """
     global _is_configured
     
     if not _is_configured:
         setup_logging()
     
+    # Auto-detect caller module name if not provided
+    if name is None:
+        frame = inspect.currentframe()
+        try:
+            # Go up the call stack to find the calling module
+            caller_frame = frame.f_back
+            name = caller_frame.f_globals.get('__name__', 'unknown')
+        finally:
+            del frame  # Prevent reference cycles
+    
     return logging.getLogger(name)
+
+def log_with_context(logger: logging.Logger, level: str, message: str, 
+                    context: Optional[Dict[str, Any]] = None) -> None:
+    """
+    Log a message with additional context information.
+    
+    Args:
+        logger: Logger instance to use
+        level: Log level ('debug', 'info', 'warning', 'error', 'critical')
+        message: Main log message
+        context: Dictionary of additional context information
+        
+    Example:
+        log_with_context(logger, 'info', 'Trade executed', {
+            'symbol': 'BTCUSD',
+            'size': 0.1,
+            'price': 45000.00
+        })
+    """
+    context = context or {}
+    
+    # Format context as key=value pairs
+    context_str = ' '.join([f"{k}={v}" for k, v in context.items()])
+    full_message = f"{message} | {context_str}" if context_str else message
+    
+    # Get the appropriate logging method
+    log_method = getattr(logger, level.lower())
+    log_method(full_message)

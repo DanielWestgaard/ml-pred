@@ -3,7 +3,6 @@ import http.client
 import json
 import os
 import sys
-import logging
 import time
 import base64
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -15,6 +14,9 @@ import pandas as pd
 import config.config as config
 from utils.broker_utils import convert_json_to_ohlcv_csv
 import utils.data_utils as data_utils
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 # Note: Using connection-per-request instead of global connection to avoid state conflicts
@@ -56,7 +58,7 @@ def historical_prices(X_SECURITY_TOKEN, CST,
                 
                 # Check for "Request-started" error
                 if "Request-started" in response_text:
-                    logging.warning(f"Capital.com 'Request-started' error in historical_prices, attempt {attempt + 1}")
+                    logger.warning(f"Capital.com 'Request-started' error in historical_prices, attempt {attempt + 1}")
                     if attempt < max_retries - 1:
                         time.sleep(1 + attempt)  # Exponential backoff
                         # Create new connection for retry
@@ -64,16 +66,16 @@ def historical_prices(X_SECURITY_TOKEN, CST,
                         conn = http.client.HTTPSConnection(config.CAPCOM_DEMO_URL)
                         continue
                     else:
-                        logging.error("Max retries exceeded for historical_prices 'Request-started' error")
+                        logger.error("Max retries exceeded for historical_prices 'Request-started' error")
                         return {"error": "Request-started"}
 
                 parsed_data = json.loads(response_text)
                 if print_answer:
-                    print(json.dumps(parsed_data, indent=4))
+                    logger.debug(f"Historical prices response: {json.dumps(parsed_data, indent=4)}")
                 return parsed_data
                 
             except Exception as e:
-                logging.error(f"Historical prices attempt {attempt + 1} failed: {e}")
+                logger.error(f"Historical prices attempt {attempt + 1} failed: {e}")
                 if attempt < max_retries - 1:
                     time.sleep(1 + attempt)
                     conn.close()
@@ -130,7 +132,7 @@ def fetch_chunk_with_retry(X_SECURITY_TOKEN, CST, epic, resolution,
             from_str = from_rounded.strftime("%Y-%m-%dT%H:%M:%S")
             to_str = to_rounded.strftime("%Y-%m-%dT%H:%M:%S")
             
-            logging.debug(f"Attempt {attempt + 1}: Fetching from {from_str} to {to_str}")
+            logger.debug(f"Attempt {attempt + 1}: Fetching from {from_str} to {to_str}")
             
             # Call the API
             chunk_data = historical_prices(
@@ -150,18 +152,18 @@ def fetch_chunk_with_retry(X_SECURITY_TOKEN, CST, epic, resolution,
                     # Reduce the time range by half and try again
                     time_diff = current_to - current_from
                     current_to = current_from + time_diff / 2
-                    logging.warning(f"Date range too large, reducing to {current_to.strftime('%Y-%m-%dT%H:%M:%S')}")
+                    logger.warning(f"Date range too large, reducing to {current_to.strftime('%Y-%m-%dT%H:%M:%S')}")
                     continue
                 else:
                     # Other error, return it
-                    logging.error(f"API Error: {chunk_data}")
+                    logger.error(f"API Error: {chunk_data}")
                     return chunk_data, current_to
             else:
                 # Success!
                 return chunk_data, current_to
                 
         except Exception as e:
-            logging.error(f"Error in attempt {attempt + 1}: {e}")
+            logger.error(f"Error in attempt {attempt + 1}: {e}")
             if attempt == max_retries - 1:
                 return {"error": str(e)}, current_to
             
@@ -194,7 +196,7 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
         Dictionary containing all the raw price data (with 'prices' key)
     """
     # Fetch the data using our improved function
-    logging.info(f"Fetching historical data for {epic} from {from_date} to {to_date}")
+    logger.info(f"Fetching historical data for {epic} from {from_date} to {to_date}")
     
     # Process in chunks and collect all data
     current_from = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S")
@@ -202,7 +204,7 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
     
     # Calculate optimal chunk size based on resolution
     chunk_size = calculate_optimal_chunk_size(resolution)
-    logging.info(f"Using chunk size of {chunk_size} for resolution {resolution}")
+    logger.info(f"Using chunk size of {chunk_size} for resolution {resolution}")
     
     # Initialize the collection of all price data
     all_prices = []
@@ -214,7 +216,7 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
         # Calculate the end date for this chunk
         chunk_end = min(current_from + chunk_size, to_datetime)
         
-        logging.info(f"Processing chunk from {current_from.strftime('%Y-%m-%d %H:%M')} to {chunk_end.strftime('%Y-%m-%d %H:%M')}")
+        logger.info(f"Processing chunk from {current_from.strftime('%Y-%m-%d %H:%M')} to {chunk_end.strftime('%Y-%m-%d %H:%M')}")
         
         # Fetch this chunk with retry logic
         chunk_data, actual_end = fetch_chunk_with_retry(
@@ -231,23 +233,23 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
         if "prices" in chunk_data and len(chunk_data["prices"]) > 0:
             all_prices.extend(chunk_data["prices"])
             successful_chunks += 1
-            logging.info(f"✓ Successfully fetched {len(chunk_data['prices'])} data points")
+            logger.info(f"✓ Successfully fetched {len(chunk_data['prices'])} data points")
         elif "errorCode" in chunk_data:
             failed_chunks += 1
-            logging.warning(f"✗ Failed to get data: {chunk_data['errorCode']}")
+            logger.warning(f"✗ Failed to get data: {chunk_data['errorCode']}")
             
             # If it's still a date range error even after retries, skip this period
             if chunk_data["errorCode"] == "error.invalid.max.daterange":
-                logging.warning(f"Skipping period {current_from.strftime('%Y-%m-%d %H:%M')} to {chunk_end.strftime('%Y-%m-%d %H:%M')} - date range too large")
+                logger.warning(f"Skipping period {current_from.strftime('%Y-%m-%d %H:%M')} to {chunk_end.strftime('%Y-%m-%d %H:%M')} - date range too large")
         else:
             failed_chunks += 1
-            logging.warning(f"✗ Unexpected response format: {chunk_data}")
+            logger.warning(f"✗ Unexpected response format: {chunk_data}")
         
         # Move to the next chunk (use actual_end in case it was reduced during retries)
         current_from = max(actual_end, current_from + timedelta(minutes=1))  # Ensure we always make progress
     
-    logging.info(f"Fetching completed: {successful_chunks} successful chunks, {failed_chunks} failed chunks")
-    logging.info(f"Total data points collected: {len(all_prices)}")
+    logger.info(f"Fetching completed: {successful_chunks} successful chunks, {failed_chunks} failed chunks")
+    logger.info(f"Total data points collected: {len(all_prices)}")
     
     # Prepare the complete data object
     complete_data = {
@@ -266,7 +268,7 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
         raw_json_file = os.path.join(config.CAPCOM_RESPONSE_JSON_DIR, f"response_raw.json")
         with open(raw_json_file, 'w') as f:
             json.dump(complete_data, f, indent=4)
-        logging.info(f"Raw data saved to {raw_json_file}")
+        logger.info(f"Raw data saved to {raw_json_file}")
     
     # Generate output filename
     output_file_name = data_utils.generate_filename(symbol=epic, timeframe=resolution, 
@@ -275,16 +277,16 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
     
     # Save the data to OHLCV CSV format
     if all_prices:
-        logging.info(f"Converting {len(all_prices)} data points to OHLCV format")
+        logger.info(f"Converting {len(all_prices)} data points to OHLCV format")
         convert_json_to_ohlcv_csv(complete_data, output_file)
-        logging.info(f"OHLCV data saved to {output_file}")
+        logger.info(f"OHLCV data saved to {output_file}")
         
         # Print summary
         first_timestamp = all_prices[0]['snapshotTimeUTC'] if all_prices else "N/A"
         last_timestamp = all_prices[-1]['snapshotTimeUTC'] if all_prices else "N/A"
-        logging.info(f"Data range: {first_timestamp} to {last_timestamp}")
+        logger.info(f"Data range: {first_timestamp} to {last_timestamp}")
     else:
-        logging.error("No data to save.")
+        logger.error("No data to save.")
     
     return complete_data
 
@@ -300,8 +302,8 @@ def fetch_maximum_available_data(X_SECURITY_TOKEN, CST, epic, resolution,
     logic to handle cases where data might not be available for the full requested range.
     """
     try:
-        logging.info(f"Attempting to fetch maximum available data for {epic}")
-        logging.info(f"Requested range: {from_date} to {to_date}")
+        logger.info(f"Attempting to fetch maximum available data for {epic}")
+        logger.info(f"Requested range: {from_date} to {to_date}")
         
         result = fetch_and_save_historical_prices(
             X_SECURITY_TOKEN, CST, epic, resolution,
@@ -310,17 +312,17 @@ def fetch_maximum_available_data(X_SECURITY_TOKEN, CST, epic, resolution,
         )
         
         if result["total_points"] > 0:
-            logging.info(f"Successfully collected {result['total_points']} data points")
+            logger.info(f"Successfully collected {result['total_points']} data points")
             return result
         else:
-            logging.warning("No data was collected for the requested period")
+            logger.warning("No data was collected for the requested period")
             
             # Try a more recent period if the original request failed completely
             recent_from = datetime.now() - timedelta(days=7)
             recent_from_str = recent_from.strftime("%Y-%m-%dT%H:%M:%S")
             recent_to_str = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
             
-            logging.info(f"Trying to fetch recent data from {recent_from_str} to {recent_to_str}")
+            logger.info(f"Trying to fetch recent data from {recent_from_str} to {recent_to_str}")
             
             return fetch_and_save_historical_prices(
                 X_SECURITY_TOKEN, CST, epic, resolution,
@@ -329,5 +331,5 @@ def fetch_maximum_available_data(X_SECURITY_TOKEN, CST, epic, resolution,
             )
             
     except Exception as e:
-        logging.error(f"Error in fetch_maximum_available_data: {e}")
+        logger.error(f"Error in fetch_maximum_available_data: {e}")
         return {"error": str(e), "prices": [], "total_points": 0}

@@ -7,12 +7,13 @@ feature generation system with the existing codebase without breaking
 current functionality.
 """
 
-import logging
 from typing import Dict, List, Optional, Any, Union
 import pandas as pd
 
 from .enhanced_generation import ModelAwareFeatureGenerator
+from utils.logging_utils import get_logger
 
+logger = get_logger()
 
 class EnhancedFeatureGeneratorAdapter:
     """
@@ -34,7 +35,7 @@ class EnhancedFeatureGeneratorAdapter:
         if isinstance(selected_features, dict):
             # Old format: dict with feature names as keys
             self.selected_features = list(selected_features.keys())
-            logging.info("Converted old dict format to new list format")
+            logger.info("Converted old dict format to new list format")
         elif isinstance(selected_features, list):
             # New format: list of feature names
             self.selected_features = selected_features
@@ -55,7 +56,7 @@ class EnhancedFeatureGeneratorAdapter:
         Returns:
             DataFrame with generated features
         """
-        logging.info("Using Enhanced Feature Generation System")
+        logger.info("Using Enhanced Feature Generation System")
         
         if self.selected_features:
             return self.enhanced_generator.generate_selected(self.selected_features)

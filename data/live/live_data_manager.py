@@ -1,4 +1,3 @@
-import logging
 import threading
 import time
 import pandas as pd
@@ -16,6 +15,9 @@ from data.features.transformation import FeatureTransformer
 from utils.data_utils import parse_timestamp_series
 import config.config as config
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class LiveDataManager:
@@ -74,7 +76,7 @@ class LiveDataManager:
         # Callbacks for data updates
         self._data_callbacks = []
         
-        logging.info(f"LiveDataManager initialized - Symbol: {symbol}, "
+        logger.info(f"LiveDataManager initialized - Symbol: {symbol}, "
                     f"Timeframe: {timeframe}, Buffer: {buffer_size}")
     
     def add_data_callback(self, callback: Callable[[pd.DataFrame], None]):
@@ -93,7 +95,7 @@ class LiveDataManager:
             True if streaming started successfully
         """
         if self._is_streaming:
-            logging.warning("Data streaming already active")
+            logger.warning("Data streaming already active")
             return True
             
         try:
@@ -103,7 +105,7 @@ class LiveDataManager:
                     # Initialize WebSocket data streaming
                     websocket_initialized = self._initialize_websocket_streaming()
                     if not websocket_initialized:
-                        logging.warning("WebSocket initialization failed, falling back to traditional broker")
+                        logger.warning("WebSocket initialization failed, falling back to traditional broker")
                         if not self._connect_broker():
                             return False
                     else:
@@ -112,9 +114,9 @@ class LiveDataManager:
                         # or if historical data jumpstart specifically requires it
                         if not self.websocket_manager.is_connected(): # Assuming is_connected() exists or similar check
                             if not self._connect_broker():
-                                logging.warning("Failed to establish broker connection for historical data, jumpstart will be disabled")
+                                logger.warning("Failed to establish broker connection for historical data, jumpstart will be disabled")
                         else:
-                            logging.info("Broker connection already established by WebSocketDataManager, skipping redundant connection.")
+                            logger.info("Broker connection already established by WebSocketDataManager, skipping redundant connection.")
                 else:
                     # Use traditional broker connection
                     if not self._connect_broker():
@@ -124,9 +126,9 @@ class LiveDataManager:
             # Skip jumpstart if using WebSocket mode since WebSocketDataManager already did it
             if jumpstart and not self._use_websocket:
                 if not self._jumpstart_buffer(dry_run):
-                    logging.warning("Buffer jumpstart failed, continuing with normal startup")
+                    logger.warning("Buffer jumpstart failed, continuing with normal startup")
             elif jumpstart and self._use_websocket:
-                logging.info("Transferring historical data from WebSocketDataManager to LiveDataManager buffer")
+                logger.info("Transferring historical data from WebSocketDataManager to LiveDataManager buffer")
                 self._transfer_websocket_buffer_data()
             
             # Start data processing thread
@@ -137,26 +139,26 @@ class LiveDataManager:
             
             if dry_run:
                 # Start simulation thread for testing
-                logging.info("SIMULATION MODE: Starting simulated data generation")
+                logger.info("SIMULATION MODE: Starting simulated data generation")
                 self._stream_thread = threading.Thread(
                     target=self._simulate_data_worker, daemon=True)
                 self._stream_thread.start()
             elif self.websocket_manager and self.websocket_manager.is_connected():
                 # WebSocket handles data streaming automatically via callbacks
-                logging.info("LIVE MODE: Using WebSocket for real-time BTCUSD data from Capital.com")
+                logger.info("LIVE MODE: Using WebSocket for real-time BTCUSD data from Capital.com")
             else:
                 # Start traditional data streaming thread
-                logging.info("LIVE MODE: Using traditional broker polling for real-time data")
+                logger.info("LIVE MODE: Using traditional broker polling for real-time data")
                 self._stream_thread = threading.Thread(
                     target=self._stream_data_worker, daemon=True)
                 self._stream_thread.start()
             
-            logging.info(f"Live data streaming started - Mode: {'simulation' if dry_run else 'live'}, "
+            logger.info(f"Live data streaming started - Mode: {'simulation' if dry_run else 'live'}, "
                         f"Jumpstart: {'enabled' if jumpstart else 'disabled'}")
             return True
             
         except Exception as e:
-            logging.error(f"Failed to start data streaming: {e}")
+            logger.error(f"Failed to start data streaming: {e}")
             self._is_streaming = False
             return False
     
@@ -165,7 +167,7 @@ class LiveDataManager:
         if not self._is_streaming:
             return
             
-        logging.info("Stopping live data streaming...")
+        logger.info("Stopping live data streaming...")
         self._is_streaming = False
         
         # Wait for threads to finish
@@ -180,7 +182,7 @@ class LiveDataManager:
             try:
                 self.websocket_manager.stop_streaming()
             except Exception as e:
-                logging.error(f"Error stopping WebSocket streaming: {e}")
+                logger.error(f"Error stopping WebSocket streaming: {e}")
             finally:
                 self.websocket_manager = None
         
@@ -189,11 +191,11 @@ class LiveDataManager:
             try:
                 self.broker.end_session()
             except Exception as e:
-                logging.error(f"Error closing broker session: {e}")
+                logger.error(f"Error closing broker session: {e}")
             finally:
                 self.broker = None
         
-        logging.info("Live data streaming stopped")
+        logger.info("Live data streaming stopped")
     
     def _connect_broker(self) -> bool:
         """Establish broker connection with retry logic"""
@@ -211,18 +213,18 @@ class LiveDataManager:
                 self.broker.start_session()  # Now automatically switches to USD_testing
                 self._connection_retries = 0
                 self._last_heartbeat = datetime.now()
-                logging.info("Broker connection established")
+                logger.info("Broker connection established")
                 return True
                 
             except RuntimeError as e:
                 # Handle specific "Request-started" errors
                 if "Request-started" in str(e):
                     self._connection_retries += 1
-                    logging.warning(f"Broker connection attempt {attempt + 1} failed with 'Request-started' error: {e}")
+                    logger.warning(f"Broker connection attempt {attempt + 1} failed with 'Request-started' error: {e}")
                     if attempt < self._max_retries - 1:
                         # Longer delay for "Request-started" errors
                         delay = 3 + (2 ** attempt)
-                        logging.info(f"Waiting {delay} seconds before retry due to session conflict...")
+                        logger.info(f"Waiting {delay} seconds before retry due to session conflict...")
                         time.sleep(delay)
                     continue
                 else:
@@ -230,11 +232,11 @@ class LiveDataManager:
                 
             except Exception as e:
                 self._connection_retries += 1
-                logging.error(f"Broker connection attempt {attempt + 1} failed: {e}")
+                logger.error(f"Broker connection attempt {attempt + 1} failed: {e}")
                 if attempt < self._max_retries - 1:
                     time.sleep(2 ** attempt)  # Exponential backoff
         
-        logging.error("Failed to establish broker connection after retries")
+        logger.error("Failed to establish broker connection after retries")
         return False
     
     def _initialize_websocket_streaming(self) -> bool:
@@ -252,14 +254,14 @@ class LiveDataManager:
             
             # Start WebSocket streaming with jumpstart
             if self.websocket_manager.start_streaming(jumpstart_buffer=True):
-                logging.info("WebSocket streaming initialized successfully")
+                logger.info("WebSocket streaming initialized successfully")
                 return True
             else:
-                logging.error("Failed to start WebSocket streaming")
+                logger.error("Failed to start WebSocket streaming")
                 return False
                 
         except Exception as e:
-            logging.error(f"Error initializing WebSocket streaming: {e}")
+            logger.error(f"Error initializing WebSocket streaming: {e}")
             return False
     
     def _on_websocket_data(self, symbol: str, data: Dict[str, Any]):
@@ -282,7 +284,7 @@ class LiveDataManager:
                 self._data_queue.put(market_data, block=False)
                 
         except Exception as e:
-            logging.error(f"Error processing WebSocket data callback: {e}")
+            logger.error(f"Error processing WebSocket data callback: {e}")
     
     def _stream_data_worker(self):
         """Worker thread for streaming live data from broker"""
@@ -306,7 +308,7 @@ class LiveDataManager:
                 time.sleep(1)  # Adjust based on data frequency needs
                 
             except Exception as e:
-                logging.error(f"Error in data streaming: {e}")
+                logger.error(f"Error in data streaming: {e}")
                 time.sleep(5)
     
     def _simulate_data_worker(self):
@@ -349,7 +351,7 @@ class LiveDataManager:
                 time.sleep(60)  # Simulate 1-minute intervals (60 seconds)
                 
             except Exception as e:
-                logging.error(f"Error in data simulation: {e}")
+                logger.error(f"Error in data simulation: {e}")
                 time.sleep(1)
     
     def _process_data_worker(self):
@@ -370,7 +372,7 @@ class LiveDataManager:
             except queue.Empty:
                 continue
             except Exception as e:
-                logging.error(f"Error processing data: {e}")
+                logger.error(f"Error processing data: {e}")
                 time.sleep(1)
     
     def _process_current_buffer(self):
@@ -385,27 +387,27 @@ class LiveDataManager:
                 
                 # Check if we've already processed this exact timestamp
                 if hasattr(self, '_last_processed_buffer_timestamp') and latest_timestamp == self._last_processed_buffer_timestamp:
-                    logging.debug(f"Buffer already processed for timestamp {latest_timestamp}, skipping duplicate processing")
+                    logger.debug(f"Buffer already processed for timestamp {latest_timestamp}, skipping duplicate processing")
                     return
                 
                 # Mark this timestamp as processed
                 self._last_processed_buffer_timestamp = latest_timestamp
-                logging.debug(f"Processing buffer with latest timestamp: {latest_timestamp}")
+                logger.debug(f"Processing buffer with latest timestamp: {latest_timestamp}")
             
             # Ensure date column exists and is properly formatted
             if 'date' not in df.columns:
-                logging.error("No 'date' column found in the dataframe")
+                logger.error("No 'date' column found in the dataframe")
                 return
                 
             try:
-                df['date'] = parse_timestamp_series(df['date'], logging.getLogger(__name__))
+                df['date'] = parse_timestamp_series(df['date'])
             except Exception as e:
-                logging.error(f"Error parsing timestamps in dataframe: {e}")
+                logger.error(f"Error parsing timestamps in dataframe: {e}")
                 # Fallback to original method with error handling
                 try:
                     df['date'] = pd.to_datetime(df['date'], format='mixed', errors='coerce')
                 except Exception as fallback_e:
-                    logging.error(f"Fallback timestamp parsing also failed: {fallback_e}")
+                    logger.error(f"Fallback timestamp parsing also failed: {fallback_e}")
                     return
             df.set_index('date', inplace=True)
             
@@ -414,7 +416,7 @@ class LiveDataManager:
             columns_to_drop = [col for col in metadata_columns if col in df.columns]
             if columns_to_drop:
                 df = df.drop(columns=columns_to_drop)
-                logging.debug(f"Filtered out metadata columns: {columns_to_drop}")
+                logger.debug(f"Filtered out metadata columns: {columns_to_drop}")
             
             # Clean data using the existing pipeline pattern
             cleaner = DataCleaner(df.copy(), save_cleaned_data=False)
@@ -424,8 +426,8 @@ class LiveDataManager:
             validator = DataValidator(df_cleaned.copy())
             validation_results = validator.run()
             if not validation_results.get('is_valid', False):
-                logging.warning(f"Data validation failed: {validation_results.get('issues', [])}")
-                logging.warning("Proceeding with feature generation despite validation issues (live streaming mode)")
+                logger.warning(f"Data validation failed: {validation_results.get('issues', [])}")
+                logger.warning("Proceeding with feature generation despite validation issues (live streaming mode)")
                 # Continue anyway in live mode - validation issues are often due to simulated data timestamps
             
             # Generate features
@@ -444,14 +446,14 @@ class LiveDataManager:
             df_with_features = feature_generator.generate_for_model(
                 model_metadata_path=model_metadata_path
             )
-            # logging.debug(f"After feature generation: {len(df_with_features.columns)} columns")  # debugging
+            # logger.debug(f"After feature generation: {len(df_with_features.columns)} columns")  # debugging
             
             feature_transformer = FeatureTransformer(
                 df_with_features, 
                 model_metadata_path=model_metadata_path
             )
             df_with_features = feature_transformer.run()
-            # logging.debug(f"After transformation: {len(df_with_features.columns)} columns")  # debugging
+            # logger.debug(f"After transformation: {len(df_with_features.columns)} columns")  # debugging
             
             # Store processed data
             self.processed_data = df_with_features
@@ -461,7 +463,7 @@ class LiveDataManager:
             self._notify_callbacks(self.latest_features)
             
         except Exception as e:
-            logging.error(f"Error in data processing pipeline: {e}")
+            logger.error(f"Error in data processing pipeline: {e}")
     
     def _fetch_latest_market_data(self) -> Optional[Dict]:
         """Fetch latest market data from broker"""
@@ -476,7 +478,7 @@ class LiveDataManager:
             return None
             
         except Exception as e:
-            logging.error(f"Error fetching market data: {e}")
+            logger.error(f"Error fetching market data: {e}")
             return None
     
     def _check_connection_health(self) -> bool:
@@ -499,7 +501,7 @@ class LiveDataManager:
     
     def _reconnect_broker(self) -> bool:
         """Attempt to reconnect to broker"""
-        logging.info("Attempting broker reconnection...")
+        logger.info("Attempting broker reconnection...")
         
         # Cleanup existing connection
         if self.broker:
@@ -523,7 +525,7 @@ class LiveDataManager:
             True if jumpstart successful
         """
         try:
-            logging.info("Jumpstarting buffer with historical data...")
+            logger.info("Jumpstarting buffer with historical data...")
             
             if dry_run:
                 # Generate bulk simulated historical data instantly
@@ -533,7 +535,7 @@ class LiveDataManager:
                 historical_data = self._fetch_historical_data_from_broker()
             
             if historical_data is None or len(historical_data) == 0:
-                logging.error("Failed to get historical data for jumpstart")
+                logger.error("Failed to get historical data for jumpstart")
                 return False
             
             # Add historical data to buffer
@@ -553,11 +555,11 @@ class LiveDataManager:
                 if len(self.raw_buffer) >= self.feature_window:
                     self._process_current_buffer()
             
-            logging.info(f"Buffer jumpstart completed - Added {len(historical_data)} historical data points")
+            logger.info(f"Buffer jumpstart completed - Added {len(historical_data)} historical data points")
             return True
             
         except Exception as e:
-            logging.error(f"Error during buffer jumpstart: {e}")
+            logger.error(f"Error during buffer jumpstart: {e}")
             return False
     
     def _generate_bulk_simulation_data(self) -> Optional[pd.DataFrame]:
@@ -610,18 +612,18 @@ class LiveDataManager:
             )
             df.index.name = 'date'
             
-            logging.info(f"Generated {len(df)} simulated historical data points for jumpstart")
+            logger.info(f"Generated {len(df)} simulated historical data points for jumpstart")
             return df
             
         except Exception as e:
-            logging.error(f"Error generating bulk simulation data: {e}")
+            logger.error(f"Error generating bulk simulation data: {e}")
             return None
     
     def _fetch_historical_data_from_broker(self) -> Optional[pd.DataFrame]:
         """Fetch recent historical data from Capital.com for jumpstart"""
         try:
             if not self.broker:
-                logging.error("No broker connection available for historical data fetch")
+                logger.error("No broker connection available for historical data fetch")
                 return None
             
             # Calculate how many data points we need
@@ -636,7 +638,7 @@ class LiveDataManager:
             from_date = start_time.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.000Z")
             to_date = end_time.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.000Z")
             
-            logging.info(f"Fetching historical data from {from_date} to {to_date}")
+            logger.info(f"Fetching historical data from {from_date} to {to_date}")
             
             # Use Capital.com's historical data endpoint
             historical_data = self.broker.get_historical_data(
@@ -649,18 +651,18 @@ class LiveDataManager:
             )
             
             if historical_data is None:
-                logging.error("No historical data returned from broker")
+                logger.error("No historical data returned from broker")
                 return None
             
             # Convert Capital.com API response to DataFrame format
             if isinstance(historical_data, dict):
                 # Log the structure for debugging
-                logging.debug(f"Historical data keys: {list(historical_data.keys())}")
+                logger.debug(f"Historical data keys: {list(historical_data.keys())}")
                 
                 if 'prices' in historical_data:
                     prices_data = historical_data['prices']
                     if not prices_data:
-                        logging.error("No price data in historical response")
+                        logger.error("No price data in historical response")
                         return None
                     
                     # Convert to DataFrame
@@ -679,33 +681,33 @@ class LiveDataManager:
                     
                     # Parse timestamps robustly
                     try:
-                        df['date'] = parse_timestamp_series(df['date'], logging.getLogger(__name__))
+                        df['date'] = parse_timestamp_series(df['date'])
                     except Exception as e:
-                        logging.error(f"Error parsing timestamps in historical data: {e}")
+                        logger.error(f"Error parsing timestamps in historical data: {e}")
                         # Fallback to pandas with error handling
                         try:
                             df['date'] = pd.to_datetime(df['date'], format='mixed', errors='coerce')
                         except Exception as fallback_e:
-                            logging.error(f"Fallback timestamp parsing failed: {fallback_e}")
+                            logger.error(f"Fallback timestamp parsing failed: {fallback_e}")
                             return None
                     df.set_index('date', inplace=True)
                     
-                    logging.info(f"Fetched {len(df)} historical data points from broker")
+                    logger.info(f"Fetched {len(df)} historical data points from broker")
                     return df
                 else:
                     # Check if it's an error response
                     if 'errorCode' in historical_data:
-                        logging.error(f"API Error in historical data: {historical_data['errorCode']}")
+                        logger.error(f"API Error in historical data: {historical_data['errorCode']}")
                         return None
                     else:
-                        logging.error(f"Unexpected historical data format - missing 'prices' key. Keys: {list(historical_data.keys())}")
+                        logger.error(f"Unexpected historical data format - missing 'prices' key. Keys: {list(historical_data.keys())}")
                         return None
             else:
-                logging.error(f"Unexpected historical data format: {type(historical_data)}")
+                logger.error(f"Unexpected historical data format: {type(historical_data)}")
                 return None
             
         except Exception as e:
-            logging.error(f"Error fetching historical data from broker: {e}")
+            logger.error(f"Error fetching historical data from broker: {e}")
             # In live mode, do NOT fallback to simulation data
             # Return None to indicate failure rather than generating fake data
             return None
@@ -716,13 +718,13 @@ class LiveDataManager:
             try:
                 callback(data)
             except Exception as e:
-                logging.error(f"Error in data callback: {e}")
+                logger.error(f"Error in data callback: {e}")
     
     def _transfer_websocket_buffer_data(self):
         """Transfer historical data from WebSocketDataManager to LiveDataManager buffer"""
         try:
             if not self.websocket_manager:
-                logging.warning("No WebSocket manager available for data transfer")
+                logger.warning("No WebSocket manager available for data transfer")
                 return
             
             # Get historical data from WebSocket buffer
@@ -732,7 +734,7 @@ class LiveDataManager:
             )
             
             if not historical_data:
-                logging.warning("No historical data available in WebSocket buffer")
+                logger.warning("No historical data available in WebSocket buffer")
                 return
             
             # Add to LiveDataManager buffer
@@ -749,10 +751,10 @@ class LiveDataManager:
                     }
                     self.raw_buffer.append(formatted_data)
             
-            logging.info(f"Transferred {len(historical_data)} historical data points to LiveDataManager buffer")
+            logger.info(f"Transferred {len(historical_data)} historical data points to LiveDataManager buffer")
             
         except Exception as e:
-            logging.error(f"Error transferring WebSocket buffer data: {e}")
+            logger.error(f"Error transferring WebSocket buffer data: {e}")
     
     def get_latest_features(self) -> Optional[pd.DataFrame]:
         """
@@ -809,7 +811,7 @@ class LiveDataManager:
             features_ok = self.latest_features is not None
             connection_ok = self._check_connection_health()
             
-            # Debug logging to see what's failing (rate limited to avoid spam)
+            # Debug logger to see what's failing (rate limited to avoid spam)
             if not (streaming_ok and buffer_ok and features_ok and connection_ok):
                 current_time = datetime.now()
                 should_log = True
@@ -819,7 +821,7 @@ class LiveDataManager:
                     should_log = time_since_last >= 30  # 30 seconds
                 
                 if should_log:
-                    logging.debug(f"Ready check failed - Streaming: {streaming_ok}, "
+                    logger.debug(f"Ready check failed - Streaming: {streaming_ok}, "
                                 f"Buffer: {buffer_ok} ({len(self.raw_buffer)}>={self.feature_window}), "
                                 f"Features: {features_ok}, Connection: {connection_ok}")
                     self._last_ready_check_log = current_time

@@ -1,6 +1,5 @@
 import datetime
 import importlib
-import logging
 import os
 import sys
 import numpy as np
@@ -18,6 +17,9 @@ from utils import data_utils, shared_utils
 import config.config as config
 from utils.model import model_utils
 import utils.hypothesis.config_loader as config_loader
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class ModelTraining():
@@ -32,12 +34,12 @@ class ModelTraining():
             - TODO: hypothesis: Provide path to hypothesis' config.yml to target its column. This currently only works close target.
         """
         try:
-            logging.info(f"---------- Initiating Model Training ----------")
+            logger.info(f"---------- Initiating Model Training ----------")
             
             self.hypothesis_source = hypothesis_source
             # Hypothesis
             if self.hypothesis_source is not None:
-                logging.info(f"Model Training was initialized with Hypothesis configuration!")
+                logger.info(f"Model Training was initialized with Hypothesis configuration!")
                 
                 # Loading in all configurations in the provided config.yml
                 configurations = config_loader.load_hypothesis_config(hypothesis_source).handle_hypothesis_source()
@@ -69,8 +71,8 @@ class ModelTraining():
                         else:
                             raise ValueError("No raw data source found")
                     except Exception as e:
-                        logging.error(f"Was unable to find neither processed datapath nor raw datapath. Make sure you provide at least one of them: {e}")
-                        logging.debug(f"Congigurations found in provided config.yml path: {configurations}")
+                        logger.error(f"Was unable to find neither processed datapath nor raw datapath. Make sure you provide at least one of them: {e}")
+                        logger.debug(f"Congigurations found in provided config.yml path: {configurations}")
                         sys.exit()
                 
                 # This is used (temporarily), in the very end, for storing the dataset path used for model training: 'getattr(self, 'dataset_path', 'unknown')'
@@ -83,14 +85,14 @@ class ModelTraining():
                 for col in self.df.columns:
                     if 'target_' in col:
                         self.target_col = col  # TODO: Logic to find target column
-                        logging.debug(f"Found hypothesis target : '{self.target_col}'")
+                        logger.debug(f"Found hypothesis target : '{self.target_col}'")
             
             # Not Hypothesis flow: User must provide dataset and model_type
             else:
-                logging.info(f"Model Training initialized without hypothesis configuration.")
+                logger.info(f"Model Training initialized without hypothesis configuration.")
                 
                 if dataset is None or model_type is None:
-                    logging.error(f"Model Training must be initialized with path to processed dataset and model_type! You provided dataset '{dataset}' and model_type '{model_type}'.")
+                    logger.error(f"Model Training must be initialized with path to processed dataset and model_type! You provided dataset '{dataset}' and model_type '{model_type}'.")
                     sys.exit()
                     
                 self.dataset_path = dataset
@@ -105,10 +107,10 @@ class ModelTraining():
                 # DataFrame has no index (name 'date'), so setting it and dropping the duplicate
                 self.df.index = pd.to_datetime(self.df['date'])  # setting index, but ensure its in datetime format
                 self.df = self.df.drop('date', axis=1)
-                logging.debug(f"Successfully made index to {self.df.index.name}")
+                logger.debug(f"Successfully made index to {self.df.index.name}")
             
         except Exception as e:
-            logging.error(f"Error initializing Model Training: {str(e)}")
+            logger.error(f"Error initializing Model Training: {str(e)}")
             raise
     
     def run(self):
@@ -119,7 +121,7 @@ class ModelTraining():
         Returns:
             - If successful, will return the path of stored model, else False.
         """
-        logging.info(f"---------- Starting to run training of {self.model_type} Model ... ----------")
+        logger.info(f"---------- Starting to run training of {self.model_type} Model ... ----------")
         
         self.model_module, self.module_path = self._get_implemented_models()
         
@@ -145,7 +147,7 @@ class ModelTraining():
             return self.model
             
         except AttributeError as e:
-            logging.error(f"Could not find expected class in {self.module_path}: {str(e)}")
+            logger.error(f"Could not find expected class in {self.module_path}: {str(e)}")
             return False
     
     def _get_processed_path(self, raw_path: str):
@@ -198,17 +200,17 @@ class ModelTraining():
                 
                 try:
                     model_module = importlib.import_module(module_path)
-                    logging.debug(f"Successfully imported {module_path}")
+                    logger.debug(f"Successfully imported {module_path}")
                     return model_module, module_path
                 except ImportError as e:
-                    logging.error(f"Failed to import {module_path}: {str(e)}")
+                    logger.error(f"Failed to import {module_path}: {str(e)}")
                     sys.exit()
         
         if not found_model or model_module is None:
-            logging.error("Model Trainer could not find an implementation of wanted model type. " +
+            logger.error("Model Trainer could not find an implementation of wanted model type. " +
                           f"You asked for '{self.model_type}', but these are the current " +
                           f"implementations: {model_implementation_list}.")
-            logging.debug("^ Remember 'model_type' must match exact name of file, eg. 'model_type == model_type.py'.")
+            logger.debug("^ Remember 'model_type' must match exact name of file, eg. 'model_type == model_type.py'.")
             sys.exit()
     
     def temporal_train_test_split(self, return_datasets:bool = False):
@@ -227,12 +229,12 @@ class ModelTraining():
             
             # Features (Input variables)
             self.X = self.df.drop(self.target_col, axis=1)
-            logging.debug(f"Successfully set Features (X), with {len(self.X.columns)} columns/features ...")
+            logger.debug(f"Successfully set Features (X), with {len(self.X.columns)} columns/features ...")
             # Target (Output variables)
             self.y = self.df[self.target_col]
-            logging.debug(f"and Target (y), '{self.target_col}', {self.y.size} values.")
+            logger.debug(f"and Target (y), '{self.target_col}', {self.y.size} values.")
         except Exception as e:
-            logging.error(f"Unable to set train/test targets: {e}")
+            logger.error(f"Unable to set train/test targets: {e}")
             
         model_utils.ensure_correct_xy_format(X = self.X, y = self.y)
         
@@ -257,7 +259,7 @@ class ModelTraining():
         
         # Create directory if it doesn't exist
         if not os.path.exists(directory):
-            logging.debug(f"Creating directory now.")
+            logger.debug(f"Creating directory now.")
             os.makedirs(directory)
         
         try:
@@ -265,13 +267,13 @@ class ModelTraining():
             model_pkl_file = os.path.join(directory, f"{self.model_type}.pkl")
             with open(model_pkl_file, 'wb') as file:  
                 pickle.dump(self.model, file)
-            logging.info(f"Successfully saved trained model: {model_pkl_file}")
+            logger.info(f"Successfully saved trained model: {model_pkl_file}")
             
             # Save model metadata
             self._save_model_info(directory, training_duration)
             
         except Exception as e:
-            logging.error(f"Unable to save trained model: {e}")
+            logger.error(f"Unable to save trained model: {e}")
             raise
 
     def _save_model_info(self, directory: str, training_duration: float):
@@ -390,7 +392,7 @@ class ModelTraining():
         with open(metadata_file, 'w') as file:
             file.write(yaml_content)
         
-        logging.info(f"Successfully saved model metadata: {metadata_file}")
+        logger.info(f"Successfully saved model metadata: {metadata_file}")
 
 def _hypothesis(self):
     """Simple method to check if this model is trained on a hypothesis or not, and returns json ready answer."""

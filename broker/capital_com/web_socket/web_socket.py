@@ -2,7 +2,6 @@
 According to Capital.com's documentation, websocket is the way one can subscribe to live market data.
 """
 
-import logging
 import http
 import json
 import os
@@ -13,7 +12,10 @@ import websocket
 from functools import partial
 
 from utils.broker_utils import on_close, on_error, on_message, on_open, on_message_improved
+from utils.logging_utils import get_logger
 
+
+logger = get_logger()  # Auto-detects module name
 
 # Global variables
 ws_url = "wss://api-streaming-capital.backend-capital.com/connect"
@@ -97,9 +99,9 @@ def unsub_live_market_data(X_SECURITY_TOKEN, CST, epic, resolution, ws):
     # Send the unsubscription message if the WebSocket is open
     if ws.sock and ws.sock.connected:
         ws.send(json.dumps(unsubscription_message))
-        print(f"Sent unsubscription request for {', '.join(epic)}")
+        logger.debug(f"Sent unsubscription request for {', '.join(epic)}")
     else:
-        print("WebSocket is not connected. Cannot send unsubscribe request.")
+        logger.warning("WebSocket is not connected. Cannot send unsubscribe request.")
         
 def send_ping(ws, X_SECURITY_TOKEN, CST):
     """
@@ -114,10 +116,10 @@ def send_ping(ws, X_SECURITY_TOKEN, CST):
     
     if ws.sock and ws.sock.connected:
         ws.send(json.dumps(ping_message))
-        logging.debug(f"Ping sent at {time.strftime('%H:%M:%S')}")
+        logger.debug(f"Ping sent at {time.strftime('%H:%M:%S')}")
         return True
     else:
-        logging.error("WebSocket is not connected. Cannot send ping.")
+        logger.error("WebSocket is not connected. Cannot send ping.")
         return False
 
 def setup_ping_timer(ws, X_SECURITY_TOKEN, CST, interval_seconds=120):
@@ -131,4 +133,4 @@ def setup_ping_timer(ws, X_SECURITY_TOKEN, CST, interval_seconds=120):
     
     # Start the first ping task
     threading.Timer(interval_seconds, ping_task).start()
-    logging.info(f"Automatic ping scheduled every {interval_seconds} seconds")
+    logger.info(f"Automatic ping scheduled every {interval_seconds} seconds")

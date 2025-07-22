@@ -1,8 +1,11 @@
 import inspect
-import logging
 import os
 import sys
 import yaml
+
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 def load_secrets(desired_keys:dict, file_path="secrets/secrets.txt"):
@@ -26,8 +29,8 @@ def load_secrets(desired_keys:dict, file_path="secrets/secrets.txt"):
                 if key in desired_keys:
                     secrets[key] = value
     
-    logging.info(f"Loaded credentials. Length: {len(secrets)}")
-    # logging.debug(f"Content of secrets: {secrets}")
+    logger.info(f"Loaded credentials. Length: {len(secrets)}")
+    # logger.debug(f"Content of secrets: {secrets}")
 
     return secrets
 
@@ -46,10 +49,10 @@ def ensure_path_exists(path : str):
         if not os.path.exists(path):
             # Create all directories in the path
             os.makedirs(path)
-            logging.info(f"Created directory: {path}")
+            logger.info(f"Created directory: {path}")
         return True
     except Exception as e:
-        logging.error(f"Error creating directory {path}: {e}")
+        logger.error(f"Error creating directory {path}: {e}")
         return False
     
 def get_available_filename(directory:str, filename:str):
@@ -92,17 +95,17 @@ def safely_execute(self:object, function_name:str):  # Similar to the one in fea
     Returns:
         - True (success) or False (error) based on success.
     """
-    logging.debug(f"Starting shared utility method safely_execute().")
+    logger.debug(f"Starting shared utility method safely_execute().")
     
     try:
         # Run the method
         method = getattr(self, function_name)
         method()
         
-        logging.debug(f"Successfully ran function {function_name}().")
+        logger.debug(f"Successfully ran function {function_name}().")
         return True
     except Exception as e:
-        logging.error(f"Error trying to run {function_name} method: {e}")
+        logger.error(f"Error trying to run {function_name} method: {e}")
         return False
 
 def list_of_functions_in_class(path_to_class:str, never_mind_functions:list = ['__init__', 'run', 'safely_execute']):
@@ -118,7 +121,7 @@ def list_of_functions_in_class(path_to_class:str, never_mind_functions:list = ['
     Returns:
         - List of existing funtions in the provided class (excluding never_min_functions).
     """
-    logging.debug(f"Starting shared utility method list_of_functions_in_class().")
+    logger.debug(f"Starting shared utility method list_of_functions_in_class().")
     
     # List to populate with functions
     functions = []
@@ -135,11 +138,11 @@ def list_of_functions_in_class(path_to_class:str, never_mind_functions:list = ['
             for method in inspect.getmembers(mod, predicate=inspect.isfunction):
                 if method[0] not in never_mind_functions:  # Won't add the 'basic' funtions, only the hypothesis ones
                     functions.append(method[0])
-            logging.debug(f"Successfully populated list with functions in provided class! {functions}")
+            logger.debug(f"Successfully populated list with functions in provided class! {functions}")
         except Exception as e:
-            logging.error(f"Unable to add functions to list: {e}")
+            logger.error(f"Unable to add functions to list: {e}")
         
     except Exception as e:
-        logging.error(f"Unable to open and import provided path_to_class, {path_to_class}. Error: {e}")
+        logger.error(f"Unable to open and import provided path_to_class, {path_to_class}. Error: {e}")
     
     return functions

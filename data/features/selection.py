@@ -1,4 +1,3 @@
-import logging
 import os
 import numpy as np
 import pandas as pd
@@ -15,7 +14,9 @@ from data.processing.base_processor import BaseProcessor
 from utils import data_utils
 from utils.model import model_utils
 import config.config as config
+from utils.logging_utils import get_logger
 
+logger = get_logger()
 
 class FeatureSelector(BaseProcessor):
     def __init__(self, data, target_col:str = 'close'):
@@ -23,7 +24,7 @@ class FeatureSelector(BaseProcessor):
         Class for Selecting the most important features. Focusing on Correlation-based Feature Selection, 
         Tree-based Feature Importance and Recursive Feature Elimination.
         """
-        logging.getLogger('matplotlib.font_manager').disabled = True
+        logger.getLogger('matplotlib.font_manager').disabled = True
         # Load dataset based on format
         self.df, self.original_df = data_utils.check_and_return_df(data)
         self.target_col = target_col
@@ -47,7 +48,7 @@ class FeatureSelector(BaseProcessor):
         - Then apply tree-based importance to get an initial feature ranking
         - Finally use RFE with your actual model to fine-tune the selection
         """
-        logging.info("---------- Running Feature Selection ----------")
+        logger.info("---------- Running Feature Selection ----------")
         
         original_close_price_col_name = 'close_og'
         
@@ -65,7 +66,7 @@ class FeatureSelector(BaseProcessor):
         # Combine methods - features selected by at least 2 methods
         if len(methods) > 1:
             feature_counts = {}
-            logging.info(f"selected features: {selected_features.items()}")
+            logger.info(f"selected features: {selected_features.items()}")
             for method, features in selected_features.items():
                 for feature in features:
                     if feature != self.target_col:
@@ -77,19 +78,19 @@ class FeatureSelector(BaseProcessor):
         else:
             final_features = selected_features[methods[0]]
         
-        logging.info(f"Feature selection concluded with the following features: {final_features}.")
+        logger.info(f"Feature selection concluded with the following features: {final_features}.")
         
         # Force close_og column to stay in final features if it exists in the dataframe
         if (original_close_price_col_name in self.df.columns and 
             original_close_price_col_name not in final_features):
-            logging.debug(f"Forcing {original_close_price_col_name} col to stay in df.")
+            logger.debug(f"Forcing {original_close_price_col_name} col to stay in df.")
             try:
                 final_features.append(original_close_price_col_name)  # Append the column name, not the Series
-                logging.debug(f"Successfully added {original_close_price_col_name} to final features.")
+                logger.debug(f"Successfully added {original_close_price_col_name} to final features.")
             except Exception as e:
-                logging.error(f"Failed to append {original_close_price_col_name} to final features: {e}")
+                logger.error(f"Failed to append {original_close_price_col_name} to final features: {e}")
         elif original_close_price_col_name not in self.df.columns:
-            logging.warning(f"Column {original_close_price_col_name} does not exist in dataframe. Cannot force include it.")
+            logger.warning(f"Column {original_close_price_col_name} does not exist in dataframe. Cannot force include it.")
         
         # Create final dataframe with selected features
         self.selected_features = final_features
@@ -111,11 +112,11 @@ class FeatureSelector(BaseProcessor):
             # Log columns that are being dropped
             non_numeric_cols = [col for col in self.df.columns if col not in numeric_cols]
             if non_numeric_cols:
-                logging.warning(f"Dropping non-numeric columns for CFS analysis: {non_numeric_cols}")
+                logger.warning(f"Dropping non-numeric columns for CFS analysis: {non_numeric_cols}")
             
             # Make sure target column is included in numeric_cols
             if self.target_col not in numeric_cols:
-                logging.error(f"Target column '{self.target_col}' is not numeric. Cannot compute correlations.")
+                logger.error(f"Target column '{self.target_col}' is not numeric. Cannot compute correlations.")
                 # Return a default list containing just the target column to avoid None
                 return [self.target_col]
             
@@ -126,7 +127,7 @@ class FeatureSelector(BaseProcessor):
             try: 
                 self._plot_fs_analysis_cfs(numeric_cols=numeric_cols)
             except Exception as e:
-                logging.error(f"Unable to plot or save plot of CFS Analysis: {e}")
+                logger.error(f"Unable to plot or save plot of CFS Analysis: {e}")
             
             # Sort and get top k candidates
             candidates = corr_with_target.abs().sort_values(ascending=False)[:k].index.tolist()
@@ -141,7 +142,7 @@ class FeatureSelector(BaseProcessor):
                 # Check if feature is essentially a duplicate of the target
                 target_corr = abs(corr_matrix.loc[feature, self.target_col])
                 if target_corr > duplicate_threshold:
-                    logging.debug(f"Excluding {feature} - essentially duplicate of target (correlation: {target_corr:.3f})")
+                    logger.debug(f"Excluding {feature} - essentially duplicate of target (correlation: {target_corr:.3f})")
                     to_remove = True
                 
                 # Check correlation with other selected features
@@ -156,12 +157,12 @@ class FeatureSelector(BaseProcessor):
             
             # Make sure to return at least the target column to avoid empty list
             if not selected:
-                logging.warning("No features selected. Returning just the target column.")
+                logger.warning("No features selected. Returning just the target column.")
                 return [self.target_col]
                 
             return selected + [self.target_col]  # Return feature names
         except Exception as e:
-            logging.error(f"Unable to perform Correlation-based Feature Selection: {e}")
+            logger.error(f"Unable to perform Correlation-based Feature Selection: {e}")
             # Return just the target column as a fallback to avoid None
             return [self.target_col]
     
@@ -228,12 +229,12 @@ class FeatureSelector(BaseProcessor):
                 plt.tight_layout()
                 plt.savefig(f'{self.storage_path}/xgb_feature_importance.png')
             except Exception as e:
-                logging.error(f"Unable to plot/save plot of XGB Regressor: {e}")
+                logger.error(f"Unable to plot/save plot of XGB Regressor: {e}")
             
-            logging.debug(f"Selected {len(selected_features)} features above threshold {threshold}: {selected_features}")
+            logger.debug(f"Selected {len(selected_features)} features above threshold {threshold}: {selected_features}")
             return selected_features
         except Exception as e:
-            logging.error(f"Unable to use XGB Regression for feature selection: {e}")
+            logger.error(f"Unable to use XGB Regression for feature selection: {e}")
             return None
         
     def rfe(self, n_features_to_select=None, step=2):
@@ -270,10 +271,10 @@ class FeatureSelector(BaseProcessor):
                 plt.ylabel('Mean test score (neg MSE)')
                 plt.savefig(f'{self.storage_path}/rfe_cv_scores.png')
             except Exception as e:
-                logging.error(f"Unable to plot/save plot of RFE (-CV): {e}")
+                logger.error(f"Unable to plot/save plot of RFE (-CV): {e}")
             
-            logging.info(f"Optimal number of features: {selector.n_features_}")
+            logger.info(f"Optimal number of features: {selector.n_features_}")
             return selected_features
         except Exception as e:
-            logging.error(f"Unable to perform Recursive Feature Elimination: {e}")
+            logger.error(f"Unable to perform Recursive Feature Elimination: {e}")
             return None

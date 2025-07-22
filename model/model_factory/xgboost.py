@@ -1,4 +1,3 @@
-import logging
 import sys
 import pandas as pd
 # ML Model
@@ -8,6 +7,9 @@ from sklearn.datasets import load_iris
 
 from model.model_factory.base_model import BaseModel
 import utils.model.model_utils as model_utils
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class XgboostModel(BaseModel):
@@ -34,7 +36,7 @@ class XgboostModel(BaseModel):
         Returns:
             - If successfull returns trained model, else None.
         """
-        logging.debug(f"----- Initializing XGBoost Model -----")
+        logger.debug(f"----- Initializing XGBoost Model -----")
         
         self.df = dataset
         self.X_train = X_train
@@ -45,7 +47,7 @@ class XgboostModel(BaseModel):
         Train the XGBoost model.
         Splitting dataset in train/test 80/20.
         """
-        logging.info(f"---------- Starting to train XGBoost Model! ----------")
+        logger.info(f"---------- Starting to train XGBoost Model! ----------")
 
         # Create model instance
         xgb = XGBRegressor(n_estimators=100,                # More trees: number of trees in the ensemble, often increased until no further improvements are seen
@@ -62,7 +64,7 @@ class XgboostModel(BaseModel):
         # Fit (train) model
         model = xgb.fit(self.X_train, self.y_train)
         
-        logging.info(f"Successfully trained XGBRegressor Model!")
+        logger.info(f"Successfully trained XGBRegressor Model!")
         return model
     
     def save_model_and_info(self):

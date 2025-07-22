@@ -1,7 +1,6 @@
 import http.client
 import os
 import sys
-import logging
 import time
 import base64
 from cryptography.hazmat.primitives.asymmetric import padding
@@ -11,6 +10,9 @@ import json
 
 from utils.broker_utils import extract_deal_reference
 import config.config as config
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 conn = http.client.HTTPSConnection(config.CAPCOM_DEMO_URL)
@@ -28,7 +30,7 @@ def all_positions(X_SECURITY_TOKEN, CST, print_answer):
     data = res.read()
     if print_answer:
         parsed_data = json.loads(data.decode("utf-8"))
-        print(json.dumps(parsed_data, indent=4))
+        logger.debug(json.dumps(parsed_data, indent=4))
     return data.decode("utf-8")
 
 def create_new_position(X_SECURITY_TOKEN, CST, 
@@ -53,7 +55,7 @@ def create_new_position(X_SECURITY_TOKEN, CST,
         Deal Reference / deal ID
     """
     if stop_amount is not None and profit_amount is not None:  # have added dollar amount of SL/TP
-        logging.info("Recieved request of using dollar amout as SL/TP.")
+        logger.info("Recieved request of using dollar amout as SL/TP.")
         payload = json.dumps({
             "epic": symbol,
             "direction": direction,
@@ -63,7 +65,7 @@ def create_new_position(X_SECURITY_TOKEN, CST,
             "profitAmount": profit_amount
         })
     elif stop_level is not None and profit_level is not None:  # have added price level/value as SL/TP
-        logging.info("Recieved request of using price level as SL/TP.")
+        logger.info("Recieved request of using price level as SL/TP.")
         payload = json.dumps({
             "epic": symbol,
             "direction": direction,
@@ -73,7 +75,7 @@ def create_new_position(X_SECURITY_TOKEN, CST,
             "profitLevel": profit_level
         })
     else:  # Not having any stop loss or take profit
-        logging.warning("Did not recieve SL/TP values!")
+        logger.warning("Did not recieve SL/TP values!")
         payload = json.dumps({
             "epic": symbol,
             "direction": direction,
@@ -91,11 +93,11 @@ def create_new_position(X_SECURITY_TOKEN, CST,
     data = res.read()
     if print_answer:
         parsed_data = json.loads(data.decode("utf-8"))
-        print(json.dumps(parsed_data, indent=4))
+        logger.debug(f"Create position response: {json.dumps(parsed_data, indent=4)}")
     
     deal_ref = extract_deal_reference(data.decode("utf-8"), "dealReference")
     # looks like the response deal reference value from placing a successfull trade is not the one related to the actual position
-    logging.info(print(f"Deal Reference from confirmed position: {deal_ref}"))
+    logger.info(f"Deal Reference from confirmed position: {deal_ref}")
     
     # Return dictionary format expected by order_manager
     if deal_ref:
@@ -123,33 +125,33 @@ def close_position(X_SECURITY_TOKEN, CST, dealID, print_answer):
         'X-SECURITY-TOKEN': X_SECURITY_TOKEN,
         'CST': CST,
     }
-    print(f"I have dealid : /api/v1/positions/{dealID}")
+    logger.info(f"Closing position with dealID: {dealID}")
     conn.request("DELETE", f"/api/v1/positions/{dealID}", payload, headers)
     res = conn.getresponse()
     data = res.read()
     if print_answer:
         parsed_data = json.loads(data.decode("utf-8"))
-        print(json.dumps(parsed_data, indent=4))
+        logger.debug(f"Close position response: {json.dumps(parsed_data, indent=4)}")
     return data.decode("utf-8")
 
 def update_position(X_SECURITY_TOKEN, CST, dealID, print_answer,
                     stop_amount=None, profit_amount=None, stop_level=None, profit_level=None,):
     if stop_amount is not None and profit_amount is not None:  # have added dollar amount of SL/TP
-        logging.info("Recieved request of using dollar amout as SL/TP.")
+        logger.info("Received request of using dollar amount as SL/TP")
         payload = json.dumps({
             "guaranteedStop": False,
             "stopAmount": stop_amount,
             "profitAmount": profit_amount
         })
     elif stop_level is not None and profit_level is not None:  # have added price level/value as SL/TP
-        logging.info("Recieved request of using price level as SL/TP.")
+        logger.info("Received request of using price level as SL/TP")
         payload = json.dumps({
             "guaranteedStop": False,
             "stopLevel": stop_level,
             "profitLevel": profit_level
         })
     else:  # Not having any stop loss or take profit
-        logging.error("Did not recieve SL/TP values! What is there to change then?")
+        logger.error("Did not receive SL/TP values! What is there to change then?")
         return None
     
     headers = {
@@ -162,7 +164,7 @@ def update_position(X_SECURITY_TOKEN, CST, dealID, print_answer,
     data = res.read()
     if print_answer:
         parsed_data = json.loads(data.decode("utf-8"))
-        print(json.dumps(parsed_data, indent=4))
+        logger.debug(f"Update position response: {json.dumps(parsed_data, indent=4)}")
     return data.decode("utf-8")
 
 # ORDERS - not really needed for current scope?
@@ -178,7 +180,7 @@ def all_orders(X_SECURITY_TOKEN, CST, print_answer=True):
     data = res.read()
     if print_answer:
         parsed_data = json.loads(data.decode("utf-8"))
-        print(json.dumps(parsed_data, indent=4))
+        logger.debug(f"All orders response: {json.dumps(parsed_data, indent=4)}")
     return data.decode("utf-8")
 
 def create_new_order(X_SECURITY_TOKEN, CST, print_answer=True):

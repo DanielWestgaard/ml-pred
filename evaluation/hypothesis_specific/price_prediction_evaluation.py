@@ -1,5 +1,7 @@
-import logging
 from .base_evaluation import BaseEvaluation
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class PricePredictionEvaluation(BaseEvaluation):
     """
@@ -8,7 +10,7 @@ class PricePredictionEvaluation(BaseEvaluation):
     
     def evaluate_model(self):
         """Evaluate price prediction model"""
-        logging.info(f"----- Price Prediction Evaluation -----")
+        logger.info(f"----- Price Prediction Evaluation -----")
         
         # Different metrics for price prediction
         # Sharpe ratio, drawdown, directional accuracy, etc.

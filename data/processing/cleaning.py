@@ -1,4 +1,3 @@
-import logging
 import pandas as pd
 import numpy as np
 
@@ -6,7 +5,9 @@ from data.processing.base_processor import BaseProcessor
 import utils.data_utils as data_utils
 from data.plot.plot_data import PlotData
 from utils.data_utils import parse_timestamp_series
+from utils.logging_utils import get_logger
 
+logger = get_logger()
 
 class DataCleaner(BaseProcessor):
     def __init__(self, raw_dataset, save_cleaned_data:bool = False):
@@ -35,7 +36,7 @@ class DataCleaner(BaseProcessor):
         returns:
             pd.DataFrame: Cleaned dataset.
         """
-        logging.info("---------- Running Data Cleaner ----------")
+        logger.info("---------- Running Data Cleaner ----------")
         # Standardizing column names to lower case
         self.df.columns = self.df.columns.str.lower()
         
@@ -48,7 +49,7 @@ class DataCleaner(BaseProcessor):
         
         # If user wants to plot and save data
         if self.save_cleaned_data:
-            logging.debug(f"Will plot and save plot of Cleaned data.")            
+            logger.debug(f"Will plot and save plot of Cleaned data.")            
             plot_data = PlotData(dataset=self.df, save_plot=self.save_cleaned_data)
             plot_data.run()
         
@@ -122,7 +123,7 @@ class DataCleaner(BaseProcessor):
             self.df = self.df.drop_duplicates(subset=['date'])
         elif pd.api.types.is_datetime64_any_dtype(self.df.index):
             # Date is in the index, remove duplicates based on index
-            logging.debug("Using datetime index for deduplication")
+            logger.debug("Using datetime index for deduplication")
             
             # For live data, we might have exact timestamp duplicates with slightly different OHLC
             # In this case, keep the last occurrence (most recent data)
@@ -130,17 +131,17 @@ class DataCleaner(BaseProcessor):
             
             if duplicated_idx.any():
                 duplicate_count = duplicated_idx.sum()
-                logging.info(f"Found {duplicate_count} duplicate timestamps - keeping most recent data")
+                logger.info(f"Found {duplicate_count} duplicate timestamps - keeping most recent data")
                 self.df = self.df[~duplicated_idx]
             
         else:
             # If no date column or datetime index, just remove completely identical rows
-            logging.warning("No 'date' column found for deduplication, removing completely identical rows")
+            logger.warning("No 'date' column found for deduplication, removing completely identical rows")
             self.df = self.df.drop_duplicates()
         
         removed_count = initial_count - len(self.df)
         if removed_count > 0:
-            logging.info(f"Removed {removed_count} duplicate records")
+            logger.info(f"Removed {removed_count} duplicate records")
         
     def _timestamp_alignment(self):
         """
@@ -156,23 +157,23 @@ class DataCleaner(BaseProcessor):
         if 'date' not in self.df.columns:
             if pd.api.types.is_datetime64_any_dtype(self.df.index):
                 # Date is already in the index, no need to process
-                logging.debug("Date information already in index, skipping timestamp alignment")
+                logger.debug("Date information already in index, skipping timestamp alignment")
                 return
             else:
-                logging.error("No 'date' column found in the dataframe")
+                logger.error("No 'date' column found in the dataframe")
                 return
             
         # Convert date column to datetime if it's not already
         if not pd.api.types.is_datetime64_any_dtype(self.df['date']):
             try:
-                self.df['date'] = parse_timestamp_series(self.df['date'], logging.getLogger(__name__))
+                self.df['date'] = parse_timestamp_series(self.df['date'])
             except Exception as e:
-                logging.error(f"Failed to convert date column to datetime with robust parser: {e}")
+                logger.error(f"Failed to convert date column to datetime with robust parser: {e}")
                 # Fallback to original method
                 try:
                     self.df['date'] = pd.to_datetime(self.df['date'], format='mixed', errors='coerce')
                 except Exception as fallback_e:
-                    logging.error(f"Fallback timestamp parsing also failed: {fallback_e}")
+                    logger.error(f"Fallback timestamp parsing also failed: {fallback_e}")
                     return
         
         # Sort by date
@@ -185,15 +186,15 @@ class DataCleaner(BaseProcessor):
         if has_tz and str(sample_date.tzinfo) != 'UTC':
             try:
                 self.df['date'] = self.df['date'].dt.tz_convert('UTC')
-                logging.debug("Converted timestamps to UTC")
+                logger.debug("Converted timestamps to UTC")
             except Exception as e:
-                logging.warning(f"Could not convert timezone to UTC: {e}")
+                logger.warning(f"Could not convert timezone to UTC: {e}")
         elif not has_tz:
             try:
                 self.df['date'] = self.df['date'].dt.tz_localize('UTC')
-                logging.debug("Localized timestamps to UTC")
+                logger.debug("Localized timestamps to UTC")
             except Exception as e:
-                logging.warning(f"Could not localize timezone to UTC: {e}")
+                logger.warning(f"Could not localize timezone to UTC: {e}")
 
         # Set date as index if it's not already
         if self.df.index.name != 'date':
@@ -201,7 +202,7 @@ class DataCleaner(BaseProcessor):
         
         # FIXED: Remove any remaining duplicates from the index before reindexing
         if self.df.index.duplicated().any():
-            logging.warning("Found duplicate index values after setting date as index - removing")
+            logger.warning("Found duplicate index values after setting date as index - removing")
             self.df = self.df[~self.df.index.duplicated(keep='first')]
         
         # NEW: Fill time series gaps
@@ -209,12 +210,12 @@ class DataCleaner(BaseProcessor):
             time_diffs = self.df.index.to_series().diff().dropna()
             if len(time_diffs) > 0:  # Check if we have any time differences
                 common_diff = time_diffs.mode().iloc[0] if not time_diffs.mode().empty else time_diffs.median()
-                logging.debug(f"Most common time interval: {common_diff}")
+                logger.debug(f"Most common time interval: {common_diff}")
                 
                 # Check for gaps
                 gaps = time_diffs[time_diffs > common_diff * 1.5]
                 if not gaps.empty:
-                    logging.warning(f"Found {len(gaps)} gaps in time series - filling them")
+                    logger.warning(f"Found {len(gaps)} gaps in time series - filling them")
                     
                     # Create complete time index
                     full_idx = pd.date_range(
@@ -236,7 +237,7 @@ class DataCleaner(BaseProcessor):
                     if 'volume' in self.df.columns:
                         self.df['volume'] = self.df['volume'].fillna(0)
                     
-                    logging.info(f"Filled time series gaps. New length: {len(self.df)}")
+                    logger.info(f"Filled time series gaps. New length: {len(self.df)}")
 
     def _handle_outliers(self):
         """
@@ -258,10 +259,10 @@ class DataCleaner(BaseProcessor):
                 lower_bound = Q1 - 2 * IQR  # Slightly more aggressive
                 upper_bound = Q3 + 2 * IQR
                 
-                # Flag potential outliers (for logging)
+                # Flag potential outliers (for logger)
                 outliers = self.df[(self.df[col] < lower_bound) | (self.df[col] > upper_bound)]
                 if len(outliers) > 0:
-                    logging.debug(f"Found {len(outliers)} outliers in {col} using IQR method")
+                    logger.debug(f"Found {len(outliers)} outliers in {col} using IQR method")
                 
                 # Winsorize (cap) extreme values instead of removing
                 self.df[col] = self.df[col].clip(lower=lower_bound, upper=upper_bound)
@@ -271,7 +272,7 @@ class DataCleaner(BaseProcessor):
             # First, handle negative volumes
             negative_mask = self.df['volume'] < 0
             if negative_mask.any():
-                logging.debug(f"Found {negative_mask.sum()} negative volume values - setting to 0")
+                logger.debug(f"Found {negative_mask.sum()} negative volume values - setting to 0")
                 self.df.loc[negative_mask, 'volume'] = 0
             
             # Filter positive volumes for outlier detection
@@ -301,7 +302,7 @@ class DataCleaner(BaseProcessor):
                 # Count outliers before capping
                 outlier_count = (positive_volumes > final_upper_bound).sum()
                 if outlier_count > 0:
-                    logging.debug(f"Capping {outlier_count} extreme volume values")
+                    logger.debug(f"Capping {outlier_count} extreme volume values")
                 
                 # Apply capping - explicitly convert to avoid dtype warning
                 capped_volumes = self.df.loc[positive_mask, 'volume'].clip(upper=final_upper_bound)
@@ -315,18 +316,18 @@ class DataCleaner(BaseProcessor):
         # Ensure index is datetime if not done in timestamp_alignment
         if not isinstance(self.df.index, pd.DatetimeIndex):
             try:
-                self.df.index = parse_timestamp_series(self.df.index, logging.getLogger(__name__))
-                logging.debug("Converted index to datetime")
+                self.df.index = parse_timestamp_series(self.df.index)
+                logger.debug("Converted index to datetime")
             except Exception as e:
-                logging.error(f"Failed to convert index to datetime with robust parser: {e}")
+                logger.error(f"Failed to convert index to datetime with robust parser: {e}")
                 # Fallback to original method
                 try:
                     self.df.index = pd.to_datetime(self.df.index, format='mixed', errors='coerce')
-                    logging.debug("Converted index to datetime using fallback method")
+                    logger.debug("Converted index to datetime using fallback method")
                 except Exception as fallback_e:
-                    logging.error(f"Fallback index timestamp parsing also failed: {fallback_e}")
+                    logger.error(f"Fallback index timestamp parsing also failed: {fallback_e}")
             except Exception as e:
-                logging.error(f"Failed to convert index to datetime: {e}")
+                logger.error(f"Failed to convert index to datetime: {e}")
         
         # Ensure price columns are float
         price_cols = ['open', 'high', 'low', 'close']
@@ -336,9 +337,9 @@ class DataCleaner(BaseProcessor):
                     original_type = self.df[col].dtype
                     self.df[col] = self.df[col].astype(float)
                     if original_type != self.df[col].dtype:
-                        logging.info(f"Converted {col} from {original_type} to {self.df[col].dtype}")
+                        logger.info(f"Converted {col} from {original_type} to {self.df[col].dtype}")
                 except Exception as e:
-                    logging.error(f"Failed to convert {col} to float: {e}")
+                    logger.error(f"Failed to convert {col} to float: {e}")
         
         # Ensure volume is integer
         if 'volume' in self.df.columns:
@@ -347,9 +348,9 @@ class DataCleaner(BaseProcessor):
                 # First convert to float to handle any decimals, then to int
                 self.df['volume'] = self.df['volume'].astype(float).round().astype('int64')
                 if original_type != self.df['volume'].dtype:
-                    logging.debug(f"Converted volume from {original_type} to {self.df['volume'].dtype}")
+                    logger.debug(f"Converted volume from {original_type} to {self.df['volume'].dtype}")
             except Exception as e:
-                logging.error(f"Failed to convert volume to int: {e}")
+                logger.error(f"Failed to convert volume to int: {e}")
     
     def _ohlc_validity(self):
         """
@@ -362,7 +363,7 @@ class DataCleaner(BaseProcessor):
         
         Only processes columns that exist in the dataframe.
         """
-        # Count original issues for logging
+        # Count original issues for logger
         issues_count = 0
         
         # Get available OHLC columns
@@ -370,7 +371,7 @@ class DataCleaner(BaseProcessor):
         
         # Only proceed if we have at least some OHLC columns
         if len(available_ohlc) < 2:
-            logging.warning("Insufficient OHLC columns for relationship validation")
+            logger.warning("Insufficient OHLC columns for relationship validation")
             return
         
         # Check and fix: High should be ≥ max(Open, Close) - only if all relevant columns exist
@@ -378,7 +379,7 @@ class DataCleaner(BaseProcessor):
             high_issues = self.df[self.df['high'] < self.df[['open', 'close']].max(axis=1)]
             if not high_issues.empty:
                 issues_count += len(high_issues)
-                logging.warning(f"Found {len(high_issues)} records where high < max(open, close) - fixing")
+                logger.warning(f"Found {len(high_issues)} records where high < max(open, close) - fixing")
                 self.df['high'] = self.df[['high', 'open', 'close']].max(axis=1)
         
         # Check and fix: Low should be ≤ min(Open, Close) - only if all relevant columns exist
@@ -386,7 +387,7 @@ class DataCleaner(BaseProcessor):
             low_issues = self.df[self.df['low'] > self.df[['open', 'close']].min(axis=1)]
             if not low_issues.empty:
                 issues_count += len(low_issues)
-                logging.warning(f"Found {len(low_issues)} records where low > min(open, close) - fixing")
+                logger.warning(f"Found {len(low_issues)} records where low > min(open, close) - fixing")
                 self.df['low'] = self.df[['low', 'open', 'close']].min(axis=1)
         
         # Ensure volume is non-negative - only if volume column exists
@@ -394,7 +395,7 @@ class DataCleaner(BaseProcessor):
             volume_issues = self.df[self.df['volume'] < 0]
             if not volume_issues.empty:
                 issues_count += len(volume_issues)
-                logging.warning(f"Found {len(volume_issues)} records with negative volume - fixing")
+                logger.warning(f"Found {len(volume_issues)} records with negative volume - fixing")
                 self.df['volume'] = self.df['volume'].clip(lower=0)
         
         # Final verification - check relationship again after fixes (only for available columns)
@@ -416,8 +417,8 @@ class DataCleaner(BaseProcessor):
             remaining_issues += (self.df['low'] > self.df['close']).sum()
         
         if remaining_issues > 0:
-            logging.warning(f"After corrections, {remaining_issues} OHLC relationship issues remain")
+            logger.warning(f"After corrections, {remaining_issues} OHLC relationship issues remain")
         elif issues_count > 0:
-            logging.info(f"Successfully fixed {issues_count} OHLC relationship issues")
+            logger.info(f"Successfully fixed {issues_count} OHLC relationship issues")
         else:
-            logging.info("No OHLC relationship issues found!")
+            logger.info("No OHLC relationship issues found!")

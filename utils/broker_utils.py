@@ -1,23 +1,25 @@
 import csv
 import os
-import logging
 from datetime import datetime
 import sys
 import json
 
 import config.config as config
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 ########## HANDLING ##########
 
 def on_open(ws, subscription_message):
-    print("Connection opened")
+    logger.info("WebSocket connection opened")
     # Send the subscription message
     ws.send(json.dumps(subscription_message))
 
 def on_message(ws, message):
     parsed = json.dumps(message, indent=4)
-    print(f"Received: {message}")
+    logger.debug(f"WebSocket message received: {message}")
 
 def on_message_improved(ws, message):
     try:
@@ -27,13 +29,11 @@ def on_message_improved(ws, message):
         # Print the formatted JSON with indentation for readability
         formatted_json = json.dumps(data, indent=4)
         
-        # Add a separator line for visual clarity between messages
-        print("\n" + "-"*50)
-        print(formatted_json)
-        print("-"*50)
+        # Log the formatted JSON with visual separation
+        logger.debug(f"\n{'-'*50}\n{formatted_json}\n{'-'*50}")
     except Exception as e:
-        print(f"Error processing message: {e}")
-        print(f"Original message: {message}")
+        logger.error(f"Error processing WebSocket message: {e}")
+        logger.debug(f"Original message: {message}")
 
 def on_message_pretty(ws, message):
     try:
@@ -54,30 +54,31 @@ def on_message_pretty(ws, message):
                 formatted_time = "N/A"
             
             # Create a formatted output
-            print("\n" + "="*50)
-            print(f"OHLC Update for {payload.get('epic')}")
-            print(f"Time: {formatted_time}")
-            print(f"Resolution: {payload.get('resolution')}")
-            print(f"Type: {payload.get('type')}")
-            print(f"Price Type: {payload.get('priceType')}")
-            print("-"*20)
-            print(f"Open:  {payload.get('o')}")
-            print(f"High:  {payload.get('h')}")
-            print(f"Low:   {payload.get('l')}")
-            print(f"Close: {payload.get('c')}")
-            print("="*50)
+            ohlc_info = (f"\n{'='*50}\n"
+                        f"OHLC Update for {payload.get('epic')}\n"
+                        f"Time: {formatted_time}\n"
+                        f"Resolution: {payload.get('resolution')}\n"
+                        f"Type: {payload.get('type')}\n"
+                        f"Price Type: {payload.get('priceType')}\n"
+                        f"{'-'*20}\n"
+                        f"Open:  {payload.get('o')}\n"
+                        f"High:  {payload.get('h')}\n"
+                        f"Low:   {payload.get('l')}\n"
+                        f"Close: {payload.get('c')}\n"
+                        f"{'='*50}")
+            logger.info(ohlc_info)
         else:
-            # For other types of messages, just print them nicely formatted
-            print(f"\nReceived message:\n{json.dumps(data, indent=4)}")
+            # For other types of messages, just log them nicely formatted
+            logger.debug(f"\nReceived message:\n{json.dumps(data, indent=4)}")
     except Exception as e:
-        print(f"Error processing message: {e}")
-        print(f"Original message: {message}")
+        logger.error(f"Error processing WebSocket message: {e}")
+        logger.debug(f"Original message: {message}")
 
 def on_error(ws, error):
-    print(f"Error: {error}")
+    logger.error(f"WebSocket error: {error}")
 
 def on_close(ws, close_status_code, close_msg):
-    print("Connection closed")
+    logger.info(f"WebSocket connection closed - Status: {close_status_code}, Message: {close_msg}")
 
 
 ########## API ##########
@@ -86,7 +87,7 @@ def get_account_id_by_name(json_data : json, account_name):
     """ Retrieves the account ID based on the account name. """
     # Parse the JSON string to a Python dictionary  
     if json_data is None:
-        logging.error("json_data is None - API call may have failed")
+        logger.error("json_data is None - API call may have failed")
         return None, None
         
     try:
@@ -96,19 +97,19 @@ def get_account_id_by_name(json_data : json, account_name):
             # Already parsed JSON
             parsed_data = json_data
         else:
-            logging.error(f"Unexpected data type for json_data: {type(json_data)}, content: {json_data}")
+            logger.error(f"Unexpected data type for json_data: {type(json_data)}, content: {json_data}")
             return None, None
     except (json.JSONDecodeError, TypeError) as e:
-        logging.error(f"Failed to parse JSON data: {e}. Data type: {type(json_data)}, Data: {json_data}")
+        logger.error(f"Failed to parse JSON data: {e}. Data type: {type(json_data)}, Data: {json_data}")
         return None, None
     
     # Iterate through accounts to find the matching accountName
     for account in parsed_data["accounts"]:
         if account["accountName"] == account_name:
-            logging.info(f"Found accountId matching account {account_name}!")
+            logger.info(f"Found accountId matching account {account_name}!")
             return account["accountId"], account_name
     
-    logging.warning(f"Did not find accountId that matched account name {account_name}")
+    logger.warning(f"Did not find accountId that matched account name {account_name}")
     # Return None if no match is found
     return None, None
 
@@ -118,7 +119,7 @@ def extract_deal_reference(json_data, key_string_to_extract):
     parsed_data = json.loads(json_data)
     # Extract the dealReference value
     value = parsed_data.get(key_string_to_extract)  # "dealReference"
-    #logging.info(f"Successfully extracted {key_string_to_extract}: {value}")
+    #logger.info(f"Successfully extracted {key_string_to_extract}: {value}")
     
     return value
 
@@ -143,7 +144,7 @@ def process_positions(json_response):
     
     # Count active positions
     position_count = len(positions)
-    print(f"Number of active positions: {position_count}")
+    logger.info(f"Number of active positions: {position_count}")
     
     # Extract all deal IDs
     deal_ids = []
@@ -201,7 +202,7 @@ def convert_json_to_ohlcv_csv(json_data, output_file):
                 'Volume': volume
             })
     
-    logging.info(f"Data successfully converted and saved to {output_file}")
+    logger.info(f"Data successfully converted and saved to {output_file}")
 
 def get_capital_from_json(json_data : str, account_name):
     """
@@ -212,8 +213,8 @@ def get_capital_from_json(json_data : str, account_name):
         for account in parsed_data["accounts"]:
             if account["accountName"] == account_name:
                 available_balance = account["balance"]["available"]
-                logging.info(f"Successfully found available account balance USD {available_balance} to account {account_name}!")
+                logger.info(f"Successfully found available account balance USD {available_balance} to account {account_name}!")
                 return available_balance
     except:
-        logging.error("Unable to find available balance from provided json data! Returning static capital 1000.")
+        logger.error("Unable to find available balance from provided json data! Returning static capital 1000.")
         return 1000

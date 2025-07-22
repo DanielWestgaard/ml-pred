@@ -1,9 +1,11 @@
-import logging
 import os
 import yaml
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 ########## Code for loading contents of model_metadata.yml - metadata related to trained model ##########
 
@@ -39,7 +41,7 @@ class ModelMetadataLoader:
                     import numpy as np
                 except ImportError:
                     # If numpy is not available, return a sensible default
-                    logging.warning("numpy not available for YAML scalar construction, using default value 0")
+                    logger.warning("numpy not available for YAML scalar construction, using default value 0")
                     return 0
                     
                 try:
@@ -79,7 +81,7 @@ class ModelMetadataLoader:
                     
                 except Exception as e:
                     # If all else fails, return a sensible default
-                    logging.warning(f"Failed to construct numpy scalar, using default value 0: {e}")
+                    logger.warning(f"Failed to construct numpy scalar, using default value 0: {e}")
                     return 0
             
             # Add numpy dtype constructor to handle numpy dtype serialization issues  
@@ -88,7 +90,7 @@ class ModelMetadataLoader:
                 try:
                     import numpy as np
                 except ImportError:
-                    logging.warning("numpy not available for YAML dtype construction, using default")
+                    logger.warning("numpy not available for YAML dtype construction, using default")
                     return 'int64'
                     
                 try:
@@ -107,7 +109,7 @@ class ModelMetadataLoader:
                     return np.dtype('int64')
                     
                 except Exception as e:
-                    logging.warning(f"Failed to construct numpy dtype, using default: {e}")
+                    logger.warning(f"Failed to construct numpy dtype, using default: {e}")
                     return np.dtype('int64')
             
             # Add constructors for numpy objects
@@ -116,10 +118,10 @@ class ModelMetadataLoader:
             
             with open(self.metadata_path, 'r') as file:
                 metadata = yaml.safe_load(file)
-            logging.debug(f"Successfully loaded metadata from {self.metadata_path}")
+            logger.debug(f"Successfully loaded metadata from {self.metadata_path}")
             return metadata
         except Exception as e:
-            logging.error(f"Error loading metadata: {e}")
+            logger.error(f"Error loading metadata: {e}")
             raise
     
     # General access methods
@@ -155,7 +157,7 @@ class ModelMetadataLoader:
             try:
                 return datetime.fromisoformat(created_at)
             except ValueError:
-                logging.warning(f"Could not parse creation date: {created_at}")
+                logger.warning(f"Could not parse creation date: {created_at}")
         return None
     
     # Training info methods
@@ -218,34 +220,34 @@ class ModelMetadataLoader:
     
     # Utility methods
     def print_summary(self):
-        """Print a formatted summary of the model."""
-        print("=" * 50)
-        print(f"Model: {self.get_model_type()}")
-        print(f"Created: {self.get_creation_date()}")
-        print(f"Target: {self.get_target_column()}")
-        print(f"Features: {self.get_feature_count()}")
+        """Log a formatted summary of the model."""
+        logger.info("=" * 50)
+        logger.info(f"Model: {self.get_model_type()}")
+        logger.info(f"Created: {self.get_creation_date()}")
+        logger.info(f"Target: {self.get_target_column()}")
+        logger.info(f"Features: {self.get_feature_count()}")
         train, test = self.get_training_samples()
-        print(f"Training samples: {train}, Test samples: {test}")
-        print(f"Training duration: {self.get_training_duration():.2f}s")
-        print(f"Hardware: {self.get_hardware_specs()}")
-        print("=" * 50)
+        logger.info(f"Training samples: {train}, Test samples: {test}")
+        logger.info(f"Training duration: {self.get_training_duration():.2f}s")
+        logger.info(f"Hardware: {self.get_hardware_specs()}")
+        logger.info("=" * 50)
     
     def compare_with(self, other_metadata_path: str):
         """Compare this model with another model's metadata."""
         other = ModelMetadataLoader(other_metadata_path)
         
-        print("Model Comparison")
-        print("=" * 60)
-        print(f"{'Metric':<20} {'Model 1':<15} {'Model 2':<15}")
-        print("-" * 60)
-        print(f"{'Model Type':<20} {self.get_model_type():<15} {other.get_model_type():<15}")
-        print(f"{'Features':<20} {self.get_feature_count():<15} {other.get_feature_count():<15}")
+        logger.info("Model Comparison")
+        logger.info("=" * 60)
+        logger.info(f"{'Metric':<20} {'Model 1':<15} {'Model 2':<15}")
+        logger.info("-" * 60)
+        logger.info(f"{'Model Type':<20} {self.get_model_type():<15} {other.get_model_type():<15}")
+        logger.info(f"{'Features':<20} {self.get_feature_count():<15} {other.get_feature_count():<15}")
         
         train1, test1 = self.get_training_samples()
         train2, test2 = other.get_training_samples()
-        print(f"{'Train Samples':<20} {train1:<15} {train2:<15}")
-        print(f"{'Test Samples':<20} {test1:<15} {test2:<15}")
-        print(f"{'Duration (s)':<20} {self.get_training_duration():<15.2f} {other.get_training_duration():<15.2f}")
+        logger.info(f"{'Train Samples':<20} {train1:<15} {train2:<15}")
+        logger.info(f"{'Test Samples':<20} {test1:<15} {test2:<15}")
+        logger.info(f"{'Duration (s)':<20} {self.get_training_duration():<15.2f} {other.get_training_duration():<15.2f}")
 
 
 # Standalone utility functions
@@ -283,7 +285,7 @@ def find_models_by_type(models_directory: str, model_type: str) -> List[str]:
                 if loader.get_model_type() == model_type:
                     model_dirs.append(root)
             except Exception as e:
-                logging.warning(f"Could not load metadata from {root}: {e}")
+                logger.warning(f"Could not load metadata from {root}: {e}")
     
     return model_dirs
 
@@ -317,7 +319,7 @@ def get_latest_model(models_directory: str, model_type: str = None) -> Optional[
                     latest_model = root
                     
             except Exception as e:
-                logging.warning(f"Could not load metadata from {root}: {e}")
+                logger.warning(f"Could not load metadata from {root}: {e}")
     
-    logging.debug(f"Utility function, get_latest_model(), found the latest trained model: {latest_model}")
+    logger.debug(f"Utility function, get_latest_model(), found the latest trained model: {latest_model}")
     return latest_model

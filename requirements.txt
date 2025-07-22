@@ -16,3 +16,4 @@ kaleido
 sktime
 gitstats
 plotly
+nbformat
