@@ -41,7 +41,12 @@ FE_SEL_BASE_DIR = os.path.join(DATA_ENGINEERING_STATS_DIR, 'fe_selection')
 TRAINED_MODEL_STORAGE = os.path.join(BASE_STORAGE_DIR, 'models')
 
 # LOGGING
-DEFAULT_LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+DEFAULT_LOG_FORMAT = '%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s'
 DEFAULT_DATE_FORMAT = '%d-%m-%Y %H:%M:%S'
 DEFAULT_LOG_LEVEL = logging.INFO
 DEBUG_LOG_LEVEL = logging.DEBUG
+
+# Enhanced logging formats for different use cases
+DETAILED_LOG_FORMAT = '%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(funcName)s() - %(message)s'
+SIMPLE_LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+STRUCTURED_LOG_FORMAT = '%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s - %(extras)s'
