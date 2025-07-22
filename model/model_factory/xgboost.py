@@ -7,6 +7,7 @@ from sklearn.datasets import load_iris
 
 from model.model_factory.base_model import BaseModel
 import utils.model.model_utils as model_utils
+from utils.gpu_utils import get_gpu_config, log_gpu_status
 from utils.logging_utils import get_logger
 
 logger = get_logger()
@@ -44,27 +45,61 @@ class XgboostModel(BaseModel):
     
     def train(self):
         """
-        Train the XGBoost model.
-        Splitting dataset in train/test 80/20.
+        Train the XGBoost model with automatic GPU acceleration.
         """
         logger.info(f"---------- Starting to train XGBoost Model! ----------")
-
-        # Create model instance
-        xgb = XGBRegressor(n_estimators=100,                # More trees: number of trees in the ensemble, often increased until no further improvements are seen
-                           max_depth=12,                    # Deeper trees: maximum depth of each tree, often values are between 1 and 10
-                           learning_rate=0.001,
-                           objective='reg:squarederror',    # 'Perfect' for price prediction
-                           subsample=0.8,                   # Random sampling to prevent overfitting
-                           colsample_bytree=0.8,            # Feature sampling
-                           reg_alpha=0.1,                   # L1 regularization
-                           reg_lambda=1.0,                  # L2 regularization
-                           random_state=42,
-                           enable_categorical=True)         # handling categorical features
+        
+        # Get optimal GPU configuration
+        gpu_config = get_gpu_config('xgboost')
+        logger.info(f"Using GPU configuration: {gpu_config['device_type'].upper()}")
+        
+        # Print GPU info for debugging
+        log_gpu_status()
+        
+        # Base parameters
+        params = {
+            'n_estimators': 100,                # More trees: number of trees in the ensemble, often increased until no further improvements are seen
+            'max_depth': 12,                    # Deeper trees: maximum depth of each tree, often values are between 1 and 10
+            'learning_rate': 0.001,
+            'objective': 'reg:squarederror',    # 'Perfect' for price prediction
+            'subsample': 0.8,                   # Random sampling to prevent overfitting
+            'colsample_bytree': 0.8,            # Feature sampling
+            'reg_alpha': 0.1,                   # L1 regularization
+            'reg_lambda': 1.0,                  # L2 regularization
+            'random_state': 42,
+            'enable_categorical': True          # handling categorical features
+        }
+        
+        # Add GPU-specific parameters
+        if 'tree_method' in gpu_config:
+            params['tree_method'] = gpu_config['tree_method']
+        if 'gpu_id' in gpu_config:
+            params['gpu_id'] = gpu_config['gpu_id']
+        if 'predictor' in gpu_config:
+            params['predictor'] = gpu_config['predictor']
+        if 'n_jobs' in gpu_config:
+            params['n_jobs'] = gpu_config['n_jobs']
+        
+        logger.debug(f"XGBoost parameters: {params}")
+        
+        # Create model instance with GPU config
+        xgb = XGBRegressor(**params)
         
         # Fit (train) model
-        model = xgb.fit(self.X_train, self.y_train)
+        try:
+            model = xgb.fit(self.X_train, self.y_train)
+            logger.info(f"Successfully trained XGBRegressor Model using {gpu_config['device_type'].upper()}!")
+        except Exception as e:
+            logger.warning(f"GPU training failed, falling back to CPU: {str(e)}")
+            # Fallback to CPU
+            cpu_params = {k: v for k, v in params.items() 
+                         if k not in ['tree_method', 'gpu_id', 'predictor']}
+            cpu_params.update({'tree_method': 'hist', 'n_jobs': -1})
+            
+            xgb = XGBRegressor(**cpu_params)
+            model = xgb.fit(self.X_train, self.y_train)
+            logger.info(f"Successfully trained XGBRegressor Model using CPU fallback!")
         
-        logger.info(f"Successfully trained XGBRegressor Model!")
         return model
     
     def save_model_and_info(self):
