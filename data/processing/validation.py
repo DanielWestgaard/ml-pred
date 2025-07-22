@@ -2,7 +2,10 @@ from numpy import float64
 import pandas as pd
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
-import logging
+from utils.logging_utils import get_logger
+
+logger = get_logger()
+
 
 class DataValidator(BaseProcessor):
     def __init__(self, clean_dataset):
@@ -18,7 +21,7 @@ class DataValidator(BaseProcessor):
         
     def run(self):
         """Run data validation checks and returns validated results."""
-        logging.info("---------- Running Data Validator ----------")
+        logger.info("---------- Running Data Validator ----------")
         
         self.validate_ohlc_relationships()
         self.validate_timestamps()
@@ -111,7 +114,7 @@ class DataValidator(BaseProcessor):
                     large_gaps = time_diffs[time_diffs > common_diff * 5]  # More lenient for live data
                     if not large_gaps.empty:
                         gap_details = {str(idx): str(gap) for idx, gap in large_gaps.items()}
-                        logging.debug(f"Detected {len(large_gaps)} time gaps. This is normal for live streaming data during session breaks.")
+                        logger.debug(f"Detected {len(large_gaps)} time gaps. This is normal for live streaming data during session breaks.")
                         self.validation_issues.append({
                             'type': 'Time Series Gaps',
                             'description': f'Found {len(large_gaps)} large gaps in time series (normal for session breaks)',
