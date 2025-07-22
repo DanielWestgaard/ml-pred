@@ -310,7 +310,7 @@ def get_gpu_info() -> GPUInfo:
     
     return _gpu_detector.gpu_info
 
-def print_gpu_status():
+def log_gpu_status():
     """Print current GPU status."""
     global _gpu_detector
     if _gpu_detector is None:
