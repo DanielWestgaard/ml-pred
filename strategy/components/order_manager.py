@@ -195,7 +195,7 @@ class OrderManager:
                 )
             
             # Parse broker response (this would depend on actual broker API response format)
-            if response and 'dealReference' in response:
+            if response and isinstance(response, dict) and 'dealReference' in response:
                 return {
                     'success': True,
                     'execution_price': order_info['requested_price'],  # Would get from response
@@ -205,9 +205,10 @@ class OrderManager:
                     'simulated': False
                 }
             else:
+                error_msg = f"Invalid broker response. Type: {type(response)}, Content: {response}"
                 return {
                     'success': False,
-                    'error': 'Invalid broker response',
+                    'error': error_msg,
                     'broker_response': response
                 }
                 
