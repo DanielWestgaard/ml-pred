@@ -166,7 +166,7 @@ class DataCleaner(BaseProcessor):
         # Convert date column to datetime if it's not already
         if not pd.api.types.is_datetime64_any_dtype(self.df['date']):
             try:
-                self.df['date'] = parse_timestamp_series(self.df['date'], logger.getLogger(__name__))
+                self.df['date'] = parse_timestamp_series(self.df['date'])
             except Exception as e:
                 logger.error(f"Failed to convert date column to datetime with robust parser: {e}")
                 # Fallback to original method
@@ -316,7 +316,7 @@ class DataCleaner(BaseProcessor):
         # Ensure index is datetime if not done in timestamp_alignment
         if not isinstance(self.df.index, pd.DatetimeIndex):
             try:
-                self.df.index = parse_timestamp_series(self.df.index, logger.getLogger(__name__))
+                self.df.index = parse_timestamp_series(self.df.index)
                 logger.debug("Converted index to datetime")
             except Exception as e:
                 logger.error(f"Failed to convert index to datetime with robust parser: {e}")
