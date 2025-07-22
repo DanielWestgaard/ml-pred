@@ -9,6 +9,8 @@ The strategy component is a **complete trading system orchestrator** that transf
 - **Real-time Data Integration**: Live market data streaming via WebSocket and REST APIs
 - **Hypothesis-Driven Architecture**: Each market hypothesis gets its own specialized strategy implementation. This must be manually implemented for the hypothesis.
 - **Comprehensive Risk Management**: Multi-layer risk controls with position sizing, stop-losses, and drawdown protection
+- **Automated Account Management**: Centralized account switching with configurable target accounts
+- **Live Trading Safety**: Automatic position closure during system shutdown for live trading protection
 - **Component Integration**: Seamlessly ties together `data/`, `broker/`, `model/`, and `evaluation/` components
 
 ## Architecture Overview 🏗️
@@ -109,7 +111,8 @@ strategy:
     order_management:
         broker: capital_com
         order_type: market
-        dry_run: true
+        dry_run: false  # false = live trading, true = simulation mode
+        execution_delay: 0.1
 
     monitoring:
         update_interval: 1.0
@@ -142,7 +145,7 @@ strategy:
 - **SignalProcessor**: Converts model predictions into actionable trading signals
 - **RiskManager**: Implements position sizing, stop-losses, and portfolio-level risk controls
 - **PositionManager**: Tracks portfolio state, open positions, and performance metrics
-- **OrderManager**: Executes trades through broker APIs with proper error handling
+- **OrderManager**: Executes trades through broker APIs with automatic position sizing, centralized account management, and live trading safety features
 
 ## Usage Examples 🚀
 
@@ -193,6 +196,29 @@ class MyCustomStrategy(BaseStrategy):
 - **Broker Component**: Trade execution via broker APIs
 - **Evaluation Component**: Performance tracking and analysis
 - **Storage**: Results and performance metrics saved to `storage/models/<model>/strategy/`
+
+## Live Trading Safety Features 🛡️
+
+### Automatic Position Closure
+When running in live trading mode (`dry_run: false`), the system _automatically closes all open positions during shutdown_:
+
+```python
+# Triggered on Ctrl+C or system shutdown
+# Only in live trading mode - dry run is unaffected
+logging.info("🔄 Live trading cleanup: Closing all open positions...")
+broker.close_all_orders()
+logging.info("✅ All positions successfully closed during cleanup")
+```
+
+### Account Management
+- **Centralized Account Switching**: All broker sessions automatically switch to your configured test account
+- **Consistent Account Usage**: Ensures all components (data, trading, monitoring) use the same account
+- **Configurable Target Account**: Set via `config.VAR_ACCOUNT_NAME_TEST` (default: "USD_testing")
+
+### Position Sizing
+- **Automatic BTCUSD Sizing**: Intelligent size calculation for Bitcoin pairs (minimum 0.01 BTC)
+- **Currency-Specific Logic**: Proper unit conversion for different asset classes
+- **Risk-Based Sizing**: Position sizes calculated based on risk management parameters
 
 ## Results & Performance Tracking 📊
 Strategy results are automatically saved:
