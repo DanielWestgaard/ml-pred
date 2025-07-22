@@ -23,11 +23,9 @@ data/
 │   ├── cleaning.py                     # Data cleaning (missing values, duplicates, outliers)
 │   └── validation.py                   # Data validation and integrity checks
 │
-├── features/                           # Feature engineering system
-│   ├── generation.py                   # Core feature generation (100+ features) (old)
-│   ├── enhanced_generation.py          # ModelAwareFeatureGenerator - advanced feature system (new)
+├── features/                           # Unified feature engineering system
+│   ├── enhanced_generation.py          # ModelAwareFeatureGenerator - unified feature system (200+ features)
 │   ├── feature_registry.py             # Feature registration and dependency management
-│   ├── integration_adapter.py          # Feature generation integration adapter
 │   ├── transformation.py               # Feature transformation and normalization
 │   ├── selection.py                    # Feature selection (CFS, XGB, RFE)
 │   └── target_hypothesis.py            # Hypothesis-specific target generation
@@ -74,6 +72,9 @@ There are 2 ways of running the Data Pipeline on your raw data:
         
         data_pipeline.run()
         ```
+        
+> [!NOTE]
+> The pipeline now uses the unified **ModelAwareFeatureGenerator** system directly, providing consistent feature generation between training and live trading environments.
     
 2. **Focusing on a Hypothesis**: The pipeline will have a somewhat different flow: `Cleaning` -> `Validation` -> `Generation` (only generating specified features from config-file) -> `Target Hypothesis` (generating _target column_ representing the Hypothesis) -> `Transformation` -> `Save`.<br>
 This really is at **the heart of this project**. Check out the documentation under `hypothesis/` and `Target Hypothesis` (chapter _in this readme file_) to see what this is, and how to create one to focus on (`config.yml`, `README.md`, new method in `target_hypothesis.py`).<br>
@@ -95,6 +96,9 @@ When this is done, you can:
                                             hypothesis_source = "hypothesis/1_session_based_tod_anomalies/config.yml")
         data_pipeline.run()
         ```
+
+> [!NOTE]
+> The pipeline intelligently handles both new list-format features and legacy dict-format generator names from hypothesis configs. The unified system automatically resolves dependencies and generates features in the optimal order.
 
 > [!NOTE]
 > Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/` and under `Features`/`Target Hypothesis` in this document. Also, use the existing functionality as examples. This is currently a quick run-down:
@@ -127,70 +131,79 @@ The second class is responsible for validating the features after feature genera
 
 
 # About features/
-Code related to creating and selecting features with prediction power to help a ML model train and predict.
+The unified feature engineering system that creates sophisticated technical indicators and features with prediction power to help ML models train and predict effectively.
 
-## Feature Generation System
+## Unified Feature Generation System (`enhanced_generation.py`)
+**ModelAwareFeatureGenerator** - A complete, production-ready feature system providing 200+ technical indicators and features:
 
-### Core Feature Generation (`generation.py`)
-The standard feature generator that creates 100+ technical indicators and features:
-- **Technical Indicators**: Moving averages, RSI, MACD, Bollinger Bands, ADX, etc.
-- **Price Features**: Price changes, volatility measures, momentum indicators
-- **Volume Features**: Volume profiles, volume oscillators, on-balance volume
-- **Time-based Features**: Session indicators, day-of-week, market hours
-- **Market Regime Features**: Trend detection, volatility regimes, market state classification
+### Feature Categories
+- **Price Action Features**: Moving averages (SMA/EMA), Rate of Change, Bollinger Bands, Support/Resistance levels, Average True Range (ATR)
+- **Volume Analysis**: Volume moving averages, Volume Rate of Change, On Balance Volume, Volume Profile with key metrics, Money Flow Index, VWAP
+- **Technical Indicators**: RSI, MACD, ADX, Stochastic Oscillator, Commodity Channel Index, Ichimoku Cloud
+- **Temporal Features**: Time of day/week/month (cyclical), Day of week patterns, Holiday detection, FX trading session analysis
+- **Market Regime Analysis**: Volatility regimes, Trend strength indicators, Market state classification, Combined regime analysis
+- **Advanced Analytics**: Seasonal decomposition (STL, MSTL), Fast Fourier Transform cyclical components, Logarithmic returns
 
-Key implementation details:
-- Uses `safely_execute()` for robust error handling during feature calculation
-- Implements `_add_features_efficiently()` to prevent DataFrame fragmentation (improving efficiency and memory usage)
-- Generates both numerical and categorical features (some models may require preprocessing)
+### Key Architectural Features
+- **Model-Aware Generation**: Automatically generates exactly what trained models require
+- **Automatic Dependency Resolution**: Handles complex feature dependencies intelligently  
+- **Decorator-Based Registration**: Easy feature addition with `@feature_generator` decorator
+- **Robust Error Handling**: Graceful failure handling with detailed logging
+- **Memory Efficient**: Optimized DataFrame operations to prevent fragmentation
+- **Extensible Design**: Simple to add new features without breaking existing functionality
 
-### Enhanced Model-Aware Feature Generation (`enhanced_generation.py`)
-The **ModelAwareFeatureGenerator** is an advanced feature system that:
+### Usage Examples
 
-#### Key Capabilities
-- **Model-Aware**: Automatically generates features based on trained model requirements
-- **Dependency Resolution**: Handles feature dependencies automatically
-- **Feature Registry**: Centralized feature registration and management system
-- **Error Resilience**: Provides clear feedback about missing or failed features
-- **Extensible Design**: Easy to add new features with automatic registration
-
-#### How It Works
+#### For Training Data (Historical Processing)
 ```python
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
 
-# Initialize with model metadata
-generator = ModelAwareFeatureGenerator(model_metadata_path="storage/models/2025-07-03_12:45:35/")
+# Initialize with data
+generator = ModelAwareFeatureGenerator(historical_data)
 
-# Generate features automatically based on model requirements
-processed_data = generator.generate_features(raw_data, missing_features_handling='skip')
+# Generate specific features for hypothesis testing  
+selected_features = ['sma_20', 'rsi_14', 'atr', 'asian_session', 'volatility_short']
+processed_data = generator.generate_selected(selected_features)
 
-# Or generate specific features
-selected_features = ['sma_20', 'rsi_14', 'volatility']
-processed_data = generator.generate_features(raw_data, required_features=selected_features)
+# Or generate all features
+all_features_data = generator.generate_all()
 ```
 
-#### Feature Registry System
-The feature registry provides:
-- **Automatic Registration**: Features auto-register using decorators
-- **Dependency Management**: Automatic handling of feature dependencies
-- **Feature Discovery**: Dynamic discovery of available features
-- **Metadata Support**: Rich feature metadata including descriptions and parameters
-
+#### For Live Trading (Model-Aware)
 ```python
-# Register a new feature
-@feature_generator('my_custom_feature', dependencies=['close'])
-def calculate_my_feature(self, data: pd.DataFrame, **kwargs) -> pd.DataFrame:
-    # Feature calculation logic
-    return data.assign(my_feature=some_calculation)
+# Generate features automatically based on model requirements
+generator = ModelAwareFeatureGenerator(live_data) 
+processed_data = generator.generate_for_model("storage/models/2025-07-03_12:45:35/model_metadata.yml")
 ```
 
-### Integration Adapter (`integration_adapter.py`)
-Provides seamless integration between old and new feature generation systems:
-- **Backward Compatibility**: Works with existing feature generation code
-- **Bridge Pattern**: Connects legacy features with new registry system
-- **Unified Interface**: Single interface for all feature generation needs
-> [!NOTE]
-> The old and new feature generation systems might be more unified later.
+#### Adding New Features
+```python
+@feature_generator(
+    output_features=['my_custom_indicator'],
+    dependencies=['sma_20', 'atr'],  # Automatic dependency handling
+    description="My custom technical indicator",
+    category="custom"
+)
+def my_custom_feature(self):
+    """Calculate custom indicator"""
+    self.df['my_custom_indicator'] = (self.df['sma_20'] / self.df['atr']) * 100
+```
+
+### Feature Registry System (`feature_registry.py`)
+The backbone of the feature system providing:
+- **Automatic Registration**: All decorated features auto-register on import
+- **Dependency Graph**: Maintains and resolves complex feature dependencies
+- **Feature Discovery**: Dynamic listing of available features and generators
+- **Execution Planning**: Topological sorting for optimal generation order
+- **Metadata Management**: Rich feature descriptions, categories, and parameters
+
+### Integration Points
+The system seamlessly integrates with both:
+- **Engineer Pipeline**: For historical data processing and model training
+- **Live Data Manager**: For real-time feature generation during strategy execution  
+- **Strategy System**: Direct feature generation based on model requirements
+
+Both pipelines use the exact same feature generation system ensuring perfect consistency between training and live trading environments.
 
 ## Transformation - transformation.py
 ### Preparation of features before normalization
