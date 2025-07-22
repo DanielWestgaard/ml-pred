@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import requests
 from datetime import date
@@ -9,6 +8,9 @@ import utils.shared_utils as shared_utils
 import config.config as config
 import utils.data_utils as data_util
 import utils.alpha_vantage_utils as alpha_utils
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class ProviderAlphaVantage(BaseProvider):
@@ -19,7 +21,7 @@ class ProviderAlphaVantage(BaseProvider):
         Note: The api key has reportedly a 25 request limit per day, but this is actually only
         related to you IP-adress and not the key, so a VPN can help with this.
         """
-        logging.info("Initializing Alpha Vantage Provider")
+        logger.info("Initializing Alpha Vantage Provider")
         self.secrets = shared_utils.load_secrets({"alpha_vantage_free_api_key"})
         self.api_key = self.secrets.get("alpha_vantage_free_api_key")
     
@@ -59,7 +61,7 @@ class ProviderAlphaVantage(BaseProvider):
         data = r.json()
         
         if print_answer:
-            print(json.dumps(data, indent=4))
+            logger.debug(json.dumps(data, indent=4))
             
         if store_answer:
             output_dir = config.ALPVAN_RESPONSE_JSON_DIR
