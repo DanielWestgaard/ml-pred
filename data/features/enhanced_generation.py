@@ -567,3 +567,646 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         # For the last few rows where we don't have future data,
         # fill with the current ATR as a reasonable approximation
         self.df['future_atr'] = self.df['future_atr'].fillna(self.df['atr'])
+    
+    # ==========================================================================
+    # MIGRATED FEATURES FROM LEGACY GENERATION.PY
+    # ==========================================================================
+    
+    @feature_generator(
+        output_features=['sma_5', 'sma_10', 'sma_20', 'sma_50', 'sma_200',
+                        'ema_5', 'ema_10', 'ema_20', 'ema_50', 'ema_200'],
+        description="Simple and Exponential Moving Averages",
+        category="price_action"
+    )
+    def moving_averages(self):
+        """Generate simple and exponential moving averages over different time periods"""
+        num_periods = [5, 10, 20, 50, 200]
+        
+        new_features = {}
+        
+        for period in num_periods:
+            new_features[f"sma_{period}"] = self.df["close"].rolling(window=period).mean()
+            new_features[f"ema_{period}"] = self.df["close"].ewm(span=period, adjust=False, min_periods=period).mean()
+        
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60'],
+        description="Rate of change over various lookback periods",
+        category="momentum"
+    )
+    def rate_of_change(self):
+        """Price momentum: Rate of change (ROC) over various lookback periods"""
+        lookback_periods = [1, 5, 10, 20, 60]
+        
+        new_features = {}
+        
+        for period in lookback_periods:
+            new_features[f"roc_{period}"] = (self.df["close"] / self.df["close"].shift(period) - 1) * 100
+        
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['upper_band', 'lower_band', 'bb_width'],
+        dependencies=['moving_averages'],
+        description="Bollinger Bands for volatility analysis",
+        category="volatility"
+    )
+    def bollinger_bands(self, period_bb: int = 20):
+        """Statistical chart characterizing prices and volatility over time"""
+        sma_key = f'sma_{period_bb}'
+        std = self.df["close"].rolling(window=period_bb).std()
+        num_std_dev = 2
+        
+        # Check if SMA already exists, if not calculate it
+        if sma_key not in self.df.columns:
+            sma = self.df["close"].rolling(window=period_bb).mean()
+        else:
+            sma = self.df[sma_key]
+        
+        # Calculate bands
+        upper_band = sma + (num_std_dev * std)
+        lower_band = sma - (num_std_dev * std)
+        bb_width = (upper_band - lower_band) / sma
+        
+        new_features = {
+            'upper_band': upper_band,
+            'lower_band': lower_band,
+            'bb_width': bb_width
+        }
+        
+        if sma_key not in self.df.columns:
+            new_features[sma_key] = sma
+            
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['distance_from_high', 'distance_from_low'],
+        description="Distance from recent highs and lows",
+        category="support_resistance"
+    )
+    def support_resistance(self, lookback: int = 20):
+        """Distance from recent high/lows"""
+        new_features = {
+            'distance_from_high': (self.df['close'] / self.df['high'].rolling(lookback).max() - 1) * 100,
+            'distance_from_low': (self.df['close'] / self.df['low'].rolling(lookback).min() - 1) * 100
+        }
+        
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['vma_7', 'vma_15', 'vma_30', 'vma_60',
+                        'relative_volume_7', 'relative_volume_15', 'relative_volume_30', 'relative_volume_60'],
+        description="Volume moving averages and relative volume",
+        category="volume"
+    )
+    def volume_moving_averages(self):
+        """Identify unusual volume spikes"""
+        num_periods = [7, 15, 30, 60]
+        
+        new_features = {}
+        
+        for period in num_periods:
+            vma = self.df['volume'].rolling(window=period).mean()
+            new_features[f'vma_{period}'] = vma
+            new_features[f'relative_volume_{period}'] = self.df['volume'] / vma
+            
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['vroc_1', 'vroc_5', 'vroc_10', 'vroc_20'],
+        description="Volume rate of change",
+        category="volume"
+    )
+    def volume_rate_of_change(self):
+        """How rapidly volume is increasing/decreasing"""
+        lookback_periods = [1, 5, 10, 20]
+        
+        new_features = {}
+        
+        for period in lookback_periods:
+            new_features[f"vroc_{period}"] = (self.df["volume"] / self.df["volume"].shift(period) - 1) * 100
+        
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['obv'],
+        description="On Balance Volume indicator",
+        category="volume"
+    )
+    def on_balance_volume(self):
+        """Cumulative indicator that relates volume to price changes"""
+        price_direction = np.sign(self.df['close'].diff())
+        price_direction[self.df['close'].diff() == 0] = 0
+        volume_direction = self.df['volume'] * price_direction
+        obv = volume_direction.cumsum()
+        
+        self._add_features_efficiently({'obv': obv})
+    
+    @feature_generator(
+        output_features=['vwap'],
+        description="Volume Weighted Average Price",
+        category="volume"
+    )
+    def vwap(self, period: int = 1):
+        """Calculate daily Volume Weighted Average Price"""
+        typical_price = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        vwap = (self.df['volume'] * typical_price).rolling(period).sum() / self.df['volume'].rolling(period).sum()
+        
+        self._add_features_efficiently({'vwap': vwap})
+    
+    @feature_generator(
+        output_features=['mfi'],
+        description="Money Flow Index - volume-weighted RSI",
+        category="oscillator"
+    )
+    def money_flow_index(self, period: int = 14):
+        """Calculate Money Flow Index - a volume-weighted RSI"""
+        typical_price = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        money_flow = typical_price * self.df['volume']
+        
+        positive_flow = np.where(typical_price > typical_price.shift(1), money_flow, 0)
+        negative_flow = np.where(typical_price < typical_price.shift(1), money_flow, 0)
+        
+        positive_flow_sum = pd.Series(positive_flow, index=self.df.index).rolling(window=period).sum()
+        negative_flow_sum = pd.Series(negative_flow, index=self.df.index).rolling(window=period).sum()
+        
+        money_ratio = np.where(negative_flow_sum != 0, positive_flow_sum / negative_flow_sum, 0)
+        mfi = 100 - (100 / (1 + money_ratio))
+        
+        self._add_features_efficiently({'mfi': mfi})
+    
+    @feature_generator(
+        output_features=['rsi_14'],
+        description="Relative Strength Index",
+        category="oscillator"
+    )
+    def relative_strength_index(self, window: int = 14):
+        """Calculate RSI using Wilder's smoothing method"""
+        delta = self.df["close"].diff()
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+        
+        # First values
+        avg_gain = gain[:window].mean()
+        avg_loss = loss[:window].mean()
+        
+        # Initialize lists with first values
+        avg_gains = [avg_gain]
+        avg_losses = [avg_loss]
+        
+        # Apply Wilder's smoothing
+        for i in range(window, len(gain)):
+            avg_gain = ((avg_gains[-1] * (window - 1)) + gain.iloc[i]) / window
+            avg_loss = ((avg_losses[-1] * (window - 1)) + loss.iloc[i]) / window
+            avg_gains.append(avg_gain)
+            avg_losses.append(avg_loss)
+        
+        # Convert to Series with proper index
+        avg_gain_series = pd.Series(avg_gains, index=self.df.index[window-1:])
+        avg_loss_series = pd.Series(avg_losses, index=self.df.index[window-1:])
+        
+        # Calculate RS and RSI
+        rs = avg_gain_series / avg_loss_series
+        rsi = 100 - (100 / (1 + rs))
+        
+        # Add to dataframe
+        rsi_full = pd.Series(index=self.df.index, dtype=float)
+        rsi_full.loc[rsi.index] = rsi
+        
+        self._add_features_efficiently({f'rsi_{window}': rsi_full})
+    
+    @feature_generator(
+        output_features=['macd_line', 'macd_signal', 'macd_histogram'],
+        description="MACD - Moving Average Convergence Divergence",
+        category="momentum"
+    )
+    def moving_average_convergence_divergence(self):
+        """Trend-following momentum indicator"""
+        ema_12 = self.df['close'].ewm(span=12, adjust=False).mean()
+        ema_26 = self.df['close'].ewm(span=26, adjust=False).mean()
+
+        macd_line = ema_12 - ema_26
+        macd_signal = macd_line.ewm(span=9, adjust=False).mean()
+        macd_histogram = macd_line - macd_signal
+        
+        new_features = {
+            'macd_line': macd_line,
+            'macd_signal': macd_signal,
+            'macd_histogram': macd_histogram
+        }
+        
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['+di', '-di', 'adx'],
+        description="Average Directional Index - trend strength",
+        category="trend"
+    )
+    def average_directional_index(self, lookback: int = 14):
+        """Measures trend strength"""
+        high_diff = self.df["high"].diff()
+        low_diff = self.df["low"].diff()
+        
+        up_move = high_diff
+        down_move = -low_diff
+        
+        plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0)
+        minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0)
+        
+        tr1 = self.df["high"] - self.df["low"]
+        tr2 = abs(self.df["high"] - self.df["close"].shift(1))
+        tr3 = abs(self.df["low"] - self.df["close"].shift(1))
+        tr = pd.DataFrame({'tr1': tr1, 'tr2': tr2, 'tr3': tr3}).max(axis=1)
+        
+        smoothed_tr = tr.rolling(window=lookback).sum()
+        smoothed_plus_dm = pd.Series(plus_dm).rolling(window=lookback).sum()
+        smoothed_minus_dm = pd.Series(minus_dm).rolling(window=lookback).sum()
+        
+        for i in range(lookback, len(tr)):
+            smoothed_tr.iloc[i] = smoothed_tr.iloc[i-1] - (smoothed_tr.iloc[i-1]/lookback) + tr.iloc[i]
+            smoothed_plus_dm.iloc[i] = smoothed_plus_dm.iloc[i-1] - (smoothed_plus_dm.iloc[i-1]/lookback) + plus_dm[i]
+            smoothed_minus_dm.iloc[i] = smoothed_minus_dm.iloc[i-1] - (smoothed_minus_dm.iloc[i-1]/lookback) + minus_dm[i]
+        
+        plus_di = 100 * (smoothed_plus_dm / smoothed_tr)
+        minus_di = 100 * (smoothed_minus_dm / smoothed_tr)
+        dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di)
+        adx = dx.rolling(window=lookback).mean()
+        
+        new_features = {
+            "+di": plus_di,
+            "-di": minus_di,
+            "adx": adx
+        }
+        
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['stoch_k', 'stoch_d'],
+        description="Stochastic Oscillator",
+        category="oscillator"
+    )
+    def stochastic_oscillator(self, k_period: int = 14, d_period: int = 3, slowing: int = 3):
+        """Calculate Stochastic Oscillator"""
+        low_min = self.df['low'].rolling(window=k_period).min()
+        high_max = self.df['high'].rolling(window=k_period).max()
+        
+        k_fast = 100 * (self.df['close'] - low_min) / (high_max - low_min)
+        k_fast = k_fast.replace([np.inf, -np.inf], np.nan).fillna(50)
+        
+        k = k_fast.rolling(window=slowing).mean() if slowing > 1 else k_fast
+        d = k.rolling(window=d_period).mean()
+        
+        new_features = {
+            'stoch_k': k,
+            'stoch_d': d
+        }
+        
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['cci'],
+        description="Commodity Channel Index",
+        category="oscillator"
+    )
+    def commodity_channel_index(self, period: int = 20):
+        """Calculate Commodity Channel Index"""
+        tp = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        ma_tp = tp.rolling(window=period).mean()
+        mad = abs(tp - ma_tp).rolling(window=period).mean()
+        cci = (tp - ma_tp) / (0.015 * mad)
+        
+        self._add_features_efficiently({'cci': cci})
+    
+    @feature_generator(
+        output_features=['log_return'],
+        description="Logarithmic returns",
+        category="returns"
+    )
+    def log_returns(self):
+        """Logarithmic returns: measure percentage change in price"""
+        log_return = np.log(self.df['close'] / self.df['close'].shift(1))
+        self._add_features_efficiently({'log_return': log_return})
+    
+    @feature_generator(
+        output_features=['vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4',
+                        'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9',
+                        'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width',
+                        'close_to_poc_pct', 'in_value_area', 'vol_concentration'],
+        description="Volume Profile analysis with key metrics",
+        category="volume"
+    )
+    def volume_profile(self, num_bins: int = 10, lookback: int = 20, key_metrics: bool = True):
+        """Calculate rolling volume profile with adaptive bins and key metrics"""
+        vol_profiles = np.zeros((len(self.df), num_bins))
+        
+        rolling_min = self.df['low'].rolling(window=lookback).min()
+        rolling_max = self.df['high'].rolling(window=lookback).max()
+        typical_price = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+        
+        new_features = {}
+        temp_df = self.df.copy()
+        temp_df['typical_price'] = typical_price
+        
+        vol_poc = np.full(len(self.df), np.nan)
+        vol_va_high = np.full(len(self.df), np.nan)
+        vol_va_low = np.full(len(self.df), np.nan)
+        vol_va_width = np.full(len(self.df), np.nan)
+        
+        for i in range(lookback, len(self.df)):
+            window = temp_df.iloc[i-lookback:i]
+            price_min = rolling_min.iloc[i]
+            price_max = rolling_max.iloc[i]
+            price_range = price_max - price_min
+            
+            if price_range > 0:
+                bin_size = price_range / num_bins
+                
+                for j, row in window.iterrows():
+                    bin_idx = min(num_bins - 1, int((row['typical_price'] - price_min) / bin_size))
+                    time_factor = 1 + 0.1 * (window.index.get_loc(j) / lookback)
+                    vol_profiles[i, bin_idx] += row['volume'] * time_factor
+                
+                total_vol = np.sum(vol_profiles[i])
+                if total_vol > 0:
+                    vol_profiles[i] = vol_profiles[i] / total_vol * 100
+                
+                for bin_num in range(num_bins):
+                    if f'vol_bin_{bin_num}' not in new_features:
+                        new_features[f'vol_bin_{bin_num}'] = np.full(len(self.df), np.nan)
+                    new_features[f'vol_bin_{bin_num}'][i] = vol_profiles[i, bin_num]
+                
+                if key_metrics:
+                    poc_bin = np.argmax(vol_profiles[i])
+                    vol_poc[i] = price_min + (poc_bin + 0.5) * bin_size
+                    
+                    value_area_threshold = 0.7
+                    sorted_bins = np.argsort(vol_profiles[i])[::-1]
+                    cum_vol = 0
+                    value_area_bins = []
+                    
+                    for bin_idx in sorted_bins:
+                        value_area_bins.append(bin_idx)
+                        cum_vol += vol_profiles[i, bin_idx] / 100
+                        if cum_vol >= value_area_threshold:
+                            break
+                    
+                    vol_va_high[i] = price_min + (max(value_area_bins) + 1) * bin_size
+                    vol_va_low[i] = price_min + min(value_area_bins) * bin_size
+                    vol_va_width[i] = (vol_va_high[i] - vol_va_low[i]) / price_range
+        
+        if key_metrics:
+            new_features['vol_poc'] = pd.Series(vol_poc, index=self.df.index)
+            new_features['vol_va_high'] = pd.Series(vol_va_high, index=self.df.index)
+            new_features['vol_va_low'] = pd.Series(vol_va_low, index=self.df.index)
+            new_features['vol_va_width'] = pd.Series(vol_va_width, index=self.df.index)
+            
+            close_to_poc_pct = (self.df['close'] - new_features['vol_poc']) / new_features['vol_poc'] * 100
+            in_value_area = ((self.df['close'] >= new_features['vol_va_low']) & 
+                            (self.df['close'] <= new_features['vol_va_high'])).astype(int)
+            
+            entropy = np.zeros(len(self.df))
+            for i in range(lookback, len(self.df)):
+                profile = vol_profiles[i] / 100
+                profile = profile[profile > 0]
+                if len(profile) > 0:
+                    entropy[i] = -np.sum(profile * np.log(profile))
+            vol_concentration = 1 - entropy / np.log(num_bins)
+            
+            new_features['close_to_poc_pct'] = close_to_poc_pct
+            new_features['in_value_area'] = in_value_area
+            new_features['vol_concentration'] = pd.Series(vol_concentration, index=self.df.index)
+        
+        for key, value in new_features.items():
+            if isinstance(value, np.ndarray):
+                new_features[key] = pd.Series(value, index=self.df.index)
+        
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
+        output_features=['seasonal_trend', 'seasonal_seasonal', 'seasonal_residual', 'seasonal_norm'],
+        description="Classical seasonal decomposition",
+        category="seasonality"
+    )
+    def seasonal_decompose(self, period: int = 160):
+        """Perform seasonal decomposition on the closing price"""
+        try:
+            from statsmodels.tsa.seasonal import seasonal_decompose
+            
+            close_series = self.df['close'].dropna()
+            
+            if len(close_series) < 2 * period:
+                logger.warning(f"Not enough data for seasonal decomposition (need {2*period}, have {len(close_series)})")
+                return
+            
+            result = seasonal_decompose(
+                close_series, 
+                model='additive', 
+                period=period, 
+                extrapolate_trend='freq'
+            )
+            
+            new_features = {
+                'seasonal_trend': result.trend,
+                'seasonal_seasonal': result.seasonal,
+                'seasonal_residual': result.resid,
+                'seasonal_norm': result.seasonal / self.df['close']
+            }
+            
+            self._add_features_efficiently(new_features)
+            
+        except Exception as e:
+            logger.warning(f"Error calculating seasonal decomposition: {e}")
+    
+    @feature_generator(
+        output_features=['stl_trend', 'stl_seasonal', 'stl_residual', 'stl_seasonal_strength', 'stl_trend_strength'],
+        description="STL decomposition - robust to outliers",
+        category="seasonality"
+    )
+    def stl_decomposition(self, period: int = 160):
+        """Perform STL decomposition on the closing price"""
+        try:
+            from statsmodels.tsa.seasonal import STL
+            
+            close_series = self.df['close'].dropna()
+            
+            if len(close_series) < 2 * period:
+                logger.warning(f"Not enough data for STL decomposition (need {2*period}, have {len(close_series)})")
+                return
+            
+            stl = STL(close_series, period=period, seasonal=13)
+            result = stl.fit()
+            
+            new_features = {
+                'stl_trend': result.trend,
+                'stl_seasonal': result.seasonal,
+                'stl_residual': result.resid,
+                'stl_seasonal_strength': 1 - (result.resid.var() / (result.seasonal + result.resid).var()),
+                'stl_trend_strength': 1 - (result.resid.var() / (result.trend + result.resid).var())
+            }
+            
+            self._add_features_efficiently(new_features)
+            
+        except Exception as e:
+            logger.warning(f"Error calculating STL decomposition: {e}")
+    
+    @feature_generator(
+        output_features=['mstl_trend', 'mstl_residual'],
+        description="MSTL decomposition for multiple seasonality",
+        category="seasonality"
+    )
+    def mstl_decomposition(self, periods: list = [24, 160]):
+        """Perform MSTL decomposition for multiple seasonality components"""
+        try:
+            from statsmodels.tsa.seasonal import MSTL
+            
+            close_series = self.df['close'].dropna()
+            
+            if len(close_series) < 2 * max(periods):
+                logger.warning(f"Not enough data for MSTL decomposition (need {2*max(periods)}, have {len(close_series)})")
+                return
+            
+            mstl = MSTL(close_series, periods=periods)
+            result = mstl.fit()
+            
+            new_features = {
+                'mstl_trend': result.trend,
+                'mstl_residual': result.resid
+            }
+            
+            # Add each seasonal component
+            for i, period in enumerate(periods):
+                new_features[f'mstl_seasonal_{period}'] = result.seasonal_[i]
+            
+            self._add_features_efficiently(new_features)
+            
+        except Exception as e:
+            logger.warning(f"Error calculating MSTL decomposition: {e}")
+    
+    @feature_generator(
+        output_features=['is_holiday', 'days_to_next_holiday'],
+        description="Holiday features for market analysis",
+        category="temporal"
+    )
+    def holiday_features(self):
+        """Add features for market holidays and special events"""
+        try:
+            import holidays
+            
+            dates = pd.Series(self.df.index.date)
+            
+            # Create US holidays calendar (adjust for your target market)
+            us_holidays = holidays.US(years=range(dates.dt.year.min(), dates.dt.year.max()+1))
+            
+            # Flag for holidays
+            is_holiday = dates.isin(us_holidays).astype(int)
+            
+            # Distance to next holiday
+            next_holiday = np.zeros(len(self.df))
+            for i, date in enumerate(dates):
+                for days_ahead in range(1, 30):
+                    future_date = date + pd.Timedelta(days=days_ahead)
+                    if future_date in us_holidays:
+                        next_holiday[i] = days_ahead
+                        break
+            
+            new_features = {
+                'is_holiday': is_holiday,
+                'days_to_next_holiday': next_holiday
+            }
+            
+            self._add_features_efficiently(new_features)
+            
+        except ImportError:
+            logger.warning("holidays package not installed. Run 'pip install holidays'")
+        except Exception as e:
+            logger.warning(f"Error calculating holiday features: {e}")
+    
+    @feature_generator(
+        output_features=['trend_strength', 'trend_regime',
+                        'trend_regime_strong_trend', 'trend_regime_weak_trend', 'trend_regime_ranging'],
+        dependencies=['moving_averages', 'average_directional_index'],
+        description="Trend strength indicators and regime classification",
+        category="trend"
+    )
+    def trend_strength_indicators(self, lookback: int = 20, adx_threshold: int = 25):
+        """Create indicators to identify trending vs ranging markets"""
+        import scipy.stats
+        
+        new_features = {}
+        
+        # ADX-based trend regime if ADX exists
+        if 'adx' in self.df.columns:
+            adx_trend_regime = np.where(self.df['adx'] > adx_threshold, 'trending', 'ranging')
+            new_features['adx_trend_regime'] = adx_trend_regime
+            
+            regime_dummies = pd.get_dummies(pd.Series(adx_trend_regime, index=self.df.index), prefix='adx_regime')
+            for col in regime_dummies.columns:
+                new_features[col] = regime_dummies[col]
+        
+        # Price vs Moving Average indicators
+        for period in [20, 50, 200]:
+            sma_col = f'sma_{period}'
+            if sma_col not in self.df.columns:
+                new_features[sma_col] = self.df['close'].rolling(window=period).mean()
+                sma_values = new_features[sma_col]
+            else:
+                sma_values = self.df[sma_col]
+            
+            new_features[f'dist_from_sma_{period}'] = (self.df['close'] / sma_values - 1) * 100
+            new_features[f'sma_{period}_slope'] = sma_values.pct_change(5, fill_method=None) * 100
+        
+        # Moving average crossovers
+        if 'sma_50' in self.df.columns and 'sma_200' in self.df.columns:
+            new_features['ma_cross_50_200'] = np.where(self.df['sma_50'] > self.df['sma_200'], 1, -1)
+        elif 'sma_50' in new_features and 'sma_200' in new_features:
+            new_features['ma_cross_50_200'] = np.where(new_features['sma_50'] > new_features['sma_200'], 1, -1)
+        
+        # Linear regression indicators
+        regression_slope = np.full(len(self.df), np.nan)
+        r_squared = np.full(len(self.df), np.nan)
+        
+        for i in range(lookback, len(self.df)):
+            y = self.df['close'].iloc[i-lookback:i].values
+            x = np.arange(len(y))
+            slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(x, y)
+            regression_slope[i] = slope
+            r_squared[i] = r_value**2
+        
+        new_features['regression_slope'] = pd.Series(regression_slope, index=self.df.index)
+        new_features['r_squared'] = pd.Series(r_squared, index=self.df.index)
+        new_features['norm_regression_slope'] = new_features['regression_slope'] / self.df['close']
+        
+        # Combined trend strength indicator
+        components = []
+        
+        if 'adx' in self.df.columns:
+            components.append(self.df['adx'] / 100)
+        
+        components.append(new_features['r_squared'])
+        
+        # MA alignment component
+        ma_alignment = (
+            np.sign(new_features['dist_from_sma_20']) * 
+            np.sign(new_features['dist_from_sma_50']) * 
+            np.sign(new_features['dist_from_sma_200'])
+        )
+        ma_aligned = (abs(ma_alignment) == 1).astype(float)
+        components.append(ma_aligned)
+        
+        trend_strength = pd.concat(components, axis=1).mean(axis=1) * 100
+        new_features['trend_strength'] = trend_strength
+        
+        # Trend regime classification
+        trend_regime = np.where(
+            trend_strength > 70, 'strong_trend',
+            np.where(trend_strength > 40, 'weak_trend', 'ranging')
+        )
+        new_features['trend_regime'] = trend_regime
+        
+        # One-hot encode trend regime
+        trend_dummies = pd.get_dummies(pd.Series(trend_regime, index=self.df.index), prefix='trend_regime')
+        for col in trend_dummies.columns:
+            new_features[col] = trend_dummies[col]
+        
+        self._add_features_efficiently(new_features)

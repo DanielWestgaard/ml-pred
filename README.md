@@ -8,7 +8,7 @@ In previous tries, I've explored the challenge of "**beating the market**". Howe
 ## The hypothesis approach 🧑‍🚀
 The approach of using different hypotheses to test and find possible inefficiencies is as follows:
 1. **Data Processing**: Cleaning and Validating
-2. **Data Engineering**: Creates features relevant for the hypothesis (e.g., volatility, returns, time of day). This will naturally not use Feature Selection.
+2. **Data Engineering**: Creates features relevant for the hypothesis using the unified ModelAwareFeatureGenerator (200+ features: volatility, returns, time of day, technical indicators, etc.). This will naturally not use Feature Selection.
 3. **Data Labeling**: Create labels based on the inefficiency hypothesis. Eg:
     ```python
     # Label: Binary momentum success after 5 green candles?
@@ -99,6 +99,18 @@ The provided path to hypothesis file is just an example.
 - **Broker Integration**: Capital.com API integration with order management
 - **Risk Management**: Multi-layer risk controls and position management
 - **Performance Tracking**: Strategy results and trade performance monitoring
+
+## Recent System Improvements 🚀
+
+### Unified Feature Generation System (July 2025)
+The feature generation system has been completely unified and modernized:
+- **200+ Features**: Comprehensive technical indicators, market regime analysis, temporal features
+- **Model-Aware**: Automatically generates exactly what trained models need
+- **Consistent Results**: Both training pipeline and live trading use identical feature generation
+- **Automatic Dependencies**: Features are generated in optimal order with dependency resolution
+- **Easy Extensibility**: Add new features with simple decorators - no complex configuration needed
+
+This provides a robust foundation ensuring perfect consistency between model training and live strategy execution.
 
 ## Nice to know 💡
 Trying to follow best practice for python, I have...
