@@ -9,7 +9,6 @@ This module provides a robust feature generation system that:
 - Is easily extensible with new features
 """
 
-import logging
 import pandas as pd
 import numpy as np
 import yaml
@@ -18,7 +17,9 @@ from pathlib import Path
 
 from .feature_registry import FeatureRegistry, FeatureDefinition, feature_generator, AutoRegisterMeta
 from utils import data_utils
+from utils.logging_utils import get_logger
 
+logger = get_logger()
 
 class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
     """
@@ -51,17 +52,17 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             
             # Check for sufficient data
             if len(self.df) < 200:
-                logging.warning(f"Dataset contains only {len(self.df)} rows. Some features may not generate properly.")
+                logger.warning(f"Dataset contains only {len(self.df)} rows. Some features may not generate properly.")
             
             # Store configuration
             self.model_metadata_path = model_metadata_path
             self.selected_features = selected_features
             self._generated_features = set()
             
-            logging.info(f"Enhanced FeatureGenerator initialized with {len(self.df)} rows")
+            logger.info(f"Enhanced FeatureGenerator initialized with {len(self.df)} rows")
             
         except Exception as e:
-            logging.error(f"Error initializing Enhanced FeatureGenerator: {e}")
+            logger.error(f"Error initializing Enhanced FeatureGenerator: {e}")
             raise
     
     @classmethod
@@ -95,10 +96,10 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
                 metadata = yaml.safe_load(f)
             
             required_features = metadata['dataset']['features']
-            logging.info(f"Model requires {len(required_features)} features")
+            logger.info(f"Model requires {len(required_features)} features")
             
         except Exception as e:
-            logging.error(f"Error loading model metadata: {e}")
+            logger.error(f"Error loading model metadata: {e}")
             raise
         
         return self.generate_selected(required_features)
@@ -113,7 +114,7 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         Returns:
             DataFrame with generated features
         """
-        logging.info(f"Generating {len(feature_names)} selected features...")
+        logger.info(f"Generating {len(feature_names)} selected features...")
         
         # Validate feature availability
         available, unavailable = self._registry.validate_feature_availability(feature_names)
@@ -125,11 +126,11 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             missing_features = [f for f in unavailable if f not in basic_columns]
             
             if missing_basic:
-                logging.info(f"Basic columns already available: {missing_basic}")
+                logger.info(f"Basic columns already available: {missing_basic}")
             
             if missing_features:
-                logging.debug(f"Features scheduled for later generation in transformation step: {missing_features}")
-                logging.info(f"Note: Some features (like 'close_og') are generated during transformation phase, not feature generation")
+                logger.debug(f"Features scheduled for later generation in transformation step: {missing_features}")
+                logger.info(f"Note: Some features (like 'close_og') are generated during transformation phase, not feature generation")
                 # Continue with available features
                 feature_names = available
         
@@ -137,18 +138,18 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         generators, missing = self._registry.get_generators_for_features(feature_names)
         
         if missing:
-            logging.warning(f"No generators found for features: {missing}")
+            logger.warning(f"No generators found for features: {missing}")
         
         if not generators:
-            logging.warning("No generators needed - returning original dataset")
+            logger.warning("No generators needed - returning original dataset")
             return self.df
         
         # Resolve dependencies and get execution order
         try:
             execution_order = self._registry.resolve_dependencies(generators)
-            logging.debug(f"Execution order: {execution_order}")
+            logger.debug(f"Execution order: {execution_order}")
         except ValueError as e:
-            logging.error(f"Dependency resolution failed: {e}")
+            logger.error(f"Dependency resolution failed: {e}")
             raise
         
         # Execute generators in order
@@ -158,7 +159,7 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             try:
                 if hasattr(self, generator_name):
                     method = getattr(self, generator_name)
-                    logging.debug(f"Executing generator: {generator_name}")
+                    logger.debug(f"Executing generator: {generator_name}")
                     method()
                     
                     # Track generated features
@@ -166,23 +167,23 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
                     if generator_def:
                         self._generated_features.update(generator_def.output_features)
                 else:
-                    logging.warning(f"Generator method '{generator_name}' not found")
+                    logger.warning(f"Generator method '{generator_name}' not found")
                     failed_generators.append(generator_name)
                     
             except Exception as e:
-                logging.error(f"Error in generator '{generator_name}': {e}")
+                logger.error(f"Error in generator '{generator_name}': {e}")
                 failed_generators.append(generator_name)
         
         # Report results
         actual_features = [f for f in feature_names if f in self.df.columns]
-        logging.info(f"Successfully generated {len(actual_features)} features")
+        logger.info(f"Successfully generated {len(actual_features)} features")
         
         if failed_generators:
-            logging.warning(f"Failed generators: {failed_generators}")
+            logger.warning(f"Failed generators: {failed_generators}")
         
         missing_expected = [f for f in feature_names if f not in self.df.columns and f not in ['open', 'high', 'low', 'close', 'volume']]
         if missing_expected:
-            logging.warning(f"Expected features not generated: {missing_expected}")
+            logger.warning(f"Expected features not generated: {missing_expected}")
         
         return self.df
     
@@ -197,7 +198,7 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
                     method = getattr(self, generator_name)
                     method()
             except Exception as e:
-                logging.error(f"Error in generator '{generator_name}': {e}")
+                logger.error(f"Error in generator '{generator_name}': {e}")
         
         return self.df
     

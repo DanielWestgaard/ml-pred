@@ -1,4 +1,3 @@
-import logging
 import pandas as pd
 import numpy as np
 import scipy
@@ -8,6 +7,9 @@ import time
 from contextlib import contextmanager
 
 from utils import data_utils
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class FeatureGenerator():
@@ -41,35 +43,35 @@ class FeatureGenerator():
                 
             # Check for sufficient data (at least 200 rows for long-term features)
             if len(self.df) < 200:
-                logging.warning(f"Dataset contains only {len(self.df)} rows. Some features requiring longer lookback periods may not be generated properly.")
+                logger.warning(f"Dataset contains only {len(self.df)} rows. Some features requiring longer lookback periods may not be generated properly.")
                 
             # Check for NaN values in required columns
             nan_counts = self.df[required_columns].isna().sum()
             if nan_counts.sum() > 0:
-                logging.warning(f"Dataset contains NaN values: {nan_counts}. Some features may be affected.")
+                logger.warning(f"Dataset contains NaN values: {nan_counts}. Some features may be affected.")
                 
         except Exception as e:
-            logging.error(f"Error initializing FeatureGenerator: {str(e)}")
+            logger.error(f"Error initializing FeatureGenerator: {str(e)}")
             raise
         
     def run(self):
         """Run feature generation on provided dataset."""
-        logging.info("---------- Running Feature Generator ----------")
+        logger.info("---------- Running Feature Generator ----------")
         generated_features = []
                 
         try:
             if self.selected_features is not None:
-                logging.debug(f"Starting to generate selected features: {self.selected_features}")
+                logger.debug(f"Starting to generate selected features: {self.selected_features}")
 
                 for feature_name, feature_value in self.selected_features.items():
                     try:
                         # print(f"{feature_name} : {feature_value}")
                         self.safely_execute(feature_name, feature_name)
                     except Exception as e:
-                        logging.error(f"Unable to execute {feature_name}, make sure the feature name matches excactly with the one implemented: {e}")
+                        logger.error(f"Unable to execute {feature_name}, make sure the feature name matches excactly with the one implemented: {e}")
             
             else:
-                logging.debug("Starting to generate all features...")
+                logger.debug("Starting to generate all features...")
                 
                 # TODO: Instead of manually calling each file, consider using shared_utils.list_of_functions_in_class()
                 
@@ -79,7 +81,7 @@ class FeatureGenerator():
                 self.safely_execute("average_true_range", "Average True Range")
                 self.safely_execute("bollinger_bands", "Bollinger Bands")
                 self.safely_execute("support_resistance", "Support and Resistance")
-                logging.debug("Finished calculating Price Action Features")
+                logger.debug("Finished calculating Price Action Features")
                 
                 # Volume-Based Features
                 self.safely_execute("volume_moving_averages", "Volume Moving Averages")
@@ -89,7 +91,7 @@ class FeatureGenerator():
                 self.safely_execute("fx_activity_profile", "Activity Profile (tick volume)")  # This is only meant for Forex pairs, but maybe selection will sort this out anyways?
                 self.safely_execute("vwap", "VWAP")
                 self.safely_execute("money_flow_index", "Money Flow Index")
-                logging.debug("Finished calculating Volume-Based Features")
+                logger.debug("Finished calculating Volume-Based Features")
                 
                 # Technical Indicators
                 self.safely_execute("relative_strength_index", "Relative Strength Index")
@@ -97,7 +99,7 @@ class FeatureGenerator():
                 self.safely_execute("average_directional_index", "Average Directional Index")
                 self.safely_execute("stochastic_oscillator", "Stochastic Oscillator")
                 self.safely_execute("commodity_channel_index", "Commodity Channel Index")
-                logging.debug("Finished calculating Technical Indicators")
+                logger.debug("Finished calculating Technical Indicators")
                 
                 # Time-based Features
                 self.safely_execute("time_of_day", "Time of Day")
@@ -111,7 +113,7 @@ class FeatureGenerator():
                 self.safely_execute("stl_decomposition", "STL Decomposition")
                 self.safely_execute("mstl_decomposition", "MSTL Decomposition")
                 self.safely_execute("holiday_features", "Holiday Features")
-                logging.debug("Finished calculating Time-based Features")
+                logger.debug("Finished calculating Time-based Features")
                 
                 # Market Regime Features
                 self.safely_execute("volatility_regimes", "Volatility Regimes")
@@ -124,13 +126,13 @@ class FeatureGenerator():
             
             try:
                 n_features, feature_list = self._generated_features()
-                logging.info(f"Generated {n_features} features.")
-                logging.debug(f"Generated features are: {feature_list}")
+                logger.info(f"Generated {n_features} features.")
+                logger.debug(f"Generated features are: {feature_list}")
             except Exception as e:
-                logging.error(f"Error calculating feature statistics: {str(e)}")
+                logger.error(f"Error calculating feature statistics: {str(e)}")
                 
         except Exception as e:
-            logging.error(f"Unexpected error during feature generation: {str(e)}")
+            logger.error(f"Unexpected error during feature generation: {str(e)}")
             
         finally:
             # Always return the DataFrame, even if some features failed to generate
@@ -143,10 +145,10 @@ class FeatureGenerator():
             method = getattr(self, method_name)
             method()
             end = time.time()
-            logging.debug(f"Feature {feature_name} took {end - start} seconds to calculate.")
+            logger.debug(f"Feature {feature_name} took {end - start} seconds to calculate.")
             return True
         except Exception as e:
-            logging.error(f"Error generating {feature_name}: {str(e)}")
+            logger.error(f"Error generating {feature_name}: {str(e)}")
             return False
     
     def _generated_features(self, basic_cols = ['date', 'open', 'high', 'low', 'close', 'volume']):
@@ -871,7 +873,7 @@ class FeatureGenerator():
             
             # Skip if we don't have enough data
             if len(close_series) < 2 * period:
-                logging.warning(f"Not enough data for seasonal decomposition (need {2*period}, have {len(close_series)})")
+                logger.warning(f"Not enough data for seasonal decomposition (need {2*period}, have {len(close_series)})")
                 return
             
             # Perform decomposition
@@ -891,7 +893,7 @@ class FeatureGenerator():
             self.df['seasonal_norm'] = self.df['seasonal_seasonal'] / self.df['close']
             
         except Exception as e:
-            logging.warning(f"Error calculating seasonal decompose: {e}")
+            logger.warning(f"Error calculating seasonal decompose: {e}")
             
     def stl_decomposition(self, period=160):
         """
@@ -904,7 +906,7 @@ class FeatureGenerator():
             
             # Skip if we don't have enough data
             if len(close_series) < 2 * period:
-                logging.warning(f"Not enough data for STL decomposition (need {2*period}, have {len(close_series)})")
+                logger.warning(f"Not enough data for STL decomposition (need {2*period}, have {len(close_series)})")
                 return
             
             # Perform STL decomposition
@@ -921,7 +923,7 @@ class FeatureGenerator():
             self.df['stl_trend_strength'] = 1 - (result.resid.var() / (result.trend + result.resid).var())
             
         except Exception as e:
-            logging.warning(f"Error calculating STL decomposition: {e}")
+            logger.warning(f"Error calculating STL decomposition: {e}")
             
     def mstl_decomposition(self, periods=[24, 160]):
         """
@@ -934,7 +936,7 @@ class FeatureGenerator():
             
             # Skip if we don't have enough data
             if len(close_series) < 2 * max(periods):
-                logging.warning(f"Not enough data for MSTL decomposition (need {2*max(periods)}, have {len(close_series)})")
+                logger.warning(f"Not enough data for MSTL decomposition (need {2*max(periods)}, have {len(close_series)})")
                 return
             
             # Perform MSTL decomposition
@@ -951,7 +953,7 @@ class FeatureGenerator():
             self.df['mstl_residual'] = result.resid
             
         except Exception as e:
-            logging.warning(f"Error calculating MSTL decomposition: {e}")
+            logger.warning(f"Error calculating MSTL decomposition: {e}")
             
     def holiday_features(self):
         """
@@ -982,9 +984,9 @@ class FeatureGenerator():
             self.df['days_to_next_holiday'] = next_holiday
             
         except ImportError:
-            logging.warning("holidays package not installed. Run 'pip install holidays'")
+            logger.warning("holidays package not installed. Run 'pip install holidays'")
         except Exception as e:
-            logging.warning(f"Error calculating holiday features: {e}")
+            logger.warning(f"Error calculating holiday features: {e}")
     
     # =============================================================================
     # Section: Market Regime Features
@@ -1160,7 +1162,7 @@ class FeatureGenerator():
         """
         # Ensure we have both volatility and trend regimes
         if 'volatility_regime' not in self.df.columns or 'trend_regime' not in self.df.columns:
-            logging.warning("Volatility or trend regimes not calculated. Run those methods first.")
+            logger.warning("Volatility or trend regimes not calculated. Run those methods first.")
             return
         
         # Combine volatility and trend regimes into a consolidated market state

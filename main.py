@@ -144,10 +144,9 @@ def main():
         provider.end_session()
     
     if args.broker_func:
-        broker = CapitalCom()
-        broker.start_session()
+        # broker = CapitalCom()
+        # broker.start_session()
         # broker.session_details(print_answer=True)
-        # broker.switch_active_account(print_answer=False)
         # broker.get_account_capital()
         # broker.list_all_accounts(print_answer=True)
         # broker.get_historical_data(epic="GBPUSD", resolution="MINUTE",
@@ -166,7 +165,7 @@ def main():
         
         # broker.sub_live_market_data(symbol="GBPUSD", timeframe="MINUTE")
         
-        broker.end_session()
+        # broker.end_session()
     
     if args.model_training:
         model_training = ModelTraining(dataset=args.model_training, model_type=args.model_type or 'xgboost')

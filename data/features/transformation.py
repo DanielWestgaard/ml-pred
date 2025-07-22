@@ -1,11 +1,12 @@
-import logging
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
+from utils.logging_utils import get_logger
 
+logger = get_logger()
 
 class FeatureTransformer(BaseProcessor):
     def __init__(self, data, model_metadata_path=None):
@@ -23,7 +24,7 @@ class FeatureTransformer(BaseProcessor):
                 metadata = yaml.safe_load(f)
             return set(metadata.get('dataset', {}).get('features', []))
         except Exception as e:
-            logging.warning(f"Could not load model features from {self.model_metadata_path}: {e}")
+            logger.warning(f"Could not load model features from {self.model_metadata_path}: {e}")
             return None
     
     def run(self, preserve_original=False, window=20):
@@ -34,7 +35,7 @@ class FeatureTransformer(BaseProcessor):
             preserve_original: If True, keep original features and add normalized ones with suffix
             window: Size of rolling window for normalization statistics
         """
-        logging.info("---------- Running Feature Transformer ----------")
+        logger.info("---------- Running Feature Transformer ----------")
         
         # Handle missing feature values
         self.handle_missing_values()
@@ -59,13 +60,13 @@ class FeatureTransformer(BaseProcessor):
         """
         # Check if the dataset has any missing feature
         if self.df.isnull().values.any():
-            logging.warning("Dataset has features containing empty values. Will drop relevant features.")
+            logger.warning("Dataset has features containing empty values. Will drop relevant features.")
 
             self._filter_features()
 
             self._handle_scattered_nans()
         else:
-            logging.debug("Dataset does not contain features with missing values.")
+            logger.debug("Dataset does not contain features with missing values.")
     
     def _filter_features(self, max_window_size:int = None, threshold:int = 0.5):
         """
@@ -75,7 +76,7 @@ class FeatureTransformer(BaseProcessor):
             - max_window_size: The feature with highest window size. Meaning minimum number of values needed to calculate.
             - threshold: Percentage of how many empty values a feature can have before being removed.
         """
-        logging.debug("Starting to filter features based on missing values...")
+        logger.debug("Starting to filter features based on missing values...")
         
         nan_percentage = self.df.isna().mean()  # Calculate the percentage of NaN values in each column
         
@@ -87,19 +88,19 @@ class FeatureTransformer(BaseProcessor):
                 if self.required_features and col in self.required_features:
                     # Use higher threshold for required features (75% instead of 50%)
                     if nan_percentage[col] > 0.75:
-                        logging.warning(f"Dropping required feature '{col}' due to excessive NaN values ({nan_percentage[col]:.2%})")
+                        logger.warning(f"Dropping required feature '{col}' due to excessive NaN values ({nan_percentage[col]:.2%})")
                         columns_to_drop.append(col)
                     else:
-                        logging.debug(f"Keeping required feature '{col}' despite {nan_percentage[col]:.2%} NaN values")
+                        logger.debug(f"Keeping required feature '{col}' despite {nan_percentage[col]:.2%} NaN values")
                 else:
                     columns_to_drop.append(col)
         
         # Drop features that exceeded thresholds
         if columns_to_drop:
             self.df = self.df.drop(columns=columns_to_drop)
-            logging.debug(f"Dropped {len(columns_to_drop)} columns that exceeded NaN threshold: {columns_to_drop}")
+            logger.debug(f"Dropped {len(columns_to_drop)} columns that exceeded NaN threshold: {columns_to_drop}")
         else:
-            logging.debug("No columns exceeded NaN threshold")
+            logger.debug("No columns exceeded NaN threshold")
         
         removed = self.original_df.columns.difference(self.df.columns)
 
@@ -108,21 +109,21 @@ class FeatureTransformer(BaseProcessor):
             high_feature_windows = ["sma_200", "sma_50", "sma_20", "sma_10", "sma_5"]  # highest possible (feature-) window must be first
             for feature in high_feature_windows:
                 if True in self.df.columns.str.contains(feature):
-                    logging.debug(f"Found {feature} first in df.")
+                    logger.debug(f"Found {feature} first in df.")
                     # This approach assumes all features have feature name in "one word"/abbreviation, followed by '_' and the window size
                     bla = feature.split('_')
                     try:
                         if len(self.df) > int(bla[1]):
                             max_window_size = int(bla[1])
-                            logging.debug(f"Successfully extracted highest window size from feature list: {max_window_size}.")
+                            logger.debug(f"Successfully extracted highest window size from feature list: {max_window_size}.")
                             break
                         else:
-                            logging.debug(f"The matched feature {feature} have a longer window, {int(bla[1])}, than the length of the df, {len(self.df)}. Continuing...")                            
+                            logger.debug(f"The matched feature {feature} have a longer window, {int(bla[1])}, than the length of the df, {len(self.df)}. Continuing...")                            
                     except Exception as e: 
-                        logging.error(f"Failed getting window size from feature name in column or converting it to int: {e}")
+                        logger.error(f"Failed getting window size from feature name in column or converting it to int: {e}")
         # Actually dropping the first max_window_size of df
         self.df = self.df.iloc[max_window_size:]
-        logging.info(f"Data Transformation - _filter_features - Successfully dropped first {max_window_size} rows. Size of df is now {len(self.df)}")
+        logger.info(f"Data Transformation - _filter_features - Successfully dropped first {max_window_size} rows. Size of df is now {len(self.df)}")
         
     def _handle_scattered_nans(self):
         """
@@ -135,7 +136,7 @@ class FeatureTransformer(BaseProcessor):
                         if self.df[col].isnull().any()}
         
         if cols_with_nans:
-            logging.info(f"Applying forward fill to {len(cols_with_nans)} columns with scattered NaNs")
+            logger.info(f"Applying forward fill to {len(cols_with_nans)} columns with scattered NaNs")
             
             # Store the number of NaNs before imputation
             total_nans_before = self.df.isnull().sum().sum()
@@ -147,17 +148,17 @@ class FeatureTransformer(BaseProcessor):
             remaining_nans = self.df.isnull().sum().sum()
             filled_nans = total_nans_before - remaining_nans
             
-            logging.info(f"Forward fill imputed {filled_nans} values")
+            logger.info(f"Forward fill imputed {filled_nans} values")
             
             # If there are still NaNs at the beginning of the series (where ffill can't work)
             if remaining_nans > 0:
-                logging.warning(f"After forward fill, {remaining_nans} NaN values remain")
-                logging.warning("These are likely at the beginning of the series - consider additional treatment")
+                logger.warning(f"After forward fill, {remaining_nans} NaN values remain")
+                logger.warning("These are likely at the beginning of the series - consider additional treatment")
                 
                 # Optional: List columns that still have NaNs
                 cols_still_with_nans = [col for col in self.df.columns if self.df[col].isnull().any()]
                 if cols_still_with_nans:
-                    logging.debug(f"Columns still containing NaNs: {cols_still_with_nans}")
+                    logger.debug(f"Columns still containing NaNs: {cols_still_with_nans}")
                     
                     # Option 1: Fill beginning NaNs with first valid value (backward fill limited to start)
                     # This is a common approach for the beginning of a time series
@@ -169,14 +170,14 @@ class FeatureTransformer(BaseProcessor):
                             # Fill NaNs before this index with the first valid value
                             self.df.loc[:first_valid_idx, col] = self.df.loc[:first_valid_idx, col].fillna(first_valid_value)
                     
-                    logging.info("Filled beginning NaNs with first valid values")
+                    logger.info("Filled beginning NaNs with first valid values")
     
     def handle_duplicates(self):
         """..."""
         # Check for duplicate columns and fix them
         duplicate_cols = self.df.columns[self.df.columns.duplicated()].tolist()
         if duplicate_cols:
-            logging.warning(f"Found duplicate columns: {duplicate_cols}")
+            logger.warning(f"Found duplicate columns: {duplicate_cols}")
             # Rename duplicates with a suffix
             for col in duplicate_cols:
                 # Get all occurrences of the duplicated column
@@ -185,7 +186,7 @@ class FeatureTransformer(BaseProcessor):
                 for i, idx in enumerate(cols[1:], 1):
                     new_name = f"{col}_{i}"
                     self.df.columns.values[idx] = new_name
-                    logging.debug(f"Renamed duplicate column '{col}' to '{new_name}'")
+                    logger.debug(f"Renamed duplicate column '{col}' to '{new_name}'")
     
     def encode_categorical_variables(self):
         """
@@ -196,10 +197,10 @@ class FeatureTransformer(BaseProcessor):
         categorical_cols = self.df.select_dtypes(include=['object', 'category']).columns.tolist()
         
         if not categorical_cols:
-            logging.debug("No categorical columns found to encode")
+            logger.debug("No categorical columns found to encode")
             return
         
-        logging.info(f"Encoding {len(categorical_cols)} categorical columns: {categorical_cols}")
+        logger.info(f"Encoding {len(categorical_cols)} categorical columns: {categorical_cols}")
         
         # Handle month_period specifically with label encoding
         if 'month_period' in categorical_cols:
@@ -212,7 +213,7 @@ class FeatureTransformer(BaseProcessor):
             
             # Apply the mapping
             self.df['month_period'] = self.df['month_period'].map(month_period_mapping)
-            logging.debug("Encoded month_period: start_of_month=0, mid_month=1, end_of_month=2")
+            logger.debug("Encoded month_period: start_of_month=0, mid_month=1, end_of_month=2")
             categorical_cols.remove('month_period')
         
         # Handle any other categorical columns (if they exist)
@@ -225,9 +226,9 @@ class FeatureTransformer(BaseProcessor):
             if len(unique_values) <= 10:  # Only for small number of categories
                 value_mapping = {val: idx for idx, val in enumerate(unique_values)}
                 self.df[col] = self.df[col].map(value_mapping)
-                logging.debug(f"Label encoded column '{col}' with mapping: {value_mapping}")
+                logger.debug(f"Label encoded column '{col}' with mapping: {value_mapping}")
             else:
-                logging.warning(f"Skipping categorical column '{col}' with too many unique values ({len(unique_values)})")
+                logger.warning(f"Skipping categorical column '{col}' with too many unique values ({len(unique_values)})")
     
     def normalize(self, preserve_original=False, window=20):
         """Perform normalization. Excludes columns that starts with 'target_ (among aother things).'"""
