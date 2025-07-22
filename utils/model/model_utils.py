@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 import pandas as pd
@@ -9,6 +8,10 @@ import yaml
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import glob
+
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 def handle_categories(df:pd.DataFrame):
@@ -29,9 +32,9 @@ def handle_categories(df:pd.DataFrame):
             try:
                 df[col] = df[col].astype('category')
                 column_object_list.append(col)
-                logging.debug(f"Successfully changed {col} dtype from object to category!")
+                logger.debug(f"Successfully changed {col} dtype from object to category!")
             except Exception as e:
-                logging.error(f"Will drop {col}: Unable to change dtype of {col} from object to categorical: {e}")
+                logger.error(f"Will drop {col}: Unable to change dtype of {col} from object to categorical: {e}")
                 df = df.drop(col, axis=1)
     
     return df
@@ -50,22 +53,22 @@ def ensure_correct_xy_format(X:pd.DataFrame, y:pd.DataFrame):
     # Check current y format
     try:
         check_raise(y, mtype='pd.Series')
-        logging.debug("✓ y is in correct format")
+        logger.debug("✓ y is in correct format")
     except Exception as e:
-        logging.ERROR(f"✗ Error with y: {e}")
+        logger.ERROR(f"✗ Error with y: {e}")
 
     # Check current X format  
     try:
         check_raise(X, mtype='pd.DataFrame')
-        logging.debug("✓ X is in correct format")
+        logger.debug("✓ X is in correct format")
     except Exception as e:
-        logging.error(f"✗ Error with X: {e}")
+        logger.error(f"✗ Error with X: {e}")
 
     # Let's also inspect your index
-    logging.debug(f"Index type: {type(y.index)}")
-    logging.debug(f"Index dtype: {y.index.dtype}")
-    logging.debug(f"Index sample: {y.index[:5]}")
-    logging.debug(f"Index frequency: {y.index.freq}")
+    logger.debug(f"Index type: {type(y.index)}")
+    logger.debug(f"Index dtype: {y.index.dtype}")
+    logger.debug(f"Index sample: {y.index[:5]}")
+    logger.debug(f"Index frequency: {y.index.freq}")
 
 
 

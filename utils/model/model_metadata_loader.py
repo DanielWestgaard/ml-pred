@@ -1,9 +1,11 @@
-import logging
 import os
 import yaml
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 ########## Code for loading contents of model_metadata.yml - metadata related to trained model ##########
 
@@ -39,7 +41,7 @@ class ModelMetadataLoader:
                     import numpy as np
                 except ImportError:
                     # If numpy is not available, return a sensible default
-                    logging.warning("numpy not available for YAML scalar construction, using default value 0")
+                    logger.warning("numpy not available for YAML scalar construction, using default value 0")
                     return 0
                     
                 try:
@@ -79,7 +81,7 @@ class ModelMetadataLoader:
                     
                 except Exception as e:
                     # If all else fails, return a sensible default
-                    logging.warning(f"Failed to construct numpy scalar, using default value 0: {e}")
+                    logger.warning(f"Failed to construct numpy scalar, using default value 0: {e}")
                     return 0
             
             # Add numpy dtype constructor to handle numpy dtype serialization issues  
@@ -88,7 +90,7 @@ class ModelMetadataLoader:
                 try:
                     import numpy as np
                 except ImportError:
-                    logging.warning("numpy not available for YAML dtype construction, using default")
+                    logger.warning("numpy not available for YAML dtype construction, using default")
                     return 'int64'
                     
                 try:
@@ -107,7 +109,7 @@ class ModelMetadataLoader:
                     return np.dtype('int64')
                     
                 except Exception as e:
-                    logging.warning(f"Failed to construct numpy dtype, using default: {e}")
+                    logger.warning(f"Failed to construct numpy dtype, using default: {e}")
                     return np.dtype('int64')
             
             # Add constructors for numpy objects
@@ -116,10 +118,10 @@ class ModelMetadataLoader:
             
             with open(self.metadata_path, 'r') as file:
                 metadata = yaml.safe_load(file)
-            logging.debug(f"Successfully loaded metadata from {self.metadata_path}")
+            logger.debug(f"Successfully loaded metadata from {self.metadata_path}")
             return metadata
         except Exception as e:
-            logging.error(f"Error loading metadata: {e}")
+            logger.error(f"Error loading metadata: {e}")
             raise
     
     # General access methods
@@ -155,7 +157,7 @@ class ModelMetadataLoader:
             try:
                 return datetime.fromisoformat(created_at)
             except ValueError:
-                logging.warning(f"Could not parse creation date: {created_at}")
+                logger.warning(f"Could not parse creation date: {created_at}")
         return None
     
     # Training info methods
@@ -283,7 +285,7 @@ def find_models_by_type(models_directory: str, model_type: str) -> List[str]:
                 if loader.get_model_type() == model_type:
                     model_dirs.append(root)
             except Exception as e:
-                logging.warning(f"Could not load metadata from {root}: {e}")
+                logger.warning(f"Could not load metadata from {root}: {e}")
     
     return model_dirs
 
@@ -317,7 +319,7 @@ def get_latest_model(models_directory: str, model_type: str = None) -> Optional[
                     latest_model = root
                     
             except Exception as e:
-                logging.warning(f"Could not load metadata from {root}: {e}")
+                logger.warning(f"Could not load metadata from {root}: {e}")
     
-    logging.debug(f"Utility function, get_latest_model(), found the latest trained model: {latest_model}")
+    logger.debug(f"Utility function, get_latest_model(), found the latest trained model: {latest_model}")
     return latest_model

@@ -1,7 +1,10 @@
-import logging
 import os
 from typing import Any, Dict, Optional, List, Union
 import yaml
+
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class HypothesisConfigError(Exception):
@@ -29,7 +32,7 @@ class LoadHypothesisConfigMetadata:
             raise FileNotFoundError(f"Config file not found: {config_path}")
             
         self.config_file = config_path
-        self.logger = logging.getLogger(__name__)
+        self.logger = logger.getLogger(__name__)
         self.config_data = self._load_config()
     
     def _load_config(self) -> Dict[str, Any]:

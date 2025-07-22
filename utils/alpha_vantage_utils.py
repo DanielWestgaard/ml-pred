@@ -1,10 +1,12 @@
 import csv
 import json
-import logging
 import os
 
 import config.config as config
 import utils.shared_utils as shared_util
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 def convert_market_data_to_csv(json_data, output_file_name:str, output_dir:str = None):
@@ -50,7 +52,7 @@ def convert_market_data_to_csv(json_data, output_file_name:str, output_dir:str =
                 break
         
         if not time_series_key:
-            logging.error("Could not find time series data in the JSON")
+            logger.error("Could not find time series data in the JSON")
             return None
         
         # Process each time entry in the Time Series data
@@ -74,5 +76,5 @@ def convert_market_data_to_csv(json_data, output_file_name:str, output_dir:str =
                 'Volume': volume
             })
     
-    logging.info(f"Data successfully converted and saved to {output}")
+    logger.info(f"Data successfully converted and saved to {output}")
     return output
