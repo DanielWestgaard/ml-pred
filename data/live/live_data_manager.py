@@ -400,7 +400,7 @@ class LiveDataManager:
                 return
                 
             try:
-                df['date'] = parse_timestamp_series(df['date'], logger.getLogger(__name__))
+                df['date'] = parse_timestamp_series(df['date'])
             except Exception as e:
                 logger.error(f"Error parsing timestamps in dataframe: {e}")
                 # Fallback to original method with error handling
@@ -681,7 +681,7 @@ class LiveDataManager:
                     
                     # Parse timestamps robustly
                     try:
-                        df['date'] = parse_timestamp_series(df['date'], logger.getLogger(__name__))
+                        df['date'] = parse_timestamp_series(df['date'])
                     except Exception as e:
                         logger.error(f"Error parsing timestamps in historical data: {e}")
                         # Fallback to pandas with error handling
