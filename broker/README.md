@@ -8,7 +8,9 @@ The broker component provides a **unified interface for trading operations** acr
 - **Live Trading Integration**: Direct integration with strategy execution system
 - **Real-time Data Streaming**: WebSocket and REST API support for live market data
 - **Order Management**: Complete order lifecycle management (placement, modification, closure)
-- **Account Management**: Account switching, capital tracking, and position monitoring
+- **Centralized Account Management**: Automatic account switching with configurable target accounts
+- **Intelligent Position Sizing**: Currency-specific size calculations (e.g., BTCUSD decimal sizing)
+- **Live Trading Safety**: Automatic position closure during system shutdown
 - **Historical Data**: Comprehensive historical data retrieval for backtesting and analysis
 
 ## Structure
@@ -51,18 +53,23 @@ from broker.capital_com.capitalcom import CapitalCom
 class OrderManager:
     def __init__(self):
         self.broker = CapitalCom()
-        self.broker.start_session()
+        self.broker.start_session()  # Auto-switches to USD_testing account
     
     def execute_order(self, signal):
-        # Execute trades based on strategy signals
+        # Execute trades with intelligent sizing (e.g., BTCUSD = 0.01 BTC minimum)
         result = self.broker.place_market_order(
             symbol=signal['symbol'],
             direction=signal['direction'],
-            size=signal['size'],
+            size=self._calculate_size(signal),  # Intelligent sizing
             stop_level=signal.get('stop_loss'),
             profit_level=signal.get('take_profit')
         )
         return result
+    
+    def cleanup(self):
+        # Safe cleanup - closes all positions in live mode
+        self.broker.close_all_orders()  # Live trading safety
+        self.broker.end_session()
 ```
 
 ### Live Data Integration
@@ -81,12 +88,11 @@ websocket_manager.connect(symbol="GBPUSD")
 ```python
 from broker.capital_com.capitalcom import CapitalCom
 
-# Initialize and start session
+# Initialize and start session (automatically switches to USD_testing account)
 broker = CapitalCom()
-broker.start_session()
+broker.start_session()  # Auto-switches to configured account
 
-# Account management
-broker.switch_active_account()
+# Account management (optional - already handled by start_session)
 capital_info = broker.get_account_capital()
 
 # Place orders with risk management
@@ -134,6 +140,14 @@ broker.sub_live_market_data(symbol="GBPUSD", timeframe="MINUTE")
 ```
 
 ## Configuration
+
+### Account Management
+```python
+# In config/config.py
+VAR_ACCOUNT_NAME_TEST = "USD_testing"  # Target account for all sessions
+```
+
+### Strategy Configuration
 Broker configuration through hypothesis config files:
 ```yml
 strategy:
@@ -141,11 +155,37 @@ strategy:
     broker: capital_com
     order_type: market
     execution_delay: 0.1
-    dry_run: false  # Set to true for simulation mode
+    dry_run: false  # false = live trading, true = simulation mode
   
   risk_management:
-    max_position_size: 0.02
-    stop_loss_pct: 0.01
+    max_position_size: 0.02  # 2% of capital per trade
+    stop_loss_pct: 0.1       # 10% stop loss
+    max_drawdown: 0.05       # 5% maximum drawdown
+```
+
+## Advanced Features 🔧
+
+### Centralized Account Management
+All broker sessions automatically switch to your configured account:
+
+```python
+# Every start_session() call automatically switches to USD_testing
+broker = CapitalCom()
+broker.start_session()  # Auto-switches to config.VAR_ACCOUNT_NAME_TEST
+
+# Override account if needed
+broker.start_session(account_name="USD_live")
+```
+
+### Intelligent Position Sizing
+- **BTCUSD**: Minimum 0.01 BTC with decimal precision (e.g., 0.0125 BTC)
+- **Forex Pairs**: Integer lot calculations (e.g., 1000 units)
+- **Risk-Based**: Sizes calculated based on USD amount and current price
+
+### Live Trading Safety
+```python
+# Automatic position closure during shutdown (live mode only)
+order_manager.cleanup()  # Closes all positions before ending session
 ```
 ## Useful links - capital.com:
 - [API documentation](https://open-api.capital.com/)
