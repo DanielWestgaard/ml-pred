@@ -1,6 +1,8 @@
-import logging
 import numpy as np
 from typing import Dict, List, Any, Optional
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class RiskManager:
     """
@@ -31,7 +33,7 @@ class RiskManager:
         self.current_drawdown = 0.0
         self.peak_equity = 0.0
         
-        logging.info(f"Risk manager initialized - Max position: {max_position_size*100}%, "
+        logger.info(f"Risk manager initialized - Max position: {max_position_size*100}%, "
                     f"Stop loss: {stop_loss_pct*100}%, Max drawdown: {max_drawdown*100}%")
     
     def calculate_position_size(self, signal_strength: float, account_balance: float,
@@ -128,9 +130,9 @@ class RiskManager:
             validation['reasons'].append(f"Total portfolio risk ({risk_pct*100:.2f}%) too high")
         
         if validation['approved']:
-            logging.info(f"Trade validated - Risk score: {risk_pct*100:.2f}%")
+            logger.info(f"Trade validated - Risk score: {risk_pct*100:.2f}%")
         else:
-            logging.warning(f"Trade rejected - Reasons: {', '.join(validation['reasons'])}")
+            logger.warning(f"Trade rejected - Reasons: {', '.join(validation['reasons'])}")
         
         return validation
     
@@ -151,7 +153,7 @@ class RiskManager:
         
         # Log significant drawdowns
         if self.current_drawdown > 0.02:  # 2% threshold
-            logging.warning(f"Current drawdown: {self.current_drawdown*100:.2f}%")
+            logger.warning(f"Current drawdown: {self.current_drawdown*100:.2f}%")
     
     def should_close_position(self, position: Dict[str, Any], current_price: float) -> Dict[str, Any]:
         """
@@ -252,7 +254,7 @@ class RiskManager:
             return validation_result['approved']
             
         except Exception as e:
-            logging.error(f"Error in can_open_position: {e}")
+            logger.error(f"Error in can_open_position: {e}")
             return False
 
     def calculate_stop_loss(self, signal: Dict[str, Any]) -> float:

@@ -1,10 +1,12 @@
-import logging
 import os
 import yaml
 
 from utils.model.model_metadata_loader import load_model_metadata
 import utils.hypothesis.config_loader as config_loader
 from strategy.strategy_factory import StrategyFactory
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class StrategyOrchestrator:
     """
@@ -58,21 +60,21 @@ class StrategyOrchestrator:
                 pass
         
         # Option 3: Default fallback
-        logging.warning("Could not determine hypothesis type, defaulting to 'session_based_tod_anomalies'")
+        logger.warning("Could not determine hypothesis type, defaulting to 'session_based_tod_anomalies'")
         return 'session_based_tod_anomalies'
     
     def run(self):
         """Run the appropriate strategy"""
-        logging.info(f"Running strategy for hypothesis type: {self.hypothesis_type}")
+        logger.info(f"Running strategy for hypothesis type: {self.hypothesis_type}")
         return self.strategy.run()
     
     def stop(self):
         """Stop the strategy gracefully"""
         if hasattr(self.strategy, 'stop') and callable(getattr(self.strategy, 'stop')):
-            logging.info("Stopping strategy...")
+            logger.info("Stopping strategy...")
             self.strategy.stop()
         elif hasattr(self.strategy, '_cleanup_resources') and callable(getattr(self.strategy, '_cleanup_resources')):
-            logging.info("Cleaning up strategy resources...")
+            logger.info("Cleaning up strategy resources...")
             self.strategy._cleanup_resources()
         else:
-            logging.warning("Strategy does not have a stop() or _cleanup_resources() method")
+            logger.warning("Strategy does not have a stop() or _cleanup_resources() method")
