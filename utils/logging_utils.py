@@ -22,7 +22,7 @@ def get_timestamp():
 def setup_logging(
     name='logging',
     type='logging_utils',
-    log_level=config.DEFAULT_LOG_LEVEL,
+    log_level=config.DEBUG_LOG_LEVEL,
     log_format=config.DEFAULT_LOG_FORMAT,
     date_format=config.DEFAULT_DATE_FORMAT,
     log_to_console=True,
@@ -99,6 +99,22 @@ def setup_logging(
     
     # Set the configured flag
     _is_configured = True
+    
+    # Suppress noisy loggers from external libraries
+    noisy_loggers = [
+        'asyncio',
+        'kaleido',
+        'choreographer',
+        'urllib3',
+        'matplotlib',
+        'plotly',
+        'selenium',
+        'browser_proc',
+        'root'  # optional: this avoids logs from libraries using root logger
+    ]
+    
+    for logger_name in noisy_loggers:
+        logging.getLogger(logger_name).setLevel(logging.ERROR)
     
     # Log startup
     logger = get_logger(type)
