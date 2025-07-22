@@ -85,7 +85,15 @@ def on_close(ws, close_status_code, close_msg):
 def get_account_id_by_name(json_data : json, account_name):
     """ Retrieves the account ID based on the account name. """
     # Parse the JSON string to a Python dictionary
-    parsed_data = json.loads(json_data)
+    try:
+        if isinstance(json_data, str):
+            parsed_data = json.loads(json_data)
+        else:
+            logging.error(f"Expected string for json_data, got {type(json_data)}: {json_data}")
+            return None, None
+    except json.JSONDecodeError as e:
+        logging.error(f"Failed to parse JSON data: {e}. Data: {json_data}")
+        return None, None
     
     # Iterate through accounts to find the matching accountName
     for account in parsed_data["accounts"]:

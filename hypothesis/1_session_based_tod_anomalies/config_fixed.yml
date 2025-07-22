@@ -36,7 +36,7 @@ strategy:
         broker: capital_com
         order_type: market
         execution_delay: 0.1
-        dry_run: true  # Keep as true for testing - no real orders
+        dry_run: false  # Keep as true for testing - no real orders
 
     monitoring:
         update_interval: 1.0  # Position update frequency in seconds

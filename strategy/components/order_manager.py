@@ -173,10 +173,19 @@ class OrderManager:
             raise Exception("No broker connection available")
         
         try:
-            # Convert size to broker format (assuming Capital.com)
-            # Note: This is a simplified conversion - actual implementation
-            # would need proper size calculation based on broker requirements
-            size_units = str(int(order_info['size_usd'] / order_info['requested_price']))
+            # Convert size to broker format for Capital.com
+            # For BTCUSD, Capital.com typically uses decimal sizes (e.g., 0.01 BTC minimum)
+            if order_info['symbol'] == 'BTCUSD':
+                # Calculate BTC units from USD amount
+                btc_units = order_info['size_usd'] / order_info['requested_price']
+                # Round to 4 decimal places and ensure minimum size of 0.01
+                btc_units = max(0.01, round(btc_units, 4))
+                size_units = str(btc_units)
+                logging.info(f"BTCUSD size calculation: ${order_info['size_usd']} / ${order_info['requested_price']} = {btc_units} BTC")
+            else:
+                # For other symbols, use the original integer calculation
+                size_units = str(max(1, int(order_info['size_usd'] / order_info['requested_price'])))
+                logging.info(f"Size calculation for {order_info['symbol']}: ${order_info['size_usd']} / ${order_info['requested_price']} = {size_units} units")
             
             # Place market order
             if order_info['stop_loss'] and order_info['take_profit']:
