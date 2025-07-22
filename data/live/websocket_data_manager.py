@@ -1,5 +1,4 @@
 import json
-import logging
 import threading
 import time
 from datetime import datetime, timedelta, timezone
@@ -10,6 +9,9 @@ import pandas as pd
 from broker.capital_com.capitalcom import CapitalCom
 import config.config as config
 from data.providers.capital_com import ProviderCapitalCom
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class WebSocketDataManager:
@@ -54,7 +56,7 @@ class WebSocketDataManager:
         self.connection_start_time = None
         self.last_data_time = None
         
-        logging.info(f"WebSocket data manager initialized for symbols: {symbols}")
+        logger.info(f"WebSocket data manager initialized for symbols: {symbols}")
     
     def add_data_callback(self, callback: Callable):
         """Add callback for new data notifications"""
@@ -73,7 +75,7 @@ class WebSocketDataManager:
         try:
             with self._connection_lock:
                 if self._is_streaming:
-                    logging.warning("WebSocket streaming already active")
+                    logger.warning("WebSocket streaming already active")
                     return True
                 
                 # 1. Initialize broker connection
@@ -91,11 +93,11 @@ class WebSocketDataManager:
                 self._is_streaming = True
                 self.connection_start_time = datetime.now()
                 
-                logging.info("WebSocket streaming started successfully")
+                logger.info("WebSocket streaming started successfully")
                 return True
                 
         except Exception as e:
-            logging.error(f"Failed to start WebSocket streaming: {e}")
+            logger.error(f"Failed to start WebSocket streaming: {e}")
             return False
     
     def stop_streaming(self):
@@ -105,23 +107,23 @@ class WebSocketDataManager:
                 if not self._is_streaming:
                     return
                 
-                logging.info("Stopping WebSocket streaming...")
+                logger.info("Stopping WebSocket streaming...")
                 
                 # Stop WebSocket connections
                 for symbol, ws in self.websockets.items():
                     try:
                         if ws and hasattr(ws, 'close'):
                             ws.close()
-                            logging.debug(f"Closed WebSocket for {symbol}")
+                            logger.debug(f"Closed WebSocket for {symbol}")
                     except Exception as e:
-                        logging.error(f"Error closing WebSocket for {symbol}: {e}")
+                        logger.error(f"Error closing WebSocket for {symbol}: {e}")
                 
                 # End broker session
                 if self.broker:
                     try:
                         self.broker.end_session()
                     except Exception as e:
-                        logging.error(f"Error ending broker session: {e}")
+                        logger.error(f"Error ending broker session: {e}")
                 
                 self._is_streaming = False
                 self._is_connected = False
@@ -130,11 +132,11 @@ class WebSocketDataManager:
                 # Log statistics
                 if self.connection_start_time:
                     uptime = datetime.now() - self.connection_start_time
-                    logging.info(f"WebSocket streaming stopped - Uptime: {uptime}, "
+                    logger.info(f"WebSocket streaming stopped - Uptime: {uptime}, "
                                f"Messages received: {self.messages_received}")
                 
         except Exception as e:
-            logging.error(f"Error stopping WebSocket streaming: {e}")
+            logger.error(f"Error stopping WebSocket streaming: {e}")
     
     def _initialize_broker(self) -> bool:
         """Initialize Capital.com broker connection"""
@@ -146,24 +148,24 @@ class WebSocketDataManager:
             body, headers, x_security_token, cst = self.broker.start_session()
             
             if not x_security_token or not cst:
-                logging.error("Failed to establish broker session - missing tokens")
+                logger.error("Failed to establish broker session - missing tokens")
                 return False
             
             # Initialize provider for historical data
             self.provider = ProviderCapitalCom()
             
             self._is_connected = True
-            logging.info("Capital.com broker connection established")
+            logger.info("Capital.com broker connection established")
             return True
             
         except Exception as e:
-            logging.error(f"Failed to initialize broker: {e}")
+            logger.error(f"Failed to initialize broker: {e}")
             return False
     
     def _jumpstart_buffers(self):
         """Preload buffers with recent historical data"""
         if not self.provider:
-            logging.warning("Provider not available for buffer jumpstart")
+            logger.warning("Provider not available for buffer jumpstart")
             return
         
         try:
@@ -177,7 +179,7 @@ class WebSocketDataManager:
             from_date = start_date.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S")
             to_date = end_date.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S")
             
-            logging.info("Jumpstarting buffers with historical data...")
+            logger.info("Jumpstarting buffers with historical data...")
             
             for symbol in self.symbols:
                 try:
@@ -196,15 +198,15 @@ class WebSocketDataManager:
                     if historical_data:
                         # Process and add to buffer
                         processed_count = self._process_historical_data(symbol, historical_data)
-                        logging.info(f"Added {processed_count} historical records to {symbol} buffer")
+                        logger.info(f"Added {processed_count} historical records to {symbol} buffer")
                     
                 except Exception as e:
-                    logging.error(f"Error jumpstarting buffer for {symbol}: {e}")
+                    logger.error(f"Error jumpstarting buffer for {symbol}: {e}")
                     # Initialize empty buffer as fallback
                     self.data_buffers[symbol] = Queue(maxsize=self.buffer_size)
         
         except Exception as e:
-            logging.error(f"Error during buffer jumpstart: {e}")
+            logger.error(f"Error during buffer jumpstart: {e}")
     
     def _process_historical_data(self, symbol: str, historical_data: Any) -> int:
         """Process historical data and add to buffer"""
@@ -240,13 +242,13 @@ class WebSocketDataManager:
                             processed_count += 1
                         
                     except (ValueError, KeyError) as e:
-                        logging.debug(f"Skipping invalid historical data point: {e}")
+                        logger.debug(f"Skipping invalid historical data point: {e}")
                         continue
             
             return processed_count
             
         except Exception as e:
-            logging.error(f"Error processing historical data for {symbol}: {e}")
+            logger.error(f"Error processing historical data for {symbol}: {e}")
             return 0
     
     def _start_websocket_subscriptions(self) -> bool:
@@ -254,18 +256,18 @@ class WebSocketDataManager:
         try:
             for symbol in self.symbols:
                 if not self._subscribe_to_symbol(symbol):
-                    logging.error(f"Failed to subscribe to {symbol}")
+                    logger.error(f"Failed to subscribe to {symbol}")
                     return False
                 
                 # Initialize buffer if not already done
                 if symbol not in self.data_buffers:
                     self.data_buffers[symbol] = Queue(maxsize=self.buffer_size)
             
-            logging.info(f"Successfully subscribed to {len(self.symbols)} symbols")
+            logger.info(f"Successfully subscribed to {len(self.symbols)} symbols")
             return True
             
         except Exception as e:
-            logging.error(f"Error starting WebSocket subscriptions: {e}")
+            logger.error(f"Error starting WebSocket subscriptions: {e}")
             return False
     
     def _subscribe_to_symbol(self, symbol: str) -> bool:
@@ -283,14 +285,14 @@ class WebSocketDataManager:
             
             if ws:
                 self.websockets[symbol] = ws
-                logging.info(f"Subscribed to WebSocket data for {symbol}")
+                logger.info(f"Subscribed to WebSocket data for {symbol}")
                 return True
             else:
-                logging.error(f"Failed to create WebSocket subscription for {symbol}")
+                logger.error(f"Failed to create WebSocket subscription for {symbol}")
                 return False
                 
         except Exception as e:
-            logging.error(f"Error subscribing to {symbol}: {e}")
+            logger.error(f"Error subscribing to {symbol}: {e}")
             return False
     
     def _create_message_handler(self, symbol: str):
@@ -326,19 +328,19 @@ class WebSocketDataManager:
                     
                     # Log periodic updates
                     if self.messages_received % 100 == 0:
-                        logging.debug(f"Received {self.messages_received} WebSocket messages")
+                        logger.debug(f"Received {self.messages_received} WebSocket messages")
                 
                 elif data.get("destination") == "ping":
                     # Handle ping responses
-                    logging.debug("Received ping response")
+                    logger.debug("Received ping response")
                 
                 else:
                     # Log other message types for debugging
-                    logging.debug(f"Received WebSocket message: {data.get('destination', 'unknown')}")
+                    logger.debug(f"Received WebSocket message: {data.get('destination', 'unknown')}")
                     
             except Exception as e:
-                logging.error(f"Error processing WebSocket message for {symbol}: {e}")
-                logging.debug(f"Problematic message: {message}")
+                logger.error(f"Error processing WebSocket message for {symbol}: {e}")
+                logger.debug(f"Problematic message: {message}")
         
         return handle_message
     
@@ -368,7 +370,7 @@ class WebSocketDataManager:
             self._notify_data_callbacks(symbol, ohlcv_data)
             
         except Exception as e:
-            logging.error(f"Error processing new data for {symbol}: {e}")
+            logger.error(f"Error processing new data for {symbol}: {e}")
     
     def _notify_data_callbacks(self, symbol: str, data: Dict[str, Any]):
         """Notify registered callbacks about new data"""
@@ -376,7 +378,7 @@ class WebSocketDataManager:
             try:
                 callback(symbol, data)
             except Exception as e:
-                logging.error(f"Error in data callback: {e}")
+                logger.error(f"Error in data callback: {e}")
     
     def get_latest_price(self, symbol: str) -> Optional[Dict[str, Any]]:
         """Get latest price data for symbol"""
@@ -396,7 +398,7 @@ class WebSocketDataManager:
             return buffer_items
             
         except Exception as e:
-            logging.error(f"Error getting buffer data for {symbol}: {e}")
+            logger.error(f"Error getting buffer data for {symbol}: {e}")
             return []
     
     def is_connected(self) -> bool:
@@ -442,5 +444,5 @@ class WebSocketDataManager:
             return df
             
         except Exception as e:
-            logging.error(f"Error converting buffer data to DataFrame for {symbol}: {e}")
+            logger.error(f"Error converting buffer data to DataFrame for {symbol}: {e}")
             return None
