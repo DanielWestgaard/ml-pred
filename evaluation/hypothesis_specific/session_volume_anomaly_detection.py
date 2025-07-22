@@ -1,4 +1,3 @@
-import logging
 import os
 from datetime import time
 import sys
@@ -7,6 +6,10 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.metrics import mean_squared_error, root_mean_squared_error, mean_absolute_error
+
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class SessionVolumeAnomalyEvaluation(BaseEvaluation):
     """
@@ -18,7 +21,7 @@ class SessionVolumeAnomalyEvaluation(BaseEvaluation):
         """
         Specialized evaluation for session-based volume anomaly prediction
         """
-        logging.info(f"----- Session-Based Volume Anomaly Evaluation -----")
+        logger.info(f"----- Session-Based Volume Anomaly Evaluation -----")
         
         
         # Make predictions
@@ -82,7 +85,7 @@ class SessionVolumeAnomalyEvaluation(BaseEvaluation):
             test_times = y_test.index.time
         else:
             # If no datetime index, create dummy session analysis
-            logging.warning("No datetime index found, skipping session-specific analysis")
+            logger.warning("No datetime index found, skipping session-specific analysis")
             test_times = None
         
         if test_times is not None:
@@ -170,26 +173,26 @@ class SessionVolumeAnomalyEvaluation(BaseEvaluation):
             'hourly_performance': hourly_performance
         }
         
-        # === Logging Results ===
-        logging.info(f"=== Basic Regression Metrics ===")
-        logging.info(f"Mean Absolute Error: {mae:.6f}")
-        logging.info(f"Root Mean Squared Error: {rmse:.6f}")
+        # === logger Results ===
+        logger.info(f"=== Basic Regression Metrics ===")
+        logger.info(f"Mean Absolute Error: {mae:.6f}")
+        logger.info(f"Root Mean Squared Error: {rmse:.6f}")
         
-        logging.info(f"=== Anomaly Detection Performance ===")
-        logging.info(f"Anomaly Precision: {precision:.2%}")
-        logging.info(f"Anomaly Recall: {recall:.2%}")
-        logging.info(f"Anomaly F1-Score: {f1_score:.3f}")
+        logger.info(f"=== Anomaly Detection Performance ===")
+        logger.info(f"Anomaly Precision: {precision:.2%}")
+        logger.info(f"Anomaly Recall: {recall:.2%}")
+        logger.info(f"Anomaly F1-Score: {f1_score:.3f}")
         
-        logging.info(f"=== Trading Signal Performance ===")
-        logging.info(f"Number of Signals Generated: {np.sum(trading_signals)}")
-        logging.info(f"Hit Rate: {hit_rate:.2%}")
-        logging.info(f"Average Return per Signal: {avg_return_per_signal:.6f}")
-        logging.info(f"Total Signal Return: {total_signal_return:.6f}")
+        logger.info(f"=== Trading Signal Performance ===")
+        logger.info(f"Number of Signals Generated: {np.sum(trading_signals)}")
+        logger.info(f"Hit Rate: {hit_rate:.2%}")
+        logger.info(f"Average Return per Signal: {avg_return_per_signal:.6f}")
+        logger.info(f"Total Signal Return: {total_signal_return:.6f}")
         
         if session_performance:
-            logging.info(f"=== Session-Specific Performance ===")
+            logger.info(f"=== Session-Specific Performance ===")
             for session, metrics in session_performance.items():
-                logging.info(f"{session}: MAE={metrics['mae']:.6f}, Samples={metrics['sample_count']}, Precision={metrics['anomaly_precision']:.2%}")
+                logger.info(f"{session}: MAE={metrics['mae']:.6f}, Samples={metrics['sample_count']}, Precision={metrics['anomaly_precision']:.2%}")
         
         # Save metrics with same error handling pattern
         if self.save_evaluations:
@@ -198,15 +201,15 @@ class SessionVolumeAnomalyEvaluation(BaseEvaluation):
                 metrics_file = os.path.join(self.evaluation_path, 'session_anomaly_metrics.json')
                 with open(metrics_file, 'w') as f:
                     json.dump(self.evaluation_metrics, f, indent=4)
-                logging.info(f"Session anomaly metrics saved to: {metrics_file}")
+                logger.info(f"Session anomaly metrics saved to: {metrics_file}")
             except Exception as e:
-                logging.error(f"Unable to save metrics under Models folder, '{self.model_directory}'. Falling back to current dir: {e}")
+                logger.error(f"Unable to save metrics under Models folder, '{self.model_directory}'. Falling back to current dir: {e}")
                 try:
                     with open("session_anomaly_metrics.json", 'w') as f:
                         json.dump(self.evaluation_metrics, f, indent=4)
-                    logging.info("Session anomaly metrics saved to: session_anomaly_metrics.json")
+                    logger.info("Session anomaly metrics saved to: session_anomaly_metrics.json")
                 except Exception as e2:
-                    logging.error(f"Failed to save metrics entirely: {e2}")
+                    logger.error(f"Failed to save metrics entirely: {e2}")
         
         return self.evaluation_metrics
     
@@ -218,20 +221,20 @@ class SessionVolumeAnomalyEvaluation(BaseEvaluation):
         This method reuses the train test data from model_training.py (done in this class' init),
         and makes model predict here before plotting.
         """
-        logging.info(f"----- Plot Regression Models Prediction-----")
+        logger.info(f"----- Plot Regression Models Prediction-----")
         
         # Make predictions
         y_pred = self.model.predict(self.X_test)
         
         try:
             test_dates = self.y_test.index
-            logging.debug(f"date in y_test was index, which is correct. Using this for plotting.")
+            logger.debug(f"date in y_test was index, which is correct. Using this for plotting.")
         except Exception as e:
             try:  # Date might not be index and just set as normal colum - weird, but try
                 test_dates = self.y_test['date']
-                logging.debug(f"date in y_test was normal date column. Should be index, but ok.")
+                logger.debug(f"date in y_test was normal date column. Should be index, but ok.")
             except Exception as e:
-                logging.error(f"Unable to find/use date in the provided dataset: {e}")
+                logger.error(f"Unable to find/use date in the provided dataset: {e}")
                 sys.exit()
         
         # df should have columns: date, open, high, low, close, volume
@@ -253,7 +256,7 @@ class SessionVolumeAnomalyEvaluation(BaseEvaluation):
             try:
                 plt.savefig(f"{self.evaluation_path}/plot.png")
             except Exception as e:
-                logging.error(f"Unable to save plot under Models folder, '{self.model_directory}'. Falling back to your current dir : {e}")
+                logger.error(f"Unable to save plot under Models folder, '{self.model_directory}'. Falling back to your current dir : {e}")
                 plt.savefig("plot.png")
         
         plt.show()

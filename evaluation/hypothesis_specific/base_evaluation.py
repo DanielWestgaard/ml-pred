@@ -1,4 +1,3 @@
-import logging
 import os
 import pickle
 import sys
@@ -6,6 +5,9 @@ from abc import ABC, abstractmethod
 from utils.model.model_metadata_loader import load_model_metadata, get_latest_model
 from model.model_training import ModelTraining
 import config.config as config
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 
 class BaseEvaluation(ABC):
@@ -18,10 +20,10 @@ class BaseEvaluation(ABC):
         """
         Initialize the base evaluator with common setup.
         """
-        logging.info(f"---------- Initializing {self.__class__.__name__} ----------")
+        logger.info(f"---------- Initializing {self.__class__.__name__} ----------")
         
         # Suppress matplotlib's debug font messages
-        logging.getLogger('matplotlib.font_manager').setLevel(logging.WARNING)
+        logger.getLogger('matplotlib.font_manager').setLevel(logger.WARNING)
         # Common model loading logic
         if model_directory is not None:
             self.model_directory = model_directory
@@ -38,7 +40,7 @@ class BaseEvaluation(ABC):
                 os.makedirs(self.evaluation_path)
                 
         except Exception as e:
-            logging.error(f"Unable to initialize {self.__class__.__name__}: {e}")
+            logger.error(f"Unable to initialize {self.__class__.__name__}: {e}")
             sys.exit()
     
     def _load_model_and_data(self):
@@ -61,7 +63,7 @@ class BaseEvaluation(ABC):
         try:
             self.hypothesis_type = loader.get_hypothesis_type()
         except AttributeError:
-            logging.warning("get_hypothesis_type() method not found in model metadata, setting to 'unknown'")
+            logger.warning("get_hypothesis_type() method not found in model metadata, setting to 'unknown'")
             self.hypothesis_type = 'unknown'
         
         # Get train/test splits
@@ -91,12 +93,12 @@ class BaseEvaluation(ABC):
                 metrics_file = os.path.join(self.evaluation_path, filename)
                 with open(metrics_file, 'w') as f:
                     json.dump(metrics, f, indent=4)
-                logging.info(f"Metrics saved to: {metrics_file}")
+                logger.info(f"Metrics saved to: {metrics_file}")
             except Exception as e:
-                logging.error(f"Unable to save metrics under Models folder. Falling back to current dir: {e}")
+                logger.error(f"Unable to save metrics under Models folder. Falling back to current dir: {e}")
                 try:
                     with open(filename, 'w') as f:
                         json.dump(metrics, f, indent=4)
-                    logging.info(f"Metrics saved to: {filename}")
+                    logger.info(f"Metrics saved to: {filename}")
                 except Exception as e2:
-                    logging.error(f"Failed to save metrics entirely: {e2}")
+                    logger.error(f"Failed to save metrics entirely: {e2}")
