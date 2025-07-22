@@ -338,11 +338,57 @@ class OrderManager:
             'dry_run_mode': self.dry_run
         }
     
-    def cleanup(self):
-        """Clean up broker connection"""
+    def cleanup(self, close_all_positions: bool = True):
+        """
+        Clean up broker connection and optionally close all positions
+        
+        Args:
+            close_all_positions: Whether to close all open positions before cleanup (only in live mode)
+        """
         if self.broker and not self.dry_run:
             try:
+                # Close all positions before ending session (safety measure for live trading)
+                if close_all_positions:
+                    logging.info("🔄 Live trading cleanup: Closing all open positions...")
+                    closed_success = self.broker.close_all_orders(print_answer=False)
+                    if closed_success:
+                        logging.info("✅ All positions successfully closed during cleanup")
+                    else:
+                        logging.warning("⚠️ Some positions may not have been closed during cleanup")
+                
+                # End broker session
                 self.broker.end_session()
                 logging.info("Broker session ended")
             except Exception as e:
-                logging.error(f"Error ending broker session: {e}")
+                logging.error(f"Error during cleanup: {e}")
+        elif not self.dry_run:
+            logging.warning("No broker connection to clean up")
+    
+    def close_all_positions(self) -> Dict[str, Any]:
+        """
+        Emergency method to close all open positions (live trading only)
+        
+        Returns:
+            Result of the close operation
+        """
+        if self.dry_run:
+            logging.info("Dry run mode - no actual positions to close")
+            return {'success': True, 'message': 'Dry run mode - simulated close all positions'}
+        
+        if not self.broker:
+            return {'success': False, 'error': 'No broker connection available'}
+        
+        try:
+            logging.info("🚨 EMERGENCY: Closing all open positions...")
+            closed_success = self.broker.close_all_orders(print_answer=True)
+            
+            if closed_success:
+                logging.info("✅ Emergency close: All positions successfully closed")
+                return {'success': True, 'message': 'All positions closed successfully'}
+            else:
+                logging.error("❌ Emergency close: Failed to close some positions")
+                return {'success': False, 'error': 'Failed to close some positions'}
+        
+        except Exception as e:
+            logging.error(f"❌ Emergency close failed: {e}")
+            return {'success': False, 'error': str(e)}

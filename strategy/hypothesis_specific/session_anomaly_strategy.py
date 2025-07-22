@@ -831,13 +831,19 @@ class SessionAnomalyStrategy(BaseStrategy):
     def _cleanup_resources(self):
         """Cleanup resources when strategy stops"""
         try:
+            # Stop data streaming first
             if self.live_data_manager:
                 self.live_data_manager.stop_streaming()
                 logging.info("Live data streaming stopped")
             
+            # Stop position monitoring
             if self.position_monitor:
                 self.position_monitor.stop_monitoring()
                 logging.info("Position monitoring stopped")
+            
+            # CRITICAL: Close all positions and cleanup broker connection (live trading safety)
+            if self.order_manager:
+                self.order_manager.cleanup(close_all_positions=True)
                 
         except Exception as e:
             logging.error(f"Error during cleanup: {e}")
