@@ -97,7 +97,11 @@ def create_new_position(X_SECURITY_TOKEN, CST,
     # looks like the response deal reference value from placing a successfull trade is not the one related to the actual position
     logging.info(print(f"Deal Reference from confirmed position: {deal_ref}"))
     
-    return deal_ref
+    # Return dictionary format expected by order_manager
+    if deal_ref:
+        return {"dealReference": deal_ref, "raw_response": data.decode("utf-8")}
+    else:
+        return None
     
 def close_position(X_SECURITY_TOKEN, CST, dealID, print_answer):
     """
