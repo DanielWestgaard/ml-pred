@@ -273,7 +273,7 @@ class GPUDetector:
                 'device': '/CPU:0'
             }
     
-    def print_gpu_info(self):
+    def log_gpu_info(self):
         """Print detailed GPU information."""
         info = self.gpu_info
         logger.info(f"\n🚀 GPU Detection Results:")
@@ -316,4 +316,4 @@ def print_gpu_status():
     if _gpu_detector is None:
         _gpu_detector = GPUDetector()
     
-    _gpu_detector.print_gpu_info()
+    _gpu_detector.log_gpu_info()
