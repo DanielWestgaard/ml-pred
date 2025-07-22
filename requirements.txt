@@ -17,3 +17,5 @@ sktime
 gitstats
 plotly
 nbformat
+torch
+tensorflow
