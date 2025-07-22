@@ -220,34 +220,34 @@ class ModelMetadataLoader:
     
     # Utility methods
     def print_summary(self):
-        """Print a formatted summary of the model."""
-        print("=" * 50)
-        print(f"Model: {self.get_model_type()}")
-        print(f"Created: {self.get_creation_date()}")
-        print(f"Target: {self.get_target_column()}")
-        print(f"Features: {self.get_feature_count()}")
+        """Log a formatted summary of the model."""
+        logger.info("=" * 50)
+        logger.info(f"Model: {self.get_model_type()}")
+        logger.info(f"Created: {self.get_creation_date()}")
+        logger.info(f"Target: {self.get_target_column()}")
+        logger.info(f"Features: {self.get_feature_count()}")
         train, test = self.get_training_samples()
-        print(f"Training samples: {train}, Test samples: {test}")
-        print(f"Training duration: {self.get_training_duration():.2f}s")
-        print(f"Hardware: {self.get_hardware_specs()}")
-        print("=" * 50)
+        logger.info(f"Training samples: {train}, Test samples: {test}")
+        logger.info(f"Training duration: {self.get_training_duration():.2f}s")
+        logger.info(f"Hardware: {self.get_hardware_specs()}")
+        logger.info("=" * 50)
     
     def compare_with(self, other_metadata_path: str):
         """Compare this model with another model's metadata."""
         other = ModelMetadataLoader(other_metadata_path)
         
-        print("Model Comparison")
-        print("=" * 60)
-        print(f"{'Metric':<20} {'Model 1':<15} {'Model 2':<15}")
-        print("-" * 60)
-        print(f"{'Model Type':<20} {self.get_model_type():<15} {other.get_model_type():<15}")
-        print(f"{'Features':<20} {self.get_feature_count():<15} {other.get_feature_count():<15}")
+        logger.info("Model Comparison")
+        logger.info("=" * 60)
+        logger.info(f"{'Metric':<20} {'Model 1':<15} {'Model 2':<15}")
+        logger.info("-" * 60)
+        logger.info(f"{'Model Type':<20} {self.get_model_type():<15} {other.get_model_type():<15}")
+        logger.info(f"{'Features':<20} {self.get_feature_count():<15} {other.get_feature_count():<15}")
         
         train1, test1 = self.get_training_samples()
         train2, test2 = other.get_training_samples()
-        print(f"{'Train Samples':<20} {train1:<15} {train2:<15}")
-        print(f"{'Test Samples':<20} {test1:<15} {test2:<15}")
-        print(f"{'Duration (s)':<20} {self.get_training_duration():<15.2f} {other.get_training_duration():<15.2f}")
+        logger.info(f"{'Train Samples':<20} {train1:<15} {train2:<15}")
+        logger.info(f"{'Test Samples':<20} {test1:<15} {test2:<15}")
+        logger.info(f"{'Duration (s)':<20} {self.get_training_duration():<15.2f} {other.get_training_duration():<15.2f}")
 
 
 # Standalone utility functions

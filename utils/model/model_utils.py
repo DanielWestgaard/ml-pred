@@ -121,7 +121,7 @@ def preprocess_features_for_xgboost(df, target_col=None, enable_categorical=Fals
             df_processed = df_processed.drop('fft_dominant_periods', axis=1)
         
         except Exception as e:
-            print(f"Error processing fft_dominant_periods: {e}")
+            logger.error(f"Error processing fft_dominant_periods: {e}")
             # Fallback: Label encode as a last resort
             le = LabelEncoder()
             df_processed['fft_dom_encoded'] = le.fit_transform(df_processed['fft_dominant_periods'])
@@ -174,12 +174,12 @@ def preprocess_features_for_xgboost(df, target_col=None, enable_categorical=Fals
             if not is_numeric:
                 non_numeric_cols.append(col)
         except Exception as e:
-            print(f"Error checking column {col}: {e}")
+            logger.error(f"Error checking column {col}: {e}")
             non_numeric_cols.append(col)
     
     # Drop non-numeric columns
     if non_numeric_cols:
-        print(f"Warning: Dropping non-numeric columns: {non_numeric_cols}")
+        logger.warning(f"Dropping non-numeric columns: {non_numeric_cols}")
         df_processed = df_processed.drop(non_numeric_cols, axis=1)
     
     return df_processed

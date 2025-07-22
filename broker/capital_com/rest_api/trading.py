@@ -30,7 +30,7 @@ def all_positions(X_SECURITY_TOKEN, CST, print_answer):
     data = res.read()
     if print_answer:
         parsed_data = json.loads(data.decode("utf-8"))
-        print(json.dumps(parsed_data, indent=4))
+        logger.debug(json.dumps(parsed_data, indent=4))
     return data.decode("utf-8")
 
 def create_new_position(X_SECURITY_TOKEN, CST, 
