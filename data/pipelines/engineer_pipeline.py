@@ -8,7 +8,7 @@ from utils import shared_utils
 import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
-from data.features.integration_adapter import EnhancedFeatureGeneratorAdapter as FeatureGenerator
+from data.features.enhanced_generation import ModelAwareFeatureGenerator
 from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
 from data.features.target_hypothesis import TargetHypothesis
@@ -74,11 +74,42 @@ class EngineeringPipeline():
         data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
         
         # Feature Generation
+        self.feature_generator = ModelAwareFeatureGenerator(self.df)
+        
         if self.selected_features is not None:
             logger.debug(f"User provided specific features to be generated: {self.selected_features}")
             self.skip_selection = True
-            self.feature_generator = FeatureGenerator(self.df, selected_features=self.selected_features)
-            self.df = self.feature_generator.run()
+            
+            # Handle different formats of selected_features
+            if isinstance(self.selected_features, dict):
+                # Old format: dict with generator method names as keys  
+                # Execute specific generators directly
+                generator_names = list(self.selected_features.keys())
+                logger.info(f"Executing specific generators: {generator_names}")
+                
+                registry = self.feature_generator._registry
+                execution_order = registry.resolve_dependencies(generator_names)
+                
+                for generator_name in execution_order:
+                    try:
+                        if hasattr(self.feature_generator, generator_name):
+                            method = getattr(self.feature_generator, generator_name)
+                            logger.debug(f"Executing generator: {generator_name}")
+                            method()
+                        else:
+                            logger.warning(f"Generator method '{generator_name}' not found")
+                    except Exception as e:
+                        logger.error(f"Error in generator '{generator_name}': {e}")
+                
+                self.df = self.feature_generator.df
+                
+            elif isinstance(self.selected_features, list):
+                # New format: list of specific feature names
+                logger.info(f"Generating specific features: {self.selected_features}")
+                self.df = self.feature_generator.generate_selected(self.selected_features)
+            else:
+                logger.warning("Unknown format for selected_features, generating all features")
+                self.df = self.feature_generator.generate_all()
             
             # Also change target to the hypothesis
             self.hypo = TargetHypothesis(self.df, self.hypothesis_name or "session_based_tod_anomalies_X")
@@ -86,8 +117,7 @@ class EngineeringPipeline():
         else:
             logger.debug("User did not provide any specific features to be generated - generating all features.")
             self.skip_selection = False
-            self.feature_generator = FeatureGenerator(self.df)
-            self.df = self.feature_generator.run()
+            self.df = self.feature_generator.generate_all()
         
         # Transformation, scaling, handle missing values, etc. of newly generated features
         self.transformation = FeatureTransformer(self.df)
