@@ -19,6 +19,7 @@ utils/
 ├── data_utils.py                   # Data processing, timestamps, features, validation
 ├── logging_utils.py                # Centralized logging configuration and utilities used by all files
 ├── shared_utils.py                 # Cross-component shared utilities
+├── gpu_utils.py                    # Automatic GPU Detection (CUDA (NVIDIA), Metal (Mac), CPU fallback)
 ├── README.md                       # Documentation
 │
 ├── hypothesis/                     # Hypothesis configuration utilities
