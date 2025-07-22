@@ -7,8 +7,6 @@ import time
 import yaml
 
 from config import config
-import logging
-import utils.logging_utils as log_utils
 from broker.capital_com.capitalcom import CapitalCom
 from data.providers.capital_com import ProviderCapitalCom
 from data.providers.alpha_vantage import ProviderAlphaVantage
@@ -21,7 +19,10 @@ from evaluation.evaluation import ModelEvaluation
 from strategy.strategy import StrategyOrchestrator
 from utils.model.model_metadata_loader import get_latest_model
 import utils.hypothesis.config_loader as config_loader
+import utils.logging_utils as log_utils
+from utils.logging_utils import get_logger
 
+logger = get_logger()
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -60,13 +61,13 @@ def parse_arguments():
 def main():
     args = parse_arguments()
     
-    log_utils._is_configured = False
-    logging = log_utils.setup_logging(name="live_orders_testing", type="strategy", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
+    # log_utils._is_configured = False
+    # logging = log_utils.setup_logging(name="live_orders_testing", type="strategy", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True
         if args.hypothesis:
-            logging.info("Trying to run data engineering with hypothesis config file.")
+            logger.info("Trying to run data engineering with hypothesis config file.")
             
             data_pipeline = EngineeringPipeline(raw_dataset=args.engineer_data or "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv", 
                                                 save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
@@ -77,7 +78,7 @@ def main():
         data_pipeline.run()
 
     if args.hypothesis:
-        logging.info(f"User using pure hypothesis flow!")
+        logger.info(f"User using pure hypothesis flow!")
         save_cleaned_data = True
         # 'Keys' for running hypothesis
         raw_data_source:str = 'raw_data_source'
@@ -116,11 +117,11 @@ def main():
             # elif eval_type in 'new' and trained_model_dir:
             #     time.sleep(1)  # Temporary, just to not get any race conditions
             #     # Evaluate the model that was just trained
-            #     logging.info(f"Evaluating freshly trained model at: {trained_model_dir}")
+            #     logger.info(f"Evaluating freshly trained model at: {trained_model_dir}")
             #     evaluation = ModelEvaluation(model_directory = trained_model_dir)
             # else:
             #     # Find the latest model of the specified type
-            #     logging.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
+            #     logger.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
             #     evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
             evaluation.run()
         
@@ -185,20 +186,20 @@ def main():
             evaluation = ModelEvaluation(model_directory=args.evaluate_old)
         elif args.evaluate_fresh and trained_model_dir:
             # Evaluate the model that was just trained
-            logging.info(f"Evaluating freshly trained model at: {trained_model_dir}")
+            logger.info(f"Evaluating freshly trained model at: {trained_model_dir}")
             evaluation = ModelEvaluation(model_directory=trained_model_dir)
         else:
             # Find the latest model of the specified type
-            logging.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
+            logger.info(f"Finding latest {args.model_type or 'xgboost'} model for evaluation...")
             evaluation = ModelEvaluation(model_type=args.model_type or 'xgboost')
         
         evaluation.run()
     
     if args.strategy:
-        logging.info(f"Starting strategy execution with config: {args.strategy}")
+        logger.info(f"Starting strategy execution with config: {args.strategy}")
         strategy = StrategyOrchestrator(hypothesis_config=args.strategy)
         strategy_results = strategy.run()
-        logging.info(f"Strategy execution completed: {strategy_results.get('status', 'unknown')}")
+        logger.info(f"Strategy execution completed: {strategy_results.get('status', 'unknown')}")
 
 
 def _strategy_flow(hypothesis_config: str):
@@ -212,14 +213,14 @@ def _strategy_flow(hypothesis_config: str):
     
     def signal_handler(sig, frame):
         """Handle Ctrl+C gracefully"""
-        logging.info("Received interrupt signal. Cleaning up strategy...")
+        logger.info("Received interrupt signal. Cleaning up strategy...")
         if strategy:
             try:
                 # Stop the strategy gracefully
                 strategy.stop()
-                logging.info("Strategy stopped gracefully")
+                logger.info("Strategy stopped gracefully")
             except Exception as e:
-                logging.error(f"Error during strategy cleanup: {e}")
+                logger.error(f"Error during strategy cleanup: {e}")
         
         # Force exit to stop any lingering threads (like ping timers)
         import os
@@ -233,19 +234,19 @@ def _strategy_flow(hypothesis_config: str):
         strategy = StrategyOrchestrator(hypothesis_config = hypothesis_config)
         strategy.run()
     except KeyboardInterrupt:
-        logging.info("Strategy execution interrupted by user")
+        logger.info("Strategy execution interrupted by user")
         if strategy:
             try:
                 strategy.stop()
             except Exception as e:
-                logging.error(f"Error during strategy cleanup: {e}")
+                logger.error(f"Error during strategy cleanup: {e}")
     except Exception as e:
-        logging.error(f"Strategy execution failed: {e}")
+        logger.error(f"Strategy execution failed: {e}")
         if strategy:
             try:
                 strategy.stop()
             except Exception as e:
-                logging.error(f"Error during strategy cleanup: {e}")
+                logger.error(f"Error during strategy cleanup: {e}")
         raise
 
 
