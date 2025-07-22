@@ -109,8 +109,8 @@ def setup_logging(
         'matplotlib',
         'plotly',
         'selenium',
-        'browser_proc',
-        'root'  # optional: this avoids logs from libraries using root logger
+        'browser_proc'
+        #'root'  # optional: this avoids logs from libraries using root logger
     ]
     
     for logger_name in noisy_loggers:
