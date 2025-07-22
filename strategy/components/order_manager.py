@@ -43,7 +43,7 @@ class OrderManager:
             if not self.dry_run:
                 try:
                     broker = CapitalCom()
-                    broker.start_session()
+                    broker.start_session()  # Now automatically switches to USD_testing
                     logging.info("Capital.com broker connection established")
                     return broker
                 except Exception as e:

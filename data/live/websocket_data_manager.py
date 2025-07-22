@@ -142,9 +142,8 @@ class WebSocketDataManager:
             # Initialize broker
             self.broker = CapitalCom()
             
-            # Start session
+            # Start session (automatically switches to USD_testing)
             body, headers, x_security_token, cst = self.broker.start_session()
-            self.broker.switch_active_account(account_name = config.VAR_ACCOUNT_NAME_TEST, print_answer=False)  # TODO: More dynamic user account selection in the config
             
             if not x_security_token or not cst:
                 logging.error("Failed to establish broker session - missing tokens")
