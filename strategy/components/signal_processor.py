@@ -1,7 +1,10 @@
-import logging
 import numpy as np
 import pandas as pd
 from typing import Dict, List, Any
+
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class SignalProcessor:
     """
@@ -21,7 +24,7 @@ class SignalProcessor:
         self.confidence_threshold = confidence_threshold
         self.signal_filters = signal_filters or []
         
-        logging.info(f"Signal processor initialized with confidence threshold: {confidence_threshold}")
+        logger.info(f"Signal processor initialized with confidence threshold: {confidence_threshold}")
     
     def process(self, predictions: np.ndarray, market_data: pd.DataFrame = None) -> Dict[str, Any]:
         """
@@ -47,8 +50,8 @@ class SignalProcessor:
         for i, prediction in enumerate(predictions):
             signal_info = self._convert_prediction_to_signal(prediction, market_data, i)
             
-            # Debug logging for confidence filtering
-            logging.debug(f"Prediction {i}: value={prediction:.4f}, confidence={signal_info['confidence']:.4f}, threshold={self.confidence_threshold}")
+            # Debug logger for confidence filtering
+            logger.debug(f"Prediction {i}: value={prediction:.4f}, confidence={signal_info['confidence']:.4f}, threshold={self.confidence_threshold}")
             
             if signal_info['confidence'] >= self.confidence_threshold:
                 signals['processed_signals'].append(signal_info)
@@ -56,12 +59,12 @@ class SignalProcessor:
                 signals['signal_direction'].append(signal_info['direction'])
                 signals['confidence_scores'].append(signal_info['confidence'])
             else:
-                logging.debug(f"Signal rejected: confidence {signal_info['confidence']:.4f} < threshold {self.confidence_threshold}")
+                logger.debug(f"Signal rejected: confidence {signal_info['confidence']:.4f} < threshold {self.confidence_threshold}")
         
         # Apply filters
         signals = self._apply_filters(signals, market_data)
         
-        logging.info(f"Generated {len(signals['processed_signals'])} signals from {len(predictions)} predictions")
+        logger.info(f"Generated {len(signals['processed_signals'])} signals from {len(predictions)} predictions")
         return signals
     
     def _convert_prediction_to_signal(self, prediction: float, market_data: pd.DataFrame, index: int) -> Dict[str, Any]:
@@ -111,7 +114,7 @@ class SignalProcessor:
                 filter_method = getattr(self, f'_apply_{filter_name}')
                 signals = filter_method(signals, market_data)
             else:
-                logging.warning(f"Unknown signal filter: {filter_name}")
+                logger.warning(f"Unknown signal filter: {filter_name}")
         
         return signals
     
@@ -131,7 +134,7 @@ class SignalProcessor:
                 signals['signal_strength'] = []
                 signals['signal_direction'] = []
                 signals['confidence_scores'] = []
-                logging.info("Signals filtered out due to extreme volatility")
+                logger.info("Signals filtered out due to extreme volatility")
         
         return signals
     
@@ -150,6 +153,6 @@ class SignalProcessor:
             signals['signal_strength'] = []
             signals['signal_direction'] = []
             signals['confidence_scores'] = []
-            logging.info("Signals filtered out due to inactive trading session")
+            logger.info("Signals filtered out due to inactive trading session")
         
         return signals

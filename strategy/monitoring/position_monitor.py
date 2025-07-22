@@ -1,9 +1,12 @@
-import logging
 import threading
 import time
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass, asdict
+
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 @dataclass
 class PositionStatus:
@@ -61,7 +64,7 @@ class PositionMonitor:
         self._position_callbacks = []
         self._risk_callbacks = []
         
-        logging.info(f"Position monitor initialized - Update interval: {update_interval}s")
+        logger.info(f"Position monitor initialized - Update interval: {update_interval}s")
     
     def add_position_callback(self, callback):
         """Add callback for position updates"""
@@ -74,7 +77,7 @@ class PositionMonitor:
     def start_monitoring(self) -> bool:
         """Start position monitoring thread"""
         if self._is_monitoring:
-            logging.warning("Position monitoring already active")
+            logger.warning("Position monitoring already active")
             return True
         
         try:
@@ -83,11 +86,11 @@ class PositionMonitor:
                 target=self._monitor_worker, daemon=True)
             self._monitor_thread.start()
             
-            logging.info("Position monitoring started")
+            logger.info("Position monitoring started")
             return True
             
         except Exception as e:
-            logging.error(f"Failed to start position monitoring: {e}")
+            logger.error(f"Failed to start position monitoring: {e}")
             self._is_monitoring = False
             return False
     
@@ -96,13 +99,13 @@ class PositionMonitor:
         if not self._is_monitoring:
             return
         
-        logging.info("Stopping position monitoring...")
+        logger.info("Stopping position monitoring...")
         self._is_monitoring = False
         
         if self._monitor_thread and self._monitor_thread.is_alive():
             self._monitor_thread.join(timeout=5)
         
-        logging.info("Position monitoring stopped")
+        logger.info("Position monitoring stopped")
     
     def add_position(self, position_id: str, symbol: str, direction: str,
                     size: float, entry_price: float, **kwargs) -> bool:
@@ -123,7 +126,7 @@ class PositionMonitor:
         try:
             with self._position_lock:
                 if position_id in self.active_positions:
-                    logging.warning(f"Position {position_id} already exists")
+                    logger.warning(f"Position {position_id} already exists")
                     return False
                 
                 position = PositionStatus(
@@ -145,7 +148,7 @@ class PositionMonitor:
                 self.active_positions[position_id] = position
                 self._update_portfolio_metrics()
                 
-                logging.info(f"Added position to monitoring: {position_id} - "
+                logger.info(f"Added position to monitoring: {position_id} - "
                            f"{direction} {size} {symbol} @ {entry_price}")
                 
                 # Notify callbacks
@@ -154,7 +157,7 @@ class PositionMonitor:
                 return True
                 
         except Exception as e:
-            logging.error(f"Error adding position {position_id}: {e}")
+            logger.error(f"Error adding position {position_id}: {e}")
             return False
     
     def update_position_price(self, position_id: str, current_price: float) -> bool:
@@ -190,7 +193,7 @@ class PositionMonitor:
                 return True
                 
         except Exception as e:
-            logging.error(f"Error updating position {position_id}: {e}")
+            logger.error(f"Error updating position {position_id}: {e}")
             return False
     
     def close_position(self, position_id: str, close_price: float, reason: str = "manual") -> bool:
@@ -198,7 +201,7 @@ class PositionMonitor:
         try:
             with self._position_lock:
                 if position_id not in self.active_positions:
-                    logging.warning(f"Position {position_id} not found for closing")
+                    logger.warning(f"Position {position_id} not found for closing")
                     return False
                 
                 position = self.active_positions[position_id]
@@ -217,7 +220,7 @@ class PositionMonitor:
                 
                 self._update_portfolio_metrics()
                 
-                logging.info(f"Closed position {position_id} - Reason: {reason}, "
+                logger.info(f"Closed position {position_id} - Reason: {reason}, "
                            f"PnL: {position.unrealized_pnl:.4f}")
                 
                 # Notify callbacks
@@ -226,7 +229,7 @@ class PositionMonitor:
                 return True
                 
         except Exception as e:
-            logging.error(f"Error closing position {position_id}: {e}")
+            logger.error(f"Error closing position {position_id}: {e}")
             return False
     
     def _monitor_worker(self):
@@ -246,7 +249,7 @@ class PositionMonitor:
                 time.sleep(self.update_interval)
                 
             except Exception as e:
-                logging.error(f"Error in position monitoring loop: {e}")
+                logger.error(f"Error in position monitoring loop: {e}")
                 time.sleep(self.update_interval)
     
     def _check_exit_conditions(self, position: PositionStatus) -> Optional[Dict[str, str]]:
@@ -269,7 +272,7 @@ class PositionMonitor:
             return None
             
         except Exception as e:
-            logging.error(f"Error checking exit conditions for {position.position_id}: {e}")
+            logger.error(f"Error checking exit conditions for {position.position_id}: {e}")
             return None
     
     def _check_risk_limits(self):
@@ -301,7 +304,7 @@ class PositionMonitor:
                 })
                 
         except Exception as e:
-            logging.error(f"Error checking risk limits: {e}")
+            logger.error(f"Error checking risk limits: {e}")
     
     def _check_position_aging(self):
         """Check for positions that have been open too long"""
@@ -313,15 +316,15 @@ class PositionMonitor:
                 age = current_time - position.entry_time
                 
                 if age > max_position_age:
-                    logging.warning(f"Position {position_id} aged out after {age}")
+                    logger.warning(f"Position {position_id} aged out after {age}")
                     self._trigger_position_close(position, 'aged_out')
                     
         except Exception as e:
-            logging.error(f"Error checking position aging: {e}")
+            logger.error(f"Error checking position aging: {e}")
     
     def _trigger_position_close(self, position: PositionStatus, reason: str):
         """Trigger position close (to be implemented by order manager)"""
-        logging.info(f"Triggering close for position {position.position_id} - Reason: {reason}")
+        logger.info(f"Triggering close for position {position.position_id} - Reason: {reason}")
         
         # Notify callbacks that position needs closing
         self._notify_position_callbacks('close_requested', position, {'reason': reason})
@@ -345,7 +348,7 @@ class PositionMonitor:
                 self.max_drawdown_today = abs(self.daily_pnl)
                 
         except Exception as e:
-            logging.error(f"Error updating portfolio metrics: {e}")
+            logger.error(f"Error updating portfolio metrics: {e}")
     
     def _notify_position_callbacks(self, event_type: str, position: PositionStatus, extra_data: Dict = None):
         """Notify position event callbacks"""
@@ -353,7 +356,7 @@ class PositionMonitor:
             try:
                 callback(event_type, asdict(position), extra_data or {})
             except Exception as e:
-                logging.error(f"Error in position callback: {e}")
+                logger.error(f"Error in position callback: {e}")
     
     def _notify_risk_callbacks(self, event_type: str, data: Dict):
         """Notify risk event callbacks"""
@@ -361,7 +364,7 @@ class PositionMonitor:
             try:
                 callback(event_type, data)
             except Exception as e:
-                logging.error(f"Error in risk callback: {e}")
+                logger.error(f"Error in risk callback: {e}")
     
     def get_portfolio_summary(self) -> Dict[str, Any]:
         """Get current portfolio summary"""

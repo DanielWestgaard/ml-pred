@@ -1,8 +1,11 @@
-import logging
 import time
 from typing import Dict, List, Any, Optional
 from datetime import datetime
+
 from broker.capital_com.capitalcom import CapitalCom
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class OrderManager:
     """
@@ -34,7 +37,7 @@ class OrderManager:
         # Initialize broker connection
         self.broker = self._initialize_broker()
         
-        logging.info(f"Order manager initialized - Broker: {broker}, "
+        logger.info(f"Order manager initialized - Broker: {broker}, "
                     f"Order type: {order_type}, Dry run: {dry_run}")
     
     def _initialize_broker(self):
@@ -44,18 +47,18 @@ class OrderManager:
                 try:
                     broker = CapitalCom()
                     broker.start_session()  # Now automatically switches to USD_testing
-                    logging.info("Capital.com broker connection established")
+                    logger.info("Capital.com broker connection established")
                     return broker
                 except Exception as e:
-                    logging.error(f"Failed to connect to Capital.com: {e}")
-                    logging.info("Falling back to dry run mode")
+                    logger.error(f"Failed to connect to Capital.com: {e}")
+                    logger.info("Falling back to dry run mode")
                     self.dry_run = True
                     return None
             else:
-                logging.info("Running in dry run mode - no actual orders will be placed")
+                logger.info("Running in dry run mode - no actual orders will be placed")
                 return None
         else:
-            logging.warning(f"Unknown broker: {self.broker_name}, using dry run mode")
+            logger.warning(f"Unknown broker: {self.broker_name}, using dry run mode")
             self.dry_run = True
             return None
     
@@ -107,12 +110,12 @@ class OrderManager:
             if result['success']:
                 order_info['status'] = 'executed'
                 self.executed_orders.append(order_info)
-                logging.info(f"Order executed: {direction} {symbol} at {result.get('execution_price', current_price)}")
+                logger.info(f"Order executed: {direction} {symbol} at {result.get('execution_price', current_price)}")
             else:
                 order_info['status'] = 'failed'
                 order_info['error_message'] = result.get('error', 'Unknown error')
                 self.failed_orders.append(order_info)
-                logging.error(f"Order failed: {order_info['error_message']}")
+                logger.error(f"Order failed: {order_info['error_message']}")
             
             # Remove from pending
             self.pending_orders.remove(order_info)
@@ -128,7 +131,7 @@ class OrderManager:
             self.failed_orders.append(order_info)
             self.pending_orders.remove(order_info)
             
-            logging.error(f"Order execution failed: {e}")
+            logger.error(f"Order execution failed: {e}")
             return order_info
     
     def _simulate_order_execution(self, order_info: Dict[str, Any]) -> Dict[str, Any]:
@@ -181,11 +184,11 @@ class OrderManager:
                 # Round to 4 decimal places and ensure minimum size of 0.01
                 btc_units = max(0.01, round(btc_units, 4))
                 size_units = str(btc_units)
-                logging.info(f"BTCUSD size calculation: ${order_info['size_usd']} / ${order_info['requested_price']} = {btc_units} BTC")
+                logger.info(f"BTCUSD size calculation: ${order_info['size_usd']} / ${order_info['requested_price']} = {btc_units} BTC")
             else:
                 # For other symbols, use the original integer calculation
                 size_units = str(max(1, int(order_info['size_usd'] / order_info['requested_price'])))
-                logging.info(f"Size calculation for {order_info['symbol']}: ${order_info['size_usd']} / ${order_info['requested_price']} = {size_units} units")
+                logger.info(f"Size calculation for {order_info['symbol']}: ${order_info['size_usd']} / ${order_info['requested_price']} = {size_units} units")
             
             # Place market order
             if order_info['stop_loss'] and order_info['take_profit']:
@@ -272,17 +275,17 @@ class OrderManager:
             
             if result['success']:
                 close_info['status'] = 'closed'
-                logging.info(f"Position closed for {symbol}")
+                logger.info(f"Position closed for {symbol}")
             else:
                 close_info['status'] = 'failed'
-                logging.error(f"Failed to close position for {symbol}: {result.get('error', 'Unknown error')}")
+                logger.error(f"Failed to close position for {symbol}: {result.get('error', 'Unknown error')}")
             
             return close_info
             
         except Exception as e:
             close_info['status'] = 'failed'
             close_info['error_message'] = str(e)
-            logging.error(f"Position close failed: {e}")
+            logger.error(f"Position close failed: {e}")
             return close_info
     
     def get_account_info(self) -> Dict[str, Any]:
@@ -316,7 +319,7 @@ class OrderManager:
                 return {'error': 'No broker connection'}
                 
         except Exception as e:
-            logging.error(f"Failed to get account info: {e}")
+            logger.error(f"Failed to get account info: {e}")
             return {'error': str(e)}
     
     def get_order_summary(self) -> Dict[str, Any]:
@@ -349,20 +352,20 @@ class OrderManager:
             try:
                 # Close all positions before ending session (safety measure for live trading)
                 if close_all_positions:
-                    logging.info("🔄 Live trading cleanup: Closing all open positions...")
+                    logger.info("🔄 Live trading cleanup: Closing all open positions...")
                     closed_success = self.broker.close_all_orders(print_answer=False)
                     if closed_success:
-                        logging.info("✅ All positions successfully closed during cleanup")
+                        logger.info("✅ All positions successfully closed during cleanup")
                     else:
-                        logging.warning("⚠️ Some positions may not have been closed during cleanup")
+                        logger.warning("⚠️ Some positions may not have been closed during cleanup")
                 
                 # End broker session
                 self.broker.end_session()
-                logging.info("Broker session ended")
+                logger.info("Broker session ended")
             except Exception as e:
-                logging.error(f"Error during cleanup: {e}")
+                logger.error(f"Error during cleanup: {e}")
         elif not self.dry_run:
-            logging.warning("No broker connection to clean up")
+            logger.warning("No broker connection to clean up")
     
     def close_all_positions(self) -> Dict[str, Any]:
         """
@@ -372,23 +375,23 @@ class OrderManager:
             Result of the close operation
         """
         if self.dry_run:
-            logging.info("Dry run mode - no actual positions to close")
+            logger.info("Dry run mode - no actual positions to close")
             return {'success': True, 'message': 'Dry run mode - simulated close all positions'}
         
         if not self.broker:
             return {'success': False, 'error': 'No broker connection available'}
         
         try:
-            logging.info("🚨 EMERGENCY: Closing all open positions...")
+            logger.info("🚨 EMERGENCY: Closing all open positions...")
             closed_success = self.broker.close_all_orders(print_answer=True)
             
             if closed_success:
-                logging.info("✅ Emergency close: All positions successfully closed")
+                logger.info("✅ Emergency close: All positions successfully closed")
                 return {'success': True, 'message': 'All positions closed successfully'}
             else:
-                logging.error("❌ Emergency close: Failed to close some positions")
+                logger.error("❌ Emergency close: Failed to close some positions")
                 return {'success': False, 'error': 'Failed to close some positions'}
         
         except Exception as e:
-            logging.error(f"❌ Emergency close failed: {e}")
+            logger.error(f"❌ Emergency close failed: {e}")
             return {'success': False, 'error': str(e)}

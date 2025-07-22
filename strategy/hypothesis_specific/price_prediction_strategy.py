@@ -1,9 +1,12 @@
-import logging
 import pandas as pd
 import numpy as np
 from datetime import datetime
 from typing import Dict, List, Any
+
 from strategy.hypothesis_specific.base_strategy import BaseStrategy
+from utils.logging_utils import get_logger
+
+logger = get_logger()
 
 class PricePredictionStrategy(BaseStrategy):
     """
@@ -18,7 +21,7 @@ class PricePredictionStrategy(BaseStrategy):
         # Price prediction specific configuration
         self.prediction_config = self._setup_prediction_config()
         
-        logging.info("Price prediction strategy initialized")
+        logger.info("Price prediction strategy initialized")
     
     def _setup_prediction_config(self) -> Dict[str, Any]:
         """Setup price prediction specific configuration"""
@@ -46,7 +49,7 @@ class PricePredictionStrategy(BaseStrategy):
                              if not col.startswith('target_') and col not in ['date', 'close_og']]
             
             if not feature_columns:
-                logging.error("No valid feature columns found in market data")
+                logger.error("No valid feature columns found in market data")
                 return {'signals': [], 'prediction_info': {}}
             
             X = market_data[feature_columns].iloc[-1:].values
@@ -61,7 +64,7 @@ class PricePredictionStrategy(BaseStrategy):
             return prediction_signals
             
         except Exception as e:
-            logging.error(f"Error generating price prediction signals: {e}")
+            logger.error(f"Error generating price prediction signals: {e}")
             return {'signals': [], 'prediction_info': {}, 'error': str(e)}
     
     def _apply_price_prediction_logic(self, signals: Dict[str, Any], 
@@ -198,7 +201,7 @@ class PricePredictionStrategy(BaseStrategy):
         )
         
         if abs(expected_movement) < self.prediction_config['min_price_movement']:
-            logging.debug("Signal filtered out: insufficient predicted price movement")
+            logger.debug("Signal filtered out: insufficient predicted price movement")
             return False
         
         # Apply volatility filter
@@ -207,7 +210,7 @@ class PricePredictionStrategy(BaseStrategy):
             if vol_analysis.get('volatility_regime') == 'high':
                 # Require higher confidence in high volatility
                 if signal['confidence'] < 0.8:
-                    logging.debug("Signal filtered out: insufficient confidence in high volatility")
+                    logger.debug("Signal filtered out: insufficient confidence in high volatility")
                     return False
         
         # Apply momentum filter
@@ -216,7 +219,7 @@ class PricePredictionStrategy(BaseStrategy):
             if not trend_analysis.get('is_trending', False):
                 # Require higher confidence in non-trending markets
                 if signal['confidence'] < 0.75:
-                    logging.debug("Signal filtered out: insufficient confidence in non-trending market")
+                    logger.debug("Signal filtered out: insufficient confidence in non-trending market")
                     return False
         
         return True
@@ -285,7 +288,7 @@ class PricePredictionStrategy(BaseStrategy):
         }
         
         try:
-            logging.info("Price prediction strategy execution started")
+            logger.info("Price prediction strategy execution started")
             
             # Placeholder execution logic
             # In a real implementation, this would:
@@ -305,12 +308,12 @@ class PricePredictionStrategy(BaseStrategy):
                 ]
             })
             
-            logging.info("Price prediction strategy execution completed")
+            logger.info("Price prediction strategy execution completed")
             
         except Exception as e:
             strategy_results['errors'].append(str(e))
             strategy_results['status'] = 'failed'
-            logging.error(f"Price prediction strategy execution failed: {e}")
+            logger.error(f"Price prediction strategy execution failed: {e}")
         
         return strategy_results
     
