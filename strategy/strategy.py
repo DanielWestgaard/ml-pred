@@ -65,3 +65,14 @@ class StrategyOrchestrator:
         """Run the appropriate strategy"""
         logging.info(f"Running strategy for hypothesis type: {self.hypothesis_type}")
         return self.strategy.run()
+    
+    def stop(self):
+        """Stop the strategy gracefully"""
+        if hasattr(self.strategy, 'stop') and callable(getattr(self.strategy, 'stop')):
+            logging.info("Stopping strategy...")
+            self.strategy.stop()
+        elif hasattr(self.strategy, '_cleanup_resources') and callable(getattr(self.strategy, '_cleanup_resources')):
+            logging.info("Cleaning up strategy resources...")
+            self.strategy._cleanup_resources()
+        else:
+            logging.warning("Strategy does not have a stop() or _cleanup_resources() method")

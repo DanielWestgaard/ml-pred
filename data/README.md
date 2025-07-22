@@ -1,44 +1,48 @@
 # About data/ 💽
-This folder will be solely responsible for engineering data that a ML model will use for training.
+This folder is responsible for all data engineering operations, supporting both **historical data processing** for model training and **real-time live data streaming** for strategy execution. The data system provides a complete pipeline from raw market data ingestion to feature-rich datasets ready for ML model training and live trading.
 
-## Focus points (not updated - TODO) 🎯
-- **Quality data**: Make sure the data is reliable.
-- **A lot of historical data**: The more data, the better.
-- **Cleaning**: Make sure data is accurate, consistent, and free from errors or irrelevant information.
-- **Feature generation**: Generate as many features as possible to help a model predict better.
-- **Feature selection**: Select the very best features with low correlation to each other and high prediction value.
-- **Normalization**: Rescaling numeric data to a standard range (eg. between 0 and 1), to ensure that features contribute equally to distance based algorithms.
-- ...
-
+## Key Capabilities 🚀
+- **Historical Data Processing**: Complete pipeline for cleaning, validating, and engineering historical market data
+- **Live Data Streaming**: Real-time market data ingestion via WebSocket and REST APIs
+- **Model-Aware Feature Generation**: Intelligent feature generation based on model requirements
+- **Quality Assurance**: Multi-layer data validation and cleaning with error handling
+- **Hypothesis-Driven Processing**: Configurable feature generation based on specific market hypotheses
+- **Real-time Feature Pipeline**: Live feature generation for strategy execution
+- **Multi-Provider Support**: Support for various data providers (Capital.com, Alpha Vantage)
 
 ## Structure 🗂️
-Will also use this for planning.
 ```
-├── providers                   # Different providers/sources to get/retrieve historical data
-│   ├── base_provider.py        # Interface for different providers. I think, currently, almost all files inherits from this - could be moved up "one level" (../)
-│   ├── capital_com.py          # Using the broker Capital.com's API to fetch historical data, very simple
-│   └── alpha_vantage.py        # Stock Market Data API, 30 days free intraday market data
+data/
+├── providers/                          # Data source providers
+│   ├── base_provider.py                # Provider interface/abstract base
+│   ├── capital_com.py                  # Capital.com API integration
+│   └── alpha_vantage.py                # Alpha Vantage API integration
 │
-├── processing/                 # Data transformation
-│   ├── cleaning.py             # Cleaning data (missing values, duplicates, alignement, etc.)
-│   └── validation.py           # Validating cleaned data
+├── processing/                         # Data transformation and validation
+│   ├── base_processor.py               # Base processor interface
+│   ├── cleaning.py                     # Data cleaning (missing values, duplicates, outliers)
+│   └── validation.py                   # Data validation and integrity checks
 │
-├── features/                   # Feature engineering
-│   ├── generation.py           # Generating features with simplistic error handling
-│   ├── normalization.py        # Rescaling numeric data to a standard range
-│   ├── target_hypothesis.py    # Methods realated to calculating and setting target to the selected hypothesis (based on 'name' var in the hypotheses config.yml-file)
-│   └── selection.py            # Various techniques (3) to select the "most efficient" features
+├── features/                           # Feature engineering system
+│   ├── generation.py                   # Core feature generation (100+ features) (old)
+│   ├── enhanced_generation.py          # ModelAwareFeatureGenerator - advanced feature system (new)
+│   ├── feature_registry.py             # Feature registration and dependency management
+│   ├── integration_adapter.py          # Feature generation integration adapter
+│   ├── transformation.py               # Feature transformation and normalization
+│   ├── selection.py                    # Feature selection (CFS, XGB, RFE)
+│   └── target_hypothesis.py            # Hypothesis-specific target generation
 │
-├── pipeline/                   # Pipeline orchestration
-│   └── engineer_pipeline.py    # Main orchestrator and pipeline for engineering historical data
+├── pipelines/                          # Data pipeline orchestration
+│   └── engineer_pipeline.py            # Main historical data processing pipeline
 │
-├── plot/                       # Functionality for plotting datasets
-│   └── plot_data.py            # Simple plotting
+├── live/                               # Real-time data management
+│   ├── live_data_manager.py            # LiveDataManager - main live data orchestrator
+│   └── websocket_data_manager.py       # WebSocket data streaming management
 │
-├── live/                       # Live data integration module
-│   └── live_data_manager.py
+├── plot/                               # Data visualization
+│   └── plot_data.py                    # Candlestick and data plotting utilities
 │
-└── README.md
+└── README.md                           # Documentation
 ```
 
 
@@ -125,33 +129,68 @@ The second class is responsible for validating the features after feature genera
 # About features/
 Code related to creating and selecting features with prediction power to help a ML model train and predict.
 
-## Feature Generation
-The feature generator generates a lot of features (100+). I have tried to implement and use a lot of the major technical indicators and features types relevant for financial time series. The easiest way to get a quick glance on the features are through ```run()``` in the ```FeatureGenerator``` class.<br>
-To handle errors, but also keep a more simplistic code, I have implemented ```safely_execute()``` that's used run/calculate all features. This way, error handling is improved (not the best) and code is still simplistic.<br>
-Furthermore, there is also implemented a helper method, `_add_features_efficiently()`, that does excactly what the name suggests. The main goal of this function is to eliminate DataFrame fragmentation, improve performance, reduce memory usage, and better code organization. Hence, when improving Generation with new features, remember this approach:
+## Feature Generation System
+
+### Core Feature Generation (`generation.py`)
+The standard feature generator that creates 100+ technical indicators and features:
+- **Technical Indicators**: Moving averages, RSI, MACD, Bollinger Bands, ADX, etc.
+- **Price Features**: Price changes, volatility measures, momentum indicators
+- **Volume Features**: Volume profiles, volume oscillators, on-balance volume
+- **Time-based Features**: Session indicators, day-of-week, market hours
+- **Market Regime Features**: Trend detection, volatility regimes, market state classification
+
+Key implementation details:
+- Uses `safely_execute()` for robust error handling during feature calculation
+- Implements `_add_features_efficiently()` to prevent DataFrame fragmentation (improving efficiency and memory usage)
+- Generates both numerical and categorical features (some models may require preprocessing)
+
+### Enhanced Model-Aware Feature Generation (`enhanced_generation.py`)
+The **ModelAwareFeatureGenerator** is an advanced feature system that:
+
+#### Key Capabilities
+- **Model-Aware**: Automatically generates features based on trained model requirements
+- **Dependency Resolution**: Handles feature dependencies automatically
+- **Feature Registry**: Centralized feature registration and management system
+- **Error Resilience**: Provides clear feedback about missing or failed features
+- **Extensible Design**: Easy to add new features with automatic registration
+
+#### How It Works
 ```python
-def some_feature(self):
-    # Calculate all features first
-    feature1 = calculation1
-    feature2 = calculation2  
-    feature3 = calculation3
-    
-    # Add all at once
-    new_features = {
-        'feature1': feature1,
-        'feature2': feature2,
-        'feature3': feature3
-    }
-    self._add_features_efficiently(new_features)
+from data.features.enhanced_generation import ModelAwareFeatureGenerator
+
+# Initialize with model metadata
+generator = ModelAwareFeatureGenerator(model_metadata_path="storage/models/2025-07-03_12:45:35/")
+
+# Generate features automatically based on model requirements
+processed_data = generator.generate_features(raw_data, missing_features_handling='skip')
+
+# Or generate specific features
+selected_features = ['sma_20', 'rsi_14', 'volatility']
+processed_data = generator.generate_features(raw_data, required_features=selected_features)
 ```
+
+#### Feature Registry System
+The feature registry provides:
+- **Automatic Registration**: Features auto-register using decorators
+- **Dependency Management**: Automatic handling of feature dependencies
+- **Feature Discovery**: Dynamic discovery of available features
+- **Metadata Support**: Rich feature metadata including descriptions and parameters
+
+```python
+# Register a new feature
+@feature_generator('my_custom_feature', dependencies=['close'])
+def calculate_my_feature(self, data: pd.DataFrame, **kwargs) -> pd.DataFrame:
+    # Feature calculation logic
+    return data.assign(my_feature=some_calculation)
+```
+
+### Integration Adapter (`integration_adapter.py`)
+Provides seamless integration between old and new feature generation systems:
+- **Backward Compatibility**: Works with existing feature generation code
+- **Bridge Pattern**: Connects legacy features with new registry system
+- **Unified Interface**: Single interface for all feature generation needs
 > [!NOTE]
-> The feature generator creates several categorical features. Some ML Models requires only numerical input, so this should be handled accordingly for the models needs.
-### Future Performance tips (TODO - Note to self):
-1. **Vectorize operations** when possible instead of loops
-2. **Avoid intermediate DataFrames** - work with Series/arrays
-3. **Group related calculations** - do all moving averages at once
-4. **Use dropna() strategically** - only when necessary
-5. **Pre-allocate arrays** for complex calculations like volume profiles
+> The old and new feature generation systems might be more unified later.
 
 ## Transformation - transformation.py
 ### Preparation of features before normalization
@@ -259,9 +298,67 @@ python main.py --plot-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250515_2
 
 
 
-# About live/live_data_manager.py 📺
-- **Streams live market data** from Capital.com WebSocket or simulation
-- **Maintains rolling buffer** of recent OHLCV data
-- **Reuses existing feature pipeline** (cleaning → validation → feature generation)
-- **Thread-safe** with proper error handling and reconnection logic
-- **Callback system** for real-time data notifications
+# Live Data Management 📺
+
+## LiveDataManager (`live/live_data_manager.py`)
+The core component for real-time data streaming and processing:
+
+### Key Features
+- **Real-time Data Streaming**: WebSocket and REST API integration for live market data
+- **Rolling Data Buffer**: Maintains configurable buffer of recent OHLCV data (default: 500 data points)
+- **Feature Pipeline Integration**: Reuses existing cleaning → validation → feature generation pipeline
+- **Thread-safe Operations**: Proper synchronization for concurrent data processing
+- **Graceful Error Handling**: Automatic reconnection and error recovery
+- **Strategy Integration**: Direct integration with trading strategies
+- **Jumpstart Capability**: Preload buffer with historical data for immediate feature generation
+
+### How It Works
+```python
+# Initialize live data manager
+live_manager = LiveDataManager(
+    symbol="GBPUSD",
+    timeframe="MINUTE", 
+    buffer_size=500,
+    feature_window=200,
+    use_websocket=True,
+    jumpstart=True
+)
+
+# Start data streaming
+live_manager.start()
+
+# Get latest processed data with features
+latest_data = live_manager.get_latest_data()
+latest_features = live_manager.get_latest_features()
+
+# Stop streaming
+live_manager.stop()
+```
+
+### Configuration Options
+- **symbol**: Trading pair (e.g., "GBPUSD", "BTCUSD")
+- **timeframe**: Data resolution ("MINUTE", "MINUTE_5", "HOUR")
+- **buffer_size**: Maximum data points to maintain in memory
+- **feature_window**: Minimum points needed for feature calculation
+- **use_websocket**: Enable WebSocket streaming (faster) vs REST polling
+- **jumpstart**: Preload buffer with historical data on startup
+- **selected_features**: Specific features to generate (None = all features)
+
+### Integration with Strategy System
+The LiveDataManager seamlessly integrates with the strategy system:
+```python
+# Inside strategy execution
+market_data = self.live_data_manager.get_latest_data()
+if market_data is not None:
+    # Generate predictions
+    prediction = self.model.predict(market_data)
+    # Process signals and execute trades
+    self.process_signals(prediction, market_data)
+```
+
+## WebSocket Data Manager (`live/websocket_data_manager.py`)
+Specialized WebSocket handler for Capital.com real-time data:
+- **Connection Management**: Automatic connection/reconnection handling  
+- **Data Parsing**: Real-time parsing of WebSocket market data
+- **Error Resilience**: Robust error handling and recovery mechanisms
+- **Integration Ready**: Direct integration with LiveDataManager

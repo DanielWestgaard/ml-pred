@@ -3,10 +3,10 @@ hypothesis:
 
 strategy:
     hypothesis_name: session_based_tod_anomalies
-    model_folder: storage/models/2025-07-03_12:45:35
+    model_folder: storage/models/2025-07-19_15:42:16
 
     data:
-        symbol: GBPUSD
+        symbol: BTCUSD
         timeframe: MINUTE
         buffer_size: 350
         feature_window: 35  # Must be >= 30 for validation
@@ -25,7 +25,7 @@ strategy:
 
     risk_management:
         max_position_size: 0.02  # 2% of capital
-        stop_loss_pct: 0.01      # 1% stop loss
+        stop_loss_pct: 0.1       # 0.05 = 5% stop loss
         max_drawdown: 0.05       # 5% max drawdown
 
     position_management:

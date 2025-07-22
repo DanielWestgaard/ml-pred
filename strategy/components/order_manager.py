@@ -43,7 +43,7 @@ class OrderManager:
             if not self.dry_run:
                 try:
                     broker = CapitalCom()
-                    broker.start_session()
+                    broker.start_session()  # Now automatically switches to USD_testing
                     logging.info("Capital.com broker connection established")
                     return broker
                 except Exception as e:
@@ -173,10 +173,19 @@ class OrderManager:
             raise Exception("No broker connection available")
         
         try:
-            # Convert size to broker format (assuming Capital.com)
-            # Note: This is a simplified conversion - actual implementation
-            # would need proper size calculation based on broker requirements
-            size_units = str(int(order_info['size_usd'] / order_info['requested_price']))
+            # Convert size to broker format for Capital.com
+            # For BTCUSD, Capital.com typically uses decimal sizes (e.g., 0.01 BTC minimum)
+            if order_info['symbol'] == 'BTCUSD':
+                # Calculate BTC units from USD amount
+                btc_units = order_info['size_usd'] / order_info['requested_price']
+                # Round to 4 decimal places and ensure minimum size of 0.01
+                btc_units = max(0.01, round(btc_units, 4))
+                size_units = str(btc_units)
+                logging.info(f"BTCUSD size calculation: ${order_info['size_usd']} / ${order_info['requested_price']} = {btc_units} BTC")
+            else:
+                # For other symbols, use the original integer calculation
+                size_units = str(max(1, int(order_info['size_usd'] / order_info['requested_price'])))
+                logging.info(f"Size calculation for {order_info['symbol']}: ${order_info['size_usd']} / ${order_info['requested_price']} = {size_units} units")
             
             # Place market order
             if order_info['stop_loss'] and order_info['take_profit']:
@@ -195,7 +204,7 @@ class OrderManager:
                 )
             
             # Parse broker response (this would depend on actual broker API response format)
-            if response and 'dealReference' in response:
+            if response and isinstance(response, dict) and 'dealReference' in response:
                 return {
                     'success': True,
                     'execution_price': order_info['requested_price'],  # Would get from response
@@ -205,9 +214,10 @@ class OrderManager:
                     'simulated': False
                 }
             else:
+                error_msg = f"Invalid broker response. Type: {type(response)}, Content: {response}"
                 return {
                     'success': False,
-                    'error': 'Invalid broker response',
+                    'error': error_msg,
                     'broker_response': response
                 }
                 
@@ -328,11 +338,57 @@ class OrderManager:
             'dry_run_mode': self.dry_run
         }
     
-    def cleanup(self):
-        """Clean up broker connection"""
+    def cleanup(self, close_all_positions: bool = True):
+        """
+        Clean up broker connection and optionally close all positions
+        
+        Args:
+            close_all_positions: Whether to close all open positions before cleanup (only in live mode)
+        """
         if self.broker and not self.dry_run:
             try:
+                # Close all positions before ending session (safety measure for live trading)
+                if close_all_positions:
+                    logging.info("🔄 Live trading cleanup: Closing all open positions...")
+                    closed_success = self.broker.close_all_orders(print_answer=False)
+                    if closed_success:
+                        logging.info("✅ All positions successfully closed during cleanup")
+                    else:
+                        logging.warning("⚠️ Some positions may not have been closed during cleanup")
+                
+                # End broker session
                 self.broker.end_session()
                 logging.info("Broker session ended")
             except Exception as e:
-                logging.error(f"Error ending broker session: {e}")
+                logging.error(f"Error during cleanup: {e}")
+        elif not self.dry_run:
+            logging.warning("No broker connection to clean up")
+    
+    def close_all_positions(self) -> Dict[str, Any]:
+        """
+        Emergency method to close all open positions (live trading only)
+        
+        Returns:
+            Result of the close operation
+        """
+        if self.dry_run:
+            logging.info("Dry run mode - no actual positions to close")
+            return {'success': True, 'message': 'Dry run mode - simulated close all positions'}
+        
+        if not self.broker:
+            return {'success': False, 'error': 'No broker connection available'}
+        
+        try:
+            logging.info("🚨 EMERGENCY: Closing all open positions...")
+            closed_success = self.broker.close_all_orders(print_answer=True)
+            
+            if closed_success:
+                logging.info("✅ Emergency close: All positions successfully closed")
+                return {'success': True, 'message': 'All positions closed successfully'}
+            else:
+                logging.error("❌ Emergency close: Failed to close some positions")
+                return {'success': False, 'error': 'Failed to close some positions'}
+        
+        except Exception as e:
+            logging.error(f"❌ Emergency close failed: {e}")
+            return {'success': False, 'error': str(e)}

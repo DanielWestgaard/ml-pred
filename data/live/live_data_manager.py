@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from collections import deque
 from typing import Dict, List, Any, Optional, Callable
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import queue
 
 from broker.capital_com.capitalcom import CapitalCom
@@ -13,6 +13,7 @@ from data.live.websocket_data_manager import WebSocketDataManager
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.transformation import FeatureTransformer
+from utils.data_utils import parse_timestamp_series
 import config.config as config
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
 
@@ -46,6 +47,12 @@ class LiveDataManager:
         self.raw_buffer = deque(maxlen=buffer_size)
         self.processed_data = None
         self.latest_features = None
+        
+        # Deduplication tracking
+        self._last_processed_buffer_timestamp = None
+        
+        # Rate limiting for repetitive log messages (avoid log spam)
+        self._last_ready_check_log = None
         
         # Threading and synchronization
         self._data_lock = threading.RLock()
@@ -94,15 +101,20 @@ class LiveDataManager:
             if not dry_run:
                 if self._use_websocket:
                     # Initialize WebSocket data streaming
-                    if not self._initialize_websocket_streaming():
-                        # Fallback to traditional broker connection
+                    websocket_initialized = self._initialize_websocket_streaming()
+                    if not websocket_initialized:
                         logging.warning("WebSocket initialization failed, falling back to traditional broker")
                         if not self._connect_broker():
                             return False
                     else:
-                        # WebSocket initialized successfully, but we still need broker connection for historical data
-                        if not self._connect_broker():
-                            logging.warning("Failed to establish broker connection for historical data, jumpstart will be disabled")
+                        # WebSocket initialized successfully,
+                        # ONLY connect broker if WebSocketDataManager didn't establish it already
+                        # or if historical data jumpstart specifically requires it
+                        if not self.websocket_manager.is_connected(): # Assuming is_connected() exists or similar check
+                            if not self._connect_broker():
+                                logging.warning("Failed to establish broker connection for historical data, jumpstart will be disabled")
+                        else:
+                            logging.info("Broker connection already established by WebSocketDataManager, skipping redundant connection.")
                 else:
                     # Use traditional broker connection
                     if not self._connect_broker():
@@ -125,14 +137,16 @@ class LiveDataManager:
             
             if dry_run:
                 # Start simulation thread for testing
+                logging.info("SIMULATION MODE: Starting simulated data generation")
                 self._stream_thread = threading.Thread(
                     target=self._simulate_data_worker, daemon=True)
                 self._stream_thread.start()
             elif self.websocket_manager and self.websocket_manager.is_connected():
                 # WebSocket handles data streaming automatically via callbacks
-                logging.info("Using WebSocket for real-time data streaming")
+                logging.info("LIVE MODE: Using WebSocket for real-time BTCUSD data from Capital.com")
             else:
                 # Start traditional data streaming thread
+                logging.info("LIVE MODE: Using traditional broker polling for real-time data")
                 self._stream_thread = threading.Thread(
                     target=self._stream_data_worker, daemon=True)
                 self._stream_thread.start()
@@ -185,13 +199,34 @@ class LiveDataManager:
         """Establish broker connection with retry logic"""
         for attempt in range(self._max_retries):
             try:
+                # Clean up any existing broker connection first to avoid session conflicts
+                if self.broker:
+                    try:
+                        self.broker.end_session()
+                    except:
+                        pass
+                    self.broker = None
+                
                 self.broker = CapitalCom()
-                self.broker.start_session()
-                self.broker.switch_active_account(account_name = config.VAR_ACCOUNT_NAME_TEST, print_answer=False)  # TODO: Should be more dynamic. Maybe provide this in the config?
+                self.broker.start_session()  # Now automatically switches to USD_testing
                 self._connection_retries = 0
                 self._last_heartbeat = datetime.now()
                 logging.info("Broker connection established")
                 return True
+                
+            except RuntimeError as e:
+                # Handle specific "Request-started" errors
+                if "Request-started" in str(e):
+                    self._connection_retries += 1
+                    logging.warning(f"Broker connection attempt {attempt + 1} failed with 'Request-started' error: {e}")
+                    if attempt < self._max_retries - 1:
+                        # Longer delay for "Request-started" errors
+                        delay = 3 + (2 ** attempt)
+                        logging.info(f"Waiting {delay} seconds before retry due to session conflict...")
+                        time.sleep(delay)
+                    continue
+                else:
+                    raise
                 
             except Exception as e:
                 self._connection_retries += 1
@@ -311,7 +346,7 @@ class LiveDataManager:
                 base_price = current_close
                 timestamp += timedelta(minutes=1)
                 
-                time.sleep(1)  # Simulate 1-minute intervals
+                time.sleep(60)  # Simulate 1-minute intervals (60 seconds)
                 
             except Exception as e:
                 logging.error(f"Error in data simulation: {e}")
@@ -344,13 +379,42 @@ class LiveDataManager:
             # Convert buffer to DataFrame
             df = pd.DataFrame(list(self.raw_buffer))
             
+            # Add timestamp-based deduplication to prevent processing same data multiple times
+            if not df.empty and 'date' in df.columns:
+                latest_timestamp = df['date'].iloc[-1]
+                
+                # Check if we've already processed this exact timestamp
+                if hasattr(self, '_last_processed_buffer_timestamp') and latest_timestamp == self._last_processed_buffer_timestamp:
+                    logging.debug(f"Buffer already processed for timestamp {latest_timestamp}, skipping duplicate processing")
+                    return
+                
+                # Mark this timestamp as processed
+                self._last_processed_buffer_timestamp = latest_timestamp
+                logging.debug(f"Processing buffer with latest timestamp: {latest_timestamp}")
+            
             # Ensure date column exists and is properly formatted
             if 'date' not in df.columns:
                 logging.error("No 'date' column found in the dataframe")
                 return
                 
-            df['date'] = pd.to_datetime(df['date'])
+            try:
+                df['date'] = parse_timestamp_series(df['date'], logging.getLogger(__name__))
+            except Exception as e:
+                logging.error(f"Error parsing timestamps in dataframe: {e}")
+                # Fallback to original method with error handling
+                try:
+                    df['date'] = pd.to_datetime(df['date'], format='mixed', errors='coerce')
+                except Exception as fallback_e:
+                    logging.error(f"Fallback timestamp parsing also failed: {fallback_e}")
+                    return
             df.set_index('date', inplace=True)
+            
+            # Filter out metadata columns that shouldn't be features
+            metadata_columns = ['symbol', 'source']
+            columns_to_drop = [col for col in metadata_columns if col in df.columns]
+            if columns_to_drop:
+                df = df.drop(columns=columns_to_drop)
+                logging.debug(f"Filtered out metadata columns: {columns_to_drop}")
             
             # Clean data using the existing pipeline pattern
             cleaner = DataCleaner(df.copy(), save_cleaned_data=False)
@@ -563,13 +627,14 @@ class LiveDataManager:
             # Calculate how many data points we need
             n_points = max(self.feature_window + 50, 200)
             
-            # Calculate time range (assuming 1-minute data)
-            end_time = datetime.now()
-            start_time = end_time - timedelta(minutes=n_points + 10)  # Add buffer
+            # Calculate time range using UTC timestamps (Capital.com API expects UTC)
+            now_utc = datetime.now(timezone.utc)
+            end_time = now_utc - timedelta(minutes=2)  # 2 minutes ago in UTC
+            start_time = end_time - timedelta(minutes=n_points + 10)  # Add buffer - TODO: Dynamic with the type of timeframe user has configured, now it only works with a minute data
             
-            # Format times for Capital.com API
-            from_date = start_time.strftime("%Y-%m-%dT%H:%M:%S")
-            to_date = end_time.strftime("%Y-%m-%dT%H:%M:%S")
+            # Format times for Capital.com API (UTC format)
+            from_date = start_time.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            to_date = end_time.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.000Z")
             
             logging.info(f"Fetching historical data from {from_date} to {to_date}")
             
@@ -602,7 +667,7 @@ class LiveDataManager:
                     df_data = []
                     for price_point in prices_data:
                         df_data.append({
-                            'date': pd.to_datetime(price_point['snapshotTimeUTC']),
+                            'date': price_point['snapshotTimeUTC'],
                             'open': price_point['openPrice']['ask'],
                             'high': price_point['highPrice']['ask'], 
                             'low': price_point['lowPrice']['ask'],
@@ -611,6 +676,18 @@ class LiveDataManager:
                         })
                     
                     df = pd.DataFrame(df_data)
+                    
+                    # Parse timestamps robustly
+                    try:
+                        df['date'] = parse_timestamp_series(df['date'], logging.getLogger(__name__))
+                    except Exception as e:
+                        logging.error(f"Error parsing timestamps in historical data: {e}")
+                        # Fallback to pandas with error handling
+                        try:
+                            df['date'] = pd.to_datetime(df['date'], format='mixed', errors='coerce')
+                        except Exception as fallback_e:
+                            logging.error(f"Fallback timestamp parsing failed: {fallback_e}")
+                            return None
                     df.set_index('date', inplace=True)
                     
                     logging.info(f"Fetched {len(df)} historical data points from broker")
@@ -629,6 +706,8 @@ class LiveDataManager:
             
         except Exception as e:
             logging.error(f"Error fetching historical data from broker: {e}")
+            # In live mode, do NOT fallback to simulation data
+            # Return None to indicate failure rather than generating fake data
             return None
     
     def _notify_callbacks(self, data: pd.DataFrame):
@@ -730,10 +809,19 @@ class LiveDataManager:
             features_ok = self.latest_features is not None
             connection_ok = self._check_connection_health()
             
-            # Debug logging to see what's failing
+            # Debug logging to see what's failing (rate limited to avoid spam)
             if not (streaming_ok and buffer_ok and features_ok and connection_ok):
-                logging.debug(f"Ready check failed - Streaming: {streaming_ok}, "
-                            f"Buffer: {buffer_ok} ({len(self.raw_buffer)}>={self.feature_window}), "
-                            f"Features: {features_ok}, Connection: {connection_ok}")
+                current_time = datetime.now()
+                should_log = True
+                
+                if self._last_ready_check_log:
+                    time_since_last = (current_time - self._last_ready_check_log).total_seconds()
+                    should_log = time_since_last >= 30  # 30 seconds
+                
+                if should_log:
+                    logging.debug(f"Ready check failed - Streaming: {streaming_ok}, "
+                                f"Buffer: {buffer_ok} ({len(self.raw_buffer)}>={self.feature_window}), "
+                                f"Features: {features_ok}, Connection: {connection_ok}")
+                    self._last_ready_check_log = current_time
             
             return streaming_ok and buffer_ok and features_ok and connection_ok

@@ -17,8 +17,7 @@ from utils.broker_utils import convert_json_to_ohlcv_csv
 import utils.data_utils as data_utils
 
 
-# Global variables
-conn = http.client.HTTPSConnection(config.CAPCOM_DEMO_URL)
+# Note: Using connection-per-request instead of global connection to avoid state conflicts
 
 def historical_prices(X_SECURITY_TOKEN, CST,
                       epic, resolution, from_date, to_date,  # format 2022-02-24T00:00:00
@@ -36,22 +35,58 @@ def historical_prices(X_SECURITY_TOKEN, CST,
     Returns:
 
     """
+    # Create a fresh connection for this request to avoid "Request-started" errors
+    conn = http.client.HTTPSConnection(config.CAPCOM_DEMO_URL)
     
-    payload = ''
-    headers = {
-        'X-SECURITY-TOKEN': X_SECURITY_TOKEN,
-        'CST': CST
-    }
-    
-    conn.request("GET", f"/api/v1/prices/{epic}?resolution={resolution}&max={max}&from={from_date}&to={to_date}", payload, headers)
-    #conn.request("GET", "/api/v1/prices/SILVER?resolution=MINUTE&max=10&from=2020-02-24T00:00:00&to=2020-02-24T01:00:00", payload, headers)
-    res = conn.getresponse()
-    data = res.read()
+    try:
+        payload = ''
+        headers = {
+            'X-SECURITY-TOKEN': X_SECURITY_TOKEN,
+            'CST': CST
+        }
+        
+        # Retry logic specifically for "Request-started" errors
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                conn.request("GET", f"/api/v1/prices/{epic}?resolution={resolution}&max={max}&from={from_date}&to={to_date}", payload, headers)
+                res = conn.getresponse()
+                data = res.read()
+                response_text = data.decode("utf-8")
+                
+                # Check for "Request-started" error
+                if "Request-started" in response_text:
+                    logging.warning(f"Capital.com 'Request-started' error in historical_prices, attempt {attempt + 1}")
+                    if attempt < max_retries - 1:
+                        time.sleep(1 + attempt)  # Exponential backoff
+                        # Create new connection for retry
+                        conn.close()
+                        conn = http.client.HTTPSConnection(config.CAPCOM_DEMO_URL)
+                        continue
+                    else:
+                        logging.error("Max retries exceeded for historical_prices 'Request-started' error")
+                        return {"error": "Request-started"}
 
-    parsed_data = json.loads(data.decode("utf-8"))
-    if print_answer:
-        print(json.dumps(parsed_data, indent=4))
-    return parsed_data
+                parsed_data = json.loads(response_text)
+                if print_answer:
+                    print(json.dumps(parsed_data, indent=4))
+                return parsed_data
+                
+            except Exception as e:
+                logging.error(f"Historical prices attempt {attempt + 1} failed: {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(1 + attempt)
+                    conn.close()
+                    conn = http.client.HTTPSConnection(config.CAPCOM_DEMO_URL)
+                else:
+                    return {"error": str(e)}
+                    
+    finally:
+        # Always close the connection when done
+        try:
+            conn.close()
+        except:
+            pass
 
 
 def calculate_optimal_chunk_size(resolution, max_points=900):

@@ -41,13 +41,24 @@ class CapitalCom(BaseBroker):
             
     # =================== SESSION METHODS ==================
     
-    def start_session(self, email=None, password=None, api_key=None, use_encryption=True, print_answer=False):
-        """Starting session with the broker."""
+    def start_session(self, email=None, password=None, api_key=None, use_encryption=True, print_answer=False, account_name=None):
+        """
+        Starting session with the broker and automatically switching to specified account.
+        
+        Args:
+            account_name: Account to switch to after session start. Defaults to config.VAR_ACCOUNT_NAME_TEST
+        """
         self.body, self.headers_dict, self.x_security_token, self.cst = session.start_session(email=email or self.email,
                                      password=password or self.enc_pass,
                                      api_key=api_key or self.api_key,
                                      use_encryption=use_encryption,
                                      print_answer=print_answer)
+        
+        # Automatically switch to the desired account after session establishment
+        target_account = account_name or config.VAR_ACCOUNT_NAME_TEST
+        self.switch_active_account(account_name=target_account, print_answer=False)
+        logging.info(f"Session started and switched to account: {target_account}")
+        
         return self.body, self.headers_dict, self.x_security_token, self.cst  # Just in case I need to use them outside
         
     def end_session(self, X_SECURITY_TOKEN=None, CST=None):

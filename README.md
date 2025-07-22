@@ -16,29 +16,28 @@ The approach of using different hypotheses to test and find possible inefficienc
     ```
 4. **Machine Learning Model Training**: Train and evaluate ML models.
 
-## Project outline (planned) 🏗️
+## Project Structure 🏗️
 ```
-├── main.py                 # Main orchestrator for running all other "systems"
-├── data/                   # Data engineering
-├── model/                  # Model training
-├── hypothesis/             # Configuration and documentation to different hypothesis'
-├── evaluation/             # Dedicated evaluation of trained models
-├── strategy/               # Interpreting model predictions into (possibly) trade executions
-├── backtesting/            # Backtest trained models
-├── live/                   # Deploy trained model on live market data
-├── storage/                # General storage for data, models, results, etc.
-├── broker/                 # Different broker integrations
-├── tests/                  # Testing (currently simple)
-├── secrets/                # Folder using secrets.txt to store sensitive vars (not stored in repo)
-├── config/                 # Configuration files
-├── utils/                  # Utility files
-├── images/                 # Storing images and sources used in documentation
-├── trash/                  # Deprecated files and code no longer needed/in use
-├── README.md               # General project description
-├── pytest.ini              # Configuration file for pytest (declaring where test dir are)
-└── secrets/                # Sensitive content (must be created individually)
-    └── secrets.txt         # Main secret file
+├── main.py                 # Main orchestrator for running complete trading pipeline
+├── data/                   # Data engineering (historical & live data streaming)
+├── model/                  # Model training and management
+├── hypothesis/             # Hypothesis configurations and documentation
+├── evaluation/             # Model evaluation and performance analysis
+├── strategy/               # Complete trading strategy execution system ✨
+├── broker/                 # Broker integrations for live trading
+├── storage/                # Data, models, results, and performance storage
+├── tests/                  # Comprehensive testing suite
+├── config/                 # System configuration files
+├── utils/                  # Shared utilities and helper functions
+├── secrets/                # Sensitive credentials (not in repo)
+├── images/                 # Documentation assets
+├── trash/                  # Deprecated code
+├── README.md               # Project overview
+└── pytest.ini             # Testing configuration
 ```
+
+> [!NOTE]
+> The system is now a **complete end-to-end trading platform** capable of running strategies in both simulation and live trading modes. The strategy/ component ties together all other components to provide a fully functional trading system.
 
 ## Setup repo 🛠️
 If this is the first time using the repo, follow these instructions:
@@ -72,13 +71,34 @@ If this is the first time using the repo, follow these instructions:
 ```main.py``` is the main orchestrator of this whole project. If you want to run entire componentes, or test out smaller stuff, this is where you do it from.<br>
 Make sure you've activated your venv, before running ```python main.py```.<br>
 All other components will have an argument you can run ```main``` with. Eg. ```python main.py --fetch-data-capcom```.
-### Current functionality
+### Current Functionality ⚡
 > [!NOTE] 
-> For a more thorough explanation of the different components, see the README's under its respective folder.
-- **Test broker functionality**: ...
-- **Fetch historical market data using Capital.com**: ...
-- **Run Data Processing and Engineering Pipeline**: ...
-- **Run Data Pipeline with a Hypothesis**: ```python main.py --engineer-data --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"```
+> For a more thorough explanation of each component, see the README files in their respective folders.
+
+**Complete Trading System:**
+The provided path to hypothesis file is just an example.
+- **Strategy Execution**: Full live trading and simulation capabilities
+  ```bash
+  python main.py -strat "hypothesis/1_session_based_tod_anomalies/config.yml"
+  ```
+  or 
+  ```bash
+  python main.py -hyp 'hypothesis/1_session_based_tod_anomalies/config_fixed.yml'
+  ```
+
+**Data & Model Pipeline:**
+- **Hypothesis-Driven Data Pipeline**: Process data with specific market hypotheses
+  ```bash
+  python main.py -hyp "hypothesis/1_session_based_tod_anomalies/config.yml"
+  ```
+- **Historical Data Fetching**: Capital.com integration for market data
+- **Live Data Streaming**: Real-time market data via WebSocket and REST APIs
+- **Model Training & Evaluation**: Complete ML model lifecycle management
+
+**Integration & Testing:**
+- **Broker Integration**: Capital.com API integration with order management
+- **Risk Management**: Multi-layer risk controls and position management
+- **Performance Tracking**: Strategy results and trade performance monitoring
 
 ## Nice to know 💡
 Trying to follow best practice for python, I have...

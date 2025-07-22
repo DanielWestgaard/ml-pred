@@ -9,7 +9,9 @@ class StrategyFactory:
     STRATEGIES = {
         'session_based_tod_anomalies': SessionAnomalyStrategy,
         'price_prediction': PricePredictionStrategy,
-        # Add more hypothesis strategy types as you develop them
+        # Add more hypothesis strategy types here as you develop them
+        # Format: 'hypothesis_name_from_config': HypothesisStrategyClass,
+        # Example: 'momentum_breakout': MomentumBreakoutStrategy,
     }
     
     @classmethod

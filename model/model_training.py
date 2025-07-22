@@ -42,20 +42,32 @@ class ModelTraining():
                 # Loading in all configurations in the provided config.yml
                 configurations = config_loader.load_hypothesis_config(hypothesis_source).handle_hypothesis_source()
                 
-                self.model_type = configurations.get("model_type")
+                self.model_type = configurations.get("model_training_type") or configurations.get("model_type")
                 
                 try:
                     dataset = configurations.get("processed_data")
                     
                     if dataset is None:
-                        raw_dataset = configurations.get("raw_data_source")                        
+                        raw_dataset = configurations.get("data_pipeline_raw_source")                        
+                        
+                        if raw_dataset is None:
+                            raw_dataset = configurations.get("raw_data_source")
 
-                        dataset = self._get_processed_path(raw_dataset)
+                        if raw_dataset is not None:
+                            dataset = self._get_processed_path(raw_dataset)
+                        else:
+                            raise ValueError("No raw data source found")
                 except:  # Failed means user either forgot to provide datapath, og have ran data pipeline first, meaning we must find that one
                     try:
-                        raw_dataset = configurations.get("raw_data_source")
+                        raw_dataset = configurations.get("data_pipeline_raw_source")
                         
-                        dataset = self._get_processed_path(raw_dataset)
+                        if raw_dataset is None:
+                            raw_dataset = configurations.get("raw_data_source")
+                            
+                        if raw_dataset is not None:
+                            dataset = self._get_processed_path(raw_dataset)
+                        else:
+                            raise ValueError("No raw data source found")
                     except Exception as e:
                         logging.error(f"Was unable to find neither processed datapath nor raw datapath. Make sure you provide at least one of them: {e}")
                         logging.debug(f"Congigurations found in provided config.yml path: {configurations}")
@@ -384,6 +396,6 @@ def _hypothesis(self):
     """Simple method to check if this model is trained on a hypothesis or not, and returns json ready answer."""
     # If model is trained on hypothesis source: return json of the hypothesis_name
     if self.hypothesis_source is not None:
-        return f"{config_loader.load_model_metadata(self.hypothesis_source).handle_hypothesis_source().get('hypothesis_name')}"
+        return f"{config_loader.load_hypothesis_config(self.hypothesis_source).handle_hypothesis_source().get('hypothesis_name')}"
     else:  # If not, return none
         return f'{None}'

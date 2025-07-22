@@ -1,0 +1,134 @@
+hypothesis:
+  name: session_based_tod_anomalies
+model_info:
+  model_type: xgboost
+  model_class: XGBRegressor
+  storage_path: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-19_15:42:16
+  created_at: '2025-07-19T15:42:16.318927'
+
+training:
+  duration_seconds: 1.78
+  duration_formatted: 0:00:01
+  completed_at: '2025-07-19T15:42:16.318939'
+  train_samples: 89904
+  test_samples: 22477
+
+dataset:
+  dataset_path: storage/data/capital_com/processed/processed_BTCUSD_m_20250501_20250718.csv
+  target_column: target_session_vol_anomaly
+  feature_count: 54
+  features:
+  - open
+  - high
+  - low
+  - close
+  - volume
+  - hour_sin
+  - hour_cos
+  - hour_of_week_sin
+  - hour_of_week_cos
+  - is_weekend
+  - month_progress_sin
+  - month_progress_cos
+  - month_period
+  - month_of_year_sin
+  - month_of_year_cos
+  - day_of_week_sin
+  - day_of_week_cos
+  - is_monday
+  - is_friday
+  - is_midweek
+  - friday_afternoon
+  - sunday_evening
+  - atr
+  - returns
+  - volatility_short
+  - volatility_long
+  - volatility_ratio
+  - volatility_regime
+  - volatility_zscore
+  - volatility_change
+  - vol_regime_high
+  - vol_regime_low
+  - vol_regime_medium
+  - activity
+  - asian_session
+  - london_session
+  - ny_session
+  - asian_london_overlap
+  - london_ny_overlap
+  - primary_session
+  - session_intensity
+  - minutes_since_session_start
+  - session_progress
+  - session_progress_sin
+  - session_progress_cos
+  - minutes_to_next_session
+  - session_transition
+  - pre_london
+  - pre_ny
+  - london_close
+  - session_atr_mean
+  - session_atr_std
+  - future_atr
+  - close_og
+  total_samples: 112381
+  date_range:
+    start: '2025-05-01 00:00:00+00:00'
+    end: '2025-07-18 01:00:00+00:00'
+  missing_values: 0
+
+model_parameters:
+  objective: reg:squarederror
+  base_score: null
+  booster: null
+  callbacks: null
+  colsample_bylevel: null
+  colsample_bynode: null
+  colsample_bytree: 0.8
+  device: null
+  early_stopping_rounds: null
+  enable_categorical: true
+  eval_metric: null
+  feature_types: null
+  feature_weights: null
+  gamma: null
+  grow_policy: null
+  importance_type: null
+  interaction_constraints: null
+  learning_rate: 0.001
+  max_bin: null
+  max_cat_threshold: null
+  max_cat_to_onehot: null
+  max_delta_step: null
+  max_depth: 12
+  max_leaves: null
+  min_child_weight: null
+  missing: .nan
+  monotone_constraints: null
+  multi_strategy: null
+  n_estimators: 100
+  n_jobs: null
+  num_parallel_tree: null
+  random_state: 42
+  reg_alpha: 0.1
+  reg_lambda: 1.0
+  sampling_method: null
+  scale_pos_weight: null
+  subsample: 0.8
+  tree_method: null
+  validate_parameters: null
+  verbosity: null
+
+system_info:
+  cpu: arm
+  cpu_cores: 10
+  cpu_threads: 10
+  memory_gb: 16.0
+  python_version: 3.11.13
+  os: Darwin 24.5.0
+
+data_split:
+  train_size: 89904
+  test_size: 22477
+  split_ratio: 89904/22477

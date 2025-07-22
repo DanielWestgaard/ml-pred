@@ -2,7 +2,7 @@ import json
 import logging
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Any, Optional, Callable
 from queue import Queue, Empty
 import pandas as pd
@@ -142,9 +142,8 @@ class WebSocketDataManager:
             # Initialize broker
             self.broker = CapitalCom()
             
-            # Start session
+            # Start session (automatically switches to USD_testing)
             body, headers, x_security_token, cst = self.broker.start_session()
-            self.broker.switch_active_account(account_name = config.VAR_ACCOUNT_NAME_TEST, print_answer=False)  # TODO: More dynamic user account selection in the config
             
             if not x_security_token or not cst:
                 logging.error("Failed to establish broker session - missing tokens")
@@ -168,12 +167,15 @@ class WebSocketDataManager:
             return
         
         try:
-            # Calculate date range for historical data (last 2 hours)
-            end_date = datetime.now()
-            start_date = end_date - timedelta(hours=2)
+            # Calculate date range for historical data using UTC timestamps
+            # Capital.com API expects UTC, not local time
+            now_utc = datetime.now(timezone.utc)
+            end_date = now_utc - timedelta(minutes=5)   # 5 minutes ago in UTC
+            start_date = end_date - timedelta(hours=6)  # 6 hours of data - TODO: Dynamic with the type of timeframe user has configured, now it only works with a minute data
             
-            from_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
-            to_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
+            # Format as UTC timestamps (remove timezone info for string formatting)
+            from_date = start_date.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S")
+            to_date = end_date.replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S")
             
             logging.info("Jumpstarting buffers with historical data...")
             

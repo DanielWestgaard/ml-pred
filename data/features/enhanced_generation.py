@@ -128,7 +128,8 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
                 logging.info(f"Basic columns already available: {missing_basic}")
             
             if missing_features:
-                logging.warning(f"Cannot generate features: {missing_features}")
+                logging.debug(f"Features scheduled for later generation in transformation step: {missing_features}")
+                logging.info(f"Note: Some features (like 'close_og') are generated during transformation phase, not feature generation")
                 # Continue with available features
                 feature_names = available
         

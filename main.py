@@ -1,11 +1,13 @@
 # When things are getting more complete, this file needs to be cleaned up as it will be the main file for running all other "systems".
 import argparse
 import json
+import signal
 import sys
 import time
 import yaml
 
 from config import config
+import logging
 import utils.logging_utils as log_utils
 from broker.capital_com.capitalcom import CapitalCom
 from data.providers.capital_com import ProviderCapitalCom
@@ -59,7 +61,7 @@ def main():
     args = parse_arguments()
     
     log_utils._is_configured = False
-    logging = log_utils.setup_logging(name="manual_testing", type="strategy", log_to_file=True, log_level=config.DEBUG_LOG_LEVEL)
+    logging = log_utils.setup_logging(name="live_orders_testing", type="strategy", log_to_file=True, log_level=config.DEBUG_LOG_LEVEL)
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True
@@ -136,8 +138,8 @@ def main():
     
     if args.fetch_data_capcom:
         provider = ProviderCapitalCom()
-        provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE",
-                                                  from_date="2018-01-01T00:00:00", to_date="2023-05-23T01:00:00",
+        provider.fetch_and_save_historical_data(symbol="BTCUSD", timeframe="MINUTE",
+                                                  from_date="2025-05-01T00:00:00", to_date="2025-07-18T01:00:00",
                                                   print_answer=False)
         provider.end_session()
     
@@ -202,13 +204,50 @@ def main():
 
 def _strategy_flow(hypothesis_config: str):
     """
-    Run strategy flow with hypothesis.
+    Run strategy flow with hypothesis with proper cleanup on interruption.
     
     Args:
         - hypothesis_config: Path to the hypothesis configuration file.
     """
-    strategy = StrategyOrchestrator(hypothesis_config = hypothesis_config)
-    strategy.run()
+    strategy = None
+    
+    def signal_handler(sig, frame):
+        """Handle Ctrl+C gracefully"""
+        logging.info("Received interrupt signal. Cleaning up strategy...")
+        if strategy:
+            try:
+                # Stop the strategy gracefully
+                strategy.stop()
+                logging.info("Strategy stopped gracefully")
+            except Exception as e:
+                logging.error(f"Error during strategy cleanup: {e}")
+        
+        # Force exit to stop any lingering threads (like ping timers)
+        import os
+        os._exit(0)
+    
+    # Register signal handler for graceful shutdown
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    try:
+        strategy = StrategyOrchestrator(hypothesis_config = hypothesis_config)
+        strategy.run()
+    except KeyboardInterrupt:
+        logging.info("Strategy execution interrupted by user")
+        if strategy:
+            try:
+                strategy.stop()
+            except Exception as e:
+                logging.error(f"Error during strategy cleanup: {e}")
+    except Exception as e:
+        logging.error(f"Strategy execution failed: {e}")
+        if strategy:
+            try:
+                strategy.stop()
+            except Exception as e:
+                logging.error(f"Error during strategy cleanup: {e}")
+        raise
 
 
 if __name__=="__main__":
