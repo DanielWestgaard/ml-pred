@@ -163,11 +163,20 @@ class ModelTraining():
         Returns:
             str: Path to the processed file
         """
-        # Replace /raw/ with /processed/ in the directory structure
-        processed_path = raw_path.replace("/raw/", "/processed/")
-        
-        # Replace raw_ prefix with processed_ in the filename
-        processed_path = processed_path.replace("raw_", "processed_")
+        # Handle both new and legacy formats
+        if "/raw/" in raw_path and "raw_" not in os.path.basename(raw_path):
+            # New format: just replace /raw/ with /processed/
+            processed_path = raw_path.replace("/raw/", "/processed/")
+        else:
+            # Legacy format: convert to new format, then get processed version TODO: Remove this once migration is complete
+            try:
+                from utils.data_utils import convert_legacy_to_new_path
+                new_raw_path = convert_legacy_to_new_path(raw_path)
+                processed_path = new_raw_path.replace("/raw/", "/processed/")
+            except Exception:
+                # Fallback to old method for compatibility
+                processed_path = raw_path.replace("/raw/", "/processed/")
+                processed_path = processed_path.replace("raw_", "processed_")
         
         return processed_path
         
