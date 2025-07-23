@@ -47,7 +47,7 @@ class ModelTraining():
                 self.model_type = configurations.get("model_training_type") or configurations.get("model_type")
                 
                 try:
-                    dataset = configurations.get("processed_data")
+                    dataset = configurations.get("model_training_processed_data")
                     
                     if dataset is None:
                         raw_dataset = configurations.get("data_pipeline_raw_source")                        
