@@ -64,15 +64,18 @@ def main():
     # log_utils._is_configured = False
     # logging = log_utils.setup_logging(name="live_orders_testing", type="strategy", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
     
-    if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
+    if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True
         if args.hypothesis:
             logger.info("Trying to run data engineering with hypothesis config file.")
             
-            data_pipeline = EngineeringPipeline(raw_dataset=args.engineer_data or "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv", 
+            # Use new path structure or fallback to legacy for compatibility
+            default_raw_path = args.engineer_data or "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv"
+            data_pipeline = EngineeringPipeline(raw_dataset=default_raw_path, 
                                                 save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
         else:
-            data_pipeline = EngineeringPipeline(raw_dataset=args.engineer_data or "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv",
+            default_raw_path = args.engineer_data or "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv"
+            data_pipeline = EngineeringPipeline(raw_dataset=default_raw_path,
                                                 save_cleaned_data = save_cleaned_data)
         
         data_pipeline.run()
