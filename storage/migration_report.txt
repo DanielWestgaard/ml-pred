@@ -1,0 +1,29 @@
+STORAGE MIGRATION REPORT
+==================================================
+
+Migration completed at: 2025-07-23 21:00:47.346162
+
+FILES SUCCESSFULLY MOVED (15):
+----------------------------------------
+✓ raw_GBPUSD_m_20250515_20250523.csv -> GBPUSD/raw/1m/2025-05-15_2025-05-23.csv
+✓ raw_GBPUSD_m_20240601_20250523.csv -> GBPUSD/raw/1m/2024-06-01_2025-05-23.csv
+✓ raw_GBPUSD_m5_20240101_20250101.csv -> GBPUSD/raw/5m/2024-01-01_2025-01-01.csv
+✓ raw_GBPUSD_m_20250101_20250523.csv -> GBPUSD/raw/1m/2025-01-01_2025-05-23.csv
+✓ raw_BTCUSD_m_20250501_20250718.csv -> BTCUSD/raw/1m/2025-05-01_2025-07-18.csv
+✓ raw_GBPUSD_m_20220101_20250523.csv -> GBPUSD/raw/1m/2022-01-01_2025-05-23.csv
+✓ raw_BTCUSD_m_20250713_20250720.csv -> BTCUSD/raw/1m/2025-07-13_2025-07-20.csv
+✓ raw_BTCUSD_m_20250722_20250722.csv -> BTCUSD/raw/1m/2025-07-22_2025-07-22.csv
+✓ raw_BTCUSD_m_20250712_20250719.csv -> BTCUSD/raw/1m/2025-07-12_2025-07-19.csv
+✓ raw_GBPUSD_m5_20170801_20250101.csv -> GBPUSD/raw/5m/2017-08-01_2025-01-01.csv
+✓ raw_GBPUSD_m_20250501_20250501.csv -> GBPUSD/raw/1m/2025-05-01_2025-05-01.csv
+✓ processed_GBPUSD_m5_20240101_20250101.csv -> GBPUSD/processed/5m/2024-01-01_2025-01-01.csv
+✓ processed_GBPUSD_m_20250515_20250523.csv -> GBPUSD/processed/1m/2025-05-15_2025-05-23.csv
+✓ processed_GBPUSD_m_20250501_20250501.csv -> GBPUSD/processed/1m/2025-05-01_2025-05-01.csv
+✓ processed_BTCUSD_m_20250501_20250718.csv -> BTCUSD/processed/1m/2025-05-01_2025-07-18.csv
+
+FILES SKIPPED (0):
+----------------------------------------
+
+FILES FAILED (1):
+----------------------------------------
+✗ Could not parse: testing.csv
