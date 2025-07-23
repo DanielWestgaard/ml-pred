@@ -1,0 +1,178 @@
+# GPU Configuration Profiles
+# Different hardware configurations for local development vs cloud training
+
+profiles:
+  # Local development on Apple Silicon Mac
+  local_mac:
+    description: "Apple Silicon Mac with Metal GPU support"
+    hardware:
+      gpu_type: "metal"
+      memory_gb: 16
+      compute_units: 16
+    frameworks:
+      xgboost:
+        tree_method: "hist"  # Limited Metal support
+        n_jobs: -1
+      pytorch:
+        device: "mps"
+        batch_size: 32
+        precision: "float32"
+      tensorflow:
+        device: "/GPU:0"
+        memory_growth: true
+    recommendations:
+      - "Good for prototyping and small datasets"
+      - "Use for model architecture testing"
+      - "Limited XGBoost GPU acceleration"
+
+  # Cloud GPU - Standard NVIDIA Tesla T4
+  cloud_t4:
+    description: "Google Cloud Platform Tesla T4 (16GB VRAM)"
+    hardware:
+      gpu_type: "cuda"
+      memory_gb: 16
+      compute_capability: "7.5"
+      cuda_version: "11.8"
+    frameworks:
+      xgboost:
+        tree_method: "gpu_hist"
+        gpu_id: 0
+        predictor: "gpu_predictor"
+        max_bin: 256
+      pytorch:
+        device: "cuda"
+        batch_size: 128
+        precision: "float16"  # Mixed precision
+        compile: true
+      tensorflow:
+        device: "/GPU:0"
+        memory_growth: true
+        mixed_precision: "mixed_float16"
+    cost_estimate: "$0.35/hour"
+    recommendations:
+      - "Good for medium datasets (1M-10M samples)"
+      - "Excellent XGBoost acceleration"
+      - "Supports mixed precision training"
+
+  # Cloud GPU - High-end NVIDIA V100
+  cloud_v100:
+    description: "AWS/GCP V100 (32GB VRAM)"
+    hardware:
+      gpu_type: "cuda"
+      memory_gb: 32
+      compute_capability: "7.0"
+      cuda_version: "11.8"
+    frameworks:
+      xgboost:
+        tree_method: "gpu_hist"
+        gpu_id: 0
+        predictor: "gpu_predictor"
+        max_bin: 512
+        subsample: 0.8
+      pytorch:
+        device: "cuda"
+        batch_size: 256
+        precision: "float16"
+        compile: true
+        gradient_accumulation: 4
+      tensorflow:
+        device: "/GPU:0"
+        memory_growth: false  # Use full memory
+        mixed_precision: "mixed_float16"
+        distribution_strategy: "mirrored"
+    cost_estimate: "$2.48/hour"
+    recommendations:
+      - "For large datasets (10M+ samples)"
+      - "Best XGBoost performance"
+      - "Supports distributed training"
+
+  # Cloud GPU - Latest NVIDIA A100
+  cloud_a100:
+    description: "NVIDIA A100 (80GB VRAM)"
+    hardware:
+      gpu_type: "cuda"
+      memory_gb: 80
+      compute_capability: "8.0"
+      cuda_version: "12.0"
+    frameworks:
+      xgboost:
+        tree_method: "gpu_hist"
+        gpu_id: 0
+        predictor: "gpu_predictor"
+        max_bin: 1024
+        multi_strategy: "one_output_per_tree"
+      pytorch:
+        device: "cuda"
+        batch_size: 512
+        precision: "bfloat16"  # Better than float16
+        compile: true
+        gradient_accumulation: 8
+        gradient_checkpointing: true
+      tensorflow:
+        device: "/GPU:0"
+        memory_growth: false
+        mixed_precision: "mixed_bfloat16"
+        distribution_strategy: "mirrored"
+    cost_estimate: "$4.10/hour"
+    recommendations:
+      - "For very large datasets (100M+ samples)"
+      - "Best overall performance"
+      - "Ideal for model research and hyperparameter tuning"
+
+# Cloud provider specific configurations
+cloud_providers:
+  aws:
+    instance_types:
+      g4dn.xlarge: "T4 16GB - $0.526/hour"
+      p3.2xlarge: "V100 16GB - $3.06/hour"  
+      p4d.24xlarge: "A100 40GB x8 - $32.77/hour"
+    setup_commands:
+      - "pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118"
+      - "pip install tensorflow[and-cuda]"
+      - "nvidia-smi"
+
+  gcp:
+    instance_types:
+      n1-standard-4-t4: "T4 16GB - $0.35/hour"
+      n1-standard-8-v100: "V100 16GB - $2.48/hour"
+      a2-highgpu-1g-a100: "A100 40GB - $3.67/hour"
+    setup_commands:
+      - "pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118"
+      - "pip install tensorflow[and-cuda]"
+      - "nvidia-smi"
+
+  azure:
+    instance_types:
+      Standard_NC4as_T4_v3: "T4 16GB - $0.526/hour"
+      Standard_NC6s_v3: "V100 16GB - $3.06/hour"
+      Standard_ND96asr_v4: "A100 40GB x8 - $27.20/hour"
+    setup_commands:
+      - "pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118"
+      - "pip install tensorflow[and-cuda]"
+      - "nvidia-smi"
+
+# Environment variables for cloud deployment
+environment_variables:
+  CUDA_VISIBLE_DEVICES: "0"  # Use first GPU
+  PYTORCH_CUDA_ALLOC_CONF: "max_split_size_mb:128"
+  TF_GPU_ALLOCATOR: "cuda_malloc_async"
+  XGB_DEVICE: "gpu"
+  
+# Automatic profile selection rules
+auto_selection:
+  rules:
+    - condition: "gpu_memory_gb < 8"
+      profile: "local_mac"
+      reason: "Limited GPU memory, use CPU-optimized settings"
+    
+    - condition: "gpu_memory_gb >= 8 AND gpu_memory_gb < 20"
+      profile: "cloud_t4"
+      reason: "Medium GPU memory, suitable for T4 class"
+    
+    - condition: "gpu_memory_gb >= 20 AND gpu_memory_gb < 40"
+      profile: "cloud_v100"
+      reason: "High GPU memory, suitable for V100 class"
+    
+    - condition: "gpu_memory_gb >= 40"
+      profile: "cloud_a100"
+      reason: "Very high GPU memory, suitable for A100 class"
