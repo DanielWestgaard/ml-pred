@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import sys
 from utils.logging_utils import get_logger
+from config import config
 
 logger = get_logger()
 
@@ -134,33 +135,35 @@ def parse_timestamp_series(series):
 def generate_filename(symbol, timeframe, start_date, end_date, is_raw=True, 
                      data_source=None, processing_info=None, extension='csv'):
     """
-    Generate a standardized filename for financial data.
+    Generate a standardized filename for financial data using new naming convention.
+    
+    New format: 'YYYY-MM-DD_YYYY-MM-DD.csv' (start_date_end_date.csv)
+    Old format: 'raw_SYMBOL_timeframe_YYYYMMDD_YYYYMMDD.csv' (deprecated)
     
     Parameters:
     -----------
     symbol : str
         The trading symbol or asset identifier
     timeframe : str
-        The timeframe of the data (e.g., '1min', '1h', '1d')
+        The timeframe of the data (e.g., '1m', '5m', '1h', '1d')
     start_date : datetime.datetime or str
         The start date of the data
     end_date : datetime.datetime or str
         The end date of the data
     is_raw : bool, default=True
-        Flag indicating if the data is raw or processed
+        Flag indicating if the data is raw or processed (used for directory structure)
     data_source : str, optional
-        The source of the data (e.g., 'yahoo', 'bloomberg')
+        The source of the data (e.g., 'capital_com', 'alpha_vantage')
     processing_info : str, optional
-        Additional information about processing steps (only used if is_raw=False)
+        Additional information about processing steps (deprecated in new format)
     extension : str, default='csv'
         The file extension without the dot
+        
+    Returns:
+    --------
+    str
+        The filename in format: 'YYYY-MM-DD_YYYY-MM-DD.csv'
     """
-    # Sanitize symbol (remove non-alphanumeric characters except underscore)
-    symbol = re.sub(r'[^\w]', '_', symbol)
-    
-    # Standardize timeframe format
-    timeframe = timeframe.lower().replace('minute', 'm').replace('hour', 'h').replace('day', 'd').replace('_', '')
-    
     # Convert dates to datetime objects if they are strings
     if isinstance(start_date, str):
         try:
@@ -189,32 +192,12 @@ def generate_filename(symbol, timeframe, start_date, end_date, is_raw=True,
         except ValueError as e:
             raise ValueError(f"Could not parse end_date: {e}")
     
-    # Format dates as YYYYMMDD
-    start_str = start_date.strftime('%Y%m%d')
-    end_str = end_date.strftime('%Y%m%d')
+    # Format dates as YYYY-MM-DD for new naming convention
+    start_str = start_date.strftime('%Y-%m-%d')
+    end_str = end_date.strftime('%Y-%m-%d')
     
-    # Base name components
-    components = [symbol, timeframe, start_str, end_str]
-    
-    # Add data source if provided
-    if data_source:
-        sanitized_source = re.sub(r'[^\w]', '_', data_source)
-        components.append(sanitized_source)
-    
-    base_name = "_".join(components)
-    
-    # Add prefix based on whether the data is raw or processed
-    if is_raw:
-        prefix = "raw"
-    else:
-        prefix = "processed"
-        # Add processing info if provided and data is processed
-        if processing_info:
-            sanitized_info = re.sub(r'[^\w]', '_', processing_info)
-            prefix = f"{prefix}_{sanitized_info}"
-    
-    # Create the final filename
-    filename = f"{prefix}_{base_name}.{extension}"
+    # Create the final filename using new format: start_date_end_date.extension
+    filename = f"{start_str}_{end_str}.{extension}"
     
     return filename
 
@@ -297,11 +280,12 @@ def check_validation(validation_results_is_valid : bool, validation_results_issu
         logger.warning(f"Validation issues: {validation_results_issues}")
         
 
-def save_processed_file(filepath, processed_data : pd.DataFrame):
+def save_processed_file(filepath, processed_data: pd.DataFrame):
     """
-    Save a processed version of the file:
-    - Replace 'raw' with 'processed' in the filename (or add 'processed_' if 'raw' isn't found)
-    - Save to ../processed/ directory
+    Save a processed version of the file using new symbol-based directory structure.
+    
+    New structure: storage/data/capital_com/{SYMBOL}/processed/{timeframe}/filename.csv
+    Old structure: storage/data/capital_com/processed/processed_filename.csv (deprecated)
     
     Note: As the method is saving the data, it's setting the index_label to 'date'. Using the Data Pipeline,
     the cleaning file (method timestamp_alignment()) sets 'date' as index, but when saving file with 'date'
@@ -309,34 +293,41 @@ def save_processed_file(filepath, processed_data : pd.DataFrame):
     Hence, we have to "manually name it" when storing.
     
     Args:
-        filepath: Original filepath, e.g. "storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv"
+        filepath: Original filepath, can be either:
+                 - New format: "storage/data/capital_com/GBPUSD/raw/5m/2024-01-01_2025-01-01.csv"
+                 - Old format: "storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv"
+        processed_data: DataFrame to save
         
     Returns:
         str: Path where the processed file was saved
     """
     logger.info("Saving processed file ...")
     
-    # Extract filename from filepath
-    filename = os.path.basename(filepath)
-    
-    # Replace "raw" with "processed" in the filename
-    if "raw" in filename:
-        processed_filename = filename.replace("raw", "processed")
+    # Determine if this is new or old format
+    if '/raw/' in filepath and (filepath.count('/raw/') == 1 and 'raw_' not in os.path.basename(filepath)):
+        # New format: storage/data/capital_com/SYMBOL/raw/timeframe/filename.csv
+        output_path = filepath.replace('/raw/', '/processed/')
+        processed_dir = os.path.dirname(output_path)
     else:
-        # If "raw" isn't in the filename, add "processed_" prefix
-        processed_filename = "processed_" + filename
-    
-    # Get parent directory of the original file's directory
-    parent_dir = os.path.dirname(os.path.dirname(filepath))
-    
-    # Create the processed directory path
-    processed_dir = os.path.join(parent_dir, "processed")
+        # Old format or legacy handling
+        filename = os.path.basename(filepath)
+        
+        # Replace "raw" with "processed" in the filename
+        if "raw" in filename:
+            processed_filename = filename.replace("raw", "processed")
+        else:
+            # If "raw" isn't in the filename, keep original filename
+            processed_filename = filename
+        
+        # Get parent directory of the original file's directory
+        parent_dir = os.path.dirname(os.path.dirname(filepath))
+        
+        # Create the processed directory path
+        processed_dir = os.path.join(parent_dir, "processed")
+        output_path = os.path.join(processed_dir, processed_filename)
     
     # Ensure the processed directory exists
     os.makedirs(processed_dir, exist_ok=True)
-    
-    # Create the full output path
-    output_path = os.path.join(processed_dir, processed_filename)
     
     # Save the dataframe
     try:  # If df has 'date' as index (done in cleaning), we want to preserve the 'date' name of the column
@@ -390,3 +381,101 @@ def check_feature_specification(selected_features : list, method : str):
         else:  # Not all features are to be generated, but specified ones
             logger.debug(f"List of feature ({method}) values contains values: {values}. Will only generate those.")
             return False, values
+
+
+def get_data_file_path(symbol: str, timeframe: str, start_date: str, end_date: str, 
+                      is_raw: bool = True, data_source: str = 'capital_com') -> str:
+    """
+    Generate complete file path for data using new symbol-based structure.
+    
+    Args:
+        symbol: Trading symbol (e.g., 'GBPUSD', 'BTCUSD')
+        timeframe: Data timeframe (e.g., '1m', '5m', '1h')
+        start_date: Start date in YYYY-MM-DD format
+        end_date: End date in YYYY-MM-DD format
+        is_raw: Whether this is raw or processed data
+        data_source: Data source ('capital_com' or 'alpha_vantage')
+    
+    Returns:
+        str: Complete file path
+    """
+    # Generate filename
+    filename = generate_filename(symbol, timeframe, start_date, end_date, 
+                                is_raw=is_raw, extension='csv')
+    
+    if data_source == 'capital_com':
+        if is_raw:
+            directory = config.get_capcom_raw_data_dir(symbol, timeframe)
+        else:
+            directory = config.get_capcom_processed_data_dir(symbol, timeframe)
+    else:
+        # Handle other data sources if needed
+        raise ValueError(f"Unsupported data source: {data_source}")
+    
+    return os.path.join(directory, filename)
+
+
+def parse_legacy_filename(filename: str) -> dict:
+    """
+    Parse legacy filename format to extract components.
+    TODO: Can be deleted later once migration is done.
+    
+    Args:
+        filename: Legacy filename like 'raw_GBPUSD_m5_20240101_20250101.csv'
+        
+    Returns:
+        dict: Parsed components with keys: symbol, timeframe, start_date, end_date, is_raw
+    """
+    # Remove extension
+    name_without_ext = filename.rsplit('.', 1)[0]
+    
+    # Pattern to match legacy format
+    pattern = r'^(raw|processed)_([A-Z]+)_([m0-9]+)_(\d{8})_(\d{8})$'
+    match = re.match(pattern, name_without_ext)
+    
+    if not match:
+        raise ValueError(f"Cannot parse legacy filename: {filename}")
+    
+    prefix, symbol, timeframe, start_date, end_date = match.groups()
+    
+    # Normalize timeframe
+    timeframe_map = {
+        'm': '1m', 'm1': '1m', 'm5': '5m', 'm15': '15m', 'm30': '30m',
+        'h': '1h', 'h1': '1h', 'h4': '4h', 'd': '1d', 'd1': '1d'
+    }
+    normalized_timeframe = timeframe_map.get(timeframe, timeframe)
+    
+    # Format dates
+    formatted_start = f"{start_date[:4]}-{start_date[4:6]}-{start_date[6:8]}"
+    formatted_end = f"{end_date[:4]}-{end_date[4:6]}-{end_date[6:8]}"
+    
+    return {
+        'symbol': symbol,
+        'timeframe': normalized_timeframe,
+        'start_date': formatted_start,
+        'end_date': formatted_end,
+        'is_raw': prefix == 'raw'
+    }
+
+
+def convert_legacy_to_new_path(legacy_path: str) -> str:
+    """
+    Convert legacy file path to new symbol-based structure.
+    TODO: Can be deleted later once migration is done.
+    
+    Args:
+        legacy_path: Old format path like 'storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv'
+        
+    Returns:
+        str: New format path like 'storage/data/capital_com/GBPUSD/raw/5m/2024-01-01_2025-01-01.csv'
+    """
+    filename = os.path.basename(legacy_path)
+    parsed = parse_legacy_filename(filename)
+    
+    return get_data_file_path(
+        symbol=parsed['symbol'],
+        timeframe=parsed['timeframe'],
+        start_date=parsed['start_date'],
+        end_date=parsed['end_date'],
+        is_raw=parsed['is_raw']
+    )
