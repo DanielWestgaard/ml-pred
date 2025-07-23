@@ -276,7 +276,7 @@ class GPUDetector:
     def log_gpu_info(self):
         """Print detailed GPU information."""
         info = self.gpu_info
-        logger.info(f"\n🚀 GPU Detection Results:")
+        logger.info(f"🚀 GPU Detection Results:")
         logger.info(f"├── Type: {info.gpu_type.value.upper()}")
         logger.info(f"├── Device: {info.device_name}")
         logger.info(f"├── Count: {info.device_count}")
