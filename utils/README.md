@@ -5,6 +5,7 @@ The utils component provides **shared utilities and helper functions** used thro
 
 ## Key Features 🚀
 - **Configuration Management**: Robust hypothesis and model configuration loading
+- **GPU Acceleration**: Automatic GPU detection and optimization across frameworks
 - **Data Processing Utilities**: Timestamp parsing, data validation, and feature utilities
 - **Model Management**: Model metadata loading and model discovery utilities  
 - **Integration Support**: Utilities for seamless component integration
@@ -19,6 +20,7 @@ utils/
 ├── data_utils.py                   # Data processing, timestamps, features, validation
 ├── logging_utils.py                # Centralized logging configuration and utilities used by all files
 ├── shared_utils.py                 # Cross-component shared utilities
+├── gpu_utils.py                    # 🚀 GPU Acceleration Framework (CUDA/Metal/CPU with auto-detection)
 ├── README.md                       # Documentation
 │
 ├── hypothesis/                     # Hypothesis configuration utilities
@@ -30,6 +32,63 @@ utils/
 ```
 
 ## Key Utilities 📦
+
+### 🚀 GPU Acceleration Framework
+
+#### GPU Utils (`gpu_utils.py`)
+Comprehensive GPU acceleration framework supporting multiple ML frameworks and hardware:
+
+**Key Features:**
+- **Automatic Hardware Detection**: Detects NVIDIA CUDA, Apple Metal, and CPU configurations
+- **Multi-Framework Support**: Optimized configurations for XGBoost, PyTorch, and TensorFlow
+- **Intelligent Fallback**: Graceful degradation from GPU to CPU when needed
+- **Cloud-Ready**: Seamless scaling from local Mac to cloud NVIDIA GPUs
+- **Performance Optimization**: Framework-specific parameter tuning
+
+**Supported Hardware:**
+- **🖥️ Mac (Apple Silicon)**: Metal Performance Shaders for PyTorch/TensorFlow
+- **☁️ NVIDIA CUDA**: Full GPU acceleration across all frameworks
+- **⚡ CPU Fallback**: Optimized CPU settings when GPU unavailable
+
+**Usage:**
+```python
+from utils.gpu_utils import get_gpu_config, log_gpu_status
+
+# Get optimal configuration for any framework
+xgb_config = get_gpu_config('xgboost')    # Returns GPU/CPU optimized params
+pytorch_config = get_gpu_config('pytorch')  # Returns device: cuda/mps/cpu
+tf_config = get_gpu_config('tensorflow')    # Returns device: /GPU:0 or /CPU:0
+
+# Display current GPU status
+log_gpu_status()  # Shows: GPU type, memory, framework compatibility
+```
+
+**Configuration Examples:**
+```python
+# NVIDIA GPU (Cloud)
+{
+    'device_type': 'cuda',
+    'tree_method': 'gpu_hist',    # XGBoost
+    'device': 'cuda',             # PyTorch
+    'device': '/GPU:0'            # TensorFlow
+}
+
+# Apple Metal (Mac)
+{
+    'device_type': 'metal',
+    'tree_method': 'hist',        # XGBoost (limited Metal support)
+    'device': 'mps',              # PyTorch Metal Performance Shaders
+    'device': '/GPU:0'            # TensorFlow Metal
+}
+
+# CPU Fallback
+{
+    'device_type': 'cpu',
+    'tree_method': 'hist',        # XGBoost CPU-optimized
+    'n_jobs': -1,                 # Use all CPU cores
+    'device': 'cpu'               # PyTorch/TensorFlow CPU
+}
+```
 
 ### Configuration Management
 
@@ -131,10 +190,11 @@ Centralized logging configuration:
 
 ### Strategy Integration
 ```python
-# Strategy using multiple utilities
+# Strategy using multiple utilities including GPU acceleration
 import utils.hypothesis.config_loader as config_loader
 from utils.model.model_metadata_loader import load_model_metadata
 from utils.data_utils import parse_timestamp_series
+from utils.gpu_utils import get_gpu_config, log_gpu_status
 
 # Load strategy configuration
 config = config_loader.load_hypothesis_config(config_path)
@@ -143,6 +203,10 @@ strategy_config = config.handle_hypothesis_source()
 # Load model metadata
 model_loader = load_model_metadata(model_directory)
 features = model_loader.get_feature_names()
+
+# Configure GPU for model inference
+gpu_config = get_gpu_config('xgboost')  # Or 'pytorch'/'tensorflow'
+log_gpu_status()
 
 # Process timestamps
 df['timestamp'] = parse_timestamp_series(df['raw_timestamp'])
@@ -160,4 +224,22 @@ config = config_loader.handle_hypothesis_source()
 # Check feature specifications
 required_features = config.get('data_pipeline', {}).get('required_features', {})
 feature_valid = check_feature_specification(required_features)
+```
+
+### Model Training Integration
+```python
+# Model training with automatic GPU acceleration
+from utils.gpu_utils import get_gpu_config, log_gpu_status
+from model.model_factory.xgboost import XgboostModel
+
+# Display GPU capabilities
+log_gpu_status()
+
+# Train model with optimal GPU settings (automatically configured)
+model = XgboostModel(dataset=df, X_train=X_train, y_train=y_train)
+trained_model = model.train()  # Uses GPU if available, falls back to CPU
+
+# Get current configuration
+current_config = get_gpu_config('xgboost')
+print(f"Training with: {current_config['device_type']}")
 ```

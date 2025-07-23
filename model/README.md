@@ -1,18 +1,28 @@
 # About model/ 🤖
-This folder focuses on training ML Models. <br>
+This folder focuses on training ML Models with **automatic GPU acceleration**. <br>
 
 ## Structure
 ```
 ├── model_training.py           # Main file to train different models
 ├── evaluation.py               # TODO: Evaluate trained model
 │
-├── model_factory/              # Different ML Models that main file can use to train
+├── model_factory/              # Different ML Models with GPU support
 │   ├── base_model.py           # Interface for all model type implementations
-│   ├── xgboost.py              # XGBoost Regressor
+│   ├── xgboost.py              # XGBoost Regressor (GPU accelerated)
+│   ├── pytorch.py              # PyTorch Neural Networks (CUDA/Metal)
+│   ├── tensorflow.py           # TensorFlow Models (CUDA/Metal)
 │   └── ...
 │
 └── ...
 ```
+
+## 🚀 GPU Acceleration Support
+All models now include **automatic GPU acceleration** with intelligent fallback:
+
+- **🖥️ Local Mac**: Apple Metal GPU support via MPS (PyTorch) and Metal (TensorFlow)
+- **☁️ Cloud NVIDIA**: Full CUDA acceleration (XGBoost gpu_hist, PyTorch CUDA, TensorFlow GPU)
+- **🔄 Auto-Fallback**: Graceful CPU fallback if GPU unavailable
+- **📊 Multi-Framework**: XGBoost, PyTorch, and TensorFlow support
 
 
 ## Training - model_training.py
@@ -104,16 +114,66 @@ To train a Machine Learning Model, you can choose how you want to use it:
 
 ### Further development - Implementing new model types
 As mentioned, `model_training.py` dynamically runs and imports model-file based on `model_type`.<br>
-To add a new implementation of a new Model Type:
-1. Name the file of the Model Type (you will be using this to call, and match, it later). Eg. 'xgboost.py' will match 'xgboost'
-2. Use the `BaseModel` Interface as a Blueprint for the needed classes. Eg:
+To add a new implementation of a new Model Type **with GPU support**:
+
+1. **Name the file** of the Model Type (you will be using this to call, and match it, later). Eg. 'xgboost.py' will match 'xgboost'
+
+2. **Use the `BaseModel` Interface** as a Blueprint for the needed classes:
     ```python
     # Import
     from model.model_factory.base_model import BaseModel
+    from utils.gpu_utils import get_gpu_config, log_gpu_status
+    
     # Implement Interface
-    class XgboostModel(BaseModel):
+    class YourModel(BaseModel):
+        def train(self):
+            # Get GPU configuration
+            gpu_config = get_gpu_config('your_framework')
+            log_gpu_status()
+            
+            # Your GPU-accelerated training code here
+            pass
     ```
-3. Pretty much good to go! `ModelTraining.run()` will split training and testing data, so make sure all model implementations have the same required parameters (as they will all be initiated, dynamically, the same): `model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)`
+
+3. **GPU Configuration**: Use `get_gpu_config(framework_name)` to get optimal settings for your framework
+   - Supported frameworks: `'xgboost'`, `'pytorch'`, `'tensorflow'`
+   - Returns device type, specific parameters, and fallback options
+
+4. **Model Initialization**: Ensure same required parameters: `model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)`
+
+### 🎯 Available Model Types
+
+| Model Type | Framework | GPU Support | Use Case |
+|------------|-----------|-------------|----------|
+| `xgboost` | XGBoost | ✅ CUDA/CPU | Tree-based models, tabular data |
+| `pytorch` | PyTorch | ✅ CUDA/Metal/CPU | Neural networks, deep learning |
+| `tensorflow` | TensorFlow | ✅ CUDA/Metal/CPU | Neural networks, production ML |
+
+### 🔧 GPU Configuration Examples
+
+```python
+# XGBoost GPU config (automatically applied)
+{
+    'device_type': 'cuda',
+    'tree_method': 'gpu_hist',
+    'gpu_id': 0,
+    'predictor': 'gpu_predictor'
+}
+
+# PyTorch GPU config
+{
+    'device_type': 'cuda',
+    'device': 'cuda',
+    'device_count': 1
+}
+
+# TensorFlow GPU config  
+{
+    'device_type': 'cuda',
+    'device': '/GPU:0',
+    'memory_growth': True
+}
+```
 
 
 ## Evaluation
