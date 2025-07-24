@@ -27,10 +27,7 @@ def complete_config(raw_data_path):
         },
         'data_pipeline': {
             'raw_source': raw_data_path,
-            'required_features': {
-                'time_of_day': [],
-                'volatility_regimes': []
-            }
+            'selected_features': null
         },
         'model_training': {
             'type': 'xgboost',
