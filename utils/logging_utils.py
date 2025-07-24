@@ -10,6 +10,7 @@ import inspect
 from typing import Optional, Dict, Any
 
 import config.config as config
+from utils.hypothesis_log_categorizer import get_dynamic_log_path, get_category_description
 
 # Global logger configuration state
 _is_configured = False
@@ -32,7 +33,8 @@ def setup_logging(
     backup_count=5,
     include_trade_logs=False,
     include_performance_logs=False,
-    environment=config.DEV_ENV
+    environment=config.DEV_ENV,
+    hypothesis_config_path=None
 ):
     """
     Configure the global logging for the entire application.
@@ -49,6 +51,7 @@ def setup_logging(
         include_trade_logs: Whether to create separate trade log
         include_performance_logs: Whether to create separate performance log
         environment: Application environment (development, production)
+        hypothesis_config_path: Path to hypothesis config file for dynamic log categorization
     """
     global _is_configured
     
@@ -56,12 +59,27 @@ def setup_logging(
     if _is_configured:
         return get_logger(type)
     
+    # Determine log subdirectory based on hypothesis config
+    dynamic_log_subdir = None
+    if hypothesis_config_path:
+        try:
+            dynamic_log_subdir = get_dynamic_log_path(hypothesis_config_path)
+        except Exception:
+            dynamic_log_subdir = 'mixed'  # Fallback
+    
     # Create logs directory if it doesn't exist
     if log_to_file:
+        # Create standard log directories
         for subdir in config.DIFFERENT_LOG_DIRS:
             full_path = os.path.join(log_dir, subdir)
             if not os.path.exists(full_path):
                 os.makedirs(full_path)
+        
+        # Create dynamic log directory if needed
+        if dynamic_log_subdir and dynamic_log_subdir not in config.DIFFERENT_LOG_DIRS:
+            dynamic_path = os.path.join(log_dir, dynamic_log_subdir)
+            if not os.path.exists(dynamic_path):
+                os.makedirs(dynamic_path)
     
     # Create formatter
     formatter = logging.Formatter(log_format, date_format)
@@ -83,11 +101,17 @@ def setup_logging(
     timestamp = get_timestamp()
     # Add main file handler
     if log_to_file:
-        for subdir in config.DIFFERENT_LOG_DIRS:
-            if type is subdir:
-                full_path = os.path.join(log_dir, subdir)
-                log_dir = full_path
-        main_log_file = os.path.join(log_dir, f"{name}_{timestamp}.log")
+        # Determine the final log directory path
+        final_log_dir = log_dir
+        if dynamic_log_subdir:
+            final_log_dir = os.path.join(log_dir, dynamic_log_subdir)
+        else:
+            for subdir in config.DIFFERENT_LOG_DIRS:
+                if type == subdir:
+                    final_log_dir = os.path.join(log_dir, subdir)
+                    break
+        
+        main_log_file = os.path.join(final_log_dir, f"{name}_{timestamp}.log")
         
         main_file_handler = RotatingFileHandler(
             main_log_file,
@@ -118,7 +142,11 @@ def setup_logging(
     
     # Log startup
     logger = get_logger(type)
-    logger.info(f"Logging system initialized. Environment: {environment}")
+    startup_msg = f"Logging system initialized. Environment: {environment}"
+    if dynamic_log_subdir:
+        category_desc = get_category_description(dynamic_log_subdir)
+        startup_msg += f", Log category: {dynamic_log_subdir} ({category_desc})"
+    logger.info(startup_msg)
     
     # Add an exception hook to log uncaught exceptions
     sys.excepthook = _log_uncaught_exception
@@ -135,13 +163,15 @@ def _log_uncaught_exception(exc_type, exc_value, exc_traceback):
     logger = get_logger("uncaught_exception")
     logger.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
-def get_logger(name: Optional[str] = None) -> logging.Logger:
+def get_logger(name: Optional[str] = None, auto_setup: bool = True) -> logging.Logger:
     """
     Get a logger instance with auto-detection of caller module name.
-    If logging system isn't configured yet, it will be configured with default settings.
+    If logging system isn't configured yet and auto_setup is True, 
+    it will be configured with default settings.
     
     Args:
         name: Logger name. If None, automatically detects the calling module name
+        auto_setup: Whether to automatically setup logging if not configured
         
     Returns:
         Logger instance configured with centralized settings
@@ -153,10 +183,13 @@ def get_logger(name: Optional[str] = None) -> logging.Logger:
         # Explicit name
         logger = get_logger(__name__)
         logger = get_logger('custom_logger')
+        
+        # Don't auto-setup logging
+        logger = get_logger(auto_setup=False)
     """
     global _is_configured
     
-    if not _is_configured:
+    if not _is_configured and auto_setup:
         setup_logging()
     
     # Auto-detect caller module name if not provided

@@ -5,8 +5,52 @@ import signal
 import sys
 import time
 import yaml
+import os
 
+# Import config early but defer other imports that might initialize logging
 from config import config
+
+# Defer logger initialization until after dynamic logging setup
+logger = None
+
+def _initialize_dynamic_logging():
+    """Initialize logging with dynamic categorization based on command line args."""
+    global logger
+    
+    # Parse args early just for logging setup
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--hypothesis', '-hyp', help='Hypothesis config file path')
+    parser.add_argument('--strategy', '-strat', help='Strategy config file path')
+    args, _ = parser.parse_known_args()
+    
+    hypothesis_config_path = args.hypothesis or args.strategy
+    
+    if hypothesis_config_path and os.path.exists(hypothesis_config_path):
+        # Import logging utilities
+        import utils.logging_utils as log_utils
+        
+        # Setup logging with dynamic categorization
+        log_utils.setup_logging(
+            name="logging", 
+            type="mixed", 
+            hypothesis_config_path=hypothesis_config_path,
+            log_level=config.DEBUG_LOG_LEVEL
+        )
+        logger = log_utils.get_logger()
+    else:
+        # Fallback to default logging
+        import utils.logging_utils as log_utils
+        log_utils.setup_logging(
+            name="logging",
+            type="mixed", 
+            log_level=config.DEBUG_LOG_LEVEL
+        )
+        logger = log_utils.get_logger()
+
+# Initialize logging before any other imports
+_initialize_dynamic_logging()
+
+# Now import everything else
 from broker.capital_com.capitalcom import CapitalCom
 from data.providers.capital_com import ProviderCapitalCom
 from data.providers.alpha_vantage import ProviderAlphaVantage
@@ -21,8 +65,6 @@ from utils.model.model_metadata_loader import get_latest_model
 import utils.hypothesis.config_loader as config_loader
 import utils.logging_utils as log_utils
 from utils.logging_utils import get_logger
-
-logger = get_logger()
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -59,10 +101,12 @@ def parse_arguments():
 
 
 def main():
+    global logger
     args = parse_arguments()
     
-    # log_utils._is_configured = False
-    # logging = log_utils.setup_logging(name="live_orders_testing", type="strategy", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
+    # Logger is already initialized by _initialize_dynamic_logging()
+    # Just get the logger instance
+    logger = get_logger()
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True
