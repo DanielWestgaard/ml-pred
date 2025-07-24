@@ -1,29 +1,29 @@
 hypothesis:
     name: session_based_tod_anomalies
 
-# data_pipeline:
-#     raw_source: storage/data/capital_com/raw/raw_BTCUSD_m_20250501_20250718.csv
+data_pipeline:
+    raw_source: storage/data/capital_com/BTCUSD/raw/1m/2025-05-01_2025-07-18.csv
   
-#     required_features:
-#         time_of_day: []  # all features
-#         time_of_week: []
-#         time_of_month: []
-#         day_of_week: []
-#         average_true_range: []
-#         volatility_regimes: []
-#         fx_activity_profile: []
-#         fx_trading_sessions: []
-#         session_timing_features: []
-#         session_transition_features: []
+    required_features:
+        time_of_day: []  # all features
+        time_of_week: []
+        time_of_month: []
+        day_of_week: []
+        average_true_range: []
+        volatility_regimes: []
+        fx_activity_profile: []
+        fx_trading_sessions: []
+        session_timing_features: []
+        session_transition_features: []
 
-model_training:
-    type: xgboost
+# model_training:
+#     type: xgboost
 
-    processed_data: storage/data/capital_com/processed/processed_GBPUSD_m_20250501_20250501.csv
+#     processed_data: storage/data/capital_com/processed/processed_GBPUSD_m_20250501_20250501.csv
 
-    parameters:
-        n_estimators: 100
-        max_depth: 12
+#     parameters:
+#         n_estimators: 100
+#         max_depth: 12
     
 # evaluate_model:
 #     type: stored
