@@ -61,13 +61,13 @@ There are 2 ways of running the Data Pipeline on your raw data:
 1. **Default/Standard**: The Pipeline will do the _usual flow_ of (simplified) `Cleaning` -> `Validation` -> `Feature Generation` -> `Transformation` -> `Feature Selection` -> `Save`.
     - Use `main.py` to run the Data Pipeline on your raw data: (flag-name might change in the future)
         ```bash
-        python main.py -eg 'storage/data/capital_com/raw/raw_GBPUSD_m5_20240101_20250101.csv'
+        python main.py -eg 'storage/data/capital_com/GBPUSD/raw/5m/2024-01-01_2025-01-01.csv'
         ```
     - Or, implement it yourself. Eg.:
         ```python
         from data.pipelines.engineer_pipeline import EngineeringPipeline
 
-        data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv",
+        data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv",
                                             save_cleaned_data = True)
         
         data_pipeline.run()
@@ -85,13 +85,13 @@ When this is done, you can:
         ```
     - **Older version of using hypothesis flow**: Use `main.py`and run the Pipeline like this (eg.):
         ```bash
-        python main.py --engineer-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250101_20250523.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
+        python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         ```
     - Or, implement it yourself:
         ```python
         from data.pipelines.engineer_pipeline import EngineeringPipeline
 
-        data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/raw/raw_GBPUSD_m_20250501_20250501.csv",  # Using hypothesis config-file, this will be dynamically fetched - so no need to provide if so
+        data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv",  # Using hypothesis config-file, this will be dynamically fetched - so no need to provide if so
                                             save_cleaned_data = True,
                                             hypothesis_source = "hypothesis/1_session_based_tod_anomalies/config.yml")
         data_pipeline.run()
@@ -303,7 +303,7 @@ Currently only using have to methods for using either ```plotly.graph_objects```
 Recommended usage is either plotting raw data, or after cleaning the data (eg. in the Data Pipeline), as the final step in the Data Pipeline is normalization.<br>
 To simply plot candlestick data:
 ```bash
-python main.py --plot-data 'storage/data/capital_com/raw/raw_GBPUSD_m_20250515_20250523.csv'
+python main.py --plot-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-05-15_2025-05-23.csv'
 ```
 ## Challenges
 - Plotting 1-minute candles the **datasets can get very large**, making the plotting and interaction _slow_, and also incredibly _difficult to see what's going on_. Current solution is a little improved ```plotly.graph_objects``` implementation in the method ```simple_small_go_candle_plot()```. Though this can easily be even more improved. Perhaps splitting up the plotting?
