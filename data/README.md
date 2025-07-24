@@ -98,7 +98,7 @@ When this is done, you can:
         ```
 
 > [!NOTE]
-> The pipeline intelligently handles both new list-format features and legacy dict-format generator names from hypothesis configs. The unified system automatically resolves dependencies and generates features in the optimal order.
+> The pipeline uses the modern list-format for feature specification from hypothesis configs. The unified system automatically resolves dependencies and generates features in the optimal order.
 
 > [!NOTE]
 > Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/` and under `Features`/`Target Hypothesis` in this document. Also, use the existing functionality as examples. This is currently a quick run-down:
