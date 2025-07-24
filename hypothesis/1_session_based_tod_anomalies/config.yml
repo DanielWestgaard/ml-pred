@@ -19,7 +19,7 @@ data_pipeline:
 # model_training:
 #     type: xgboost
 
-#     processed_data: storage/data/capital_com/processed/processed_GBPUSD_m_20250501_20250501.csv
+#     processed_data: storage/data/capital_com/GBPUSD/processed/1m/2025-05-01_2025-05-01.csv
 
 #     parameters:
 #         n_estimators: 100
