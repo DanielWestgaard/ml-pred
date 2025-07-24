@@ -2,19 +2,19 @@ hypothesis:
     name: session_based_tod_anomalies
 
 data_pipeline:
-    raw_source: storage/data/capital_com/BTCUSD/raw/1m/2025-05-01_2025-07-18.csv
+    raw_source: storage/data/capital_com/BTCUSD/raw/15m/2025-02-01_2025-03-18.csv
   
     required_features:
-        time_of_day: []  # all features
-        time_of_week: []
-        time_of_month: []
-        day_of_week: []
-        average_true_range: []
-        volatility_regimes: []
-        fx_activity_profile: []
-        fx_trading_sessions: []
-        session_timing_features: []
-        session_transition_features: []
+        # time_of_day: []  # all features
+        # time_of_week: []
+        # time_of_month: []
+        # day_of_week: []
+        # average_true_range: []
+        # volatility_regimes: []
+        # fx_activity_profile: []
+        # fx_trading_sessions: []
+        # session_timing_features: []
+        # session_transition_features: []
 
 # model_training:
 #     type: xgboost
