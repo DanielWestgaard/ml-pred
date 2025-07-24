@@ -13,3 +13,4 @@ storage/data/capital_com/processed/processed_GBPUSD_m_20250101_20250523.csv
 storage/data_engineering_stats/cleaned_data
 logs/strategy
 storage/data/capital_com_backup
+storage/data/capital_com/GBPUSD/processed/1m/2022-01-01_2025-05-23.csv
