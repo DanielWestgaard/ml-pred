@@ -163,12 +163,8 @@ class ModelTraining():
         Returns:
             str: Path to the processed file
         """
-        # Replace /raw/ with /processed/ in the directory structure
+        # Convert raw path to processed path using new symbol-based structure
         processed_path = raw_path.replace("/raw/", "/processed/")
-        
-        # Replace raw_ prefix with processed_ in the filename
-        processed_path = processed_path.replace("raw_", "processed_")
-        
         return processed_path
         
     def _get_implemented_models(self):

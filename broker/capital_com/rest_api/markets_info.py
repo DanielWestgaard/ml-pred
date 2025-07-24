@@ -270,10 +270,28 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
             json.dump(complete_data, f, indent=4)
         logger.info(f"Raw data saved to {raw_json_file}")
     
-    # Generate output filename
-    output_file_name = data_utils.generate_filename(symbol=epic, timeframe=resolution, 
-                                               start_date=from_date, end_date=to_date, is_raw=True)
-    output_file = os.path.join(config.CAPCOM_RAW_DATA_DIR, output_file_name)
+    # Generate output filepath using new symbol-based structure
+    timeframe_map = {
+        'MINUTE': '1m',
+        'MINUTE_5': '5m',
+        'MINUTE_15': '15m',
+        'MINUTE_30': '30m',
+        'HOUR': '1h',
+        'HOUR_4': '4h',
+        'DAY': '1d'
+    }
+    normalized_timeframe = timeframe_map.get(resolution, resolution.lower())
+    
+    output_file = data_utils.get_data_file_path(
+        symbol=epic, 
+        timeframe=normalized_timeframe,
+        start_date=from_date.split('T')[0],  # Extract date part
+        end_date=to_date.split('T')[0],      # Extract date part
+        is_raw=True
+    )
+    
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     
     # Save the data to OHLCV CSV format
     if all_prices:
