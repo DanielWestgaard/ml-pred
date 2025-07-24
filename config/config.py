@@ -28,7 +28,7 @@ BASE_LOGS_DIR = os.path.join(BASE_DIR, 'logs')
 CAPCOM_BASE_STORAGE_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'capital_com')
 CAPCOM_RESPONSE_JSON_DIR = os.path.join(CAPCOM_BASE_STORAGE_DIR, 'saved_responses')
 
-# Helper functions for new symbol-based structure
+# Helper functions for symbol-based storage structure
 def get_capcom_raw_data_dir(symbol: str, timeframe: str = None) -> str:
     """Get raw data directory for a specific symbol and optional timeframe."""
     base_path = os.path.join(CAPCOM_BASE_STORAGE_DIR, symbol, 'raw')
@@ -42,10 +42,6 @@ def get_capcom_processed_data_dir(symbol: str, timeframe: str = None) -> str:
     if timeframe:
         return os.path.join(base_path, timeframe)
     return base_path
-
-# Legacy support - these will be deprecated
-CAPCOM_RAW_DATA_DIR = os.path.join(CAPCOM_BASE_STORAGE_DIR, 'raw')  # DEPRECATED
-CAPCOM_PROCESSED_DATA_DIR = os.path.join(CAPCOM_BASE_STORAGE_DIR, 'processed')  # DEPRECATED
 # Alpha Vantage API
 ALPVAN_BASE_STORAGE_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'alpha_vantage')
 ALPVAN_RAW_DATA_DIR = os.path.join(ALPVAN_BASE_STORAGE_DIR, 'raw')
