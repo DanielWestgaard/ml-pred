@@ -80,35 +80,12 @@ class EngineeringPipeline():
             logger.debug(f"User provided specific features to be generated: {self.selected_features}")
             self.skip_selection = True
             
-            # Handle different formats of selected_features
-            if isinstance(self.selected_features, dict):
-                # Old format: dict with generator method names as keys  
-                # Execute specific generators directly
-                generator_names = list(self.selected_features.keys())
-                logger.info(f"Executing specific generators: {generator_names}")
-                
-                registry = self.feature_generator._registry
-                execution_order = registry.resolve_dependencies(generator_names)
-                
-                for generator_name in execution_order:
-                    try:
-                        if hasattr(self.feature_generator, generator_name):
-                            method = getattr(self.feature_generator, generator_name)
-                            logger.debug(f"Executing generator: {generator_name}")
-                            method()
-                        else:
-                            logger.warning(f"Generator method '{generator_name}' not found")
-                    except Exception as e:
-                        logger.error(f"Error in generator '{generator_name}': {e}")
-                
-                self.df = self.feature_generator.df
-                
-            elif isinstance(self.selected_features, list):
-                # New format: list of specific feature names
+            # Generate specific features using list format
+            if isinstance(self.selected_features, list):
                 logger.info(f"Generating specific features: {self.selected_features}")
                 self.df = self.feature_generator.generate_selected(self.selected_features)
             else:
-                logger.warning("Unknown format for selected_features, generating all features")
+                logger.warning("selected_features must be a list of feature names, generating all features")
                 self.df = self.feature_generator.generate_all()
             
             # Also change target to the hypothesis

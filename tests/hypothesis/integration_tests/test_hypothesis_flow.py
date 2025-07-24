@@ -207,11 +207,7 @@ class TestHypothesisIntegrationFlow(unittest.TestCase):
             'hypothesis': {'name': 'feature_test'},
             'data_pipeline': {
                 'raw_source': self.raw_data_path,
-                'required_features': {
-                    'time_of_day': ['hour', 'minute'],
-                    'volatility_regimes': [],
-                    'session_timing_features': ['london_session', 'ny_session']
-                }
+                'selected_features': ['hour', 'minute', 'london_session', 'ny_session']
             }
         }
         config_path = test_hypothesis_utils.create_config_file(config_dict = feature_config, temp_dir = self.temp_dir)

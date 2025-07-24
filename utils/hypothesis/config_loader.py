@@ -165,10 +165,10 @@ class LoadHypothesisConfigMetadata:
             section_data = self._extract_section(section_name, required_fields)
             config.update(section_data)
         
-        # Special handling for required_features from data_pipeline
-        if 'data_pipeline' in config and 'required_features' in config['data_pipeline']:
-            config['features'] = config['data_pipeline']['required_features']
-            logger.debug(f"Extracted required_features as 'features': {config['features']}")
+        # Special handling for selected_features from data_pipeline
+        if 'data_pipeline' in config and 'selected_features' in config['data_pipeline']:
+            config['features'] = config['data_pipeline']['selected_features']
+            logger.debug(f"Extracted selected_features as 'features': {config['features']}")
         
         # Log summary
         sections_found = [section for section in ['data_pipeline', 'model_training', 'evaluate_model', 'strategy'] 
