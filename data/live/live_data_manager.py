@@ -432,13 +432,6 @@ class LiveDataManager:
                 # Continue anyway in live mode - validation issues are often due to simulated data timestamps
             
             # Generate features
-            # Convert list of selected features to dict format expected by FeatureGenerator
-            selected_features_dict = None
-            if self.selected_features and isinstance(self.selected_features, list):
-                # Convert list to dict with feature names as keys and empty values
-                selected_features_dict = {feature: [] for feature in self.selected_features}
-            elif self.selected_features:
-                selected_features_dict = self.selected_features
             
             # Use the same model metadata path for both feature generation and transformation
             model_metadata_path = "storage/models/2025-07-03_12:45:35/model_metadata.yml"  # TODO: Dynamic to use the models from hyppthesis/strategy config
