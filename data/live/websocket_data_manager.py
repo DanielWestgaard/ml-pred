@@ -10,6 +10,7 @@ from broker.capital_com.capitalcom import CapitalCom
 import config.config as config
 from data.providers.capital_com import ProviderCapitalCom
 from utils.logging_utils import get_logger
+from utils.broker_utils import extract_mid_price_ohlcv
 
 logger = get_logger()
 
@@ -224,17 +225,13 @@ class WebSocketDataManager:
             if 'prices' in data:
                 for price_bar in data['prices']:
                     try:
-                        # Convert to standard OHLCV format
-                        ohlcv_data = {
-                            'timestamp': price_bar.get('snapshotTimeUTC'),
-                            'open': float(price_bar.get('openPrice', {}).get('bid', 0)),
-                            'high': float(price_bar.get('highPrice', {}).get('bid', 0)),
-                            'low': float(price_bar.get('lowPrice', {}).get('bid', 0)),
-                            'close': float(price_bar.get('closePrice', {}).get('bid', 0)),
-                            'volume': float(price_bar.get('lastTradedVolume', 0)),
-                            'symbol': symbol,
-                            'source': 'historical'
-                        }
+                        # Use unified mid-price extraction with all formatting in one step
+                        ohlcv_data = extract_mid_price_ohlcv(
+                            price_bar, 
+                            symbol=symbol, 
+                            source='historical', 
+                            as_floats=True
+                        )
                         
                         # Add to buffer (don't block if full)
                         if not self.data_buffers[symbol].full():

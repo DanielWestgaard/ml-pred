@@ -24,7 +24,7 @@ class FeatureSelector(BaseProcessor):
         Class for Selecting the most important features. Focusing on Correlation-based Feature Selection, 
         Tree-based Feature Importance and Recursive Feature Elimination.
         """
-        logger.getLogger('matplotlib.font_manager').disabled = True
+        # logger.getLogger('matplotlib.font_manager').disabled = True  # AttributeError: 'Logger' object has no attribute 'getLogger'
         # Load dataset based on format
         self.df, self.original_df = data_utils.check_and_return_df(data)
         self.target_col = target_col

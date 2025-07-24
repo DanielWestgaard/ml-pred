@@ -116,7 +116,8 @@ class EngineeringPipeline():
             self.df = self.hypo.run()
         else:
             logger.debug("User did not provide any specific features to be generated - generating all features.")
-            self.skip_selection = False
+            self.skip_selection = True
+            logger.debug(f"Also, Skip Selection is (currently set to ${self.skip_selection})")
             self.df = self.feature_generator.generate_all()
         
         # Transformation, scaling, handle missing values, etc. of newly generated features
