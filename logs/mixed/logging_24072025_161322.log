@@ -1,0 +1,140 @@
+24-07-2025 16:13:22 - mixed                                   :149  - INFO     - Logging system initialized. Environment: development, Log category: mixed (Mixed workflow with multiple components)
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'average_directional_index' producing ['+di', '-di', 'adx']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'average_true_range' producing ['atr']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'bollinger_bands' producing ['upper_band', 'lower_band', 'bb_width']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'commodity_channel_index' producing ['cci']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'day_of_week' producing ['day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'future_atr_features' producing ['future_atr']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'fx_activity_profile' producing ['activity']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'fx_trading_sessions' producing ['asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'holiday_features' producing ['is_holiday', 'days_to_next_holiday']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'log_returns' producing ['log_return']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'market_microstructure_features' producing ['hl_spread_bps', 'hl_spread_ma_20', 'hl_spread_ratio']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'money_flow_index' producing ['mfi']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'moving_average_convergence_divergence' producing ['macd_line', 'macd_signal', 'macd_histogram']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'moving_averages' producing ['sma_5', 'sma_10', 'sma_20', 'sma_50', 'sma_200', 'ema_5', 'ema_10', 'ema_20', 'ema_50', 'ema_200']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'mstl_decomposition' producing ['mstl_trend', 'mstl_residual']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'on_balance_volume' producing ['obv']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'rate_of_change' producing ['roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'relative_strength_index' producing ['rsi_14']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'seasonal_decompose' producing ['seasonal_trend', 'seasonal_seasonal', 'seasonal_residual', 'seasonal_norm']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_atr_features' producing ['session_atr_mean', 'session_atr_std']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_timing_features' producing ['minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_transition_features' producing ['minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'stl_decomposition' producing ['stl_trend', 'stl_seasonal', 'stl_residual', 'stl_seasonal_strength', 'stl_trend_strength']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'stochastic_oscillator' producing ['stoch_k', 'stoch_d']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'support_resistance' producing ['distance_from_high', 'distance_from_low']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_day' producing ['hour_sin', 'hour_cos']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_month' producing ['month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_week' producing ['hour_of_week_sin', 'hour_of_week_cos', 'is_weekend']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'trend_strength_indicators' producing ['trend_strength', 'trend_regime', 'trend_regime_strong_trend', 'trend_regime_weak_trend', 'trend_regime_ranging']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volatility_regimes' producing ['returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_high', 'vol_regime_low', 'vol_regime_medium']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_moving_averages' producing ['vma_7', 'vma_15', 'vma_30', 'vma_60', 'relative_volume_7', 'relative_volume_15', 'relative_volume_30', 'relative_volume_60']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_profile' producing ['vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_rate_of_change' producing ['vroc_1', 'vroc_5', 'vroc_10', 'vroc_20']
+24-07-2025 16:13:23 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'vwap' producing ['vwap']
+24-07-2025 16:13:24 - __main__                                :128  - INFO     - User using pure hypothesis flow!
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config.yml
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :154  - INFO     - Loaded hypothesis: session_based_tod_anomalies
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'data_pipeline' not found in configuration
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.type: xgboost
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2025-05-01_2025-05-01.csv
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 100, 'max_depth': 12}
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.type: stored
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.model_folder: storage/models/2025-07-03_12:45:35
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'strategy' not found in configuration
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :176  - INFO     - Successfully loaded config sections: ['model_training', 'evaluate_model']
+24-07-2025 16:13:24 - model.model_training                    :37   - INFO     - ---------- Initiating Model Training ----------
+24-07-2025 16:13:24 - model.model_training                    :42   - INFO     - Model Training was initialized with Hypothesis configuration!
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config.yml
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :154  - INFO     - Loaded hypothesis: session_based_tod_anomalies
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'data_pipeline' not found in configuration
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.type: xgboost
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2025-05-01_2025-05-01.csv
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 100, 'max_depth': 12}
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.type: stored
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.model_folder: storage/models/2025-07-03_12:45:35
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'strategy' not found in configuration
+24-07-2025 16:13:24 - utils.hypothesis.config_loader          :176  - INFO     - Successfully loaded config sections: ['model_training', 'evaluate_model']
+24-07-2025 16:13:24 - utils.data_utils                        :250  - DEBUG    - Loading storage/data/capital_com/GBPUSD/processed/1m/2025-05-01_2025-05-01.csv
+24-07-2025 16:13:24 - model.model_training                    :88   - DEBUG    - Found hypothesis target : 'target_session_vol_anomaly'
+24-07-2025 16:13:24 - model.model_training                    :110  - DEBUG    - Successfully made index to date
+24-07-2025 16:13:24 - model.model_training                    :124  - INFO     - ---------- Starting to run training of xgboost Model ... ----------
+24-07-2025 16:13:24 - model.model_training                    :199  - DEBUG    - Successfully imported model.model_factory.xgboost
+24-07-2025 16:13:24 - model.model_training                    :228  - DEBUG    - Successfully set Features (X), with 50 columns/features ...
+24-07-2025 16:13:24 - model.model_training                    :231  - DEBUG    - and Target (y), 'target_session_vol_anomaly', 61 values.
+24-07-2025 16:13:24 - utils.model.model_utils                 :56   - DEBUG    - ✓ y is in correct format
+24-07-2025 16:13:24 - utils.model.model_utils                 :63   - DEBUG    - ✓ X is in correct format
+24-07-2025 16:13:24 - utils.model.model_utils                 :68   - DEBUG    - Index type: <class 'pandas.core.indexes.datetimes.DatetimeIndex'>
+24-07-2025 16:13:24 - utils.model.model_utils                 :69   - DEBUG    - Index dtype: datetime64[ns, UTC]
+24-07-2025 16:13:24 - utils.model.model_utils                 :70   - DEBUG    - Index sample: DatetimeIndex(['2025-05-01 00:00:00+00:00', '2025-05-01 00:01:00+00:00',
+               '2025-05-01 00:02:00+00:00', '2025-05-01 00:03:00+00:00',
+               '2025-05-01 00:04:00+00:00'],
+              dtype='datetime64[ns, UTC]', name='date', freq=None)
+24-07-2025 16:13:24 - utils.model.model_utils                 :71   - DEBUG    - Index frequency: None
+24-07-2025 16:13:24 - model.model_factory.xgboost             :40   - DEBUG    - ----- Initializing XGBoost Model -----
+24-07-2025 16:13:24 - model.model_factory.xgboost             :50   - INFO     - ---------- Starting to train XGBoost Model! ----------
+24-07-2025 16:13:26 - tensorflow                              :34   - DEBUG    - Falling back to TensorFlow client; we recommended you install the Cloud TPU client directly with pip install cloud-tpu-client.
+24-07-2025 16:13:26 - h5py._conv                              :47   - DEBUG    - Creating converter from 7 to 5
+24-07-2025 16:13:26 - h5py._conv                              :47   - DEBUG    - Creating converter from 5 to 7
+24-07-2025 16:13:26 - h5py._conv                              :47   - DEBUG    - Creating converter from 7 to 5
+24-07-2025 16:13:26 - h5py._conv                              :47   - DEBUG    - Creating converter from 5 to 7
+24-07-2025 16:13:27 - model.model_factory.xgboost             :54   - INFO     - Using GPU configuration: METAL
+24-07-2025 16:13:27 - utils.gpu_utils                         :279  - INFO     - 🚀 GPU Detection Results:
+24-07-2025 16:13:27 - utils.gpu_utils                         :280  - INFO     - ├── Type: METAL
+24-07-2025 16:13:27 - utils.gpu_utils                         :281  - INFO     - ├── Device: Apple M1 Pro
+24-07-2025 16:13:27 - utils.gpu_utils                         :282  - INFO     - ├── Count: 1
+24-07-2025 16:13:27 - utils.gpu_utils                         :286  - INFO     - ├── Capability: Metal 3
+24-07-2025 16:13:27 - utils.gpu_utils                         :288  - INFO     - └── Framework Support:
+24-07-2025 16:13:27 - utils.gpu_utils                         :291  - INFO     -     ├── xgboost: ✅
+24-07-2025 16:13:27 - utils.gpu_utils                         :291  - INFO     -     ├── pytorch: ✅
+24-07-2025 16:13:27 - utils.gpu_utils                         :291  - INFO     -     ├── tensorflow: ❌
+24-07-2025 16:13:27 - model.model_factory.xgboost             :83   - DEBUG    - XGBoost parameters: {'n_estimators': 100, 'max_depth': 12, 'learning_rate': 0.001, 'objective': 'reg:squarederror', 'subsample': 0.8, 'colsample_bytree': 0.8, 'reg_alpha': 0.1, 'reg_lambda': 1.0, 'random_state': 42, 'enable_categorical': True, 'tree_method': 'hist', 'n_jobs': -1}
+24-07-2025 16:13:27 - model.model_factory.xgboost             :91   - INFO     - Successfully trained XGBRegressor Model using METAL!
+24-07-2025 16:13:27 - model.model_training                    :258  - DEBUG    - Creating directory now.
+24-07-2025 16:13:27 - model.model_training                    :266  - INFO     - Successfully saved trained model: /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-24_16:13:27/xgboost.pkl
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config.yml
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :154  - INFO     - Loaded hypothesis: session_based_tod_anomalies
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'data_pipeline' not found in configuration
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.type: xgboost
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2025-05-01_2025-05-01.csv
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 100, 'max_depth': 12}
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.type: stored
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.model_folder: storage/models/2025-07-03_12:45:35
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'strategy' not found in configuration
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :176  - INFO     - Successfully loaded config sections: ['model_training', 'evaluate_model']
+24-07-2025 16:13:27 - model.model_training                    :391  - INFO     - Successfully saved model metadata: /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-24_16:13:27/model_metadata.yml
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config.yml
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :154  - INFO     - Loaded hypothesis: session_based_tod_anomalies
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'data_pipeline' not found in configuration
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.type: xgboost
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2025-05-01_2025-05-01.csv
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 100, 'max_depth': 12}
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.type: stored
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.model_folder: storage/models/2025-07-03_12:45:35
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'strategy' not found in configuration
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :176  - INFO     - Successfully loaded config sections: ['model_training', 'evaluate_model']
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config.yml
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :154  - INFO     - Loaded hypothesis: session_based_tod_anomalies
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'data_pipeline' not found in configuration
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.type: xgboost
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2025-05-01_2025-05-01.csv
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 100, 'max_depth': 12}
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.type: stored
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted evaluate_model.model_folder: storage/models/2025-07-03_12:45:35
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'strategy' not found in configuration
+24-07-2025 16:13:27 - utils.hypothesis.config_loader          :176  - INFO     - Successfully loaded config sections: ['model_training', 'evaluate_model']
+24-07-2025 16:13:27 - evaluation.hypothesis_specific.base_eval:23   - INFO     - ---------- Initializing SessionVolumeAnomalyEvaluation ----------
+24-07-2025 16:13:27 - uncaught_exception                      :164  - CRITICAL - Uncaught exception
+Traceback (most recent call last):
+  File "/Users/danielwestgaard/progRel/ml-pred/main.py", line 301, in <module>
+    main()
+  File "/Users/danielwestgaard/progRel/ml-pred/main.py", line 159, in main
+    evaluation = ModelEvaluation(hypothesis_config = args.hypothesis)
+  File "/Users/danielwestgaard/progRel/ml-pred/evaluation/evaluation.py", line 38, in __init__
+    self.evaluator = EvaluationFactory.create_evaluator(
+  File "/Users/danielwestgaard/progRel/ml-pred/evaluation/evaluation_factory.py", line 36, in create_evaluator
+    return evaluator_class(**kwargs)
+  File "/Users/danielwestgaard/progRel/ml-pred/evaluation/hypothesis_specific/base_evaluation.py", line 26, in __init__
+    logger.getLogger('matplotlib.font_manager').setLevel(logger.WARNING)
+AttributeError: 'Logger' object has no attribute 'getLogger'
