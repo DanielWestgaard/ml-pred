@@ -22,7 +22,8 @@ import utils.hypothesis.config_loader as config_loader
 import utils.logging_utils as log_utils
 from utils.logging_utils import get_logger
 
-logger = get_logger()
+# Defer logger initialization until after dynamic logging setup
+logger = None
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -59,19 +60,29 @@ def parse_arguments():
 
 
 def main():
+    global logger
     args = parse_arguments()
     
     # Setup dynamic logging based on hypothesis configuration if provided
     hypothesis_config_path = args.hypothesis or args.strategy
     if hypothesis_config_path:
-        # Reset logging configuration to apply dynamic categorization
-        log_utils._is_configured = False
+        # Setup logging with dynamic categorization
         log_utils.setup_logging(
             name="logging", 
             type="mixed", 
             hypothesis_config_path=hypothesis_config_path,
             log_level=config.DEBUG_LOG_LEVEL
         )
+    else:
+        # Fallback to default logging setup
+        log_utils.setup_logging(
+            name="logging",
+            type="mixed",
+            log_level=config.DEBUG_LOG_LEVEL
+        )
+    
+    # Initialize logger after setup
+    logger = get_logger()
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True

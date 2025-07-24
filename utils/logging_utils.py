@@ -101,16 +101,17 @@ def setup_logging(
     timestamp = get_timestamp()
     # Add main file handler
     if log_to_file:
-        # Use dynamic log subdirectory if available, otherwise fallback to type matching
+        # Determine the final log directory path
+        final_log_dir = log_dir
         if dynamic_log_subdir:
-            log_dir = os.path.join(log_dir, dynamic_log_subdir)
+            final_log_dir = os.path.join(log_dir, dynamic_log_subdir)
         else:
             for subdir in config.DIFFERENT_LOG_DIRS:
                 if type == subdir:
-                    log_dir = os.path.join(log_dir, subdir)
+                    final_log_dir = os.path.join(log_dir, subdir)
                     break
         
-        main_log_file = os.path.join(log_dir, f"{name}_{timestamp}.log")
+        main_log_file = os.path.join(final_log_dir, f"{name}_{timestamp}.log")
         
         main_file_handler = RotatingFileHandler(
             main_log_file,
@@ -162,13 +163,15 @@ def _log_uncaught_exception(exc_type, exc_value, exc_traceback):
     logger = get_logger("uncaught_exception")
     logger.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
-def get_logger(name: Optional[str] = None) -> logging.Logger:
+def get_logger(name: Optional[str] = None, auto_setup: bool = True) -> logging.Logger:
     """
     Get a logger instance with auto-detection of caller module name.
-    If logging system isn't configured yet, it will be configured with default settings.
+    If logging system isn't configured yet and auto_setup is True, 
+    it will be configured with default settings.
     
     Args:
         name: Logger name. If None, automatically detects the calling module name
+        auto_setup: Whether to automatically setup logging if not configured
         
     Returns:
         Logger instance configured with centralized settings
@@ -180,10 +183,13 @@ def get_logger(name: Optional[str] = None) -> logging.Logger:
         # Explicit name
         logger = get_logger(__name__)
         logger = get_logger('custom_logger')
+        
+        # Don't auto-setup logging
+        logger = get_logger(auto_setup=False)
     """
     global _is_configured
     
-    if not _is_configured:
+    if not _is_configured and auto_setup:
         setup_logging()
     
     # Auto-detect caller module name if not provided
