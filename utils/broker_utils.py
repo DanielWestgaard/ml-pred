@@ -156,9 +156,61 @@ def process_positions(json_response):
 
 # Not sure where to place this method. Was thinking in the data processing pipeline, 
 # but could also be more of a utility func for when taking in live market data.
+def extract_mid_price_ohlcv(price_data, symbol=None, source=None, as_floats=False):
+    """
+    Extract mid-price OHLCV data from bid-ask price data.
+    
+    This function provides unified price extraction across all data managers,
+    ensuring consistency between historical training data and live trading data.
+    Focus: Pure price conversion only - no feature engineering.
+    
+    Args:
+        price_data (dict): Price data containing bid/ask prices
+        symbol (str, optional): Trading symbol to include in result
+        source (str, optional): Data source identifier to include in result  
+        as_floats (bool): Whether to convert prices to float (default: False)
+        
+    Returns:
+        dict: OHLCV data with mid prices and optional metadata
+    """
+    # Calculate mid prices (average of bid and ask) with rounding
+    decimals = config.PRICE_DECIMALS
+    
+    mid_open = round((price_data['openPrice']['bid'] + price_data['openPrice']['ask']) / 2, decimals)
+    mid_high = round((price_data['highPrice']['bid'] + price_data['highPrice']['ask']) / 2, decimals)
+    mid_low = round((price_data['lowPrice']['bid'] + price_data['lowPrice']['ask']) / 2, decimals)
+    mid_close = round((price_data['closePrice']['bid'] + price_data['closePrice']['ask']) / 2, decimals)
+    volume = price_data.get('lastTradedVolume', 0)
+    
+    # Convert to floats if requested (for WebSocket manager compatibility)
+    if as_floats:
+        mid_open = float(mid_open)
+        mid_high = float(mid_high)
+        mid_low = float(mid_low)
+        mid_close = float(mid_close)
+        volume = float(volume)
+    
+    result = {
+        'timestamp': price_data.get('snapshotTimeUTC'),
+        'open': mid_open,
+        'high': mid_high,
+        'low': mid_low,
+        'close': mid_close,
+        'volume': volume
+    }
+    
+    # Add optional metadata
+    if symbol:
+        result['symbol'] = symbol
+    if source:
+        result['source'] = source
+        
+    return result
+
 def convert_json_to_ohlcv_csv(json_data, output_file):
     """
     Converts the provided JSON price data to OHLCV format and saves it to a CSV file.
+    Uses unified mid-price extraction for consistency.
     
     Args:
         json_data (dict or str): The JSON data containing price information
@@ -181,25 +233,17 @@ def convert_json_to_ohlcv_csv(json_data, output_file):
         
         # Process each price entry
         for price in data['prices']:
-            # Extract UTC timestamp (using snapshotTimeUTC for consistency)
-            timestamp = price['snapshotTimeUTC']
-            
-            # Calculate mid prices (average of bid and ask) with rounding
-            decimals = config.PRICE_DECIMALS  # Adjust based on the asset's typical price granularity
-            open_price = round((price['openPrice']['bid'] + price['openPrice']['ask']) / 2, decimals)
-            high_price = round((price['highPrice']['bid'] + price['highPrice']['ask']) / 2, decimals)
-            low_price = round((price['lowPrice']['bid'] + price['lowPrice']['ask']) / 2, decimals)
-            close_price = round((price['closePrice']['bid'] + price['closePrice']['ask']) / 2, decimals)
-            volume = price['lastTradedVolume']
+            # Use unified mid-price extraction
+            ohlcv_data = extract_mid_price_ohlcv(price)
             
             # Write the row to the CSV
             writer.writerow({
-                'Date': timestamp,
-                'Open': open_price,
-                'High': high_price,
-                'Low': low_price,
-                'Close': close_price,
-                'Volume': volume
+                'Date': ohlcv_data['timestamp'],
+                'Open': ohlcv_data['open'],
+                'High': ohlcv_data['high'],
+                'Low': ohlcv_data['low'],
+                'Close': ohlcv_data['close'],
+                'Volume': ohlcv_data['volume']
             })
     
     logger.info(f"Data successfully converted and saved to {output_file}")
