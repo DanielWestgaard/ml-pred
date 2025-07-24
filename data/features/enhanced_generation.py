@@ -1123,6 +1123,42 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             logger.warning(f"Error calculating holiday features: {e}")
     
     @feature_generator(
+        output_features=['hl_spread_bps', 'hl_spread_ma_20', 'hl_spread_ratio'],
+        description="Market microstructure features using high-low spread as proxy",
+        category="microstructure"
+    )
+    def market_microstructure_features(self):
+        """
+        Market microstructure features using high-low spread as proxy for bid-ask spread.
+        This provides insights into market liquidity and volatility conditions.
+        """
+        new_features = {}
+        
+        # Market microstructure features - spread proxy using high-low
+        # Until bid-ask data is available in live feed, use high-low as spread proxy
+        hl_spread = self.df['high'] - self.df['low']
+        mid_price = (self.df['high'] + self.df['low']) / 2
+        new_features['hl_spread_bps'] = np.where(
+            mid_price > 0, 
+            (hl_spread / mid_price) * 10000, 
+            0
+        )
+        
+        # Rolling spread statistics - convert to pandas Series for rolling operations
+        spread_series = pd.Series(new_features['hl_spread_bps'], index=self.df.index)
+        new_features['hl_spread_ma_20'] = spread_series.rolling(window=20).mean()
+        new_features['hl_spread_ratio'] = np.where(
+            new_features['hl_spread_ma_20'] > 0,
+            new_features['hl_spread_bps'] / new_features['hl_spread_ma_20'],
+            1.0
+        )
+        
+        # NOTE: When bid-ask data becomes available in live feed, 
+        # replace with: new_features['bid_ask_spread_bps'] = (ask - bid) / mid * 10000
+        
+        self._add_features_efficiently(new_features)
+    
+    @feature_generator(
         output_features=['trend_strength', 'trend_regime',
                         'trend_regime_strong_trend', 'trend_regime_weak_trend', 'trend_regime_ranging'],
         dependencies=['moving_averages', 'average_directional_index'],
@@ -1196,27 +1232,6 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         
         trend_strength = pd.concat(components, axis=1).mean(axis=1) * 100
         new_features['trend_strength'] = trend_strength
-        
-        # Market microstructure features - spread proxy using high-low
-        # Until bid-ask data is available in live feed, use high-low as spread proxy
-        hl_spread = self.df['high'] - self.df['low']
-        mid_price = (self.df['high'] + self.df['low']) / 2
-        new_features['hl_spread_bps'] = np.where(
-            mid_price > 0, 
-            (hl_spread / mid_price) * 10000, 
-            0
-        )
-        
-        # Rolling spread statistics
-        new_features['hl_spread_ma_20'] = new_features['hl_spread_bps'].rolling(window=20).mean()
-        new_features['hl_spread_ratio'] = np.where(
-            new_features['hl_spread_ma_20'] > 0,
-            new_features['hl_spread_bps'] / new_features['hl_spread_ma_20'],
-            1.0
-        )
-        
-        # NOTE: When bid-ask data becomes available in live feed, 
-        # replace with: new_features['bid_ask_spread_bps'] = (ask - bid) / mid * 10000
         
         # Trend regime classification
         trend_regime = np.where(
