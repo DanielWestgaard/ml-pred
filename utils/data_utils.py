@@ -438,10 +438,12 @@ def parse_legacy_filename(filename: str) -> dict:
     
     prefix, symbol, timeframe, start_date, end_date = match.groups()
     
-    # Normalize timeframe
+    # Normalize timeframe (handles both legacy and Capital.com API formats)
     timeframe_map = {
         'm': '1m', 'm1': '1m', 'm5': '5m', 'm15': '15m', 'm30': '30m',
-        'h': '1h', 'h1': '1h', 'h4': '4h', 'd': '1d', 'd1': '1d'
+        'h': '1h', 'h1': '1h', 'h4': '4h', 'd': '1d', 'd1': '1d',
+        'minute': '1m', 'minute_5': '5m', 'minute_15': '15m', 'minute_30': '30m',
+        '60minute': '1h', 'hour': '1h', 'hour_4': '4h', 'day': '1d'
     }
     normalized_timeframe = timeframe_map.get(timeframe, timeframe)
     

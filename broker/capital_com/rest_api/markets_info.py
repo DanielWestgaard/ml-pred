@@ -271,7 +271,15 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
         logger.info(f"Raw data saved to {raw_json_file}")
     
     # Generate output filepath using new symbol-based structure
-    timeframe_map = {'MINUTE': '1m', 'HOUR': '1h', 'DAY': '1d'}
+    timeframe_map = {
+        'MINUTE': '1m',
+        'MINUTE_5': '5m',
+        'MINUTE_15': '15m',
+        'MINUTE_30': '30m',
+        'HOUR': '1h',
+        'HOUR_4': '4h',
+        'DAY': '1d'
+    }
     normalized_timeframe = timeframe_map.get(resolution, resolution.lower())
     
     output_file = data_utils.get_data_file_path(
