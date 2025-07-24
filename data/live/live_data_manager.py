@@ -13,6 +13,7 @@ from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.transformation import FeatureTransformer
 from utils.data_utils import parse_timestamp_series
+from utils.broker_utils import extract_mid_price_ohlcv
 import config.config as config
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
 from utils.logging_utils import get_logger
@@ -668,13 +669,15 @@ class LiveDataManager:
                     # Convert to DataFrame
                     df_data = []
                     for price_point in prices_data:
+                        # Use unified mid-price extraction - no redundant conversion
+                        ohlcv_data = extract_mid_price_ohlcv(price_point)
                         df_data.append({
-                            'date': price_point['snapshotTimeUTC'],
-                            'open': price_point['openPrice']['ask'],
-                            'high': price_point['highPrice']['ask'], 
-                            'low': price_point['lowPrice']['ask'],
-                            'close': price_point['closePrice']['ask'],
-                            'volume': price_point.get('lastTradedVolume', 0)
+                            'date': ohlcv_data['timestamp'],
+                            'open': ohlcv_data['open'],
+                            'high': ohlcv_data['high'], 
+                            'low': ohlcv_data['low'],
+                            'close': ohlcv_data['close'],
+                            'volume': ohlcv_data['volume']
                         })
                     
                     df = pd.DataFrame(df_data)
