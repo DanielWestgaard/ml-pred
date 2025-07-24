@@ -61,8 +61,17 @@ def parse_arguments():
 def main():
     args = parse_arguments()
     
-    # log_utils._is_configured = False
-    # logging = log_utils.setup_logging(name="live_orders_testing", type="strategy", log_to_file=False, log_level=config.DEBUG_LOG_LEVEL)
+    # Setup dynamic logging based on hypothesis configuration if provided
+    hypothesis_config_path = args.hypothesis or args.strategy
+    if hypothesis_config_path:
+        # Reset logging configuration to apply dynamic categorization
+        log_utils._is_configured = False
+        log_utils.setup_logging(
+            name="logging", 
+            type="mixed", 
+            hypothesis_config_path=hypothesis_config_path,
+            log_level=config.DEBUG_LOG_LEVEL
+        )
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True
