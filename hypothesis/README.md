@@ -59,7 +59,8 @@ These are the different componentes/sections you can specify in the configuratio
 
 This should serve as an example template to how features are selected to new hypotheses.
 ```yml
-name: <name-of-the-hypothesis>
+hypothesis:
+    name: <name-of-the-hypothesis>
 
 # Data Pipeline on raw data
 data_pipeline:  # TODO: Now have to change logic for reading required features and possibility for providing data source
