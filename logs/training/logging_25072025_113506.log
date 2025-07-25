@@ -1,0 +1,177 @@
+25-07-2025 11:35:06 - mixed                                   :149  - INFO     - Logging system initialized. Environment: development, Log category: training (Model training and hyperparameter tuning)
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'average_directional_index' producing ['+di', '-di', 'adx']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'average_true_range' producing ['atr']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'bollinger_bands' producing ['upper_band', 'lower_band', 'bb_width']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'commodity_channel_index' producing ['cci']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'day_of_week' producing ['day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'future_atr_features' producing ['future_atr']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'fx_activity_profile' producing ['activity']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'fx_trading_sessions' producing ['asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'holiday_features' producing ['is_holiday', 'days_to_next_holiday']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'log_returns' producing ['log_return']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'market_microstructure_features' producing ['hl_spread_bps', 'hl_spread_ma_20', 'hl_spread_ratio']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'money_flow_index' producing ['mfi']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'moving_average_convergence_divergence' producing ['macd_line', 'macd_signal', 'macd_histogram']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'moving_averages' producing ['sma_5', 'sma_10', 'sma_20', 'sma_50', 'sma_200', 'ema_5', 'ema_10', 'ema_20', 'ema_50', 'ema_200']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'mstl_decomposition' producing ['mstl_trend', 'mstl_residual']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'on_balance_volume' producing ['obv']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'rate_of_change' producing ['roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'relative_strength_index' producing ['rsi_14']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'seasonal_decompose' producing ['seasonal_trend', 'seasonal_seasonal', 'seasonal_residual', 'seasonal_norm']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_atr_features' producing ['session_atr_mean', 'session_atr_std']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_timing_features' producing ['minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_transition_features' producing ['minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'stl_decomposition' producing ['stl_trend', 'stl_seasonal', 'stl_residual', 'stl_seasonal_strength', 'stl_trend_strength']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'stochastic_oscillator' producing ['stoch_k', 'stoch_d']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'support_resistance' producing ['distance_from_high', 'distance_from_low']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_day' producing ['hour_sin', 'hour_cos']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_month' producing ['month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_week' producing ['hour_of_week_sin', 'hour_of_week_cos', 'is_weekend']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'trend_strength_indicators' producing ['trend_strength', 'trend_regime', 'trend_regime_strong_trend', 'trend_regime_weak_trend', 'trend_regime_ranging']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volatility_regimes' producing ['returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_high', 'vol_regime_low', 'vol_regime_medium']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_moving_averages' producing ['vma_7', 'vma_15', 'vma_30', 'vma_60', 'relative_volume_7', 'relative_volume_15', 'relative_volume_30', 'relative_volume_60']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_profile' producing ['vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_rate_of_change' producing ['vroc_1', 'vroc_5', 'vroc_10', 'vroc_20']
+25-07-2025 11:35:07 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'vwap' producing ['vwap']
+25-07-2025 11:35:08 - __main__                                :128  - INFO     - User using pure hypothesis flow!
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config.yml
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :154  - INFO     - Loaded hypothesis: session_based_tod_anomalies
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'data_pipeline' not found in configuration
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.type: xgboost
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2022-01-01_2025-05-23.csv
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 100, 'max_depth': 12}
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'evaluate_model' not found in configuration
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'strategy' not found in configuration
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :176  - INFO     - Successfully loaded config sections: ['model_training']
+25-07-2025 11:35:08 - model.model_training                    :37   - INFO     - ---------- Initiating Model Training ----------
+25-07-2025 11:35:08 - model.model_training                    :42   - INFO     - Model Training was initialized with Hypothesis configuration!
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/1_session_based_tod_anomalies/config.yml
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :154  - INFO     - Loaded hypothesis: session_based_tod_anomalies
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'data_pipeline' not found in configuration
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.type: xgboost
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2022-01-01_2025-05-23.csv
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 100, 'max_depth': 12}
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'evaluate_model' not found in configuration
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'strategy' not found in configuration
+25-07-2025 11:35:08 - utils.hypothesis.config_loader          :176  - INFO     - Successfully loaded config sections: ['model_training']
+25-07-2025 11:35:08 - utils.data_utils                        :250  - DEBUG    - Loading storage/data/capital_com/GBPUSD/processed/1m/2022-01-01_2025-05-23.csv
+25-07-2025 11:35:16 - model.model_training                    :88   - DEBUG    - Found hypothesis target : 'target_session_vol_anomaly'
+25-07-2025 11:35:17 - model.model_training                    :110  - DEBUG    - Successfully made index to date
+25-07-2025 11:35:17 - model.model_training                    :124  - INFO     - ---------- Starting to run training of xgboost Model ... ----------
+25-07-2025 11:35:17 - model.model_training                    :199  - DEBUG    - Successfully imported model.model_factory.xgboost
+25-07-2025 11:35:18 - model.model_training                    :228  - DEBUG    - Successfully set Features (X), with 57 columns/features ...
+25-07-2025 11:35:18 - model.model_training                    :231  - DEBUG    - and Target (y), 'target_session_vol_anomaly', 1780016 values.
+25-07-2025 11:35:18 - utils.model.model_utils                 :56   - DEBUG    - ✓ y is in correct format
+25-07-2025 11:35:18 - utils.model.model_utils                 :63   - DEBUG    - ✓ X is in correct format
+25-07-2025 11:35:18 - utils.model.model_utils                 :68   - DEBUG    - Index type: <class 'pandas.core.indexes.datetimes.DatetimeIndex'>
+25-07-2025 11:35:18 - utils.model.model_utils                 :69   - DEBUG    - Index dtype: datetime64[ns, UTC]
+25-07-2025 11:35:18 - utils.model.model_utils                 :70   - DEBUG    - Index sample: DatetimeIndex(['2022-01-02 22:05:00+00:00', '2022-01-02 22:06:00+00:00',
+               '2022-01-02 22:07:00+00:00', '2022-01-02 22:08:00+00:00',
+               '2022-01-02 22:09:00+00:00'],
+              dtype='datetime64[ns, UTC]', name='date', freq=None)
+25-07-2025 11:35:18 - utils.model.model_utils                 :71   - DEBUG    - Index frequency: None
+25-07-2025 11:35:18 - model.model_factory.xgboost             :40   - DEBUG    - ----- Initializing XGBoost Model -----
+25-07-2025 11:35:18 - model.model_factory.xgboost             :50   - INFO     - ---------- Starting to train XGBoost Model! ----------
+25-07-2025 11:35:23 - tensorflow                              :34   - DEBUG    - Falling back to TensorFlow client; we recommended you install the Cloud TPU client directly with pip install cloud-tpu-client.
+25-07-2025 11:35:23 - h5py._conv                              :47   - DEBUG    - Creating converter from 7 to 5
+25-07-2025 11:35:23 - h5py._conv                              :47   - DEBUG    - Creating converter from 5 to 7
+25-07-2025 11:35:23 - h5py._conv                              :47   - DEBUG    - Creating converter from 7 to 5
+25-07-2025 11:35:23 - h5py._conv                              :47   - DEBUG    - Creating converter from 5 to 7
+25-07-2025 11:35:24 - model.model_factory.xgboost             :54   - INFO     - Using GPU configuration: METAL
+25-07-2025 11:35:24 - utils.gpu_utils                         :279  - INFO     - 🚀 GPU Detection Results:
+25-07-2025 11:35:24 - utils.gpu_utils                         :280  - INFO     - ├── Type: METAL
+25-07-2025 11:35:24 - utils.gpu_utils                         :281  - INFO     - ├── Device: Apple M1 Pro
+25-07-2025 11:35:24 - utils.gpu_utils                         :282  - INFO     - ├── Count: 1
+25-07-2025 11:35:24 - utils.gpu_utils                         :286  - INFO     - ├── Capability: Metal 3
+25-07-2025 11:35:24 - utils.gpu_utils                         :288  - INFO     - └── Framework Support:
+25-07-2025 11:35:24 - utils.gpu_utils                         :291  - INFO     -     ├── xgboost: ✅
+25-07-2025 11:35:24 - utils.gpu_utils                         :291  - INFO     -     ├── pytorch: ✅
+25-07-2025 11:35:24 - utils.gpu_utils                         :291  - INFO     -     ├── tensorflow: ❌
+25-07-2025 11:35:24 - model.model_factory.xgboost             :83   - DEBUG    - XGBoost parameters: {'n_estimators': 100, 'max_depth': 12, 'learning_rate': 0.001, 'objective': 'reg:squarederror', 'subsample': 0.8, 'colsample_bytree': 0.8, 'reg_alpha': 0.1, 'reg_lambda': 1.0, 'random_state': 42, 'enable_categorical': True, 'tree_method': 'hist', 'n_jobs': -1}
+25-07-2025 11:35:25 - model.model_factory.xgboost             :93   - WARNING  - GPU training failed, falling back to CPU: [11:35:25] /Users/runner/work/xgboost/xgboost/src/data/gradient_index.h:100: Check failed: valid: Input data contains `inf` or a value too large, while `missing` is not set to `inf`
+Stack trace:
+  [bt] (0) 1   libxgboost.dylib                    0x0000000129d0d9e4 dmlc::LogMessageFatal::~LogMessageFatal() + 124
+  [bt] (1) 2   libxgboost.dylib                    0x0000000129eb7f58 void xgboost::GHistIndexMatrix::SetIndexData<xgboost::data::ColumnarAdapterBatch, unsigned char, xgboost::common::Index::CompressBin<unsigned char>, xgboost::data::IsValidFunctor&>(xgboost::common::Span<unsigned char, 18446744073709551615ul>, unsigned long, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>, unsigned long, xgboost::data::ColumnarAdapterBatch const&, xgboost::data::IsValidFunctor&, unsigned long, xgboost::common::Index::CompressBin<unsigned char>&&) + 328
+  [bt] (2) 3   libxgboost.dylib                    0x0000000129eb7b30 auto xgboost::common::DispatchBinType<void xgboost::GHistIndexMatrix::PushBatchImpl<xgboost::data::ColumnarAdapterBatch, xgboost::data::IsValidFunctor&>(int, xgboost::data::ColumnarAdapterBatch const&, unsigned long, xgboost::data::IsValidFunctor&, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>)::'lambda'(xgboost::data::ColumnarAdapterBatch)>(xgboost::common::BinTypeSize, xgboost::data::ColumnarAdapterBatch&&) + 120
+  [bt] (3) 4   libxgboost.dylib                    0x0000000129eb690c void xgboost::GHistIndexMatrix::PushBatchImpl<xgboost::data::ColumnarAdapterBatch, xgboost::data::IsValidFunctor&>(int, xgboost::data::ColumnarAdapterBatch const&, unsigned long, xgboost::data::IsValidFunctor&, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>) + 336
+  [bt] (4) 5   libxgboost.dylib                    0x0000000129eb6430 void xgboost::GHistIndexMatrix::PushAdapterBatch<xgboost::data::ColumnarAdapterBatch>(xgboost::Context const*, unsigned long, unsigned long, xgboost::data::ColumnarAdapterBatch const&, float, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>, double, unsigned long long) + 304
+  [bt] (5) 6   libxgboost.dylib                    0x0000000129ebdce8 xgboost::data::IterativeDMatrix::InitFromCPU(xgboost::Context const*, xgboost::BatchParam const&, void*, float, std::__1::shared_ptr<xgboost::DMatrix>) + 2224
+  [bt] (6) 7   libxgboost.dylib                    0x0000000129ebd010 xgboost::data::IterativeDMatrix::IterativeDMatrix(void*, void*, std::__1::shared_ptr<xgboost::DMatrix>, void (*)(void*), int (*)(void*), float, int, int, long long) + 788
+  [bt] (7) 8   libxgboost.dylib                    0x0000000129e6071c xgboost::DMatrix* xgboost::DMatrix::Create<void*, void*, void (void*), int (void*)>(void*, void*, std::__1::shared_ptr<xgboost::DMatrix>, void (*)(void*), int (*)(void*), float, int, int, long long) + 152
+  [bt] (8) 9   libxgboost.dylib                    0x0000000129d179e4 XGQuantileDMatrixCreateFromCallback + 520
+
+
+25-07-2025 11:35:26 - uncaught_exception                      :164  - CRITICAL - Uncaught exception
+Traceback (most recent call last):
+  File "/Users/danielwestgaard/progRel/ml-pred/model/model_factory/xgboost.py", line 90, in train
+    model = xgb.fit(self.X_train, self.y_train)
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/sklearn.py", line 1222, in fit
+    train_dmatrix, evals = _wrap_evaluation_matrices(
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/sklearn.py", line 628, in _wrap_evaluation_matrices
+    train_dmatrix = create_dmatrix(
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/sklearn.py", line 1137, in _create_dmatrix
+    return QuantileDMatrix(
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 1614, in __init__
+    self._init(
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 1680, in _init
+    _check_call(ret)
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 310, in _check_call
+    raise XGBoostError(py_str(_LIB.XGBGetLastError()))
+xgboost.core.XGBoostError: [11:35:25] /Users/runner/work/xgboost/xgboost/src/data/gradient_index.h:100: Check failed: valid: Input data contains `inf` or a value too large, while `missing` is not set to `inf`
+Stack trace:
+  [bt] (0) 1   libxgboost.dylib                    0x0000000129d0d9e4 dmlc::LogMessageFatal::~LogMessageFatal() + 124
+  [bt] (1) 2   libxgboost.dylib                    0x0000000129eb7f58 void xgboost::GHistIndexMatrix::SetIndexData<xgboost::data::ColumnarAdapterBatch, unsigned char, xgboost::common::Index::CompressBin<unsigned char>, xgboost::data::IsValidFunctor&>(xgboost::common::Span<unsigned char, 18446744073709551615ul>, unsigned long, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>, unsigned long, xgboost::data::ColumnarAdapterBatch const&, xgboost::data::IsValidFunctor&, unsigned long, xgboost::common::Index::CompressBin<unsigned char>&&) + 328
+  [bt] (2) 3   libxgboost.dylib                    0x0000000129eb7b30 auto xgboost::common::DispatchBinType<void xgboost::GHistIndexMatrix::PushBatchImpl<xgboost::data::ColumnarAdapterBatch, xgboost::data::IsValidFunctor&>(int, xgboost::data::ColumnarAdapterBatch const&, unsigned long, xgboost::data::IsValidFunctor&, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>)::'lambda'(xgboost::data::ColumnarAdapterBatch)>(xgboost::common::BinTypeSize, xgboost::data::ColumnarAdapterBatch&&) + 120
+  [bt] (3) 4   libxgboost.dylib                    0x0000000129eb690c void xgboost::GHistIndexMatrix::PushBatchImpl<xgboost::data::ColumnarAdapterBatch, xgboost::data::IsValidFunctor&>(int, xgboost::data::ColumnarAdapterBatch const&, unsigned long, xgboost::data::IsValidFunctor&, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>) + 336
+  [bt] (4) 5   libxgboost.dylib                    0x0000000129eb6430 void xgboost::GHistIndexMatrix::PushAdapterBatch<xgboost::data::ColumnarAdapterBatch>(xgboost::Context const*, unsigned long, unsigned long, xgboost::data::ColumnarAdapterBatch const&, float, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>, double, unsigned long long) + 304
+  [bt] (5) 6   libxgboost.dylib                    0x0000000129ebdce8 xgboost::data::IterativeDMatrix::InitFromCPU(xgboost::Context const*, xgboost::BatchParam const&, void*, float, std::__1::shared_ptr<xgboost::DMatrix>) + 2224
+  [bt] (6) 7   libxgboost.dylib                    0x0000000129ebd010 xgboost::data::IterativeDMatrix::IterativeDMatrix(void*, void*, std::__1::shared_ptr<xgboost::DMatrix>, void (*)(void*), int (*)(void*), float, int, int, long long) + 788
+  [bt] (7) 8   libxgboost.dylib                    0x0000000129e6071c xgboost::DMatrix* xgboost::DMatrix::Create<void*, void*, void (void*), int (void*)>(void*, void*, std::__1::shared_ptr<xgboost::DMatrix>, void (*)(void*), int (*)(void*), float, int, int, long long) + 152
+  [bt] (8) 9   libxgboost.dylib                    0x0000000129d179e4 XGQuantileDMatrixCreateFromCallback + 520
+
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/danielwestgaard/progRel/ml-pred/main.py", line 301, in <module>
+    main()
+  File "/Users/danielwestgaard/progRel/ml-pred/main.py", line 146, in main
+    model = model_training.run()
+  File "/Users/danielwestgaard/progRel/ml-pred/model/model_training.py", line 142, in run
+    self.model = model_instance.train()
+  File "/Users/danielwestgaard/progRel/ml-pred/model/model_factory/xgboost.py", line 100, in train
+    model = xgb.fit(self.X_train, self.y_train)
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/sklearn.py", line 1222, in fit
+    train_dmatrix, evals = _wrap_evaluation_matrices(
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/sklearn.py", line 628, in _wrap_evaluation_matrices
+    train_dmatrix = create_dmatrix(
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/sklearn.py", line 1137, in _create_dmatrix
+    return QuantileDMatrix(
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 1614, in __init__
+    self._init(
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 1680, in _init
+    _check_call(ret)
+  File "/Users/danielwestgaard/progRel/ml-pred/venv/lib/python3.10/site-packages/xgboost/core.py", line 310, in _check_call
+    raise XGBoostError(py_str(_LIB.XGBGetLastError()))
+xgboost.core.XGBoostError: [11:35:26] /Users/runner/work/xgboost/xgboost/src/data/gradient_index.h:100: Check failed: valid: Input data contains `inf` or a value too large, while `missing` is not set to `inf`
+Stack trace:
+  [bt] (0) 1   libxgboost.dylib                    0x0000000129d0d9e4 dmlc::LogMessageFatal::~LogMessageFatal() + 124
+  [bt] (1) 2   libxgboost.dylib                    0x0000000129eb7f58 void xgboost::GHistIndexMatrix::SetIndexData<xgboost::data::ColumnarAdapterBatch, unsigned char, xgboost::common::Index::CompressBin<unsigned char>, xgboost::data::IsValidFunctor&>(xgboost::common::Span<unsigned char, 18446744073709551615ul>, unsigned long, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>, unsigned long, xgboost::data::ColumnarAdapterBatch const&, xgboost::data::IsValidFunctor&, unsigned long, xgboost::common::Index::CompressBin<unsigned char>&&) + 328
+  [bt] (2) 3   libxgboost.dylib                    0x0000000129eb7b30 auto xgboost::common::DispatchBinType<void xgboost::GHistIndexMatrix::PushBatchImpl<xgboost::data::ColumnarAdapterBatch, xgboost::data::IsValidFunctor&>(int, xgboost::data::ColumnarAdapterBatch const&, unsigned long, xgboost::data::IsValidFunctor&, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>)::'lambda'(xgboost::data::ColumnarAdapterBatch)>(xgboost::common::BinTypeSize, xgboost::data::ColumnarAdapterBatch&&) + 120
+  [bt] (3) 4   libxgboost.dylib                    0x0000000129eb690c void xgboost::GHistIndexMatrix::PushBatchImpl<xgboost::data::ColumnarAdapterBatch, xgboost::data::IsValidFunctor&>(int, xgboost::data::ColumnarAdapterBatch const&, unsigned long, xgboost::data::IsValidFunctor&, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>) + 336
+  [bt] (4) 5   libxgboost.dylib                    0x0000000129eb6430 void xgboost::GHistIndexMatrix::PushAdapterBatch<xgboost::data::ColumnarAdapterBatch>(xgboost::Context const*, unsigned long, unsigned long, xgboost::data::ColumnarAdapterBatch const&, float, xgboost::common::Span<xgboost::FeatureType const, 18446744073709551615ul>, double, unsigned long long) + 304
+  [bt] (5) 6   libxgboost.dylib                    0x0000000129ebdce8 xgboost::data::IterativeDMatrix::InitFromCPU(xgboost::Context const*, xgboost::BatchParam const&, void*, float, std::__1::shared_ptr<xgboost::DMatrix>) + 2224
+  [bt] (6) 7   libxgboost.dylib                    0x0000000129ebd010 xgboost::data::IterativeDMatrix::IterativeDMatrix(void*, void*, std::__1::shared_ptr<xgboost::DMatrix>, void (*)(void*), int (*)(void*), float, int, int, long long) + 788
+  [bt] (7) 8   libxgboost.dylib                    0x0000000129e6071c xgboost::DMatrix* xgboost::DMatrix::Create<void*, void*, void (void*), int (void*)>(void*, void*, std::__1::shared_ptr<xgboost::DMatrix>, void (*)(void*), int (*)(void*), float, int, int, long long) + 152
+  [bt] (8) 9   libxgboost.dylib                    0x0000000129d179e4 XGQuantileDMatrixCreateFromCallback + 520
+
+

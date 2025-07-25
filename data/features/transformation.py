@@ -325,8 +325,11 @@ class FeatureTransformer(BaseProcessor):
             # For cases where std is zero, set z-score to 0
             z_score[~mask & ~rolling_mean.isna()] = 0
             
+            # Handle any infinite values that might have been created
+            z_score = z_score.replace([np.inf, -np.inf], np.nan)
+            
             # Forward fill NaN values from initial window
-            z_score = z_score.bfill()  # z_score.fillna(method='bfill')
+            z_score = z_score.bfill().fillna(0)  # z_score.fillna(method='bfill')
             
             # Add to dataframe
             if preserve_original:
@@ -367,8 +370,11 @@ class FeatureTransformer(BaseProcessor):
             # For cases where range is zero, set to 0.5 (middle of range)
             scaled[~mask & ~rolling_min.isna()] = 0.5
             
+            # Handle any infinite values that might have been created
+            scaled = scaled.replace([np.inf, -np.inf], np.nan)
+            
             # Forward fill NaN values from initial window
-            scaled = scaled.bfill()  # scaled.fillna(method='bfill')
+            scaled = scaled.bfill().fillna(0.5)  # scaled.fillna(method='bfill')
             
             # Add to dataframe
             if preserve_original:

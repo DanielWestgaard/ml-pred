@@ -44,11 +44,12 @@ class DataCleaner(BaseProcessor):
         self._remove_duplicates()
         self._timestamp_alignment()
         self._handle_outliers()
+        self._handle_infinite_values()
         self._datatype_consistency()
         self._ohlc_validity()
         
         # If user wants to plot and save data
-        if self.save_cleaned_data:
+        if False:  # Temporarily disabled to avoid browser hang on large datasets
             logger.debug(f"Will plot and save plot of Cleaned data.")            
             plot_data = PlotData(dataset=self.df, save_plot=self.save_cleaned_data)
             plot_data.run()
@@ -310,6 +311,69 @@ class DataCleaner(BaseProcessor):
 
                 # Ensure all volume values are integers
                 self.df['volume'] = self.df['volume'].astype('int64')
+    
+    def _handle_infinite_values(self):
+        """Handle infinite values in the dataset that could cause model training failures"""
+        inf_columns = []
+        total_inf_before = 0
+        total_inf_after = 0
+        
+        logger.debug("Checking for infinite values in dataset...")
+        
+        for col in self.df.columns:
+            if self.df[col].dtype in ['float64', 'float32', 'int64', 'int32']:
+                try:
+                    # Check for infinite values
+                    inf_mask = np.isinf(self.df[col])
+                    
+                    if inf_mask.any():
+                        inf_count = inf_mask.sum()
+                        inf_columns.append(col)
+                        total_inf_before += inf_count
+                        
+                        logger.debug(f"Found {inf_count} infinite values in column '{col}'")
+                        
+                        # Replace inf with NaN first
+                        self.df[col] = self.df[col].replace([np.inf, -np.inf], np.nan)
+                        
+                        # Handle the NaN values using different strategies based on column type
+                        if col in ['open', 'high', 'low', 'close']:
+                            # For price columns, use forward fill then backward fill
+                            self.df[col] = self.df[col].ffill().bfill()
+                            # If still NaN, use the median as last resort
+                            if self.df[col].isna().any():
+                                median_price = self.df[col].median()
+                                self.df[col] = self.df[col].fillna(median_price)
+                                
+                        elif col == 'volume':
+                            # For volume, use forward fill, then set to 0
+                            self.df[col] = self.df[col].ffill().fillna(0)
+                            
+                        else:
+                            # For other features, use forward fill, backward fill, then 0
+                            self.df[col] = self.df[col].ffill().bfill().fillna(0)
+                        
+                        # Verify infinite values are gone
+                        remaining_inf = np.isinf(self.df[col]).sum()
+                        total_inf_after += remaining_inf
+                        
+                        if remaining_inf > 0:
+                            logger.warning(f"Column '{col}' still has {remaining_inf} infinite values after cleaning")
+                
+                except (TypeError, ValueError, AttributeError) as e:
+                    logger.debug(f"Skipping infinite value check for column '{col}': {e}")
+                    continue
+        
+        # Report results
+        if inf_columns:
+            cleaned_inf = total_inf_before - total_inf_after
+            logger.info(f"Handled infinite values in {len(inf_columns)} columns: {inf_columns}")
+            logger.info(f"Cleaned {cleaned_inf} infinite values (from {total_inf_before} to {total_inf_after})")
+            
+            if total_inf_after > 0:
+                logger.error(f"WARNING: {total_inf_after} infinite values remain - this may cause training failures!")
+        else:
+            logger.debug("No infinite values found in dataset")
     
     def _datatype_consistency(self):
         """Ensure correct formats: timestamps as datetime, prices as floats, volumes as integers."""

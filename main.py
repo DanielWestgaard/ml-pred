@@ -186,8 +186,8 @@ def main():
     
     if args.fetch_data_capcom:
         provider = ProviderCapitalCom()
-        provider.fetch_and_save_historical_data(symbol="BTCUSD", timeframe="MINUTE_15",
-                                                  from_date="2025-02-01T00:00:00", to_date="2025-03-18T01:00:00",
+        provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE",
+                                                  from_date="2021-01-01T00:00:00", to_date="2025-07-23T01:00:00",
                                                   print_answer=False)
         provider.end_session()
     

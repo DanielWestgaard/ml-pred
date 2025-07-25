@@ -23,7 +23,7 @@ class BaseEvaluation(ABC):
         logger.info(f"---------- Initializing {self.__class__.__name__} ----------")
         
         # Suppress matplotlib's debug font messages
-        logger.getLogger('matplotlib.font_manager').setLevel(logger.WARNING)
+        # logger.getLogger('matplotlib.font_manager').setLevel(logger.WARNING)  # AttributeError: 'Logger' object has no attribute 'getLogger'
         # Common model loading logic
         if model_directory is not None:
             self.model_directory = model_directory
