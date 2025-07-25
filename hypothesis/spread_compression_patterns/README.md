@@ -4,10 +4,12 @@
 When bid-ask spreads suddenly compress, market makers (brokers) are essentially saying “we expect more volume/activity soon”.
 They’re willing to accept lower margins per trade because they anticipate higher turnover. 
 This often happens 15-45 minutes before news/volatility events, not after.<br>
-In many cases, when spreads suddenly compress, it reflects an expectation of higher volume or activity.
+In many cases, when spreads suddenly compress, it reflects an expectation of higher volume or activity.<br>
+
+The broker currently being used, Capital.com, provides separate bid- and ask-prices OHLC through their REST API and websocket (dynamic spread).
 
 
-## **Realistic Targets for GBP/USD:**
+## **Realistic Targets for liquid pairs (GBP/USD):**
 
 - **Signal Frequency**: 3-6 compression events per day
 - **Success Rate Target**: 58-65% (profitable above 52% with 2:1 risk/reward)
