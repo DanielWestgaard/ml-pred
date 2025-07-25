@@ -651,13 +651,19 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         category="momentum"
     )
     def rate_of_change(self):
-        """Price momentum: Rate of change (ROC) over various lookback periods"""
+        """Price momentum: Rate of change (ROC) over various lookback periods with safe division"""
         lookback_periods = [1, 5, 10, 20, 60]
         
         new_features = {}
         
         for period in lookback_periods:
-            new_features[f"roc_{period}"] = (self.df["close"] / self.df["close"].shift(period) - 1) * 100
+            price_shift = self.df["close"].shift(period)
+            # Safe division - avoid inf when shifted price is 0
+            new_features[f"roc_{period}"] = np.where(
+                price_shift > 0,
+                (self.df["close"] / price_shift - 1) * 100,
+                0
+            )
         
         self._add_features_efficiently(new_features)
     
@@ -701,10 +707,21 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         category="support_resistance"
     )
     def support_resistance(self, lookback: int = 20):
-        """Distance from recent high/lows"""
+        """Distance from recent high/lows with safe division"""
+        rolling_high = self.df['high'].rolling(lookback).max()
+        rolling_low = self.df['low'].rolling(lookback).min()
+        
         new_features = {
-            'distance_from_high': (self.df['close'] / self.df['high'].rolling(lookback).max() - 1) * 100,
-            'distance_from_low': (self.df['close'] / self.df['low'].rolling(lookback).min() - 1) * 100
+            'distance_from_high': np.where(
+                rolling_high > 0,
+                (self.df['close'] / rolling_high - 1) * 100,
+                0
+            ),
+            'distance_from_low': np.where(
+                rolling_low > 0,
+                (self.df['close'] / rolling_low - 1) * 100,
+                0
+            )
         }
         
         self._add_features_efficiently(new_features)
@@ -716,7 +733,7 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         category="volume"
     )
     def volume_moving_averages(self):
-        """Identify unusual volume spikes"""
+        """Identify unusual volume spikes with safe division"""
         num_periods = [7, 15, 30, 60]
         
         new_features = {}
@@ -724,7 +741,12 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         for period in num_periods:
             vma = self.df['volume'].rolling(window=period).mean()
             new_features[f'vma_{period}'] = vma
-            new_features[f'relative_volume_{period}'] = self.df['volume'] / vma
+            # Safe division - avoid inf when vma is 0
+            new_features[f'relative_volume_{period}'] = np.where(
+                vma > 0,
+                self.df['volume'] / vma,
+                1
+            )
             
         self._add_features_efficiently(new_features)
     
@@ -734,13 +756,19 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         category="volume"
     )
     def volume_rate_of_change(self):
-        """How rapidly volume is increasing/decreasing"""
+        """How rapidly volume is increasing/decreasing with safe division"""
         lookback_periods = [1, 5, 10, 20]
         
         new_features = {}
         
         for period in lookback_periods:
-            new_features[f"vroc_{period}"] = (self.df["volume"] / self.df["volume"].shift(period) - 1) * 100
+            volume_shift = self.df["volume"].shift(period)
+            # Safe division - avoid inf when shifted volume is 0
+            new_features[f"vroc_{period}"] = np.where(
+                volume_shift > 0,
+                (self.df["volume"] / volume_shift - 1) * 100,
+                0
+            )
         
         self._add_features_efficiently(new_features)
     
@@ -925,11 +953,13 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         category="oscillator"
     )
     def commodity_channel_index(self, period: int = 20):
-        """Calculate Commodity Channel Index"""
+        """Calculate Commodity Channel Index with safe division"""
         tp = (self.df['high'] + self.df['low'] + self.df['close']) / 3
         ma_tp = tp.rolling(window=period).mean()
         mad = abs(tp - ma_tp).rolling(window=period).mean()
-        cci = (tp - ma_tp) / (0.015 * mad)
+        
+        # Safe division - avoid inf when mad is 0
+        cci = np.where(mad > 1e-10, (tp - ma_tp) / (0.015 * mad), 0)
         
         self._add_features_efficiently({'cci': cci})
     
@@ -939,8 +969,16 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         category="returns"
     )
     def log_returns(self):
-        """Logarithmic returns: measure percentage change in price"""
-        log_return = np.log(self.df['close'] / self.df['close'].shift(1))
+        """Logarithmic returns: measure percentage change in price with safe calculation"""
+        price_ratio = self.df['close'] / self.df['close'].shift(1)
+        
+        # Handle division by zero, negative values, and inf values
+        log_return = np.where(
+            (price_ratio > 0) & np.isfinite(price_ratio),
+            np.log(price_ratio),
+            0
+        )
+        
         self._add_features_efficiently({'log_return': log_return})
     
     @feature_generator(
