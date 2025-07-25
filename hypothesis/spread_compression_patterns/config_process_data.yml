@@ -1,0 +1,10 @@
+hypothesis:
+  name: spread_compression_patterns
+
+data_pipeline:
+  raw_source: <source-to-raw-data>
+
+  selected_features:
+    [
+      ...
+    ]
