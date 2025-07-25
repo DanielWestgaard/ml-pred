@@ -16,7 +16,7 @@ In many cases, when spreads suddenly compress, it reflects an expectation of hig
 
 
 ## Features:
-Extremly important with not too many, as we don't want to confuse and overfit the model.<br>
+Extremly important to not have too many features as I don't want to confuse and overfit the model.<br>
 Suggestions:
 ```python
 # === CORE SPREAD FEATURES (5 features) ===
