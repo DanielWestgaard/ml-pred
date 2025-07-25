@@ -202,10 +202,65 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         
         return self.df
     
+    def _handle_infinite_values(self, feature_dict: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Handle infinite values in generated features with robust error handling
+        
+        Args:
+            feature_dict: Dictionary of feature name -> values
+            
+        Returns:
+            Dictionary with infinite values properly handled
+        """
+        cleaned_features = {}
+        inf_columns_found = []
+        
+        for feature_name, values in feature_dict.items():
+            try:
+                # Convert to pandas Series if it's not already
+                if not isinstance(values, (pd.Series, pd.DataFrame)):
+                    if hasattr(values, '__iter__') and not isinstance(values, str):
+                        values = pd.Series(values, index=self.df.index)
+                    else:
+                        # Single value, broadcast to full length
+                        values = pd.Series([values] * len(self.df), index=self.df.index)
+                
+                # Check for infinite values
+                if hasattr(values, 'replace') and values.dtype.kind in 'fc':  # float or complex
+                    # Count infinite values before cleaning
+                    inf_mask = np.isinf(values)
+                    if inf_mask.any():
+                        inf_count = inf_mask.sum()
+                        inf_columns_found.append((feature_name, inf_count))
+                        
+                        # Replace inf with NaN
+                        values = values.replace([np.inf, -np.inf], np.nan)
+                        
+                        # Handle NaN values with forward fill, then backward fill, then zero
+                        values = values.ffill().bfill().fillna(0)
+                
+                cleaned_features[feature_name] = values
+                
+            except Exception as e:
+                logger.warning(f"Error handling infinite values in feature '{feature_name}': {e}")
+                # Fallback: create zeros if we can't clean the feature
+                cleaned_features[feature_name] = pd.Series(0, index=self.df.index)
+        
+        # Log results
+        if inf_columns_found:
+            total_inf = sum(count for _, count in inf_columns_found)
+            logger.info(f"Cleaned {total_inf} infinite values across {len(inf_columns_found)} features: "
+                       f"{[(name, count) for name, count in inf_columns_found]}")
+        
+        return cleaned_features
+    
     def _add_features_efficiently(self, new_features_dict: Dict[str, Any], drop_columns: List[str] = None):
         """Add multiple features efficiently to avoid DataFrame fragmentation"""
         if new_features_dict:
-            for name, values in new_features_dict.items():
+            # Clean infinite values before adding to DataFrame
+            cleaned_features = self._handle_infinite_values(new_features_dict)
+            
+            for name, values in cleaned_features.items():
                 self.df[name] = values
         
         if drop_columns:
