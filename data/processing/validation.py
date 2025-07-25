@@ -28,6 +28,7 @@ class DataValidator(BaseProcessor):
         self.validate_volume()
         self.validate_price_movement()
         self.validate_data_completeness()
+        self.validate_infinite_values()
         
         return {
             'is_valid': len(self.validation_issues) == 0,
@@ -217,4 +218,61 @@ class DataValidator(BaseProcessor):
             self.validation_issues.append({
                 'type': 'Insufficient Data',
                 'description': f'Only {len(self.df)} data points available, minimum 30 required'
+            })
+    
+    def validate_infinite_values(self):
+        """Validate dataset for infinite values that could cause training issues"""
+        import numpy as np
+        
+        inf_columns = []
+        total_inf_count = 0
+        
+        for col in self.df.columns:
+            if self.df[col].dtype in ['float64', 'float32', 'int64', 'int32']:
+                # Check for infinite values
+                try:
+                    inf_mask = np.isinf(self.df[col])
+                    if inf_mask.any():
+                        inf_count = inf_mask.sum()
+                        inf_columns.append((col, inf_count))
+                        total_inf_count += inf_count
+                except (TypeError, ValueError):
+                    # Skip columns that can't be checked for inf (e.g., string columns)
+                    continue
+        
+        if inf_columns:
+            self.validation_issues.append({
+                'type': 'Infinite Values',
+                'description': f'Found {total_inf_count} infinite values across {len(inf_columns)} columns',
+                'details': {col: count for col, count in inf_columns},
+                'affected_columns': [col for col, _ in inf_columns]
+            })
+            
+            # Log warning about potential model training issues
+            logger.warning(f"CRITICAL: Found infinite values in dataset - this will cause XGBoost training to fail!")
+            logger.warning(f"Affected columns: {[col for col, _ in inf_columns]}")
+        else:
+            logger.debug("No infinite values found in dataset")
+        
+        # Also check for very large values that might cause numerical issues
+        large_value_columns = []
+        threshold = 1e10  # Very large number threshold
+        
+        for col in self.df.columns:
+            if self.df[col].dtype in ['float64', 'float32']:
+                try:
+                    large_mask = np.abs(self.df[col]) > threshold
+                    if large_mask.any():
+                        large_count = large_mask.sum()
+                        max_value = np.abs(self.df[col]).max()
+                        large_value_columns.append((col, large_count, max_value))
+                except (TypeError, ValueError):
+                    continue
+        
+        if large_value_columns:
+            self.validation_issues.append({
+                'type': 'Very Large Values',
+                'description': f'Found extremely large values (>{threshold}) in {len(large_value_columns)} columns',
+                'details': {col: {'count': count, 'max_abs_value': max_val} 
+                           for col, count, max_val in large_value_columns}
             })
