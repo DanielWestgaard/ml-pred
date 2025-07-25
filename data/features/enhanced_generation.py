@@ -549,8 +549,11 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         
         self.df['volatility_zscore'] = vol_zscore
         
-        # Volatility change
-        self.df['volatility_change'] = self.df['volatility_short'].pct_change()
+        # Volatility change with safe calculation
+        vol_change = self.df['volatility_short'].pct_change(fill_method=None)
+        # Replace infinite values that can occur when previous volatility is 0
+        vol_change = vol_change.replace([np.inf, -np.inf], 0)
+        self.df['volatility_change'] = vol_change
         
         # Volatility regimes using quantiles
         vol_quantiles = self.df['volatility_short'].quantile([0.33, 0.67])
