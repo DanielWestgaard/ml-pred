@@ -1,5 +1,5 @@
 ## Hypothesis description
-Use spread compression to predict possible volatile price action and execute trades before this happens.<br>
+**Use spread compression to predict possible volatile price action and execute trades before this happens**.<br>
 
 When bid-ask spreads suddenly compress, market makers (brokers) are essentially saying “we expect more volume/activity soon”.
 They’re willing to accept lower margins per trade because they anticipate higher turnover. 
