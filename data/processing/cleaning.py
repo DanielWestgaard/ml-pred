@@ -48,7 +48,7 @@ class DataCleaner(BaseProcessor):
         self._ohlc_validity()
         
         # If user wants to plot and save data
-        if False:  # Temporarily disabled to avoid browser hang
+        if False:  # Temporarily disabled to avoid browser hang on large datasets
             logger.debug(f"Will plot and save plot of Cleaned data.")            
             plot_data = PlotData(dataset=self.df, save_plot=self.save_cleaned_data)
             plot_data.run()
