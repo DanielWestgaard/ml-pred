@@ -370,8 +370,11 @@ class FeatureTransformer(BaseProcessor):
             # For cases where range is zero, set to 0.5 (middle of range)
             scaled[~mask & ~rolling_min.isna()] = 0.5
             
+            # Handle any infinite values that might have been created
+            scaled = scaled.replace([np.inf, -np.inf], np.nan)
+            
             # Forward fill NaN values from initial window
-            scaled = scaled.bfill()  # scaled.fillna(method='bfill')
+            scaled = scaled.bfill().fillna(0.5)  # scaled.fillna(method='bfill')
             
             # Add to dataframe
             if preserve_original:
