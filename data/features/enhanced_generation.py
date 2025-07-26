@@ -753,6 +753,30 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             
         self._add_features_efficiently(new_features)
     
+    # Individual feature generators for missing dependencies
+    @feature_generator(
+        output_features=['volume_ma_20'],
+        description="20-period volume moving average",
+        category="volume"
+    )
+    def volume_ma_20_feature(self):
+        """Generate 20-period volume moving average"""
+        self.df['volume_ma_20'] = self.df['volume'].rolling(window=20).mean()
+    
+    @feature_generator(
+        output_features=['volume_ratio'],
+        dependencies=['volume_ma_20'],
+        description="Current volume relative to 20-period average",
+        category="volume"
+    )
+    def volume_ratio_feature(self):
+        """Generate volume ratio relative to 20-period average"""
+        self.df['volume_ratio'] = np.where(
+            self.df['volume_ma_20'] > 0,
+            self.df['volume'] / self.df['volume_ma_20'],
+            1.0
+        )
+    
     @feature_generator(
         output_features=['vroc_1', 'vroc_5', 'vroc_10', 'vroc_20'],
         description="Volume rate of change",
