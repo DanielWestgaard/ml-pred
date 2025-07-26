@@ -42,7 +42,7 @@ data_pipeline:
       "hour",
       "london_session",
       "asian_session",
-      "us_session",
+      "ny_session",
       
       # Signal strength composite
       "signal_strength_compression"
