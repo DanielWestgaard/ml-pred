@@ -39,12 +39,14 @@ class LiveDataManager:
             buffer_size: Maximum number of data points to keep in buffer
             feature_window: Minimum data points needed for feature calculation
             selected_features: Specific features to generate (None = all features)
+            spread_focused: Whether to include spread data in live streams (default: False)
         """
         self.symbol = symbol
         self.timeframe = timeframe
         self.buffer_size = buffer_size
         self.feature_window = feature_window
         self.selected_features = selected_features
+        self.spread_focused = kwargs.get('spread_focused', False)
         
         # Data storage
         self.raw_buffer = deque(maxlen=buffer_size)
@@ -662,8 +664,8 @@ class LiveDataManager:
                     # Convert to DataFrame
                     df_data = []
                     for price_point in prices_data:
-                        # Use unified mid-price extraction - no redundant conversion
-                        ohlcv_data = extract_mid_price_ohlcv(price_point)
+                        # Use unified mid-price extraction with optional spread data
+                        ohlcv_data = extract_mid_price_ohlcv(price_point, include_spreads=self.spread_focused)
                         df_data.append({
                             'date': ohlcv_data['timestamp'],
                             'open': ohlcv_data['open'],
