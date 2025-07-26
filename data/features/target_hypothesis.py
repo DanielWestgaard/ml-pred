@@ -89,7 +89,7 @@ class TargetHypothesis(BaseProcessor):
         particularly during London session trading hours when market liquidity changes.
         """
         try:
-            # Required features for this hypothesis
+            # Required features check
             required_features = [
                 'compression_ratio', 'spread_volatility_ewm', 'compression_consistency',
                 'volume_ratio', 'london_session', 'signal_strength_compression'
@@ -97,34 +97,55 @@ class TargetHypothesis(BaseProcessor):
             
             missing_features = [f for f in required_features if f not in self.df.columns]
             if missing_features:
-                logger.error(f"Missing required features for spread_compression_patterns: {missing_features}")
+                logger.error(f"Missing required features: {missing_features}")
                 return
             
-            # Future price movement (next 15 periods ahead for 5m data = 75 minutes)
+            # Future price movement (next 15 periods = 75 minutes for 5m data)
             self.df['future_price_change'] = (
                 self.df['close'].shift(-15) - self.df['close']
             ) / self.df['close']
             
-            # Define significant movement threshold (0.15% for GBPUSD)
-            movement_threshold = 0.0015
+            # STEP 1: Analyze actual data distributions first
+            logger.info("=== DATA DISTRIBUTION ANALYSIS ===")
+            logger.info(f"Compression ratio - Mean: {self.df['compression_ratio'].mean():.4f}, "
+                    f"Std: {self.df['compression_ratio'].std():.4f}, "
+                    f"95th percentile: {self.df['compression_ratio'].quantile(0.95):.4f}")
             
-            # Target conditions:
-            # 1. Strong compression ratio (> 0.1 = 10% compression)
-            # 2. Consistent compression (> 0.5)
-            # 3. Volume confirmation (> 1.2 = 20% above average)
-            # 4. During London session hours (bonus weight)
-            # 5. Results in significant price movement
+            logger.info(f"Compression consistency - Mean: {self.df['compression_consistency'].mean():.4f}, "
+                    f"95th percentile: {self.df['compression_consistency'].quantile(0.95):.4f}")
             
-            compression_signal = (
-                (self.df['compression_ratio'] > 0.1) &
-                (self.df['compression_consistency'] > 0.5) &
-                (self.df['volume_ratio'] > 1.2)
+            logger.info(f"Volume ratio - Mean: {self.df['volume_ratio'].mean():.4f}, "
+                    f"95th percentile: {self.df['volume_ratio'].quantile(0.95):.4f}")
+            
+            logger.info(f"Future price change - Std: {self.df['future_price_change'].std():.6f}, "
+                    f"95th percentile: {abs(self.df['future_price_change']).quantile(0.95):.6f}")
+            
+            # STEP 2: Use adaptive thresholds based on actual data
+            compression_threshold = self.df['compression_ratio'].quantile(0.80)  # Top 20%
+            consistency_threshold = self.df['compression_consistency'].quantile(0.70)  # Top 30%
+            volume_threshold = max(1.1, self.df['volume_ratio'].quantile(0.75))  # Top 25% but at least 1.1
+            movement_threshold = abs(self.df['future_price_change']).quantile(0.75)  # Top 25% movements
+            
+            logger.info(f"Adaptive thresholds - Compression: {compression_threshold:.4f}, "
+                    f"Consistency: {consistency_threshold:.4f}, "
+                    f"Volume: {volume_threshold:.4f}, "
+                    f"Movement: {movement_threshold:.6f}")
+            
+            # STEP 3: Progressive signal strength (instead of hard AND conditions)
+            
+            # Basic compression signal
+            compression_signal = self.df['compression_ratio'] > compression_threshold
+            
+            # Add consistency bonus
+            compression_with_consistency = (
+                compression_signal & 
+                (self.df['compression_consistency'] > consistency_threshold)
             )
             
-            # Enhanced signal during London session
-            london_enhanced_signal = (
-                compression_signal & 
-                (self.df['london_session'] == 1)
+            # Add volume confirmation
+            strong_compression_signal = (
+                compression_with_consistency & 
+                (self.df['volume_ratio'] > volume_threshold)
             )
             
             # Future significant movement
@@ -132,33 +153,124 @@ class TargetHypothesis(BaseProcessor):
                 abs(self.df['future_price_change']) > movement_threshold
             )
             
-            # Target: Compression pattern that leads to significant movement
-            # Higher weight for London session occurrences
-            target_spread_compression = np.where(
-                london_enhanced_signal & significant_movement, 2,  # Strong signal during London
+            # STEP 4: Create tiered targets
+            
+            # Tier 1: Basic compression + movement
+            basic_signal = compression_signal & significant_movement
+            
+            # Tier 2: Compression + consistency + movement  
+            medium_signal = compression_with_consistency & significant_movement
+            
+            # Tier 3: Full signal (compression + consistency + volume + movement)
+            strong_signal = strong_compression_signal & significant_movement
+            
+            # Tier 4: London session bonus
+            london_strong_signal = strong_signal & (self.df['london_session'] == 1)
+            
+            # STEP 5: Create multi-class target
+            target_values = np.where(
+                london_strong_signal, 4,  # Best signal
                 np.where(
-                    compression_signal & significant_movement, 1,  # Regular signal
-                    0  # No signal
+                    strong_signal, 3,     # Strong signal
+                    np.where(
+                        medium_signal, 2,  # Medium signal
+                        np.where(
+                            basic_signal, 1,  # Basic signal
+                            0  # No signal
+                        )
+                    )
                 )
-            ).astype(int)
-            target_spread_compression_series = pd.Series(target_spread_compression)
+            )
             
-            # Create binary version for simpler classification
-            self.df['target_spread_compression_binary'] = (
-                target_spread_compression_series > 0
-            ).astype(int)
+            self.df['target_spread_compression_multi'] = target_values
             
-            logger.info(f"Target columns for spread_compression_patterns hypothesis created.")
-            logger.info(f"Target distribution: {target_spread_compression_series.value_counts().to_dict()}")
+            # Binary version (any signal vs no signal)
+            self.df['target_spread_compression_binary'] = (target_values > 0).astype(int)
             
-            logger.info("temporarily validating hypothesis suggestions")
-            validate_spread_compression_hypothesis(self, self.df)
+            # STEP 6: Report results
+            target_distribution = pd.Series(target_values).value_counts().sort_index()
+            logger.info(f"Multi-class target distribution: {target_distribution.to_dict()}")
+            logger.info(f"Binary target distribution: {self.df['target_spread_compression_binary'].value_counts().to_dict()}")
+            
+            # Signal frequency analysis
+            total_signals = (target_values > 0).sum()
+            signal_frequency = total_signals / len(self.df) * 100
+            logger.info(f"Signal frequency: {total_signals}/{len(self.df)} = {signal_frequency:.2f}% of periods")
+            
+            # Estimate daily frequency (assuming 5-minute bars)
+            periods_per_day = 288  # 24 * 60 / 5
+            estimated_daily_signals = signal_frequency / 100 * periods_per_day
+            logger.info(f"Estimated daily signals: {estimated_daily_signals:.1f}")
+            
+            # STEP 7: Quick validation of each tier
+            for tier in [1, 2, 3, 4]:
+                tier_mask = target_values == tier
+                if tier_mask.sum() > 0:
+                    tier_movement = abs(self.df[tier_mask]['future_price_change']).mean()
+                    logger.info(f"Tier {tier} average movement: {tier_movement:.6f} ({tier_mask.sum()} events)")
+            
+            quick_signal_validation(self)
+            
+            return True
             
         except Exception as e:
-            logger.error(f"Unable to calculate target for spread_compression_patterns hypothesis: {e}")
+            logger.error(f"Unable to calculate fixed target: {e}")
+            return False
 
     # IMPORTANT FOR FURTHER DEVELOPMENT: Remember to add the prefix 'target_*' for the target column to the hypothesis.
     # This is because the normalization step after generation and this step will not normalize columns that starts with 'target_'.
+
+
+
+
+
+
+##### TEMPORARILY TESTING TARGET HYPOTHESIS SPREAD COMPRESSION PATTERNS - CAN DELETE ONCE DONE MANUAL TESTING
+
+def quick_signal_validation(self):
+    """
+    Quick check if signals have any predictive power
+    """
+    try:
+        # Test different simple conditions
+        conditions = {
+            'compression_only': self.df['compression_ratio'] > self.df['compression_ratio'].quantile(0.8),
+            'volume_only': self.df['volume_ratio'] > self.df['volume_ratio'].quantile(0.8),
+            'consistency_only': self.df['compression_consistency'] > self.df['compression_consistency'].quantile(0.8),
+            'combined_loose': (
+                (self.df['compression_ratio'] > self.df['compression_ratio'].quantile(0.7)) &
+                (self.df['volume_ratio'] > self.df['volume_ratio'].quantile(0.7))
+            )
+        }
+        
+        logger.info("=== INDIVIDUAL SIGNAL VALIDATION ===")
+        
+        for name, condition in conditions.items():
+            if condition.sum() > 10:  # Need minimum events
+                # Future movement for events vs non-events
+                event_movement = abs(self.df[condition]['future_price_change']).mean()
+                normal_movement = abs(self.df[~condition]['future_price_change']).mean()
+                
+                if normal_movement > 0:
+                    ratio = event_movement / normal_movement
+                    logger.info(f"{name}: {condition.sum()} events, movement ratio: {ratio:.2f}x")
+                else:
+                    logger.info(f"{name}: {condition.sum()} events, unable to calculate ratio")
+        
+        logger.info("=== TESTING THE DATA DISTRIBUTIONS ===")
+        # First run this to see your data distributions:
+        logger.info(f"Compression ratio 80th percentile: {self.df['compression_ratio'].quantile(0.8)}")
+        logger.info(f"Consistency 70th percentile: {self.df['compression_consistency'].quantile(0.7)}")  
+        logger.info(f"Volume 75th percentile: {self.df['volume_ratio'].quantile(0.75)}")
+        logger.info(f"Movement 75th percentile: {abs(self.df['future_price_change']).quantile(0.75)}")
+        
+        logger.info("=== Quick Diagnostic Questions ===")
+        logger.info(f"df['compression_ratio'].describe() shows : {self.df['compression_ratio'].describe()}")
+        logger.info(f"df['compression_consistency'].describe() shows : {self.df['compression_consistency'].describe()}")
+        logger.info(f"Data period is from GBPUSD 5m 2024-12-01_2025-01-23, though I really plan on using 1m (only using 5m now for testing as its faster to process and fetch)")
+        
+    except Exception as e:
+        logger.error(f"Validation error: {e}")
 
 
 def validate_spread_compression_hypothesis(self, df):
