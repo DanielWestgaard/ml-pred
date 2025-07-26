@@ -1342,3 +1342,130 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             new_features[col] = trend_dummies[col]
         
         self._add_features_efficiently(new_features)
+
+    @feature_generator(
+        output_features=['mid_price'],
+        description="Mid price calculation for spread analysis",
+        category="spread_compression"
+    )
+    def mid_price_feature(self):
+        """Calculate mid price for spread compression analysis"""
+        self.df['mid_price'] = (self.df['high'] + self.df['low']) / 2
+
+    @feature_generator(
+        output_features=['spread_baseline', 'spread_recent', 'compression_ratio', 
+                        'compression_consistency', 'spread_volatility_ewm'],
+        dependencies=['hl_spread_bps', 'mid_price'],
+        description="Spread compression detection features using EWMA",
+        category="spread_compression"
+    )
+    def spread_compression_features(self):
+        """
+        Generate spread compression detection features using EWMA (better than std).
+        
+        Uses high-low spread as proxy until bid-ask data is available.
+        EWMA provides better responsiveness for detecting compression patterns.
+        """
+        lookback_window = 60  # 60 periods for baseline
+        alpha_baseline = 2 / (lookback_window + 1)  # EWMA alpha for baseline
+        alpha_recent = 2 / (4)  # Fast EWMA for recent spread (3-period equivalent)
+        
+        # Ensure hl_spread_bps exists
+        if 'hl_spread_bps' not in self.df.columns:
+            # Calculate if missing
+            hl_spread = self.df['high'] - self.df['low']
+            mid_price = self.df['mid_price'] if 'mid_price' in self.df.columns else (self.df['high'] + self.df['low']) / 2
+            spread_bps = np.where(mid_price > 0, (hl_spread / mid_price) * 10000, 0)
+        else:
+            spread_bps = self.df['hl_spread_bps']
+        
+        # EWMA baseline (slower moving average)
+        self.df['spread_baseline'] = pd.Series(spread_bps).ewm(alpha=alpha_baseline, adjust=False).mean()
+        
+        # EWMA recent (faster moving average)  
+        self.df['spread_recent'] = pd.Series(spread_bps).ewm(alpha=alpha_recent, adjust=False).mean()
+        
+        # Compression ratio (key feature)
+        self.df['compression_ratio'] = np.where(
+            self.df['spread_baseline'] > 0,
+            (self.df['spread_baseline'] - self.df['spread_recent']) / self.df['spread_baseline'],
+            0
+        )
+        
+        # Spread volatility using EWMA (better than rolling std)
+        spread_returns = pd.Series(spread_bps).pct_change(fill_method=None)
+        spread_vol_ewm = spread_returns.ewm(alpha=0.1).std()  # 10-period equivalent EWMA std
+        self.df['spread_volatility_ewm'] = spread_vol_ewm
+        
+        # Compression consistency (inverse of volatility)
+        self.df['compression_consistency'] = np.where(
+            spread_vol_ewm > 0,
+            1 / (1 + spread_vol_ewm * 1000),
+            1.0
+        )
+
+    @feature_generator(
+        output_features=['volume_recent_ratio'],
+        dependencies=['volume_ma_20'],
+        description="Recent volume ratio for spread compression confirmation",
+        category="spread_compression"
+    )
+    def volume_recent_ratio_feature(self):
+        """Generate recent volume ratio using EWMA for spread compression"""
+        # Fast EWMA for recent volume (3-period equivalent)
+        alpha_recent = 2 / (4)
+        volume_recent_ewm = self.df['volume'].ewm(alpha=alpha_recent, adjust=False).mean()
+        
+        # Volume recent ratio
+        self.df['volume_recent_ratio'] = np.where(
+            self.df['volume_ma_20'] > 0,
+            volume_recent_ewm / self.df['volume_ma_20'],
+            1.0
+        )
+
+    @feature_generator(
+        output_features=['price_momentum_5'],
+        dependencies=['mid_price'],
+        description="5-period price momentum for spread compression",
+        category="spread_compression"
+    )
+    def price_momentum_5_feature(self):
+        """Generate 5-period price momentum"""
+        self.df['price_momentum_5'] = (
+            self.df['mid_price'] - self.df['mid_price'].shift(5)
+        ) / self.df['mid_price'].shift(5)
+
+    @feature_generator(
+        output_features=['hour'],
+        description="Simple hour feature for session detection",
+        category="spread_compression"
+    )
+    def hour_feature(self):
+        """Generate simple hour feature"""
+        self.df['hour'] = self.df.index.hour
+
+    @feature_generator(
+        output_features=['signal_strength_compression'],
+        dependencies=['compression_ratio', 'volume_ratio', 'compression_consistency', 'london_session'],
+        description="Combined signal strength for spread compression patterns",
+        category="spread_compression"
+    )
+    def signal_strength_compression_feature(self):
+        """
+        Generate combined signal strength for spread compression.
+        
+        Weighted combination of compression indicators with session bonus.
+        """
+        # Ensure dependencies exist with safe defaults
+        compression_ratio = self.df.get('compression_ratio', 0)
+        volume_ratio = self.df.get('volume_ratio', 1)
+        compression_consistency = self.df.get('compression_consistency', 0)
+        london_session = self.df.get('london_session', 0)
+        
+        # Combined signal strength (matching hypothesis weights)
+        self.df['signal_strength_compression'] = (
+            compression_ratio * 2.0 +           # Weight compression highest
+            volume_ratio * 1.0 +                # Volume confirmation  
+            compression_consistency * 1.5 +     # Consistency matters
+            london_session * 0.3                # Session bonus
+        )
