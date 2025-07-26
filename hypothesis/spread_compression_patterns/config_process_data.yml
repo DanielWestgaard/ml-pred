@@ -2,48 +2,27 @@ hypothesis:
   name: spread_compression_patterns
 
 data_pipeline:
-  raw_source: storage/data/capital_com/GBPUSD/raw/5m/2024-12-01_2025-01-23.csv
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
   spread_focused: true  # Enable bid-ask spread data preservation (default: false)
 
-  selected_features:
+  selected_features:  # OPTIMIZED FEATURE SET - 8 CORE FEATURES (redundancy eliminated)
     [
-      # Core price features (needed for spread calculation)
-      "mid_price",
-      "close_og",
+      # Primary compression signal (most sensitive, no redundancy)
+      'compression_ratio_micro',      # 30min/3min timeframe (eliminated short due to 0.905 correlation)
+      'compression_consistency',      # Strongest predictor (-0.4169 correlation)
       
-      # True spread features (available when spread_focused=true)
-      "bid_ask_spread_features",
-      "spread_tight_features", 
-      "spread_wide_features",
-      "spread_relative_features",
+      # Enhanced signal strength (optimized weights)
+      'signal_strength_v2',           # Combines all signals with optimal weights
       
-      # High-low spread proxy features (fallback when spread_focused=false)
-      "hl_spread_bps", 
-      "hl_spread_ma_20",
-      "hl_spread_ratio",
+      # Volume confirmation suite (comprehensive coverage)
+      'volume_ratio',                 # 1.40x movement ratio (strongest individual)
+      'volume_acceleration',          # Volume momentum detection
+      'volume_breakout',              # Z-score > 2 breakout detection
       
-      # Spread compression detection features
-      "spread_baseline",
-      "spread_recent", 
-      "compression_ratio",
-      "compression_consistency",
-      "spread_volatility_ewm",
+      # Context features (market timing & price)
+      'london_session',               # Session timing (proven effective)
+      'price_momentum_5',             # 5-period price momentum
       
-      # Volume confirmation features
-      "volume_ma_20",
-      "volume_ratio",
-      "volume_recent_ratio",
-      
-      # Price momentum features
-      "price_momentum_5",
-      "volatility_short",
-      
-      # Time-based features
-      "hour",
-      "london_session",
-      "asian_session",
-      "ny_session",
-      
-      # Signal strength composite
-      "signal_strength_compression"
+      # Target for validation
+      'future_price_change'
     ]

@@ -1,0 +1,261 @@
+26-07-2025 15:46:40 - mixed                                   :149  - INFO     - Logging system initialized. Environment: development, Log category: data (Data pipeline and feature engineering)
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'average_directional_index' producing ['+di', '-di', 'adx']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'average_true_range' producing ['atr']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'bid_ask_spread_features' producing ['bid_ask_spread_bps', 'bid_ask_spread_relative']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'bollinger_bands' producing ['upper_band', 'lower_band', 'bb_width']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'commodity_channel_index' producing ['cci']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'day_of_week' producing ['day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'future_atr_features' producing ['future_atr']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'fx_activity_profile' producing ['activity']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'fx_trading_sessions' producing ['asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'holiday_features' producing ['is_holiday', 'days_to_next_holiday']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'hour_feature' producing ['hour']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'log_returns' producing ['log_return']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'market_microstructure_features' producing ['hl_spread_bps', 'hl_spread_ma_20', 'hl_spread_ratio']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'mid_price_feature' producing ['mid_price']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'money_flow_index' producing ['mfi']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'moving_average_convergence_divergence' producing ['macd_line', 'macd_signal', 'macd_histogram']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'moving_averages' producing ['sma_5', 'sma_10', 'sma_20', 'sma_50', 'sma_200', 'ema_5', 'ema_10', 'ema_20', 'ema_50', 'ema_200']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'mstl_decomposition' producing ['mstl_trend', 'mstl_residual']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'on_balance_volume' producing ['obv']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'price_momentum_5_feature' producing ['price_momentum_5']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'rate_of_change' producing ['roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'relative_strength_index' producing ['rsi_14']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'seasonal_decompose' producing ['seasonal_trend', 'seasonal_seasonal', 'seasonal_residual', 'seasonal_norm']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_atr_features' producing ['session_atr_mean', 'session_atr_std']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_timing_features' producing ['minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_transition_features' producing ['minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'signal_strength_compression_feature' producing ['signal_strength_compression']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'spread_compression_features' producing ['spread_baseline', 'spread_recent', 'compression_ratio', 'compression_consistency', 'spread_volatility_ewm']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'spread_relative_features' producing ['spread_relative', 'spread_baseline_true', 'spread_recent_true', 'compression_ratio_true']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'spread_tight_features' producing ['spread_tight', 'spread_wide', 'spread_avg']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'stl_decomposition' producing ['stl_trend', 'stl_seasonal', 'stl_residual', 'stl_seasonal_strength', 'stl_trend_strength']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'stochastic_oscillator' producing ['stoch_k', 'stoch_d']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'support_resistance' producing ['distance_from_high', 'distance_from_low']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_day' producing ['hour_sin', 'hour_cos']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_month' producing ['month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_week' producing ['hour_of_week_sin', 'hour_of_week_cos', 'is_weekend']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'trend_strength_indicators' producing ['trend_strength', 'trend_regime', 'trend_regime_strong_trend', 'trend_regime_weak_trend', 'trend_regime_ranging']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volatility_regimes' producing ['returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_high', 'vol_regime_low', 'vol_regime_medium']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_ma_20_feature' producing ['volume_ma_20']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_moving_averages' producing ['vma_7', 'vma_15', 'vma_30', 'vma_60', 'relative_volume_7', 'relative_volume_15', 'relative_volume_30', 'relative_volume_60']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_profile' producing ['vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_rate_of_change' producing ['vroc_1', 'vroc_5', 'vroc_10', 'vroc_20']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_ratio_feature' producing ['volume_ratio']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_recent_ratio_feature' producing ['volume_recent_ratio']
+26-07-2025 15:46:41 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'vwap' producing ['vwap']
+26-07-2025 15:46:42 - __main__                                :128  - INFO     - User using pure hypothesis flow!
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/spread_compression_patterns/config_process_data.yml
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :154  - INFO     - Loaded hypothesis: spread_compression_patterns
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted data_pipeline.raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted data_pipeline.spread_focused: True
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted data_pipeline.selected_features: ['compression_ratio', 'compression_consistency', 'signal_strength_compression', 'mid_price', 'volume_ratio', 'london_session', 'price_momentum_5', 'volatility_short', 'spread_relative', 'spread_volatility_ewm', 'hour', 'future_price_change']
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'model_training' not found in configuration
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'evaluate_model' not found in configuration
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'strategy' not found in configuration
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :171  - DEBUG    - Extracted selected_features as 'features': ['compression_ratio', 'compression_consistency', 'signal_strength_compression', 'mid_price', 'volume_ratio', 'london_session', 'price_momentum_5', 'volatility_short', 'spread_relative', 'spread_volatility_ewm', 'hour', 'future_price_change']
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :176  - DEBUG    - Extracted spread_focused setting: True
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :184  - INFO     - Successfully loaded config sections: ['data_pipeline']
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/spread_compression_patterns/config_process_data.yml
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :154  - INFO     - Loaded hypothesis: spread_compression_patterns
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted data_pipeline.raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted data_pipeline.spread_focused: True
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :131  - DEBUG    - Extracted data_pipeline.selected_features: ['compression_ratio', 'compression_consistency', 'signal_strength_compression', 'mid_price', 'volume_ratio', 'london_session', 'price_momentum_5', 'volatility_short', 'spread_relative', 'spread_volatility_ewm', 'hour', 'future_price_change']
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'model_training' not found in configuration
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'evaluate_model' not found in configuration
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :115  - DEBUG    - Section 'strategy' not found in configuration
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :171  - DEBUG    - Extracted selected_features as 'features': ['compression_ratio', 'compression_consistency', 'signal_strength_compression', 'mid_price', 'volume_ratio', 'london_session', 'price_momentum_5', 'volatility_short', 'spread_relative', 'spread_volatility_ewm', 'hour', 'future_price_change']
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :176  - DEBUG    - Extracted spread_focused setting: True
+26-07-2025 15:46:42 - utils.hypothesis.config_loader          :184  - INFO     - Successfully loaded config sections: ['data_pipeline']
+26-07-2025 15:46:42 - utils.data_utils                        :250  - DEBUG    - Loading storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
+26-07-2025 15:46:43 - data.pipelines.engineer_pipeline        :51   - DEBUG    - Engineering Pipeline - Successfully loaded data!
+26-07-2025 15:46:43 - utils.data_utils                        :250  - DEBUG    - Loading                        Date     Open     High      Low    Close  Volume  bid_open  ask_open  ...  ask_close  spread_open  spread_high  spread_low  spread_close  spread_tight  spread_wide  spread_avg
+0       2024-10-01T00:00:00  1.33776  1.33779  1.33763  1.33773      72   1.33769   1.33782  ...    1.33780      0.00013      0.00013     0.00013       0.00013      -0.00003      0.00029     0.00013
+1       2024-10-01T00:01:00  1.33773  1.33774  1.33757  1.33774     100   1.33766   1.33779  ...    1.33781      0.00013      0.00013     0.00013       0.00013      -0.00004      0.00030     0.00013
+2       2024-10-01T00:02:00  1.33773  1.33777  1.33754  1.33773     103   1.33767   1.33780  ...    1.33780      0.00013      0.00013     0.00013       0.00013      -0.00010      0.00036     0.00013
+3       2024-10-01T00:03:00  1.33774  1.33777  1.33754  1.33777      79   1.33768   1.33781  ...    1.33783      0.00013      0.00013     0.00013       0.00013      -0.00010      0.00036     0.00013
+4       2024-10-01T00:04:00  1.33780  1.33783  1.33773  1.33779      81   1.33773   1.33786  ...    1.33785      0.00013      0.00013     0.00013       0.00013       0.00004      0.00022     0.00013
+...                     ...      ...      ...      ...      ...     ...       ...       ...  ...        ...          ...          ...         ...           ...           ...          ...         ...
+302099  2025-07-25T00:56:00  1.35057  1.35058  1.35052  1.35054      45   1.35050   1.35063  ...    1.35061      0.00013      0.00013     0.00013       0.00013       0.00007      0.00019     0.00013
+302100  2025-07-25T00:57:00  1.35054  1.35074  1.35054  1.35069      55   1.35047   1.35060  ...    1.35076      0.00013      0.00013     0.00013       0.00013      -0.00007      0.00033     0.00013
+302101  2025-07-25T00:58:00  1.35068  1.35074  1.35068  1.35068      36   1.35062   1.35075  ...    1.35075      0.00013      0.00013     0.00013       0.00013       0.00007      0.00019     0.00013
+302102  2025-07-25T00:59:00  1.35069  1.35076  1.35069  1.35075      42   1.35063   1.35076  ...    1.35081      0.00013      0.00013     0.00013       0.00013       0.00006      0.00020     0.00013
+302103  2025-07-25T01:00:00  1.35074  1.35093  1.35074  1.35089      68   1.35067   1.35080  ...    1.35096      0.00013      0.00013     0.00013       0.00013      -0.00007      0.00033     0.00013
+
+[302104 rows x 21 columns]
+26-07-2025 15:46:43 - data.pipelines.engineer_pipeline        :66   - INFO     - ---------- Running Data Pipeline ----------
+26-07-2025 15:46:43 - data.processing.cleaning                :39   - INFO     - ---------- Running Data Cleaner ----------
+26-07-2025 15:46:43 - data.processing.cleaning                :145  - INFO     - Removed 316 duplicate records
+26-07-2025 15:46:43 - utils.data_utils                        :96   - DEBUG    - Parsing timestamp series with 301788 values
+26-07-2025 15:46:43 - utils.data_utils                        :125  - DEBUG    - Attempting pandas mixed format parsing
+26-07-2025 15:46:43 - data.processing.cleaning                :196  - DEBUG    - Localized timestamps to UTC
+26-07-2025 15:46:43 - data.processing.cleaning                :214  - DEBUG    - Most common time interval: 0 days 00:01:00
+26-07-2025 15:46:43 - data.processing.cleaning                :219  - WARNING  - Found 928 gaps in time series - filling them
+26-07-2025 15:46:43 - data.processing.cleaning                :241  - INFO     - Filled time series gaps. New length: 427741
+26-07-2025 15:46:43 - data.processing.cleaning                :306  - DEBUG    - Capping 3253 extreme volume values
+26-07-2025 15:46:43 - data.processing.cleaning                :321  - DEBUG    - Checking for infinite values in dataset...
+26-07-2025 15:46:43 - data.processing.cleaning                :376  - DEBUG    - No infinite values found in dataset
+26-07-2025 15:46:43 - data.processing.cleaning                :488  - INFO     - No OHLC relationship issues found!
+26-07-2025 15:46:43 - utils.data_utils                        :250  - DEBUG    - Loading                               open     high      low    close  volume  bid_open  ask_open  ...  spread_open  spread_high  spread_low  spread_close  spread_tight  spread_wide  spread_avg
+2024-10-01 00:00:00+00:00  1.33776  1.33779  1.33763  1.33773      72   1.33769   1.33782  ...      0.00013      0.00013     0.00013       0.00013      -0.00003      0.00029     0.00013
+2024-10-01 00:01:00+00:00  1.33773  1.33774  1.33757  1.33774     100   1.33766   1.33779  ...      0.00013      0.00013     0.00013       0.00013      -0.00004      0.00030     0.00013
+2024-10-01 00:02:00+00:00  1.33773  1.33777  1.33754  1.33773     103   1.33767   1.33780  ...      0.00013      0.00013     0.00013       0.00013      -0.00010      0.00036     0.00013
+2024-10-01 00:03:00+00:00  1.33774  1.33777  1.33754  1.33777      79   1.33768   1.33781  ...      0.00013      0.00013     0.00013       0.00013      -0.00010      0.00036     0.00013
+2024-10-01 00:04:00+00:00  1.33780  1.33783  1.33773  1.33779      81   1.33773   1.33786  ...      0.00013      0.00013     0.00013       0.00013       0.00004      0.00022     0.00013
+...                            ...      ...      ...      ...     ...       ...       ...  ...          ...          ...         ...           ...           ...          ...         ...
+2025-07-25 00:56:00+00:00  1.35057  1.35058  1.35052  1.35054      45   1.35050   1.35063  ...      0.00013      0.00013     0.00013       0.00013       0.00007      0.00019     0.00013
+2025-07-25 00:57:00+00:00  1.35054  1.35074  1.35054  1.35069      55   1.35047   1.35060  ...      0.00013      0.00013     0.00013       0.00013      -0.00007      0.00033     0.00013
+2025-07-25 00:58:00+00:00  1.35068  1.35074  1.35068  1.35068      36   1.35062   1.35075  ...      0.00013      0.00013     0.00013       0.00013       0.00007      0.00019     0.00013
+2025-07-25 00:59:00+00:00  1.35069  1.35076  1.35069  1.35075      42   1.35063   1.35076  ...      0.00013      0.00013     0.00013       0.00013       0.00006      0.00020     0.00013
+2025-07-25 01:00:00+00:00  1.35074  1.35093  1.35074  1.35089      68   1.35067   1.35080  ...      0.00013      0.00013     0.00013       0.00013      -0.00007      0.00033     0.00013
+
+[427741 rows x 20 columns]
+26-07-2025 15:46:43 - data.processing.validation              :24   - INFO     - ---------- Running Data Validator ----------
+26-07-2025 15:46:43 - data.processing.validation              :255  - DEBUG    - No infinite values found in dataset
+26-07-2025 15:46:43 - utils.data_utils                        :277  - INFO     - Validation of cleaned data was valid!
+26-07-2025 15:46:43 - utils.data_utils                        :250  - DEBUG    - Loading                               open     high      low    close  volume  bid_open  ask_open  ...  spread_open  spread_high  spread_low  spread_close  spread_tight  spread_wide  spread_avg
+2024-10-01 00:00:00+00:00  1.33776  1.33779  1.33763  1.33773      72   1.33769   1.33782  ...      0.00013      0.00013     0.00013       0.00013      -0.00003      0.00029     0.00013
+2024-10-01 00:01:00+00:00  1.33773  1.33774  1.33757  1.33774     100   1.33766   1.33779  ...      0.00013      0.00013     0.00013       0.00013      -0.00004      0.00030     0.00013
+2024-10-01 00:02:00+00:00  1.33773  1.33777  1.33754  1.33773     103   1.33767   1.33780  ...      0.00013      0.00013     0.00013       0.00013      -0.00010      0.00036     0.00013
+2024-10-01 00:03:00+00:00  1.33774  1.33777  1.33754  1.33777      79   1.33768   1.33781  ...      0.00013      0.00013     0.00013       0.00013      -0.00010      0.00036     0.00013
+2024-10-01 00:04:00+00:00  1.33780  1.33783  1.33773  1.33779      81   1.33773   1.33786  ...      0.00013      0.00013     0.00013       0.00013       0.00004      0.00022     0.00013
+...                            ...      ...      ...      ...     ...       ...       ...  ...          ...          ...         ...           ...           ...          ...         ...
+2025-07-25 00:56:00+00:00  1.35057  1.35058  1.35052  1.35054      45   1.35050   1.35063  ...      0.00013      0.00013     0.00013       0.00013       0.00007      0.00019     0.00013
+2025-07-25 00:57:00+00:00  1.35054  1.35074  1.35054  1.35069      55   1.35047   1.35060  ...      0.00013      0.00013     0.00013       0.00013      -0.00007      0.00033     0.00013
+2025-07-25 00:58:00+00:00  1.35068  1.35074  1.35068  1.35068      36   1.35062   1.35075  ...      0.00013      0.00013     0.00013       0.00013       0.00007      0.00019     0.00013
+2025-07-25 00:59:00+00:00  1.35069  1.35076  1.35069  1.35075      42   1.35063   1.35076  ...      0.00013      0.00013     0.00013       0.00013       0.00006      0.00020     0.00013
+2025-07-25 01:00:00+00:00  1.35074  1.35093  1.35074  1.35089      68   1.35067   1.35080  ...      0.00013      0.00013     0.00013       0.00013      -0.00007      0.00033     0.00013
+
+[427741 rows x 20 columns]
+26-07-2025 15:46:43 - data.features.enhanced_generation       :62   - INFO     - Enhanced FeatureGenerator initialized with 427741 rows
+26-07-2025 15:46:43 - data.pipelines.engineer_pipeline        :82   - DEBUG    - User provided specific features to be generated: ['compression_ratio', 'compression_consistency', 'signal_strength_compression', 'mid_price', 'volume_ratio', 'london_session', 'price_momentum_5', 'volatility_short', 'spread_relative', 'spread_volatility_ewm', 'hour', 'future_price_change']
+26-07-2025 15:46:43 - data.pipelines.engineer_pipeline        :87   - INFO     - Generating specific features: ['compression_ratio', 'compression_consistency', 'signal_strength_compression', 'mid_price', 'volume_ratio', 'london_session', 'price_momentum_5', 'volatility_short', 'spread_relative', 'spread_volatility_ewm', 'hour', 'future_price_change']
+26-07-2025 15:46:43 - data.features.enhanced_generation       :117  - INFO     - Generating 12 selected features...
+26-07-2025 15:46:43 - data.features.enhanced_generation       :138  - DEBUG    - Final expanded feature list: ['spread_relative', 'london_session', 'price_momentum_5', 'hour', 'compression_ratio', 'volatility_short', 'compression_consistency', 'mid_price', 'spread_volatility_ewm', 'future_price_change', 'signal_strength_compression', 'volume_ratio']
+26-07-2025 15:46:43 - data.features.enhanced_generation       :153  - DEBUG    - Features scheduled for later generation in transformation step: ['future_price_change']
+26-07-2025 15:46:43 - data.features.enhanced_generation       :154  - INFO     - Note: Some features (like 'close_og') are generated during transformation phase, not feature generation
+26-07-2025 15:46:43 - data.features.enhanced_generation       :171  - DEBUG    - Execution order: ['market_microstructure_features', 'fx_trading_sessions', 'spread_tight_features', 'mid_price_feature', 'volume_ma_20_feature', 'hour_feature', 'volatility_regimes', 'spread_compression_features', 'price_momentum_5_feature', 'spread_relative_features', 'volume_ratio_feature', 'signal_strength_compression_feature']
+26-07-2025 15:46:43 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: market_microstructure_features
+26-07-2025 15:46:43 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: fx_trading_sessions
+26-07-2025 15:46:43 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: spread_tight_features
+26-07-2025 15:46:43 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: mid_price_feature
+26-07-2025 15:46:43 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: volume_ma_20_feature
+26-07-2025 15:46:43 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: hour_feature
+26-07-2025 15:46:43 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: volatility_regimes
+26-07-2025 15:46:44 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: spread_compression_features
+26-07-2025 15:46:44 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: price_momentum_5_feature
+26-07-2025 15:46:44 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: spread_relative_features
+26-07-2025 15:46:44 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: volume_ratio_feature
+26-07-2025 15:46:44 - data.features.enhanced_generation       :183  - DEBUG    - Executing generator: signal_strength_compression_feature
+26-07-2025 15:46:44 - data.features.enhanced_generation       :221  - DEBUG    - Preserving label column: mid_price
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: bid_open
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: ask_open
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: bid_high
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: ask_high
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: bid_low
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: ask_low
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: bid_close
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: ask_close
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: spread_open
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: spread_high
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: spread_low
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: spread_close
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: spread_tight
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: spread_wide
+26-07-2025 15:46:44 - data.features.enhanced_generation       :237  - DEBUG    - Filtering out unrequested spread column: spread_avg
+26-07-2025 15:46:44 - data.features.enhanced_generation       :244  - INFO     - Filtering out 39 unrequested features: ['asian_london_overlap', 'asian_session', 'ask_close', 'ask_high', 'ask_low', 'ask_open', 'bid_close', 'bid_high', 'bid_low', 'bid_open', 'compression_ratio_true', 'hl_spread_bps', 'hl_spread_ma_20', 'hl_spread_ratio', 'london_ny_overlap', 'ny_session', 'primary_session', 'returns', 'session_intensity', 'spread_avg', 'spread_baseline', 'spread_baseline_true', 'spread_close', 'spread_high', 'spread_low', 'spread_open', 'spread_recent', 'spread_recent_true', 'spread_tight', 'spread_wide', 'vol_regime_high', 'vol_regime_low', 'vol_regime_medium', 'volatility_change', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volume_ma_20']
+26-07-2025 15:46:44 - data.features.enhanced_generation       :249  - INFO     - Successfully generated 11 requested features
+26-07-2025 15:46:44 - data.features.enhanced_generation       :272  - INFO     - All expected features successfully generated
+26-07-2025 15:46:44 - utils.data_utils                        :250  - DEBUG    - Loading                            spread_relative  london_session  price_momentum_5  hour  compression_ratio  ...  spread_volatility_ewm  volume    close  signal_strength_compression  volume_ratio
+2024-10-01 00:00:00+00:00         0.000097               0               NaN     0           0.000000  ...                    NaN      72  1.33773                     2.500000      1.000000
+2024-10-01 00:01:00+00:00         0.000097               0               NaN     0          -0.029161  ...                    NaN     100  1.33774                     2.441677      1.000000
+2024-10-01 00:02:00+00:00         0.000097               0               NaN     0          -0.214582  ...               0.205342     103  1.33773                     0.578106      1.000000
+2024-10-01 00:03:00+00:00         0.000097               0               NaN     0          -0.296898  ...               0.190356      79  1.33777                     0.414042      1.000000
+2024-10-01 00:04:00+00:00         0.000097               0               NaN     0           0.035776  ...               0.398340      81  1.33779                     1.075308      1.000000
+...                                    ...             ...               ...   ...                ...  ...                    ...     ...      ...                          ...           ...
+2025-07-25 00:56:00+00:00         0.000096               0         -0.000089     0          -0.255481  ...               1.161682      45  1.35054                     0.342602      0.852273
+2025-07-25 00:57:00+00:00         0.000096               0          0.000059     0          -0.426357  ...               1.262325      55  1.35069                     0.182309      1.033835
+2025-07-25 00:58:00+00:00         0.000096               0          0.000115     0           0.026904  ...               1.256655      36  1.35068                     0.728527      0.673527
+2025-07-25 00:59:00+00:00         0.000096               0          0.000181     0           0.213567  ...               1.194565      42  1.35075                     1.219350      0.790960
+2025-07-25 01:00:00+00:00         0.000096               0          0.000278     1          -0.166011  ...               1.204760      68  1.35089                     0.910098      1.240876
+
+[427741 rows x 16 columns]
+26-07-2025 15:46:44 - data.features.target_hypothesis         :39   - INFO     - ---------- Running Hypothesis Targeting ----------
+26-07-2025 15:46:44 - utils.shared_utils                      :124  - DEBUG    - Starting shared utility method list_of_functions_in_class().
+26-07-2025 15:46:44 - utils.shared_utils                      :141  - DEBUG    - Successfully populated list with functions in provided class! ['session_based_tod_anomalies', 'spread_compression_patterns']
+26-07-2025 15:46:44 - utils.shared_utils                      :98   - DEBUG    - Starting shared utility method safely_execute().
+26-07-2025 15:46:44 - data.features.target_hypothesis         :109  - INFO     - === DATA DISTRIBUTION ANALYSIS ===
+26-07-2025 15:46:44 - data.features.target_hypothesis         :110  - INFO     - Compression ratio - Mean: 0.0059, Std: 0.3233, 95th percentile: 0.4296
+26-07-2025 15:46:44 - data.features.target_hypothesis         :114  - INFO     - Compression consistency - Mean: 0.2761, 95th percentile: 1.0000
+26-07-2025 15:46:44 - data.features.target_hypothesis         :117  - INFO     - Volume ratio - Mean: 1.0158, 95th percentile: 1.5781
+26-07-2025 15:46:44 - data.features.target_hypothesis         :120  - INFO     - Future price change - Std: 0.000430, 95th percentile: 0.000886
+26-07-2025 15:46:44 - data.features.target_hypothesis         :129  - INFO     - Adaptive thresholds - Compression: 0.2121, Consistency: 0.0023, Volume: 1.1000, Movement: 0.000348
+26-07-2025 15:46:44 - data.features.target_hypothesis         :192  - INFO     - Multi-class target distribution: {0: 402311, 1: 24709, 2: 626, 3: 46, 4: 49}
+26-07-2025 15:46:44 - data.features.target_hypothesis         :193  - INFO     - Binary target distribution: {0: 402311, 1: 25430}
+26-07-2025 15:46:44 - data.features.target_hypothesis         :198  - INFO     - Signal frequency: 25430/427741 = 5.95% of periods
+26-07-2025 15:46:44 - data.features.target_hypothesis         :203  - INFO     - Estimated daily signals: 17.1
+26-07-2025 15:46:44 - data.features.target_hypothesis         :210  - INFO     - Tier 1 average movement: 0.000657 (24709 events)
+26-07-2025 15:46:44 - data.features.target_hypothesis         :210  - INFO     - Tier 2 average movement: 0.000842 (626 events)
+26-07-2025 15:46:44 - data.features.target_hypothesis         :210  - INFO     - Tier 3 average movement: 0.000603 (46 events)
+26-07-2025 15:46:44 - data.features.target_hypothesis         :210  - INFO     - Tier 4 average movement: 0.000790 (49 events)
+26-07-2025 15:46:44 - data.features.target_hypothesis         :246  - INFO     - === INDIVIDUAL SIGNAL VALIDATION ===
+26-07-2025 15:46:44 - data.features.target_hypothesis         :256  - INFO     - compression_only: 85548 events, movement ratio: 1.29x
+26-07-2025 15:46:44 - data.features.target_hypothesis         :256  - INFO     - volume_only: 85548 events, movement ratio: 1.52x
+26-07-2025 15:46:44 - data.features.target_hypothesis         :256  - INFO     - combined_loose: 30946 events, movement ratio: 1.24x
+26-07-2025 15:46:44 - data.features.target_hypothesis         :260  - INFO     - === TESTING THE DATA DISTRIBUTIONS ===
+26-07-2025 15:46:44 - data.features.target_hypothesis         :262  - INFO     - Compression ratio 80th percentile: 0.21211483391666447
+26-07-2025 15:46:44 - data.features.target_hypothesis         :263  - INFO     - Consistency 70th percentile: 0.0023361511973427687
+26-07-2025 15:46:44 - data.features.target_hypothesis         :264  - INFO     - Volume 75th percentile: 1.0832659660468875
+26-07-2025 15:46:44 - data.features.target_hypothesis         :265  - INFO     - Movement 75th percentile: 0.0003480251792795258
+26-07-2025 15:46:44 - data.features.target_hypothesis         :267  - INFO     - === Quick Diagnostic Questions ===
+26-07-2025 15:46:44 - data.features.target_hypothesis         :268  - INFO     - df['compression_ratio'].describe() shows : count    4.277410e+05
+mean     5.898872e-03
+std      3.233285e-01
+min     -8.942646e+00
+25%     -5.550856e-02
+50%     -2.954059e-15
+75%      1.636166e-01
+max      9.999609e-01
+Name: compression_ratio, dtype: float64
+26-07-2025 15:46:44 - data.features.target_hypothesis         :269  - INFO     - df['compression_consistency'].describe() shows : count    427741.000000
+mean          0.276077
+std           0.443918
+min           0.000029
+25%           0.000968
+50%           0.001451
+75%           0.999998
+max           1.000000
+Name: compression_consistency, dtype: float64
+26-07-2025 15:46:44 - data.features.target_hypothesis         :270  - INFO     - Data period is from GBPUSD 1m 2024-10-01_2025-07-25 to see if we get the same results
+26-07-2025 15:46:44 - utils.shared_utils                      :105  - DEBUG    - Successfully ran function spread_compression_patterns().
+26-07-2025 15:46:44 - utils.data_utils                        :250  - DEBUG    - Loading                            spread_relative  london_session  price_momentum_5  hour  ...  volume_ratio  future_price_change  target_spread_compression_multi  target_spread_compression_binary
+2024-10-01 00:00:00+00:00         0.000097               0               NaN     0  ...      1.000000            -0.000202                                0                                 0
+2024-10-01 00:01:00+00:00         0.000097               0               NaN     0  ...      1.000000            -0.000224                                0                                 0
+2024-10-01 00:02:00+00:00         0.000097               0               NaN     0  ...      1.000000            -0.000172                                0                                 0
+2024-10-01 00:03:00+00:00         0.000097               0               NaN     0  ...      1.000000            -0.000232                                0                                 0
+2024-10-01 00:04:00+00:00         0.000097               0               NaN     0  ...      1.000000            -0.000224                                0                                 0
+...                                    ...             ...               ...   ...  ...           ...                  ...                              ...                               ...
+2025-07-25 00:56:00+00:00         0.000096               0         -0.000089     0  ...      0.852273                  NaN                                0                                 0
+2025-07-25 00:57:00+00:00         0.000096               0          0.000059     0  ...      1.033835                  NaN                                0                                 0
+2025-07-25 00:58:00+00:00         0.000096               0          0.000115     0  ...      0.673527                  NaN                                0                                 0
+2025-07-25 00:59:00+00:00         0.000096               0          0.000181     0  ...      0.790960                  NaN                                0                                 0
+2025-07-25 01:00:00+00:00         0.000096               0          0.000278     1  ...      1.240876                  NaN                                0                                 0
+
+[427741 rows x 19 columns]
+26-07-2025 15:46:44 - data.features.transformation            :38   - INFO     - ---------- Running Feature Transformer ----------
+26-07-2025 15:46:44 - data.features.transformation            :63   - WARNING  - Dataset has features containing empty values. Will drop relevant features.
+26-07-2025 15:46:44 - data.features.transformation            :79   - DEBUG    - Starting to filter features based on missing values...
+26-07-2025 15:46:44 - data.features.transformation            :103  - DEBUG    - No columns exceeded NaN threshold
+26-07-2025 15:46:44 - data.features.transformation            :126  - INFO     - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 427741
+26-07-2025 15:46:44 - data.features.transformation            :139  - INFO     - Applying forward fill to 5 columns with scattered NaNs
+26-07-2025 15:46:44 - data.features.transformation            :151  - INFO     - Forward fill imputed 125968 values
+26-07-2025 15:46:44 - data.features.transformation            :155  - WARNING  - After forward fill, 27 NaN values remain
+26-07-2025 15:46:44 - data.features.transformation            :156  - WARNING  - These are likely at the beginning of the series - consider additional treatment
+26-07-2025 15:46:44 - data.features.transformation            :161  - DEBUG    - Columns still containing NaNs: ['price_momentum_5', 'volatility_short', 'spread_volatility_ewm']
+26-07-2025 15:46:44 - data.features.transformation            :173  - INFO     - Filled beginning NaNs with first valid values
+26-07-2025 15:46:44 - data.features.transformation            :200  - DEBUG    - No categorical columns found to encode
+26-07-2025 15:46:44 - data.pipelines.engineer_pipeline        :108  - INFO     - As selected features were provided, pipeline will skip Feature Selection.
+26-07-2025 15:46:44 - data.pipelines.engineer_pipeline        :113  - INFO     - ---------- Data Pipeline finished all 'data steps'! ----------
+26-07-2025 15:46:44 - utils.data_utils                        :301  - INFO     - Saving processed file ...
+26-07-2025 15:46:50 - utils.data_utils                        :316  - INFO     - Successfully saved file! storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
+26-07-2025 15:46:50 - data.pipelines.engineer_pipeline        :122  - INFO     - ---------- Data Pipeline Finished ----------
