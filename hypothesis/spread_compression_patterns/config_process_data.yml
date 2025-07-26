@@ -5,37 +5,24 @@ data_pipeline:
   raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
   spread_focused: true  # Enable bid-ask spread data preservation (default: false)
 
-  selected_features:  # ENHANCED OPTIMAL FEATURES FOR TIER 2+ SIGNALS
+  selected_features:  # OPTIMIZED FEATURE SET - 8 CORE FEATURES (redundancy eliminated)
     [
-      # Enhanced multi-timeframe compression signals
-      'compression_ratio_micro',      # Most sensitive (30min/3min)
-      'compression_ratio_short',      # Medium sensitivity (1hr/5min)  
-      'compression_ratio',            # Original (60min/3min)
-      'compression_consistency', 
+      # Primary compression signal (most sensitive, no redundancy)
+      'compression_ratio_micro',      # 30min/3min timeframe (eliminated short due to 0.905 correlation)
+      'compression_consistency',      # Strongest predictor (-0.4169 correlation)
       
       # Enhanced signal strength (optimized weights)
-      'signal_strength_v2',           # NEW: Optimized for validation results
-      'signal_strength_compression',  # Original for comparison
+      'signal_strength_v2',           # Combines all signals with optimal weights
       
-      # Advanced volume confirmation
-      'volume_ratio',                 # 1.52x movement ratio (strongest)
-      'volume_acceleration',          # NEW: Volume momentum detection
-      'volume_breakout',              # NEW: Z-score > 2 detection
+      # Volume confirmation suite (comprehensive coverage)
+      'volume_ratio',                 # 1.40x movement ratio (strongest individual)
+      'volume_acceleration',          # Volume momentum detection
+      'volume_breakout',              # Z-score > 2 breakout detection
       
-      # Market context (proven predictors)
-      'mid_price',
-      'london_session',               # Session bonus
-      'price_momentum_5',
-      'volatility_short',
+      # Context features (market timing & price)
+      'london_session',               # Session timing (proven effective)
+      'price_momentum_5',             # 5-period price momentum
       
-      # Spread fundamentals  
-      'spread_relative',
-      'spread_volatility_ewm',
-      'volume_spread_correlation',    # NEW: Volume-spread correlation
-      
-      # Time context
-      'hour',
-      
-      # Validation
+      # Target for validation
       'future_price_change'
     ]
