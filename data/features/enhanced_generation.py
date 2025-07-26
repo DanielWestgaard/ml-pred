@@ -116,6 +116,27 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         """
         logger.info(f"Generating {len(feature_names)} selected features...")
         
+        # **FEATURE EXPANSION**: Handle logical feature groups in config
+        # Some config entries like "bid_ask_spread_features" refer to logical groups, not individual features
+        expanded_features = []
+        feature_group_mappings = {
+            'bid_ask_spread_features': ['bid_ask_spread_bps', 'bid_ask_spread_relative'],
+            'spread_tight_features': ['spread_tight', 'spread_wide', 'spread_avg'],
+            'spread_wide_features': ['spread_tight', 'spread_wide', 'spread_avg'],  # Same as tight_features
+            'spread_relative_features': ['spread_relative', 'spread_baseline_true', 'spread_recent_true', 'compression_ratio_true']
+        }
+        
+        for feature_name in feature_names:
+            if feature_name in feature_group_mappings:
+                expanded_features.extend(feature_group_mappings[feature_name])
+                logger.debug(f"Expanded feature group '{feature_name}' to: {feature_group_mappings[feature_name]}")
+            else:
+                expanded_features.append(feature_name)
+        
+        # Update feature_names with expanded list
+        feature_names = list(set(expanded_features))  # Remove duplicates
+        logger.debug(f"Final expanded feature list: {feature_names}")
+        
         # Validate feature availability
         available, unavailable = self._registry.validate_feature_availability(feature_names)
         
@@ -174,9 +195,58 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
                 logger.error(f"Error in generator '{generator_name}': {e}")
                 failed_generators.append(generator_name)
         
+        # **CRITICAL FIX**: Filter to only keep requested features
+        # This prevents feature bloat when generators produce multiple features
+        original_columns = ['open', 'high', 'low', 'close', 'volume']  # Always keep these
+        
+        # Identify which columns to keep
+        columns_to_keep = set(original_columns)
+        columns_to_keep.update(f for f in feature_names if f in self.df.columns)
+        
+        # Also keep derived columns that are part of the dataset structure
+        derived_columns = ['timestamp', 'date']  # Basic derived columns to preserve
+        columns_to_keep.update(f for f in derived_columns if f in self.df.columns)
+        
+        # **TARGET COLUMNS**: Always preserve target columns (they start with 'target_')
+        target_columns = [col for col in self.df.columns if col.startswith('target_')]
+        columns_to_keep.update(target_columns)
+        if target_columns:
+            logger.debug(f"Preserving target columns: {target_columns}")
+        
+        # **FUTURE/LABEL COLUMNS**: Preserve common label columns  
+        label_columns = ['future_price_change', 'close_og', 'mid_price']
+        for col in label_columns:
+            if col in self.df.columns:
+                columns_to_keep.add(col)
+                logger.debug(f"Preserving label column: {col}")
+        
+        # **SPREAD DATA FILTERING**: Only keep spread columns if explicitly requested
+        # Raw spread data columns that come from data ingestion but may not be needed
+        spread_columns = [
+            'bid_open', 'ask_open', 'bid_high', 'ask_high', 'bid_low', 'ask_low', 
+            'bid_close', 'ask_close', 'spread_open', 'spread_high', 'spread_low', 
+            'spread_close', 'spread_tight', 'spread_wide', 'spread_avg'
+        ]
+        
+        # Only keep spread columns if they were explicitly requested
+        for col in spread_columns:
+            if col in self.df.columns and col in feature_names:
+                columns_to_keep.add(col)
+                logger.debug(f"Keeping explicitly requested spread column: {col}")
+            elif col in self.df.columns:
+                logger.debug(f"Filtering out unrequested spread column: {col}")
+        
+        # Filter the dataframe to only requested features
+        columns_before = set(self.df.columns)
+        columns_to_drop = columns_before - columns_to_keep
+        
+        if columns_to_drop:
+            logger.info(f"Filtering out {len(columns_to_drop)} unrequested features: {sorted(list(columns_to_drop))}")
+            self.df = self.df[list(columns_to_keep)]
+        
         # Report results
         actual_features = [f for f in feature_names if f in self.df.columns]
-        logger.info(f"Successfully generated {len(actual_features)} features")
+        logger.info(f"Successfully generated {len(actual_features)} requested features")
         
         # More accurate reporting - separate actual generator failures from missing individual generators
         actual_generator_failures = []

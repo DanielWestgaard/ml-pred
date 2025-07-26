@@ -98,6 +98,8 @@ Robust configuration management for hypothesis-based workflows:
 **Key Features:**
 - **YAML Configuration Loading**: Safe loading of hypothesis config files
 - **Configuration Validation**: Validates config structure and required fields
+- **🆕 Spread-Focused Configuration**: Supports `spread_focused` option for bid-ask analysis
+- **🆕 Feature Selection Management**: Handles `selected_features` lists with intelligent filtering
 - **Dynamic Source Handling**: Supports multiple configuration sources
 - **Error Resilience**: Comprehensive error handling and user feedback
 - **Integration Ready**: Used by data pipeline, model training, evaluation, and strategy components
@@ -107,13 +109,17 @@ Robust configuration management for hypothesis-based workflows:
 import utils.hypothesis.config_loader as config_loader
 
 # Load and validate hypothesis configuration
-config = config_loader.load_hypothesis_config("hypothesis/1_session_based_tod_anomalies/config.yml")
+config = config_loader.load_hypothesis_config("hypothesis/spread_compression_patterns/config.yml")
 processed_config = config.handle_hypothesis_source()
 
 # Access configuration sections
 data_config = processed_config.get('data_pipeline', {})
 model_config = processed_config.get('model_training', {})
 strategy_config = processed_config.get('strategy', {})
+
+# 🆕 Access spread-focused and feature selection options
+spread_focused = processed_config.get('spread_focused', False)  # True enables bid-ask data
+selected_features = processed_config.get('features', [])       # Filtered feature list
 ```
 
 ### Model Management
@@ -176,8 +182,25 @@ Cross-component utilities for system integration:
 Capital.com API integration utilities:
 - **API Response Processing**: Convert JSON responses to OHLCV format
 - **Data Transformation**: Price calculation (mid-price from bid/ask)
+- **🆕 Spread Data Extraction**: Unified `extract_mid_price_ohlcv()` with optional bid-ask spread preservation
+- **🆕 Spread-Focused Processing**: `include_spreads` parameter for preserving market microstructure data
 - **File Management**: Automated data file saving and organization
 - **Error Handling**: Robust API error handling and recovery
+
+**Recent Enhancements:**
+```python
+from utils.broker_utils import extract_mid_price_ohlcv, convert_json_to_ohlcv_csv
+
+# Standard OHLCV extraction
+ohlcv_data = extract_mid_price_ohlcv(price_data, include_spreads=False)
+
+# 🆕 Spread-focused extraction (preserves bid/ask data)
+spread_data = extract_mid_price_ohlcv(price_data, include_spreads=True)
+# Returns: OHLCV + bid_open, ask_open, spread_tight, spread_wide, etc.
+
+# CSV conversion with spread data
+convert_json_to_ohlcv_csv(json_data, output_file, include_spreads=True)
+```
 
 #### Logging Utils (`logging_utils.py`)
 Centralized logging configuration:

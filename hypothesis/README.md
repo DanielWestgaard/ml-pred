@@ -63,11 +63,13 @@ hypothesis:
     name: <name-of-the-hypothesis>
 
 # Data Pipeline on raw data
-data_pipeline:  # TODO: Now have to change logic for reading required features and possibility for providing data source
+data_pipeline:
     raw_source: <source-to-raw-data>                             # Must have
+    spread_focused: false                                        # 🆕 True: Enable bid-ask spread data preservation (default: false)
   
     selected_features: null                                     # null = all features, or specify list:
                                                                 # ['sma_20', 'rsi_14', 'atr'] = only these features
+                                                                # 🆕 System now intelligently filters to only requested features!
 
 # Train a ML Model
 model_training:
@@ -149,6 +151,20 @@ strategy:
 > [!NOTE]
 > To use specific features, provide a list of exact feature names (e.g., ```['sma_20', 'rsi_14', 'atr']```). To generate all available features, use ```null```. The ModelAwareFeatureGenerator will automatically handle dependencies and generate features in the optimal order.
 
+> [!NOTE]
+> **🆕 Intelligent Feature Filtering**: The system now respects `selected_features` configuration precisely. When you request specific features, the system:
+> - Runs required generators (which may produce multiple features)  
+> - **Filters** the result to keep only your requested features + essential columns
+> - Prevents feature bloat (e.g., requesting `london_session` no longer gives you all 7 session features)
+> - Reduces datasets from (eg.) 57+ features to your focused selection (eg. ~25-37 features)
+
+> [!NOTE]  
+> **🆕 Spread-Focused Processing**: Set `spread_focused: true` in `data_pipeline` to:
+> - Preserve bid-ask spread data during data ingestion
+> - Enable spread compression analysis features
+> - Support market microstructure hypotheses
+> - Use with spread-related features like `'compression_ratio'`, `'bid_ask_spread_features'`
+
 ## How to use
 
 The hypothesis system now supports a **complete end-to-end workflow** from data processing to live trading strategy execution. You can configure and run the entire pipeline through the hypothesis configuration file.
@@ -187,6 +203,34 @@ python main.py -train --hypothesis 'hypothesis/1_session_based_tod_anomalies/con
 # Strategy execution only
 python main.py -strat --hypothesis 'hypothesis/1_session_based_tod_anomalies/config.yml'
 ```
+
+#### 🆕 4. Spread-Focused Hypothesis Example
+```bash
+# Run spread compression hypothesis with intelligent filtering
+python main.py -hyp 'hypothesis/spread_compression_patterns/config_process_data.yml'
+```
+
+**Example Configuration:**
+```yml
+hypothesis:
+  name: spread_compression_patterns
+
+data_pipeline:
+  raw_source: storage/data/capital_com/GBPUSD/raw/5m/2024-12-01_2025-01-23.csv
+  spread_focused: true  # 🆕 Preserves bid-ask spread data
+
+  selected_features:
+    # Core spread features (auto-expanded from groups)
+    - "bid_ask_spread_features"      # → bid_ask_spread_bps, bid_ask_spread_relative
+    - "spread_compression_features"  # → compression_ratio, compression_consistency, etc.
+    
+    # Specific individual features
+    - "london_session"              # Only london_session (not all 7 session features)
+    - "volume_ma_20"
+    - "mid_price"
+```
+
+**Result:** Focused 37-feature dataset instead of 57+ feature bloat
 
 ### Strategy Integration Examples
 
