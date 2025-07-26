@@ -1,33 +1,33 @@
 hypothesis:
     name: session_based_tod_anomalies
 
-# data_pipeline:
-#     raw_source: storage/data/capital_com/GBPUSD/raw/1m/2022-01-01_2025-05-23.csv
+data_pipeline:
+    raw_source: storage/data/capital_com/GBPUSD/raw/1m/2022-01-01_2025-05-23.csv
   
-#     selected_features: [
-#             # time_of_day features
-#             'hour_sin', 'hour_cos',
-#             # time_of_week features  
-#             'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend',
-#             # time_of_month features
-#             'month_progress_sin', 'month_progress_cos', 'month_of_year_sin', 'month_of_year_cos', 'month_period',
-#             # day_of_week features
-#             'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening',
-#             # average_true_range features
-#             'atr',
-#             # volatility_regimes features
-#             'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_low', 'vol_regime_medium', 'vol_regime_high',
-#             # fx_activity_profile features
-#             'activity',
-#             # fx_trading_sessions features
-#             'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity',
-#             # session_timing_features
-#             'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos',
-#             # session_transition_features
-#             'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close',
-#             # spread
-#             'hl_spread_bps', 'hl_spread_ma_20', 'hl_spread_ratio'
-#         ]
+    selected_features: [
+            # time_of_day features
+            'hour_sin', 'hour_cos',
+            # time_of_week features  
+            'hour_of_week_sin', 'hour_of_week_cos', 'is_weekend',
+            # time_of_month features
+            'month_progress_sin', 'month_progress_cos', 'month_of_year_sin', 'month_of_year_cos', 'month_period',
+            # day_of_week features
+            'day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening',
+            # average_true_range features
+            'atr',
+            # volatility_regimes features
+            'returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_low', 'vol_regime_medium', 'vol_regime_high',
+            # fx_activity_profile features
+            'activity',
+            # fx_trading_sessions features
+            'asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity',
+            # session_timing_features
+            'minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos',
+            # session_transition_features
+            'minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close',
+            # spread
+            'hl_spread_bps', 'hl_spread_ma_20', 'hl_spread_ratio'
+        ]
 
 # model_training:
 #     type: xgboost
@@ -38,9 +38,9 @@ hypothesis:
 #         n_estimators: 100
 #         max_depth: 12
     
-evaluate_model:
-    type: stored
-    model_folder: storage/models/2025-07-25_11:40:14  # Dynamic: will use latest model if not specified
+# evaluate_model:
+#     type: stored
+#     model_folder: storage/models/2025-07-25_11:40:14  # Dynamic: will use latest model if not specified
 
 # strategy:
 #     hypothesis_name: session_based_tod_anomalies
