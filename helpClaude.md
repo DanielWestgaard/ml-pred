@@ -30,7 +30,7 @@ ml-pred/
 ```
 
 ## **Current Feature Implementation:**
-My `enhanced_generation.py` includes these working spread compression features:
+My `enhanced_generation.py` includes (amongst many others) these working spread compression features:
 - `compression_ratio` - EWMA-based compression detection (60-period baseline, 3-period recent)
 - `compression_consistency` - Inverse of spread volatility  
 - `volume_ratio` - Current volume vs 20-period average
