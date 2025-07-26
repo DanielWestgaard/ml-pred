@@ -195,8 +195,8 @@ def main():
     
     if args.broker_func:
         broker = CapitalCom()
-        # broker.start_session()
-        # broker.session_details(print_answer=True)
+        broker.start_session()
+        broker.session_details(print_answer=True)
         # broker.get_account_capital()
         # broker.list_all_accounts(print_answer=True)
         # broker.get_historical_data(epic="GBPUSD", resolution="MINUTE",
@@ -213,7 +213,7 @@ def main():
         # broker.close_all_orders(print_answer=True)
         # broker.all_positions()
         
-        # broker.sub_live_market_data(symbol="GBPUSD", timeframe="MINUTE")
+        broker.sub_live_market_data(symbol="BTCUSD", timeframe="MINUTE")
         
         broker.end_session()
     
