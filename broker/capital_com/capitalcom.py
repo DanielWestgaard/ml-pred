@@ -95,10 +95,10 @@ class CapitalCom(BaseBroker):
                                     from_date:str, to_date:str,  # format 2022-02-24T00:00:00
                                     output_file=None,
                                     X_SECURITY_TOKEN=None, CST=None,
-                                    print_answer=False, save_raw_data=False):
+                                    print_answer=False, save_raw_data=False, include_spreads=False):
         return markets_info.fetch_and_save_historical_prices(X_SECURITY_TOKEN=X_SECURITY_TOKEN or self.x_security_token, CST=CST or self.cst,
                                                              epic=epic, resolution=resolution, from_date=from_date, to_date=to_date,
-                                                             output_file=output_file, print_answer=print_answer, save_raw_data=save_raw_data)
+                                                             output_file=output_file, print_answer=print_answer, save_raw_data=save_raw_data, include_spreads=include_spreads)
     
     def fetch_maximum_available_data(self, epic:str, resolution:str, 
                                     from_date:str, to_date:str,  # format 2022-02-24T00:00:00

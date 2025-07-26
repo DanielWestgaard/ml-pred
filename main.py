@@ -186,9 +186,11 @@ def main():
     
     if args.fetch_data_capcom:
         provider = ProviderCapitalCom()
+        # Enable spread data collection for spread-focused analysis 
+        # (use include_spreads=False for backward compatibility with existing pipelines)
         provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE",
                                                   from_date="2021-01-01T00:00:00", to_date="2025-07-23T01:00:00",
-                                                  print_answer=False)
+                                                  print_answer=False, include_spreads=True)
         provider.end_session()
     
     if args.broker_func:
