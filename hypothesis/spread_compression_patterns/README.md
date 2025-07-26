@@ -75,50 +75,8 @@ df['signal_strength'] = (
 
 
 ## Goal / Target:
-Suggestion:
-```python
-def create_target_labels(self, df: pd.DataFrame, 
-                        prediction_minutes: int = 60) -> pd.DataFrame:
-    """
-    Create target labels for future volatility increase
-    """
-    df = df.copy()
-    
-    # Calculate returns
-    df['returns'] = df['mid_price'].pct_change()
-    
-    # Future volatility calculation
-    future_vol = []
-    historical_vol = []
-    
-    for i in range(len(df)):
-        # Historical volatility (baseline)
-        if i >= self.lookback_window:
-            hist_returns = df['returns'].iloc[i-self.lookback_window:i]
-            hist_vol = hist_returns.std() * np.sqrt(1440)  # Annualized
-        else:
-            hist_vol = np.nan
-        historical_vol.append(hist_vol)
-        
-        # Future volatility (what we're predicting)
-        end_idx = min(i + prediction_minutes, len(df))
-        if end_idx - i >= 10:  # Need minimum data
-            future_returns = df['returns'].iloc[i+1:end_idx]
-            fut_vol = future_returns.std() * np.sqrt(1440)  # Annualized
-        else:
-            fut_vol = np.nan
-        future_vol.append(fut_vol)
-    
-    df['historical_volatility'] = historical_vol
-    df['future_volatility'] = future_vol
-    
-    # Target: volatility increase
-    df['volatility_increase_ratio'] = (
-        df['future_volatility'] - df['historical_volatility']
-    ) / df['historical_volatility']
-    
-    # Binary target: significant volatility increase
-    df['target_vol_increase'] = (df['volatility_increase_ratio'] > 0.3).astype(int)
-    
-    return df
-```
+I'm thinking of using 'target_spread_compression_binary' for these reasons:
+- **Simpler learning problem**: Binary classification is easier to optimize than multi-class
+- **Class balance**: You'll likely have severe class imbalance with the 0/1/2 target
+- **Clear actionable signal**: Either trade or don't trade
+- **Better evaluation metrics**: Easier to interpret precision/recall for binary
