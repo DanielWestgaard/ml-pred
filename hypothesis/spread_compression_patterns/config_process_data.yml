@@ -6,5 +6,37 @@ data_pipeline:
 
   selected_features:
     [
-      ...
+      # Core price features (needed for spread calculation)
+      "mid_price",
+      "close_og",
+      
+      # High-low spread proxy features (existing)
+      "hl_spread_bps", 
+      "hl_spread_ma_20",
+      "hl_spread_ratio",
+      
+      # Spread compression detection features
+      "spread_baseline",
+      "spread_recent", 
+      "compression_ratio",
+      "compression_consistency",
+      "spread_volatility_ewm",
+      
+      # Volume confirmation features
+      "volume_ma_20",
+      "volume_ratio",
+      "volume_recent_ratio",
+      
+      # Price momentum features
+      "price_momentum_5",
+      "volatility_short",
+      
+      # Time-based features
+      "hour",
+      "london_session",
+      "asian_session",
+      "us_session",
+      
+      # Signal strength composite
+      "signal_strength_compression"
     ]
