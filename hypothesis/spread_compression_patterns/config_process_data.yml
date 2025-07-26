@@ -5,45 +5,27 @@ data_pipeline:
   raw_source: storage/data/capital_com/GBPUSD/raw/5m/2024-12-01_2025-01-23.csv
   spread_focused: true  # Enable bid-ask spread data preservation (default: false)
 
-  selected_features:
+  selected_features:  # CORE ESSENTIAL FEATURES
     [
-      # Core price features (needed for spread calculation)
-      "mid_price",
-      "close_og",
+      # Primary signal
+      'compression_ratio',
+      'compression_consistency', 
+      'signal_strength_compression',
       
-      # True spread features (available when spread_focused=true)
-      "bid_ask_spread_features",
-      "spread_tight_features", 
-      "spread_wide_features",
-      "spread_relative_features",
+      # Market context
+      'mid_price',
+      'volume_ratio',
+      'london_session',
+      'price_momentum_5',
+      'volatility_short',
       
-      # High-low spread proxy features (fallback when spread_focused=false)
-      "hl_spread_bps", 
-      "hl_spread_ma_20",
-      "hl_spread_ratio",
+      # Spread fundamentals
+      'spread_relative',  # Choose ONE spread measure
+      'spread_volatility_ewm',
       
-      # Spread compression detection features
-      "spread_baseline",
-      "spread_recent", 
-      "compression_ratio",
-      "compression_consistency",
-      "spread_volatility_ewm",
+      # Time context
+      'hour',
       
-      # Volume confirmation features
-      "volume_ma_20",
-      "volume_ratio",
-      "volume_recent_ratio",
-      
-      # Price momentum features
-      "price_momentum_5",
-      "volatility_short",
-      
-      # Time-based features
-      "hour",
-      "london_session",
-      "asian_session",
-      "ny_session",
-      
-      # Signal strength composite
-      "signal_strength_compression"
+      # Validation
+      'future_price_change'
     ]
