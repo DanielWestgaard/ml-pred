@@ -170,6 +170,14 @@ class LoadHypothesisConfigMetadata:
             config['features'] = config['data_pipeline']['selected_features']
             logger.debug(f"Extracted selected_features as 'features': {config['features']}")
         
+        # Special handling for spread_focused option from data_pipeline
+        if 'data_pipeline' in config and 'spread_focused' in config['data_pipeline']:
+            config['spread_focused'] = config['data_pipeline']['spread_focused']
+            logger.debug(f"Extracted spread_focused setting: {config['spread_focused']}")
+        else:
+            config['spread_focused'] = False  # Default to False for backward compatibility
+            logger.debug("No spread_focused setting found, defaulting to False")
+        
         # Log summary
         sections_found = [section for section in ['data_pipeline', 'model_training', 'evaluate_model', 'strategy'] 
                          if section in config]
