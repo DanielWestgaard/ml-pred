@@ -156,9 +156,9 @@ def process_positions(json_response):
 
 # Not sure where to place this method. Was thinking in the data processing pipeline, 
 # but could also be more of a utility func for when taking in live market data.
-def extract_mid_price_ohlcv(price_data, symbol=None, source=None, as_floats=False):
+def extract_mid_price_ohlcv(price_data, symbol=None, source=None, as_floats=False, include_spreads=False):
     """
-    Extract mid-price OHLCV data from bid-ask price data.
+    Extract mid-price OHLCV data from bid-ask price data, with optional spread data.
     
     This function provides unified price extraction across all data managers,
     ensuring consistency between historical training data and live trading data.
@@ -169,9 +169,10 @@ def extract_mid_price_ohlcv(price_data, symbol=None, source=None, as_floats=Fals
         symbol (str, optional): Trading symbol to include in result
         source (str, optional): Data source identifier to include in result  
         as_floats (bool): Whether to convert prices to float (default: False)
+        include_spreads (bool): Whether to include bid/ask spread data (default: False)
         
     Returns:
-        dict: OHLCV data with mid prices and optional metadata
+        dict: OHLCV data with mid prices and optional spread data and metadata
     """
     # Calculate mid prices (average of bid and ask) with rounding
     decimals = config.PRICE_DECIMALS
@@ -199,6 +200,54 @@ def extract_mid_price_ohlcv(price_data, symbol=None, source=None, as_floats=Fals
         'volume': volume
     }
     
+    # Add spread data if requested
+    if include_spreads:
+        # Extract bid/ask prices
+        bid_open = price_data['openPrice']['bid']
+        ask_open = price_data['openPrice']['ask']
+        bid_high = price_data['highPrice']['bid']
+        ask_high = price_data['highPrice']['ask']
+        bid_low = price_data['lowPrice']['bid']
+        ask_low = price_data['lowPrice']['ask']
+        bid_close = price_data['closePrice']['bid']
+        ask_close = price_data['closePrice']['ask']
+        
+        # Convert to floats if requested
+        if as_floats:
+            bid_open = float(bid_open)
+            ask_open = float(ask_open)
+            bid_high = float(bid_high)
+            ask_high = float(ask_high)
+            bid_low = float(bid_low)
+            ask_low = float(ask_low)
+            bid_close = float(bid_close)
+            ask_close = float(ask_close)
+        
+        # Add bid/ask data
+        spread_data = {
+            'bid_open': bid_open,
+            'ask_open': ask_open,
+            'bid_high': bid_high,
+            'ask_high': ask_high,
+            'bid_low': bid_low,
+            'ask_low': ask_low,
+            'bid_close': bid_close,
+            'ask_close': ask_close,
+            
+            # Calculate actual spreads
+            'spread_open': ask_open - bid_open,
+            'spread_high': ask_high - bid_high,
+            'spread_low': ask_low - bid_low,
+            'spread_close': ask_close - bid_close,
+            
+            # Spread compression specific features from hypothesis
+            'spread_tight': ask_low - bid_high,  # Tightest possible spread
+            'spread_wide': ask_high - bid_low,   # Widest spread in period
+            'spread_avg': ask_close - bid_close  # Standard spread (same as spread_close)
+        }
+        
+        result.update(spread_data)
+    
     # Add optional metadata
     if symbol:
         result['symbol'] = symbol
@@ -207,14 +256,15 @@ def extract_mid_price_ohlcv(price_data, symbol=None, source=None, as_floats=Fals
         
     return result
 
-def convert_json_to_ohlcv_csv(json_data, output_file):
+def convert_json_to_ohlcv_csv(json_data, output_file, include_spreads=False):
     """
     Converts the provided JSON price data to OHLCV format and saves it to a CSV file.
-    Uses unified mid-price extraction for consistency.
+    Uses unified mid-price extraction for consistency, with optional spread data.
     
     Args:
         json_data (dict or str): The JSON data containing price information
         output_file (str): Path to the output CSV file
+        include_spreads (bool): Whether to include bid/ask spread columns (default: False)
     """
     # If json_data is a string, parse it to a dictionary
     if isinstance(json_data, str):
@@ -224,8 +274,19 @@ def convert_json_to_ohlcv_csv(json_data, output_file):
     
     # Open the CSV file for writing
     with open(output_file, 'w', newline='') as csvfile:
-        # Create CSV writer
+        # Create CSV writer with dynamic fieldnames
         fieldnames = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
+        
+        # Add spread columns if requested
+        if include_spreads:
+            spread_columns = [
+                'bid_open', 'ask_open', 'bid_high', 'ask_high', 
+                'bid_low', 'ask_low', 'bid_close', 'ask_close',
+                'spread_open', 'spread_high', 'spread_low', 'spread_close',
+                'spread_tight', 'spread_wide', 'spread_avg'
+            ]
+            fieldnames.extend(spread_columns)
+            
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         
         # Write the header
@@ -233,18 +294,27 @@ def convert_json_to_ohlcv_csv(json_data, output_file):
         
         # Process each price entry
         for price in data['prices']:
-            # Use unified mid-price extraction
-            ohlcv_data = extract_mid_price_ohlcv(price)
+            # Use unified extraction with spread data if requested
+            ohlcv_data = extract_mid_price_ohlcv(price, include_spreads=include_spreads)
             
-            # Write the row to the CSV
-            writer.writerow({
+            # Prepare row data
+            row_data = {
                 'Date': ohlcv_data['timestamp'],
                 'Open': ohlcv_data['open'],
                 'High': ohlcv_data['high'],
                 'Low': ohlcv_data['low'],
                 'Close': ohlcv_data['close'],
                 'Volume': ohlcv_data['volume']
-            })
+            }
+            
+            # Add spread data if available
+            if include_spreads:
+                for col in spread_columns:
+                    if col in ohlcv_data:
+                        row_data[col] = ohlcv_data[col]
+            
+            # Write the row to the CSV
+            writer.writerow(row_data)
     
     logger.info(f"Data successfully converted and saved to {output_file}")
 
