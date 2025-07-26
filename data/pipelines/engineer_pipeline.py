@@ -40,8 +40,10 @@ class EngineeringPipeline():
             self.hypothesis_name = configurations.get('hypothesis_name')
             raw_dataset = configurations.get('data_pipeline_raw_source')
             self.selected_features = configurations.get('features')
+            self.spread_focused = configurations.get('spread_focused', False)
         else:
             self.selected_features = None
+            self.spread_focused = False
         
         self.raw_data_path = raw_dataset
         # Loading data

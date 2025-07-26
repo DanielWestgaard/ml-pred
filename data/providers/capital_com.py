@@ -12,11 +12,11 @@ class ProviderCapitalCom(BaseProvider):
     
     def fetch_and_save_historical_data(self, symbol:str, timeframe:str,
                                         from_date:str, to_date:str,  # "2025-04-15T00:00:00"
-                                        print_answer:bool = False):
+                                        print_answer:bool = False, include_spreads:bool = False):
         """Fetch historical market data using the improved method."""
         self.broker.fetch_and_save_historical_prices(epic=symbol, resolution=timeframe,
                                                      from_date=from_date, to_date=to_date,
-                                                     print_answer=print_answer)
+                                                     print_answer=print_answer, include_spreads=include_spreads)
     
     def fetch_maximum_available_data(self, symbol:str, timeframe:str,
                                    from_date:str, to_date:str,  # "2025-04-15T00:00:00"

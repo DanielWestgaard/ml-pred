@@ -3,6 +3,7 @@ hypothesis:
 
 data_pipeline:
   raw_source: <source-to-raw-data>
+  spread_focused: true  # Enable bid-ask spread data preservation (default: false)
 
   selected_features:
     [
@@ -10,7 +11,13 @@ data_pipeline:
       "mid_price",
       "close_og",
       
-      # High-low spread proxy features (existing)
+      # True spread features (available when spread_focused=true)
+      "bid_ask_spread_features",
+      "spread_tight_features", 
+      "spread_wide_features",
+      "spread_relative_features",
+      
+      # High-low spread proxy features (fallback when spread_focused=false)
       "hl_spread_bps", 
       "hl_spread_ma_20",
       "hl_spread_ratio",

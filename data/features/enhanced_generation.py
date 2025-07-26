@@ -1469,3 +1469,87 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             compression_consistency * 1.5 +     # Consistency matters
             london_session * 0.3                # Session bonus
         )
+
+    @feature_generator(
+        output_features=['bid_ask_spread_bps', 'bid_ask_spread_relative'],
+        description="True bid-ask spread features when spread data is available",
+        category="spread_compression"
+    )
+    def bid_ask_spread_features(self):
+        """
+        Generate true bid-ask spread features when spread data is available.
+        Falls back to high-low proxy if bid-ask data is not available.
+        """
+        # Check if true spread data is available
+        if 'spread_close' in self.df.columns:
+            # Use true bid-ask spread
+            mid_price = (self.df['bid_close'] + self.df['ask_close']) / 2
+            self.df['bid_ask_spread_bps'] = (self.df['spread_close'] / mid_price) * 10000
+            self.df['bid_ask_spread_relative'] = self.df['spread_close'] / mid_price
+        elif 'hl_spread_bps' in self.df.columns:
+            # Fall back to high-low proxy
+            self.df['bid_ask_spread_bps'] = self.df['hl_spread_bps']
+            mid_price = (self.df['high'] + self.df['low']) / 2
+            hl_spread = self.df['high'] - self.df['low']
+            self.df['bid_ask_spread_relative'] = hl_spread / mid_price
+        else:
+            # Calculate high-low proxy if nothing exists
+            hl_spread = self.df['high'] - self.df['low']
+            mid_price = (self.df['high'] + self.df['low']) / 2
+            self.df['bid_ask_spread_bps'] = (hl_spread / mid_price) * 10000
+            self.df['bid_ask_spread_relative'] = hl_spread / mid_price
+
+    @feature_generator(
+        output_features=['spread_tight', 'spread_wide', 'spread_avg'],
+        description="Spread compression hypothesis specific features from bid-ask data",
+        category="spread_compression"
+    )
+    def spread_tight_features(self):
+        """
+        Generate spread tight, wide, and average features from your hypothesis.
+        Uses true bid-ask data when available, falls back to high-low proxy.
+        """
+        # Check if true bid-ask data is available
+        if all(col in self.df.columns for col in ['ask_low', 'bid_high', 'ask_high', 'bid_low', 'ask_close', 'bid_close']):
+            # Use true bid-ask data (from your hypothesis)
+            self.df['spread_tight'] = self.df['ask_low'] - self.df['bid_high']  # Tightest possible spread
+            self.df['spread_wide'] = self.df['ask_high'] - self.df['bid_low']   # Widest spread in period
+            self.df['spread_avg'] = self.df['ask_close'] - self.df['bid_close'] # Standard spread
+        else:
+            # Fall back to high-low approximations
+            hl_spread = self.df['high'] - self.df['low']
+            # These are approximations but better than nothing
+            self.df['spread_tight'] = hl_spread * 0.3  # Assume tight spread is ~30% of HL range
+            self.df['spread_wide'] = hl_spread         # Wide spread approximates HL range
+            self.df['spread_avg'] = hl_spread * 0.5    # Average spread is ~50% of HL range
+
+    @feature_generator(
+        output_features=['spread_relative', 'spread_baseline_true', 'spread_recent_true', 'compression_ratio_true'],
+        dependencies=['spread_avg', 'mid_price'],
+        description="Enhanced spread compression features using true spread data",
+        category="spread_compression"
+    )
+    def spread_relative_features(self):
+        """
+        Generate relative spread and compression features using true spread data.
+        This enhances the compression detection with actual bid-ask information.
+        """
+        # Relative spread (normalized by mid-price)
+        mid_price = self.df.get('mid_price', (self.df['high'] + self.df['low']) / 2)
+        self.df['spread_relative'] = self.df['spread_avg'] / mid_price
+        
+        # Enhanced baseline and recent using true spread relative values
+        lookback_window = 60  # 60 periods for baseline
+        alpha_baseline = 2 / (lookback_window + 1)  # EWMA alpha for baseline
+        alpha_recent = 2 / (4)  # Fast EWMA for recent spread (3-period equivalent)
+        
+        # EWMA baseline and recent using relative spread (better than absolute)
+        self.df['spread_baseline_true'] = self.df['spread_relative'].ewm(alpha=alpha_baseline, adjust=False).mean()
+        self.df['spread_recent_true'] = self.df['spread_relative'].ewm(alpha=alpha_recent, adjust=False).mean()
+        
+        # Enhanced compression ratio using true spreads
+        self.df['compression_ratio_true'] = np.where(
+            self.df['spread_baseline_true'] > 0,
+            (self.df['spread_baseline_true'] - self.df['spread_recent_true']) / self.df['spread_baseline_true'],
+            0
+        )
