@@ -123,7 +123,10 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             'bid_ask_spread_features': ['bid_ask_spread_bps', 'bid_ask_spread_relative'],
             'spread_tight_features': ['spread_tight', 'spread_wide', 'spread_avg'],
             'spread_wide_features': ['spread_tight', 'spread_wide', 'spread_avg'],  # Same as tight_features
-            'spread_relative_features': ['spread_relative', 'spread_baseline_true', 'spread_recent_true', 'compression_ratio_true']
+            'spread_relative_features': ['spread_relative', 'spread_baseline_true', 'spread_recent_true', 'compression_ratio_true'],
+            'multi_timeframe_compression_features': ['compression_ratio_micro', 'compression_ratio_short', 'compression_ratio_medium'],
+            'advanced_volume_confirmation_features': ['volume_acceleration', 'volume_breakout', 'volume_spread_correlation'],
+            'enhanced_signal_strength_calculator': ['signal_strength_v2']
         }
         
         for feature_name in feature_names:
@@ -1553,6 +1556,143 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
     def hour_feature(self):
         """Generate simple hour feature"""
         self.df['hour'] = self.df.index.hour
+
+    @feature_generator(
+        output_features=['compression_ratio_micro', 'compression_ratio_short', 'compression_ratio_medium'],
+        dependencies=['hl_spread_bps', 'mid_price'],
+        description="Multi-timeframe compression detection features",
+        category="spread_compression"
+    )
+    def multi_timeframe_compression_features(self):
+        """
+        Generate multi-timeframe compression detection features.
+        
+        - Micro: 30min baseline, 3min recent (most sensitive)
+        - Short: 1hr baseline, 5min recent  
+        - Medium: 2hr baseline, 10min recent
+        """
+        # Use hl_spread_bps if available, otherwise calculate
+        if 'hl_spread_bps' not in self.df.columns:
+            hl_spread = self.df['high'] - self.df['low']
+            mid_price = self.df['mid_price'] if 'mid_price' in self.df.columns else (self.df['high'] + self.df['low']) / 2
+            spread_bps = np.where(mid_price > 0, (hl_spread / mid_price) * 10000, 0)
+        else:
+            spread_bps = self.df['hl_spread_bps']
+        
+        # Micro timeframe: 30min baseline, 3min recent (most sensitive)
+        alpha_baseline_micro = 2 / (31)  # 30min baseline
+        alpha_recent_micro = 2 / (4)     # 3min recent
+        
+        baseline_micro = pd.Series(spread_bps).ewm(alpha=alpha_baseline_micro, adjust=False).mean()
+        recent_micro = pd.Series(spread_bps).ewm(alpha=alpha_recent_micro, adjust=False).mean()
+        
+        self.df['compression_ratio_micro'] = np.where(
+            baseline_micro > 0,
+            (baseline_micro - recent_micro) / baseline_micro,
+            0
+        )
+        
+        # Short timeframe: 1hr baseline, 5min recent
+        alpha_baseline_short = 2 / (61)  # 1hr baseline
+        alpha_recent_short = 2 / (6)     # 5min recent
+        
+        baseline_short = pd.Series(spread_bps).ewm(alpha=alpha_baseline_short, adjust=False).mean()
+        recent_short = pd.Series(spread_bps).ewm(alpha=alpha_recent_short, adjust=False).mean()
+        
+        self.df['compression_ratio_short'] = np.where(
+            baseline_short > 0,
+            (baseline_short - recent_short) / baseline_short,
+            0
+        )
+        
+        # Medium timeframe: 2hr baseline, 10min recent
+        alpha_baseline_medium = 2 / (121) # 2hr baseline
+        alpha_recent_medium = 2 / (11)    # 10min recent
+        
+        baseline_medium = pd.Series(spread_bps).ewm(alpha=alpha_baseline_medium, adjust=False).mean()
+        recent_medium = pd.Series(spread_bps).ewm(alpha=alpha_recent_medium, adjust=False).mean()
+        
+        self.df['compression_ratio_medium'] = np.where(
+            baseline_medium > 0,
+            (baseline_medium - recent_medium) / baseline_medium,
+            0
+        )
+
+    @feature_generator(
+        output_features=['volume_acceleration', 'volume_breakout', 'volume_spread_correlation'],
+        dependencies=['volume_ratio', 'volume_ma_20'],
+        description="Advanced volume confirmation features for spread compression",
+        category="spread_compression"
+    )
+    def advanced_volume_confirmation_features(self):
+        """
+        Generate advanced volume confirmation features.
+        
+        - volume_acceleration: Momentum detection in volume
+        - volume_breakout: Z-score > 2 detection
+        - volume_spread_correlation: Rolling correlation
+        """
+        volume = self.df['volume']
+        
+        # Volume acceleration (momentum detection)
+        # Rate of change in volume_ratio over 5 periods
+        volume_ratio = self.df.get('volume_ratio', volume / self.df.get('volume_ma_20', volume.rolling(20).mean()))
+        self.df['volume_acceleration'] = volume_ratio.pct_change(5, fill_method=None)
+        
+        # Volume breakout detection (z-score > 2)
+        volume_mean = volume.rolling(60).mean()
+        volume_std = volume.rolling(60).std()
+        volume_zscore = np.where(volume_std > 0, (volume - volume_mean) / volume_std, 0)
+        self.df['volume_breakout'] = np.where(volume_zscore > 2, 1, 0)
+        
+        # Rolling volume-spread correlation (20-period)
+        if 'hl_spread_bps' in self.df.columns:
+            spread_data = self.df['hl_spread_bps']
+        else:
+            # Calculate spread if not available
+            hl_spread = self.df['high'] - self.df['low']
+            mid_price = (self.df['high'] + self.df['low']) / 2
+            spread_data = np.where(mid_price > 0, (hl_spread / mid_price) * 10000, 0)
+        
+        # Rolling correlation between volume and spread
+        correlation_window = 20
+        rolling_corr = volume.rolling(correlation_window).corr(pd.Series(spread_data, index=volume.index))
+        self.df['volume_spread_correlation'] = rolling_corr.fillna(0)
+
+    @feature_generator(
+        output_features=['signal_strength_v2'],
+        dependencies=['volume_ratio', 'compression_ratio_micro', 'volume_acceleration', 'london_session'],
+        description="Enhanced signal strength calculator with optimized weights",
+        category="spread_compression"
+    )
+    def enhanced_signal_strength_calculator(self):
+        """
+        Enhanced signal strength calculator optimized for validation results.
+        
+        Weights based on validation performance:
+        - volume_ratio: 2.0x weight (strongest signal - 1.52x movement)
+        - compression_ratio_micro: 1.5x weight
+        - volume_acceleration: 1.2x weight
+        - london_session: 0.5x weight
+        """
+        # Ensure dependencies exist with safe defaults
+        volume_ratio = self.df.get('volume_ratio', 1)
+        compression_ratio_micro = self.df.get('compression_ratio_micro', 0)
+        volume_acceleration = self.df.get('volume_acceleration', 0)
+        london_session = self.df.get('london_session', 0)
+        
+        # Normalize inputs for consistent scaling
+        volume_ratio_norm = np.clip((volume_ratio - 1) * 2, -2, 2)  # Scale around 1
+        compression_ratio_norm = np.clip(compression_ratio_micro * 5, -2, 2)  # Scale compression
+        volume_accel_norm = np.clip(volume_acceleration * 10, -2, 2)  # Scale acceleration
+        
+        # Enhanced signal strength with optimized weights
+        self.df['signal_strength_v2'] = (
+            volume_ratio_norm * 2.0 +           # 2.0x weight (strongest predictor)
+            compression_ratio_norm * 1.5 +      # 1.5x weight (micro timeframe)
+            volume_accel_norm * 1.2 +           # 1.2x weight (momentum)
+            london_session * 0.5                # 0.5x weight (session bonus)
+        )
 
     @feature_generator(
         output_features=['signal_strength_compression'],
