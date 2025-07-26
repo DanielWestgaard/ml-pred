@@ -176,7 +176,7 @@ def fetch_chunk_with_retry(X_SECURITY_TOKEN, CST, epic, resolution,
 
 def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution, 
                                     from_date, to_date, output_file,
-                                    print_answer, save_raw_data):
+                                    print_answer, save_raw_data, include_spreads=False):
     """
     Fetches historical price data over an extended period and saves it to a CSV file.
     Improved version with better chunking and error handling.
@@ -191,6 +191,7 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
         output_file: Path to the output CSV file
         print_answer: Whether to print individual API responses
         save_raw_data: Save a copy of the raw JSON data (for debugging)
+        include_spreads: Whether to include bid/ask spread data in CSV output (default: False)
         
     Returns:
         Dictionary containing all the raw price data (with 'prices' key)
@@ -296,7 +297,7 @@ def fetch_and_save_historical_prices(X_SECURITY_TOKEN, CST, epic, resolution,
     # Save the data to OHLCV CSV format
     if all_prices:
         logger.info(f"Converting {len(all_prices)} data points to OHLCV format")
-        convert_json_to_ohlcv_csv(complete_data, output_file)
+        convert_json_to_ohlcv_csv(complete_data, output_file, include_spreads=include_spreads)
         logger.info(f"OHLCV data saved to {output_file}")
         
         # Print summary

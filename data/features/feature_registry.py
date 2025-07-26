@@ -105,13 +105,29 @@ class FeatureRegistry:
                 
             definition = self._generators[gen_name]
             for dep in definition.dependencies:
-                if dep not in all_generators:
-                    all_generators.add(dep)
-                    to_process.append(dep)
-                
-                # Add edge: dep -> gen_name
-                graph[dep].append(gen_name)
-                in_degree[gen_name] += 1
+                # Check if dependency is a feature name that needs to be resolved to a generator
+                if dep in self._feature_to_generators:
+                    # This is a feature dependency - resolve to its generator(s)
+                    dep_generators = self._feature_to_generators[dep]
+                    for dep_gen in dep_generators:
+                        if dep_gen not in all_generators:
+                            all_generators.add(dep_gen)
+                            to_process.append(dep_gen)
+                        
+                        # Add edge: dep_gen -> gen_name
+                        graph[dep_gen].append(gen_name)
+                        in_degree[gen_name] += 1
+                elif dep in self._generators:
+                    # This is a generator dependency
+                    if dep not in all_generators:
+                        all_generators.add(dep)
+                        to_process.append(dep)
+                    
+                    # Add edge: dep -> gen_name
+                    graph[dep].append(gen_name)
+                    in_degree[gen_name] += 1
+                # If dependency is neither a known feature nor generator, skip it
+                # (might be a basic column like 'close', 'volume', etc.)
         
         # Initialize in_degree for all generators
         for gen in all_generators:

@@ -30,10 +30,12 @@ class WebSocketDataManager:
             symbols: List of trading symbols to subscribe to
             timeframe: Data timeframe (MINUTE, HOUR, etc.)
             buffer_size: Maximum buffer size for each symbol
+            spread_focused: Whether to include spread data in WebSocket feeds (default: False)
         """
         self.symbols = symbols
         self.timeframe = timeframe
         self.buffer_size = buffer_size
+        self.spread_focused = kwargs.get('spread_focused', False)
         
         # Connection state
         self._is_connected = False
@@ -230,7 +232,8 @@ class WebSocketDataManager:
                             price_bar, 
                             symbol=symbol, 
                             source='historical', 
-                            as_floats=True
+                            as_floats=True,
+                            include_spreads=self.spread_focused
                         )
                         
                         # Add to buffer (don't block if full)

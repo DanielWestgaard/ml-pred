@@ -186,15 +186,17 @@ def main():
     
     if args.fetch_data_capcom:
         provider = ProviderCapitalCom()
-        provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE",
-                                                  from_date="2021-01-01T00:00:00", to_date="2025-07-23T01:00:00",
-                                                  print_answer=False)
+        # Enable spread data collection for spread-focused analysis 
+        # (use include_spreads=False for backward compatibility with existing pipelines)
+        provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE_5",
+                                                  from_date="2024-12-01T00:00:00", to_date="2025-01-23T01:00:00",
+                                                  print_answer=False, include_spreads=True)
         provider.end_session()
     
     if args.broker_func:
         broker = CapitalCom()
-        # broker.start_session()
-        # broker.session_details(print_answer=True)
+        broker.start_session()
+        broker.session_details(print_answer=True)
         # broker.get_account_capital()
         # broker.list_all_accounts(print_answer=True)
         # broker.get_historical_data(epic="GBPUSD", resolution="MINUTE",
@@ -211,7 +213,7 @@ def main():
         # broker.close_all_orders(print_answer=True)
         # broker.all_positions()
         
-        # broker.sub_live_market_data(symbol="GBPUSD", timeframe="MINUTE")
+        broker.sub_live_market_data(symbol="BTCUSD", timeframe="MINUTE")
         
         broker.end_session()
     
