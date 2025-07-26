@@ -5,23 +5,33 @@ data_pipeline:
   raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
   spread_focused: true  # Enable bid-ask spread data preservation (default: false)
 
-  selected_features:  # CORE ESSENTIAL FEATURES
+  selected_features:  # ENHANCED OPTIMAL FEATURES FOR TIER 2+ SIGNALS
     [
-      # Primary signal
-      'compression_ratio',
+      # Enhanced multi-timeframe compression signals
+      'compression_ratio_micro',      # Most sensitive (30min/3min)
+      'compression_ratio_short',      # Medium sensitivity (1hr/5min)  
+      'compression_ratio',            # Original (60min/3min)
       'compression_consistency', 
-      'signal_strength_compression',
       
-      # Market context
+      # Enhanced signal strength (optimized weights)
+      'signal_strength_v2',           # NEW: Optimized for validation results
+      'signal_strength_compression',  # Original for comparison
+      
+      # Advanced volume confirmation
+      'volume_ratio',                 # 1.52x movement ratio (strongest)
+      'volume_acceleration',          # NEW: Volume momentum detection
+      'volume_breakout',              # NEW: Z-score > 2 detection
+      
+      # Market context (proven predictors)
       'mid_price',
-      'volume_ratio',
-      'london_session',
+      'london_session',               # Session bonus
       'price_momentum_5',
       'volatility_short',
       
-      # Spread fundamentals
-      'spread_relative',  # Choose ONE spread measure
+      # Spread fundamentals  
+      'spread_relative',
       'spread_volatility_ewm',
+      'volume_spread_correlation',    # NEW: Volume-spread correlation
       
       # Time context
       'hour',
