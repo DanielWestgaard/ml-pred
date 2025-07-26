@@ -143,10 +143,13 @@ The unified feature engineering system that creates sophisticated technical indi
 - **Temporal Features**: Time of day/week/month (cyclical), Day of week patterns, Holiday detection, FX trading session analysis
 - **Market Regime Analysis**: Volatility regimes, Trend strength indicators, Market state classification, Combined regime analysis
 - **Advanced Analytics**: Seasonal decomposition (STL, MSTL), Fast Fourier Transform cyclical components, Logarithmic returns
+- **🆕 Spread Compression Features**: True bid-ask spread analysis, compression detection, spread volatility, and market microstructure features
 
 ### Key Architectural Features
 - **Model-Aware Generation**: Automatically generates exactly what trained models require
 - **Automatic Dependency Resolution**: Handles complex feature dependencies intelligently  
+- **🆕 Intelligent Feature Filtering**: Respects `selected_features` configuration - generates only requested features, preventing feature bloat
+- **🆕 Spread-Focused Processing**: Optional bid-ask spread data preservation via `spread_focused` configuration
 - **Decorator-Based Registration**: Easy feature addition with `@feature_generator` decorator
 - **Robust Error Handling**: Graceful failure handling with detailed logging
 - **Memory Efficient**: Optimized DataFrame operations to prevent fragmentation
@@ -161,11 +164,18 @@ from data.features.enhanced_generation import ModelAwareFeatureGenerator
 # Initialize with data
 generator = ModelAwareFeatureGenerator(historical_data)
 
-# Generate specific features for hypothesis testing  
-selected_features = ['sma_20', 'rsi_14', 'atr', 'asian_session', 'volatility_short']
+# 🆕 Generate specific features (with intelligent filtering)
+selected_features = ['london_session', 'compression_ratio', 'volume_ma_20', 'mid_price']
 processed_data = generator.generate_selected(selected_features)
+# Result: Only generates the 4 requested features + essential columns
+# Filters out unwanted features from generators that produce multiple outputs
 
-# Or generate all features
+# 🆕 Feature group expansion support
+spread_features = ['bid_ask_spread_features', 'spread_compression_features'] 
+processed_data = generator.generate_selected(spread_features)
+# Automatically expands groups to individual features
+
+# Or generate all features (200+ features)
 all_features_data = generator.generate_all()
 ```
 
@@ -174,6 +184,23 @@ all_features_data = generator.generate_all()
 # Generate features automatically based on model requirements
 generator = ModelAwareFeatureGenerator(live_data) 
 processed_data = generator.generate_for_model("storage/models/2025-07-03_12:45:35/model_metadata.yml")
+```
+
+#### 🆕 Spread-Focused Processing (Bid-Ask Analysis)
+```python
+# Enable spread-focused processing in hypothesis config
+data_pipeline:
+  spread_focused: true  # Preserves bid-ask spread data
+  selected_features: 
+    - "compression_ratio"
+    - "bid_ask_spread_features"  # Expands to actual spread features
+    - "london_session"
+
+# Results in focused feature set for spread compression analysis:
+# - compression_ratio, spread_relative, bid_ask_spread_bps
+# - london_session (no other session features)
+# - Essential OHLCV + targets preserved
+# - Raw spread data filtered unless explicitly requested
 ```
 
 #### Adding New Features
@@ -196,6 +223,32 @@ The backbone of the feature system providing:
 - **Feature Discovery**: Dynamic listing of available features and generators
 - **Execution Planning**: Topological sorting for optimal generation order
 - **Metadata Management**: Rich feature descriptions, categories, and parameters
+
+### 🆕 Intelligent Feature Filtering System
+The system now provides precise control over feature generation:
+
+#### How It Works
+1. **Generator Execution**: Runs required generators based on dependencies
+2. **Post-Generation Filtering**: Keeps only explicitly requested features
+3. **Essential Preservation**: Always preserves OHLCV, targets, and structure columns
+4. **Spread Data Control**: Filters raw spread data unless explicitly requested
+
+#### Example: Session Feature Filtering
+```python
+# Request: ['london_session']  
+# Generator runs: fx_trading_sessions (produces 7 session features)
+# Filter keeps: london_session only (filters out 6 unwanted features)
+
+# Before filtering: 57 features (feature bloat)
+# After filtering: 37 features (focused dataset)
+```
+
+#### Automatic Feature Group Expansion
+```python
+# Config: "bid_ask_spread_features" 
+# Expands to: ['bid_ask_spread_bps', 'bid_ask_spread_relative']
+# Enables logical grouping in hypothesis configurations
+```
 
 ### Integration Points
 The system seamlessly integrates with both:
