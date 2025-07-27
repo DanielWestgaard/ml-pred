@@ -129,9 +129,9 @@ class SignalProcessor:
                 strength = probability  # Probability itself is the strength
             else:  # Class 0 prediction
                 # For negative predictions, set very low confidence to filter them out
-                confidence = 1 - probability  # Confidence in negative prediction
+                confidence = probability  # Use the low probability of positive class
                 direction = 'BUY'  # Default direction, but will be filtered out
-                strength = 1 - probability
+                strength = probability  # Very low strength for negative predictions
         else:
             # Binary prediction without probabilities
             if prediction == 1:
