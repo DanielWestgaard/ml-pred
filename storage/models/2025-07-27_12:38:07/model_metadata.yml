@@ -1,0 +1,76 @@
+hypothesis:
+  name: spread_compression_patterns
+model_info:
+  model_type: random_forest
+  model_class: RandomForestClassifier
+  storage_path: /Users/danielwestgaard/progRel/ml-pred/storage/models/2025-07-27_12:38:07
+  created_at: '2025-07-27T12:38:07.660188'
+
+training:
+  duration_seconds: 17.37
+  duration_formatted: 0:00:17
+  completed_at: '2025-07-27T12:38:07.660200'
+  train_samples: 408000
+  test_samples: 102001
+
+dataset:
+  dataset_path: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv
+  target_column: target_spread_compression_binary
+  feature_count: 17
+  features:
+  - volume_breakout
+  - open
+  - high
+  - signal_strength_v2
+  - compression_consistency
+  - london_session
+  - low
+  - volume
+  - volume_acceleration
+  - volume_ratio
+  - mid_price
+  - compression_ratio_micro
+  - price_momentum_5
+  - close
+  - future_price_change
+  - target_spread_compression_multi
+  - close_og
+  total_samples: 510001
+  date_range:
+    start: '2024-06-02 21:00:00+00:00'
+    end: '2025-05-23 01:00:00+00:00'
+  missing_values: 0
+
+model_parameters:
+  bootstrap: true
+  ccp_alpha: 0.0
+  class_weight: balanced
+  criterion: gini
+  max_depth: 10
+  max_features: sqrt
+  max_leaf_nodes: null
+  max_samples: null
+  min_impurity_decrease: 0.0
+  min_samples_leaf: 2
+  min_samples_split: 5
+  min_weight_fraction_leaf: 0.0
+  monotonic_cst: null
+  n_estimators: 300
+  n_jobs: -1
+  oob_score: true
+  random_state: 42
+  verbose: 0
+  warm_start: false
+
+system_info:
+  cpu: arm
+  cpu_cores: 8
+  cpu_threads: 8
+  memory_gb: 16.0
+  python_version: 3.10.16
+  os: Darwin 24.5.0
+
+data_split:
+  train_size: 408000
+  test_size: 102001
+  split_ratio: 408000/102001
