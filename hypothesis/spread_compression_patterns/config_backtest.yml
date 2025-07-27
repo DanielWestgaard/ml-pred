@@ -19,7 +19,7 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: 1000                               # Limit to 1000 iterations for testing
+        max_loops: 10000                              # Increased limit for proper testing
         loop_interval: 0                              # No delays in backtesting (0 = instant)
     
     # Signal processing (inherit from strategy)

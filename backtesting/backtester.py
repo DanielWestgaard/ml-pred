@@ -257,7 +257,9 @@ class BacktestOrchestrator:
             
             # Main backtesting loop
             iteration = 0
-            while self.data_manager.has_more_data() and self.is_running:
+            max_loops = self.config.get('backtesting', {}).get('execution', {}).get('max_loops', 10000)
+            
+            while self.data_manager.has_more_data() and self.is_running and iteration < max_loops:
                 iteration += 1
                 
                 # Get next data point
@@ -368,6 +370,7 @@ class BacktestOrchestrator:
                     progress = self.data_manager.get_progress_info()
                     account_info = self.simulation_broker.get_account_info()
                     logger.info(f"Progress: {progress['progress_percentage']:.1f}% | "
+                               f"Iteration: {iteration}/{max_loops} | "
                                f"Equity: ${account_info['current_equity']:.2f} | "
                                f"Trades: {executed_trades} | "
                                f"Signals: {signals_generated}")
@@ -388,7 +391,8 @@ class BacktestOrchestrator:
             
             execution_time = time.time() - self.start_time
             logger.info(f"✅ Backtest completed in {execution_time:.2f} seconds")
-            logger.info(f"📊 Final Results: Return: {self.backtest_results['backtest_summary']['total_return_pct']:.2f}%, "
+            logger.info(f"📊 Final Results: Iterations: {iteration}/{max_loops} | "
+                       f"Return: {self.backtest_results['backtest_summary']['total_return_pct']:.2f}%, "
                        f"Trades: {self.backtest_results['trading_performance']['total_trades']}, "
                        f"Win Rate: {self.backtest_results['trading_performance']['win_rate']:.1f}%")
             
