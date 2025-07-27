@@ -1,57 +1,79 @@
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
+from enum import Enum
 
 from utils.logging_utils import get_logger
 
 logger = get_logger()
 
+class ModelType(Enum):
+    """Supported model types for signal processing"""
+    REGRESSION = "regression"
+    BINARY_CLASSIFICATION = "binary_classification"
+    MULTICLASS_CLASSIFICATION = "multiclass_classification"
+
 class SignalProcessor:
     """
     Converts model predictions into actionable trading signals.
+    Supports both regression and classification models with automatic detection.
     Applies filters and confidence thresholds to raw predictions.
     """
     
     def __init__(self, confidence_threshold: float = 0.6, 
-                 signal_filters: List[str] = None, **kwargs):
+                 signal_filters: List[str] = None, 
+                 model_type: Optional[ModelType] = None,
+                 **kwargs):
         """
         Initialize signal processor
         
         Args:
             confidence_threshold: Minimum confidence required for signal generation
             signal_filters: List of filter names to apply to signals
+            model_type: Type of model (auto-detected if not specified)
         """
         self.confidence_threshold = confidence_threshold
         self.signal_filters = signal_filters or []
+        self.model_type = model_type
         
-        logger.info(f"Signal processor initialized with confidence threshold: {confidence_threshold}")
+        logger.info(f"Signal processor initialized with confidence threshold: {confidence_threshold}, model type: {model_type}")
     
-    def process(self, predictions: np.ndarray, market_data: pd.DataFrame = None) -> Dict[str, Any]:
+    def process(self, predictions: np.ndarray, market_data: pd.DataFrame = None, 
+                model=None, prediction_probabilities: np.ndarray = None) -> Dict[str, Any]:
         """
         Process raw model predictions into trading signals
         
         Args:
-            predictions: Raw model predictions
+            predictions: Raw model predictions (class labels for classification, values for regression)
             market_data: Current market data for context
+            model: Model object for auto-detection of type
+            prediction_probabilities: Probability scores for classification models
             
         Returns:
             Dictionary containing signal information
         """
+        # Auto-detect model type if not specified
+        if self.model_type is None and model is not None:
+            self.model_type = self._detect_model_type(model)
+        
         signals = {
             'raw_predictions': predictions,
+            'prediction_probabilities': prediction_probabilities,
             'processed_signals': [],
             'signal_strength': [],
             'signal_direction': [],
             'confidence_scores': [],
-            'timestamp': pd.Timestamp.now()
+            'timestamp': pd.Timestamp.now(),
+            'model_type': self.model_type.value if self.model_type else 'unknown'
         }
         
         # Convert predictions to signals
         for i, prediction in enumerate(predictions):
-            signal_info = self._convert_prediction_to_signal(prediction, market_data, i)
+            prob = prediction_probabilities[i] if prediction_probabilities is not None else None
+            signal_info = self._convert_prediction_to_signal(prediction, market_data, i, prob)
             
             # Debug logger for confidence filtering
-            logger.debug(f"Prediction {i}: value={prediction:.4f}, confidence={signal_info['confidence']:.4f}, threshold={self.confidence_threshold}")
+            logger.debug(f"Prediction {i}: value={prediction}, confidence={signal_info['confidence']:.4f}, threshold={self.confidence_threshold}")
             
             if signal_info['confidence'] >= self.confidence_threshold:
                 signals['processed_signals'].append(signal_info)
@@ -64,22 +86,71 @@ class SignalProcessor:
         # Apply filters
         signals = self._apply_filters(signals, market_data)
         
-        logger.info(f"Generated {len(signals['processed_signals'])} signals from {len(predictions)} predictions")
+        logger.info(f"Generated {len(signals['processed_signals'])} signals from {len(predictions)} predictions (model: {self.model_type})")
         return signals
     
-    def _convert_prediction_to_signal(self, prediction: float, market_data: pd.DataFrame, index: int) -> Dict[str, Any]:
+    def _convert_prediction_to_signal(self, prediction: float, market_data: pd.DataFrame, 
+                                    index: int, probability: Optional[float] = None) -> Dict[str, Any]:
         """
         Convert a single prediction to signal information
         
         Args:
-            prediction: Single prediction value
+            prediction: Single prediction value (class label for classification, value for regression)
             market_data: Market data context
             index: Index of current prediction
+            probability: Probability score for classification models
             
         Returns:
             Signal information dictionary
         """
-        # Basic signal conversion logic (to be customized per hypothesis)
+        if self.model_type == ModelType.BINARY_CLASSIFICATION:
+            return self._convert_classification_prediction(prediction, probability, index)
+        elif self.model_type == ModelType.REGRESSION:
+            return self._convert_regression_prediction(prediction, index)
+        else:
+            # Fallback to regression logic for unknown models
+            logger.warning(f"Unknown model type {self.model_type}, defaulting to regression logic")
+            return self._convert_regression_prediction(prediction, index)
+    
+    def _convert_classification_prediction(self, prediction: float, probability: Optional[float], index: int) -> Dict[str, Any]:
+        """
+        Convert classification prediction to signal
+        
+        Args:
+            prediction: Class prediction (0 or 1)
+            probability: Probability of positive class
+            index: Prediction index
+        """
+        # Use probability if available, otherwise use binary prediction
+        if probability is not None:
+            confidence = max(probability, 1 - probability)  # Distance from 0.5
+            direction = 'BUY' if probability > 0.5 else 'SELL'
+            strength = abs(probability - 0.5) * 2  # Normalize to 0-1
+        else:
+            # Binary prediction without probabilities
+            confidence = 0.8 if prediction == 1 else 0.2  # Fixed confidence for binary
+            direction = 'BUY' if prediction == 1 else 'SELL'
+            strength = 0.8 if prediction == 1 else 0.2
+        
+        return {
+            'direction': direction,
+            'strength': strength,
+            'confidence': confidence,
+            'prediction_value': prediction,
+            'probability': probability,
+            'index': index,
+            'signal_type': 'classification'
+        }
+    
+    def _convert_regression_prediction(self, prediction: float, index: int) -> Dict[str, Any]:
+        """
+        Convert regression prediction to signal (original logic)
+        
+        Args:
+            prediction: Regression prediction value
+            index: Prediction index
+        """
+        # Original regression logic
         if prediction > 0.5:
             direction = 'BUY'
             strength = abs(prediction - 0.5) * 2  # Normalize to 0-1
@@ -87,7 +158,6 @@ class SignalProcessor:
             direction = 'SELL'
             strength = abs(0.5 - prediction) * 2  # Normalize to 0-1
         
-        # Calculate confidence (simplified - can be enhanced)
         confidence = strength
         
         return {
@@ -95,8 +165,40 @@ class SignalProcessor:
             'strength': strength,
             'confidence': confidence,
             'prediction_value': prediction,
-            'index': index
+            'index': index,
+            'signal_type': 'regression'
         }
+    
+    def _detect_model_type(self, model) -> ModelType:
+        """
+        Auto-detect model type from model object
+        
+        Args:
+            model: Trained model object
+            
+        Returns:
+            Detected model type
+        """
+        model_class_name = model.__class__.__name__.lower()
+        
+        # Classification model detection
+        classification_keywords = ['classifier', 'classification']
+        if any(keyword in model_class_name for keyword in classification_keywords):
+            # Check if it's binary classification by looking for predict_proba
+            if hasattr(model, 'predict_proba'):
+                return ModelType.BINARY_CLASSIFICATION
+            return ModelType.BINARY_CLASSIFICATION  # Default to binary for classifiers
+        
+        # Regression model detection
+        regression_keywords = ['regressor', 'regression']
+        if any(keyword in model_class_name for keyword in regression_keywords):
+            return ModelType.REGRESSION
+        
+        # Default fallback based on available methods
+        if hasattr(model, 'predict_proba'):
+            return ModelType.BINARY_CLASSIFICATION
+        else:
+            return ModelType.REGRESSION
     
     def _apply_filters(self, signals: Dict[str, Any], market_data: pd.DataFrame) -> Dict[str, Any]:
         """

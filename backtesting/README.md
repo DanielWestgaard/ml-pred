@@ -4,9 +4,11 @@
 The backtesting system provides **rapid, accurate simulation** of trading strategies using historical data. It leverages **90% of existing strategy components** to ensure identical behavior between backtesting and live trading while optimizing for speed and comprehensive analysis.
 
 ## Key Features 🚀
+- **✨ Multi-Model Support**: Automatic detection and handling of both regression and classification models
 - **🔄 Component Reuse**: Leverages existing `strategy/components` (RiskManager, SignalProcessor, PositionManager)
 - **⚡ High Performance**: Complete backtests in ~30 seconds vs hours of live testing
 - **📈 Realistic Simulation**: Accurate transaction costs, slippage, and market impact modeling
+- **🎯 Proper Confidence Handling**: Probability-based confidence for classification, magnitude-based for regression
 - **📊 Comprehensive Analytics**: Advanced performance metrics, risk analysis, and visualizations
 - **🎛️ Easy Configuration**: Simple YAML configuration for rapid hypothesis testing
 - **🔍 Detailed Logging**: Full trade-by-trade analysis and position tracking
