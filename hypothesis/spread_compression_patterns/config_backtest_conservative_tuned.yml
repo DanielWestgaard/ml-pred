@@ -6,10 +6,10 @@ backtesting:
     enabled: true
     model_folder: storage/models/2025-07-27_12:53:02
     
-    # Test on single high-signal day for faster iteration
+    # Test on different optimal period - second best scoring period
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv
-    start_date: '2025-04-07'                          # High-signal day
-    end_date: '2025-04-08'                            # Single day for quick testing
+    start_date: '2025-04-14'                          # Second optimal period (Score: 35.2, 842 signals)
+    end_date: '2025-04-15'                            # Single day for quick testing
     buffer_size: 200
     
     # Capital and costs
