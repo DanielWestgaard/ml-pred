@@ -24,7 +24,7 @@ backtesting:
     
     # Signal processing (inherit from strategy)
     signal_processing:
-        confidence_threshold: 0.6                     # Only accept high-confidence positive predictions
+        confidence_threshold: 0.55                    # Accept medium-high confidence positive predictions  
         signal_filters: ['session_filter']            # Apply session-based filtering
     
     # Risk management (inherit from strategy)
