@@ -24,8 +24,8 @@ class BacktestDataManager:
             buffer_size: Number of historical rows to maintain for feature generation
         """
         self.data_path = Path(data_path)
-        self.start_date = pd.to_datetime(start_date) if start_date else None
-        self.end_date = pd.to_datetime(end_date) if end_date else None
+        self.start_date = pd.to_datetime(start_date, utc=True) if start_date else None
+        self.end_date = pd.to_datetime(end_date, utc=True) if end_date else None
         self.buffer_size = buffer_size
         
         # Data storage
@@ -51,9 +51,18 @@ class BacktestDataManager:
             self.full_data = pd.read_csv(self.data_path)
             
             # Ensure timestamp column is properly formatted
+            timestamp_column = None
             if 'timestamp' in self.full_data.columns:
-                self.full_data['timestamp'] = pd.to_datetime(self.full_data['timestamp'])
+                timestamp_column = 'timestamp'
+            elif 'date' in self.full_data.columns:
+                timestamp_column = 'date'
+            
+            if timestamp_column:
+                self.full_data['timestamp'] = pd.to_datetime(self.full_data[timestamp_column])
                 self.full_data.set_index('timestamp', inplace=True)
+                # Drop the original column if it was renamed
+                if timestamp_column != 'timestamp' and timestamp_column in self.full_data.columns:
+                    self.full_data.drop(columns=[timestamp_column], inplace=True)
             elif self.full_data.index.name != 'timestamp':
                 # Try to use index as timestamp if it looks like datetime
                 try:

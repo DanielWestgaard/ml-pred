@@ -74,8 +74,10 @@ class BacktestOrchestrator:
                 self.config = config_loader.handle_hypothesis_source()
                 logger.info(f"Loaded hypothesis config using utils/hypothesis/config_loader: {self.hypothesis_config_path}")
                 logger.info(f"Config keys: {list(self.config.keys())}")
-                self.model_folder = self.config.get("backtesting_model_folder")
-                logger.debug(f"Model Folder is {self.model_folder}")
+                # Extract model folder from backtesting config (consistent with strategy approach)
+                backtesting_config = self.config.get('backtesting', {})
+                self.model_folder = backtesting_config.get('model_folder')
+                logger.debug(f"Model Folder from backtesting config: {self.model_folder}")
             else:
                 # Create minimal config for model-only backtesting
                 self.config = {
@@ -95,20 +97,31 @@ class BacktestOrchestrator:
     def _load_model(self):
         """Load trained model and metadata using existing model utilities"""
         try:
-            # Determine model path
+            # Determine model path (consistent with strategy approach)
             if self.model_folder:
                 model_path = self.model_folder
-            elif self.config.get('model_training', {}).get('model_folder'):
-                model_path = self.config['model_training']['model_folder']
             else:
-                # Use existing utility to find most recent model for the hypothesis
-                from utils.model.model_utils import get_latest_model
-                hypothesis_name = self.config.get('hypothesis_name', 'spread_compression_patterns')
-                model_path = get_latest_model("storage/models", model_type=None)
+                # Try to get model folder from config sections
+                backtesting_config = self.config.get('backtesting', {})
+                model_training_config = self.config.get('model_training', {})
+                strategy_config = self.config.get('strategy', {})
                 
-                # If no latest model found, try the old method as fallback
+                # Check different config locations for model folder
+                model_path = (
+                    backtesting_config.get('model_folder') or
+                    model_training_config.get('model_folder') or
+                    strategy_config.get('model_folder')
+                )
+                
                 if not model_path:
-                    model_path = self._find_latest_model(hypothesis_name)
+                    # Use existing utility to find most recent model for the hypothesis
+                    from utils.model.model_metadata_loader import get_latest_model
+                    hypothesis_name = self.config.get('hypothesis_name', 'spread_compression_patterns')
+                    model_path = get_latest_model("storage/models", model_type=None)
+                    
+                    # If no latest model found, try the old method as fallback
+                    if not model_path:
+                        model_path = self._find_latest_model(hypothesis_name)
             
             if not model_path:
                 raise ValueError("No model path specified and no trained models found")
