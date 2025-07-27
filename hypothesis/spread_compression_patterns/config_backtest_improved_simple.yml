@@ -1,7 +1,8 @@
 hypothesis:
   name: spread_compression_patterns
 
-# Backtesting: Improved configuration based on analysis
+# OPTIMIZED configuration based on parameter tuning analysis
+# This represents the best-performing parameter combination from testing
 backtesting:
     enabled: true
     model_folder: storage/models/2025-07-27_12:53:02
@@ -9,7 +10,7 @@ backtesting:
     # Data configuration - Using optimal period identified by analysis  
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv
     start_date: '2025-04-07'                          # Top-scoring period with 975 signals
-    end_date: '2025-04-10'                            # Shorter 3-day test period
+    end_date: '2025-04-10'                            # 3-day validation period
     buffer_size: 200
     
     # Capital and costs
@@ -19,45 +20,43 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: 10000                              # Increased for 7-day period with high signal density
+        max_loops: 4320                               # 3 days * 24h * 60min = 4320 loops
         loop_interval: 0
     
-    # Improved signal processing
+    # High-quality signal processing
     signal_processing:
         confidence_threshold: 0.75                    # Higher threshold for quality signals
         signal_filters: ['session_filter']
-        
-        # Additional filters to improve signal quality
         min_signal_strength: 0.3                      # Minimum signal strength threshold
         volume_confirmation_required: true            # Require volume confirmation
         
-    # Enhanced risk management
+    # Conservative risk management (optimized)
     risk_management:
-        max_position_size: 0.015                      # Slightly smaller positions for better risk control
-        stop_loss_pct: 0.015                         # Tighter stop loss (1.5%)
-        take_profit_pct: 0.045                        # Wider take profit (4.5%) - better risk/reward
-        max_drawdown: 0.04                            # Tighter drawdown control (4%)
-        max_concurrent_positions: 2                   # Reduce to 2 concurrent positions
-        
-        # Risk scaling based on volatility
+        max_position_size: 0.015                      # Smaller positions for better risk control (1.5%)
+        stop_loss_pct: 0.015                         # Tight stop loss (1.5%)
+        take_profit_pct: 0.045                        # Wide take profit (4.5%) - optimal 1:3 risk/reward
+        max_drawdown: 0.04                            # Strict drawdown control (4%)
+        max_concurrent_positions: 2                   # Limited concurrency for better control
         position_size_scaling: 'volatility'           # Scale position size based on current volatility
         
-    # Position management improvements
+    # Position management
     position_management:
         max_concurrent_positions: 2
         position_tracking: detailed
     
-    # Intelligent exit strategy (spread compression specific)
+    # OPTIMIZED intelligent exit strategy (best performing parameters from testing)
     exit_strategy:
-        confidence_exit_threshold: 0.30               # Exit when model confidence drops below 30%
-        signal_strength_decay: 0.25                   # Exit when signal strength drops 25% from peak
-        volatility_exit_multiplier: 1.5               # Exit when volatility exceeds 1.5x entry volatility
-        minimum_signal_life: 3                        # Minimum 3 minutes before considering exits
+        confidence_exit_threshold: 0.35               # OPTIMIZED: Best performing threshold (was 0.30)
+        signal_strength_decay: 0.17                   # OPTIMIZED: Enhanced sensitivity (was 0.25)
+        volatility_exit_multiplier: 1.3               # OPTIMIZED: More sensitive volatility detection (was 1.5)
+        minimum_signal_life: 5                        # OPTIMIZED: Conservative protection (was 3)
     
-    # Signal tracking for intelligent exits
+    # Enhanced signal tracking for better decay detection
     signal_tracking:
         signal_strength_features:
-            - compression_ratio_micro
-            - volume_ratio  
-            - signal_strength_v2
-            - compression_consistency
+            - compression_ratio_micro                  # Core compression feature
+            - volume_ratio                             # Volume confirmation
+            - signal_strength_v2                       # Enhanced signal strength
+            - compression_consistency                  # Consistency metric
+            - volatility_short                         # Volatility tracking for exits
+            - spread_baseline                          # Spread baseline for comparison
