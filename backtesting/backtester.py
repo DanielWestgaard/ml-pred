@@ -366,12 +366,13 @@ class BacktestOrchestrator:
                 current_row = self.preprocessed_data.iloc[self.current_data_index]
                 
                 # Extract market data (OHLCV) - use 'date' as timestamp
+                # Use original price columns (_og) since main columns are normalized
                 current_data = {
                     'timestamp': current_row['date'],  # Use 'date' column
-                    'open': current_row.get('open', current_row.get('close', 0)),
-                    'high': current_row.get('high', current_row.get('close', 0)),
-                    'low': current_row.get('low', current_row.get('close', 0)),
-                    'close': current_row.get('close', 0),
+                    'open': current_row.get('open', current_row.get('close_og', 0)),
+                    'high': current_row.get('high', current_row.get('close_og', 0)),
+                    'low': current_row.get('low', current_row.get('close_og', 0)),
+                    'close': current_row.get('close_og', 0),  # Use actual price, not normalized
                     'volume': current_row.get('volume', 0)
                 }
                 
