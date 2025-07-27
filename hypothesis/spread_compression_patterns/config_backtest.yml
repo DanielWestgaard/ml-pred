@@ -19,12 +19,12 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: 50000                             # Allow full month of 1-minute data (31 days * 24h * 60m = ~44,640)
+        max_loops: 10000                              # starting a bit lower for testing purposes, 50 000 - Allow full month of 1-minute data (31 days * 24h * 60m = ~44,640)
         loop_interval: 0                              # No delays in backtesting (0 = instant)
     
     # Signal processing (inherit from strategy)
     signal_processing:
-        confidence_threshold: 0.55                    # Accept medium-high confidence positive predictions  
+        confidence_threshold: 0.51                    # Accept medium-high confidence positive predictions  
         signal_filters: ['session_filter']            # Apply session-based filtering
     
     # Risk management (inherit from strategy)
