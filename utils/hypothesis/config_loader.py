@@ -94,6 +94,25 @@ class LoadHypothesisConfigMetadata:
         if evaluate_model and not isinstance(evaluate_model, dict):
             errors.append("Section 'evaluate_model' must be a dictionary")
         
+        # Validate backtesting if present
+        backtesting = self._safe_get(['backtesting'])
+        if backtesting:
+            if not isinstance(backtesting, dict):
+                errors.append("Section 'backtesting' must be a dictionary")
+            else:
+                # Validate specific backtesting parameters if they exist
+                if 'initial_capital' in backtesting and not isinstance(backtesting['initial_capital'], (int, float)):
+                    errors.append("Field 'backtesting.initial_capital' must be a number")
+                
+                if 'transaction_costs' in backtesting and not isinstance(backtesting['transaction_costs'], (int, float)):
+                    errors.append("Field 'backtesting.transaction_costs' must be a number")
+                
+                if 'slippage' in backtesting and not isinstance(backtesting['slippage'], (int, float)):
+                    errors.append("Field 'backtesting.slippage' must be a number")
+                
+                if 'enabled' in backtesting and not isinstance(backtesting['enabled'], bool):
+                    errors.append("Field 'backtesting.enabled' must be a boolean")
+        
         return errors
     
     def _safe_get(self, path: List[str], default: Any = None) -> Any:
@@ -158,7 +177,8 @@ class LoadHypothesisConfigMetadata:
             ('data_pipeline', ['raw_source']),  # raw_source is required if section exists
             ('model_training', ['type']),       # type is required if section exists  
             ('evaluate_model', None),           # No required fields
-            ('strategy', None)                  # No required fields
+            ('strategy', None),                 # No required fields
+            ('backtesting', None)               # No required fields (all backtesting params are optional)
         ]
         
         for section_name, required_fields in sections_to_extract:
@@ -179,7 +199,7 @@ class LoadHypothesisConfigMetadata:
             logger.debug("No spread_focused setting found, defaulting to False")
         
         # Log summary
-        sections_found = [section for section in ['data_pipeline', 'model_training', 'evaluate_model', 'strategy'] 
+        sections_found = [section for section in ['data_pipeline', 'model_training', 'evaluate_model', 'strategy', 'backtesting'] 
                          if section in config]
         logger.info(f"Successfully loaded config sections: {sections_found}")
         
