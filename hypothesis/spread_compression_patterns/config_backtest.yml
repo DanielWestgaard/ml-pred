@@ -6,10 +6,10 @@ backtesting:
     enabled: true                                     # Enable backtesting mode
     model_folder: storage/models/2025-07-27_12:53:02
     
-    # Data configuration
+    # Data configuration  
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv  # Use same data as training
     start_date: '2025-01-01'                          # Use out-of-sample period  
-    end_date: '2025-03-31'                            # Test data end date (1 week for quick testing)
+    end_date: '2025-01-31'                            # Test data end date (1 month for testing)
     buffer_size: 200                                  # Historical buffer for feature generation
     
     # Capital and costs

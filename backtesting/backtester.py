@@ -61,10 +61,15 @@ class BacktestOrchestrator:
         self.is_running = False
         self.start_time = None
         
+        # Preprocessed data for backtesting
+        self.preprocessed_data = None
+        self.current_data_index = 0
+        
         # Load configuration and initialize components
         self._load_configuration()
         self._load_model()
         self._detect_model_type()
+        self._load_preprocessed_data()
         self._initialize_components()
         
         logger.info("Backtest orchestrator initialized successfully")
@@ -211,6 +216,65 @@ class BacktestOrchestrator:
             self.prediction_processor = PredictionProcessor(self.model_type)
             logger.warning("Defaulting to regression model type")
     
+    def _load_preprocessed_data(self):
+        """Load and filter preprocessed data for backtesting"""
+        try:
+            # Get data source from config
+            backtest_config = self.config.get('backtesting', {})
+            data_source = backtest_config.get('data_source')
+            
+            if not data_source:
+                # Try to get from model metadata
+                data_source = self.model_metadata.get('dataset', {}).get('dataset_path')
+            
+            if not data_source:
+                raise ValueError("No data source specified in config or model metadata")
+            
+            logger.info(f"Loading preprocessed data from: {data_source}")
+            
+            # Load full dataset
+            full_data = pd.read_csv(data_source)
+            
+            # Use 'date' column as timestamp and rename for consistency
+            if 'date' in full_data.columns:
+                full_data['timestamp'] = pd.to_datetime(full_data['date'])
+            else:
+                raise ValueError("No 'date' column found in preprocessed data")
+            
+            # Filter by date range
+            start_date = backtest_config.get('start_date')
+            end_date = backtest_config.get('end_date')
+            
+            if start_date:
+                start_date = pd.to_datetime(start_date, utc=True)  # Make timezone-aware
+                full_data = full_data[full_data['timestamp'] >= start_date]
+            
+            if end_date:
+                end_date = pd.to_datetime(end_date, utc=True)  # Make timezone-aware
+                full_data = full_data[full_data['timestamp'] <= end_date]
+            
+            # Sort by timestamp
+            full_data = full_data.sort_values('timestamp').reset_index(drop=True)
+            
+            self.preprocessed_data = full_data
+            self.current_data_index = 0
+            
+            logger.info(f"Loaded {len(self.preprocessed_data)} preprocessed data points")
+            logger.info(f"Date range: {self.preprocessed_data['timestamp'].min()} to {self.preprocessed_data['timestamp'].max()}")
+            
+            # Log available features
+            model_features = self.model_metadata.get('dataset', {}).get('features', [])
+            available_features = [f for f in model_features if f in self.preprocessed_data.columns]
+            missing_features = [f for f in model_features if f not in self.preprocessed_data.columns]
+            
+            logger.info(f"Available features: {len(available_features)}/{len(model_features)}")
+            if missing_features:
+                logger.warning(f"Missing features: {missing_features}")
+            
+        except Exception as e:
+            logger.error(f"Error loading preprocessed data: {e}")
+            raise
+    
     def _initialize_components(self):
         """Initialize backtesting components"""
         try:
@@ -244,14 +308,14 @@ class BacktestOrchestrator:
             self.feature_generator = None  # Will be initialized per-iteration
             
             # Strategy components (reuse existing components!)
-            signal_config = self.config.get('signal_processing', {})
+            signal_config = self.config.get('backtesting', {}).get('signal_processing', {})
             self.signal_processor = SignalProcessor(
                 confidence_threshold=signal_config.get('confidence_threshold', 0.6),
                 signal_filters=signal_config.get('signal_filters', []),
                 model_type=self.model_type
             )
             
-            risk_config = self.config.get('risk_management', {})
+            risk_config = self.config.get('backtesting', {}).get('risk_management', {})
             self.risk_manager = RiskManager(
                 max_position_size=risk_config.get('max_position_size', 0.02),
                 stop_loss_pct=risk_config.get('stop_loss_pct', 0.01),
@@ -260,7 +324,7 @@ class BacktestOrchestrator:
                 max_concurrent_positions=risk_config.get('max_concurrent_positions', 3)
             )
             
-            position_config = self.config.get('position_management', {})
+            position_config = self.config.get('backtesting', {}).get('position_management', {})
             self.position_manager = PositionManager(
                 max_concurrent_positions=position_config.get('max_concurrent_positions', 3),
                 position_tracking=position_config.get('position_tracking', 'detailed')
@@ -290,56 +354,45 @@ class BacktestOrchestrator:
             signals_generated = 0
             progress_interval = 1000  # Log progress every 1000 iterations
             
-            # Main backtesting loop
+            # Main backtesting loop using preprocessed data
             iteration = 0
             max_loops = self.config.get('backtesting', {}).get('execution', {}).get('max_loops', 10000)
+            total_data_points = len(self.preprocessed_data)
             
-            while self.data_manager.has_more_data() and self.is_running and iteration < max_loops:
+            while self.current_data_index < total_data_points and self.is_running and iteration < max_loops:
                 iteration += 1
                 
-                # Get next data point
-                current_data = self.data_manager.get_next_data_point()
-                if not current_data:
-                    break
+                # Get current data point from preprocessed data
+                current_row = self.preprocessed_data.iloc[self.current_data_index]
                 
-                # Get data buffer for feature generation
-                data_buffer = self.data_manager.get_current_data_buffer()
+                # Extract market data (OHLCV) - use 'date' as timestamp
+                current_data = {
+                    'timestamp': current_row['date'],  # Use 'date' column
+                    'open': current_row.get('open', current_row.get('close', 0)),
+                    'high': current_row.get('high', current_row.get('close', 0)),
+                    'low': current_row.get('low', current_row.get('close', 0)),
+                    'close': current_row.get('close', 0),
+                    'volume': current_row.get('volume', 0)
+                }
                 
-                # Skip if buffer is too small for feature generation
-                if len(data_buffer) < 50:  # Minimum buffer for stable feature generation
-                    continue
-                
-                # Generate features for current data point
+                # Use preprocessed features directly (no feature generation needed!)
                 try:
-                    # Get required features from model metadata
-                    required_features = self._get_required_features()
-                    
-                    # Initialize feature generator with current data buffer
-                    if self.feature_generator is None or len(data_buffer) > 50:
-                        self.feature_generator = ModelAwareFeatureGenerator(
-                            data_buffer,
-                            selected_features=required_features
-                        )
-                    
-                    # Generate features
-                    features_df = self.feature_generator.generate_selected(required_features)
-                    
-                    if features_df.empty or len(features_df) == 0:
-                        continue
-                    
-                    # Get latest feature row for prediction
-                    latest_features = features_df.iloc[-1:]
-                    
-                    # Ensure we have all the features the model expects
+                    # Get model features directly from preprocessed data
                     model_features = self.model_metadata.get('dataset', {}).get('features', [])
-                    missing_features = [f for f in model_features if f not in latest_features.columns]
+                    target_column = self.model_metadata.get('dataset', {}).get('target_column', '')
                     
+                    # Filter out target column from features
+                    prediction_features_list = [f for f in model_features if f != target_column]
+                    
+                    # Check for missing features
+                    missing_features = [f for f in prediction_features_list if f not in current_row.index]
                     if missing_features:
                         logger.debug(f"Missing features for prediction: {missing_features}")
+                        self.current_data_index += 1
                         continue
                     
-                    # Select only the features the model was trained on
-                    prediction_features = latest_features[model_features]
+                    # Extract features for this data point
+                    prediction_features = current_row[prediction_features_list].to_frame().T
                     
                     # Process predictions using the prediction processor
                     prediction_results = self.prediction_processor.process_predictions(
@@ -349,10 +402,10 @@ class BacktestOrchestrator:
                     predictions = prediction_results['predictions']
                     probabilities = prediction_results.get('positive_probabilities')
                     
-                    # Process prediction into trading signals
+                    # Process prediction into trading signals (no data_buffer needed for preprocessed data)
                     signals = self.signal_processor.process(
                         predictions, 
-                        data_buffer, 
+                        market_data=None,  # No market data buffer needed
                         model=self.model,
                         prediction_probabilities=probabilities
                     )
@@ -406,26 +459,31 @@ class BacktestOrchestrator:
                     account_info = self.simulation_broker.get_account_info()
                     self.risk_manager.update_drawdown(account_info['current_equity'])
                     
+                    # Move to next data point
+                    self.current_data_index += 1
+                    
                 except Exception as e:
                     logger.debug(f"Error processing data point {iteration}: {e}")
+                    self.current_data_index += 1
                     continue
                 
                 # Progress logging
                 if iteration % progress_interval == 0:
-                    progress = self.data_manager.get_progress_info()
+                    progress_pct = (self.current_data_index / total_data_points) * 100
                     account_info = self.simulation_broker.get_account_info()
-                    logger.info(f"Progress: {progress['progress_percentage']:.1f}% | "
+                    logger.info(f"Progress: {progress_pct:.1f}% | "
                                f"Iteration: {iteration}/{max_loops} | "
+                               f"Data: {self.current_data_index}/{total_data_points} | "
                                f"Equity: ${account_info['current_equity']:.2f} | "
                                f"Trades: {executed_trades} | "
                                f"Signals: {signals_generated}")
             
             # Close all remaining positions at end of backtest
-            if self.data_manager.get_latest_data_point():
-                final_data = self.data_manager.get_latest_data_point()
+            if self.current_data_index > 0:
+                final_row = self.preprocessed_data.iloc[self.current_data_index - 1]
                 self.simulation_broker.close_all_positions(
-                    current_price=final_data['close'],
-                    timestamp=final_data['timestamp']
+                    current_price=final_row['close'],
+                    timestamp=final_row['date']
                 )
             
             # Calculate final results
