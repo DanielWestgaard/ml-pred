@@ -30,8 +30,8 @@ backtesting:
     # Risk management (inherit from strategy)
     risk_management:
         max_position_size: 0.02                       # 2% of capital per position
-        stop_loss_pct: 0.01                          # 1% stop loss
-        take_profit_pct: 0.02                        # 2% take profit
+        stop_loss_pct: 0.02                          # 2% stop loss
+        take_profit_pct: 0.04                        # 4% take profit
         max_drawdown: 0.05                           # 5% maximum drawdown limit
         max_concurrent_positions: 3                   # Maximum 3 simultaneous positions
     
