@@ -4,10 +4,10 @@ hypothesis:
 # Backtesting: Rapid strategy validation with historical data
 backtesting:
     enabled: true                                     # Enable backtesting mode
-    model_folder: storage/models/2025-07-19_15:42:16
+    model_folder: storage/models/2025-07-27_12:53:02
     
     # Data configuration
-    data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv  # Processed data for backtesting
+    data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv  # Processed data for backtesting
     start_date: '2024-10-01'                          # Start from end of training period
     end_date: '2025-05-23'                            # Test data end date
     buffer_size: 200                                  # Historical buffer for feature generation
