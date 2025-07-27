@@ -375,6 +375,12 @@ class BacktestOrchestrator:
                     'volume': current_row.get('volume', 0)
                 }
                 
+                # Skip if we have invalid price data
+                if current_data['close'] <= 0:
+                    logger.debug(f"Skipping invalid price data at index {self.current_data_index}")
+                    self.current_data_index += 1
+                    continue
+                
                 # Use preprocessed features directly (no feature generation needed!)
                 try:
                     # Get model features directly from preprocessed data

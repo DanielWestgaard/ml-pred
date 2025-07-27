@@ -4,14 +4,9 @@ from typing import Dict, List, Any, Optional
 from enum import Enum
 
 from utils.logging_utils import get_logger
+from utils.model.model_type_detector import ModelType
 
 logger = get_logger()
-
-class ModelType(Enum):
-    """Supported model types for signal processing"""
-    REGRESSION = "regression"
-    BINARY_CLASSIFICATION = "binary_classification"
-    MULTICLASS_CLASSIFICATION = "multiclass_classification"
 
 class SignalProcessor:
     """
