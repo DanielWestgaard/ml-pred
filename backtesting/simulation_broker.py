@@ -169,6 +169,24 @@ class SimulationBroker:
             if net_pnl > 0:
                 self.winning_trades += 1
             
+            # Calculate holding period safely
+            try:
+                # Ensure timestamps are datetime objects
+                if isinstance(timestamp, str):
+                    exit_time = pd.to_datetime(timestamp)
+                else:
+                    exit_time = timestamp
+                    
+                if isinstance(position['entry_timestamp'], str):
+                    entry_time = pd.to_datetime(position['entry_timestamp'])
+                else:
+                    entry_time = position['entry_timestamp']
+                    
+                holding_period_minutes = (exit_time - entry_time).total_seconds() / 60
+            except Exception as e:
+                logger.warning(f"Error calculating holding period: {e}, defaulting to 0")
+                holding_period_minutes = 0
+            
             # Create closed trade record
             closed_trade = {
                 **position,
@@ -179,7 +197,7 @@ class SimulationBroker:
                 'gross_pnl': pnl,
                 'net_pnl': net_pnl,
                 'total_transaction_costs': position['transaction_cost'] + exit_transaction_cost,
-                'holding_period_minutes': (timestamp - position['entry_timestamp']).total_seconds() / 60,
+                'holding_period_minutes': holding_period_minutes,
                 'status': 'closed'
             }
             
