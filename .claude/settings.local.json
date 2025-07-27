@@ -5,7 +5,8 @@
       "Bash(grep:*)",
       "Bash(python:*)",
       "Bash(chmod:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }
