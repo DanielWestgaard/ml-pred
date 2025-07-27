@@ -306,8 +306,12 @@ class BacktestOrchestrator:
                     # Select only the features the model was trained on
                     prediction_features = latest_features[model_features]
                     
-                    # Make prediction
-                    prediction = self.model.predict(prediction_features)[0]
+                    # Make prediction with probability for confidence
+                    if hasattr(self.model, 'predict_proba'):
+                        prediction_proba = self.model.predict_proba(prediction_features)[0]
+                        prediction = prediction_proba[1]  # Use probability of positive class
+                    else:
+                        prediction = self.model.predict(prediction_features)[0]
                     
                     # Process prediction into trading signals
                     signals = self.signal_processor.process([prediction], data_buffer)
