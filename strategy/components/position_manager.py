@@ -91,6 +91,21 @@ class PositionManager:
         
         return position
     
+    def add_position(self, trade_result: Dict[str, Any]) -> None:
+        """
+        Add a position from broker trade result (for backtesting)
+        
+        Args:
+            trade_result: Trade result from simulation broker
+        """
+        if trade_result.get('success'):
+            position_data = trade_result.get('position_data', {})
+            self.open_positions.append(position_data)
+            self.position_history.append(position_data.copy())
+            self.total_trades += 1
+            
+            logger.debug(f"Added position from trade result: {position_data.get('id', 'unknown')}")
+    
     def update_position(self, position_id: str, current_price: float) -> Optional[Dict[str, Any]]:
         """
         Update an existing position with current market price

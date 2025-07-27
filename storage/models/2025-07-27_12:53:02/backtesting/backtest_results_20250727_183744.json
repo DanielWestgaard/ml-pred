@@ -1,0 +1,30 @@
+{
+  "backtest_summary": {
+    "hypothesis_name": "spread_compression_patterns",
+    "model_type": "random_forest",
+    "initial_capital": 10000,
+    "final_equity": 9999.148741125264,
+    "total_return": -8.512588747362315e-05,
+    "total_return_pct": -0.008512588747362316,
+    "execution_time_seconds": 4.519397020339966
+  },
+  "trading_performance": {
+    "total_trades": 3,
+    "winning_trades": 3,
+    "losing_trades": -3,
+    "win_rate": 3.0,
+    "total_fees": 1.5599560875547727,
+    "max_drawdown": 8.512588747362315e-05,
+    "max_drawdown_pct": 0.008512588747362316
+  },
+  "risk_metrics": {
+    "error": "No closed trades for risk analysis"
+  },
+  "trade_analysis": {
+    "error": "No trades to analyze"
+  },
+  "data_period": {
+    "start": "2025-01-01 00:00:00+00:00",
+    "end": "2025-01-31 00:00:00+00:00"
+  }
+}

@@ -131,6 +131,7 @@ def main():
         raw_data_source:str = 'raw_data_source'
         # ...
         strategy:str = 'strategy'
+        backtesting:str = 'backtesting'
         
         # Getting all the configurations
         conf = config_loader.load_hypothesis_config(args.hypothesis).handle_hypothesis_source()
@@ -174,6 +175,9 @@ def main():
         
         if strategy in conf_keys:
             _strategy_flow(args.hypothesis)
+        
+        if backtesting in conf_keys:
+            _backtesting_flow(args.hypothesis)
     
     if args.plot_data:
         plot_data = PlotData(dataset=args.plot_data, save_plot=False)
@@ -298,6 +302,15 @@ def _strategy_flow(hypothesis_config: str):
                 logger.error(f"Error during strategy cleanup: {e}")
         raise
 
+def _backtesting_flow(hypothesis_config: str):
+    from backtesting.backtester import BacktestOrchestrator
+
+    # Test the trained model
+    backtester = BacktestOrchestrator(
+        hypothesis_config_path = hypothesis_config  # "hypothesis/spread_compression_patterns/config_complete.yml"
+    )
+
+    results = backtester.run_backtest()
 
 if __name__=="__main__":
     main()

@@ -5,9 +5,11 @@ The strategy component is a **complete trading system orchestrator** that transf
 
 ## Key Features 🚀
 - **Full Trading System**: Complete end-to-end trading system from data ingestion to trade execution
+- **✨ Multi-Model Support**: Automatic detection and handling of both regression and classification models
 - **Live & Simulation Modes**: Support for both paper trading (simulation) and live market execution
 - **Real-time Data Integration**: Live market data streaming via WebSocket and REST APIs
 - **Hypothesis-Driven Architecture**: Each market hypothesis gets its own specialized strategy implementation. This must be manually implemented for the hypothesis.
+- **Enhanced Signal Processing**: Probability-based confidence for classification, magnitude-based for regression
 - **Comprehensive Risk Management**: Multi-layer risk controls with position sizing, stop-losses, and drawdown protection
 - **Automated Account Management**: Centralized account switching with configurable target accounts
 - **Live Trading Safety**: Automatic position closure during system shutdown for live trading protection
@@ -96,8 +98,9 @@ strategy:
         loop_interval: 5
 
     signal_processing:
-        confidence_threshold: 0.7
+        confidence_threshold: 0.3  # Lower for classification, higher for regression
         signal_filters: ['session_filter', 'volatility_filter']
+        model_type: 'auto'  # Auto-detect or specify: 'regression'/'binary_classification'
 
     risk_management:
         max_position_size: 0.02  # 2% of capital
@@ -142,7 +145,10 @@ strategy:
 - Each strategy inherits from BaseStrategy and implements `generate_signals()` and `execute_strategy()`
 
 ### Strategy Components
-- **SignalProcessor**: Converts model predictions into actionable trading signals
+- **✨ Enhanced SignalProcessor**: Converts model predictions into actionable trading signals with automatic model type detection
+  - **Classification Support**: Uses `predict_proba()` for confidence scores
+  - **Regression Support**: Uses prediction magnitude for confidence
+  - **Auto-Detection**: Automatically determines model type from model object or metadata
 - **RiskManager**: Implements position sizing, stop-losses, and portfolio-level risk controls
 - **PositionManager**: Tracks portfolio state, open positions, and performance metrics
 - **OrderManager**: Executes trades through broker APIs with automatic position sizing, centralized account management, and live trading safety features

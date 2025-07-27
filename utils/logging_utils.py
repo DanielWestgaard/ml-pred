@@ -29,7 +29,7 @@ def setup_logging(
     log_to_console=True,
     log_to_file=True,
     log_dir=config.BASE_LOGS_DIR,
-    max_file_size=10*1024*1024,  # 10 MB - remove?
+    max_file_size=90*1024*1024,  # 10 MB - remove?
     backup_count=5,
     include_trade_logs=False,
     include_performance_logs=False,

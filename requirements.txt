@@ -19,3 +19,4 @@ plotly
 nbformat
 torch
 tensorflow
+timeout

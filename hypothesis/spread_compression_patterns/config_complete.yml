@@ -49,6 +49,44 @@ model_training:
         n_jobs: -1                                    # Use all available CPU cores
         max_features: sqrt                            # sqrt(n_features) for classification
 
+# Backtesting: Rapid strategy validation with historical data
+backtesting:
+    enabled: true                                     # Enable backtesting mode
+    
+    # Data configuration
+    data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv  # Processed data for backtesting
+    start_date: '2024-10-01'                          # Start from end of training period
+    end_date: '2025-05-23'                            # Test data end date
+    buffer_size: 200                                  # Historical buffer for feature generation
+    
+    # Capital and costs
+    initial_capital: 10000                            # Starting capital for simulation
+    transaction_costs: 0.0013                        # 1.3 pips for GBPUSD (realistic spread)
+    slippage: 0.0002                                  # 0.2 pips average slippage
+    
+    # Execution settings
+    execution:
+        max_loops: null                               # Process all historical data (null = unlimited)
+        loop_interval: 0                              # No delays in backtesting (0 = instant)
+    
+    # Signal processing (inherit from strategy)
+    signal_processing:
+        confidence_threshold: 0.6                     # Minimum confidence for signal generation
+        signal_filters: ['session_filter']            # Apply session-based filtering
+    
+    # Risk management (inherit from strategy)
+    risk_management:
+        max_position_size: 0.02                       # 2% of capital per position
+        stop_loss_pct: 0.01                          # 1% stop loss
+        take_profit_pct: 0.02                        # 2% take profit
+        max_drawdown: 0.05                           # 5% maximum drawdown limit
+        max_concurrent_positions: 3                   # Maximum 3 simultaneous positions
+    
+    # Position management
+    position_management:
+        max_concurrent_positions: 3                   # Consistent with risk management
+        position_tracking: detailed                   # Detailed position tracking for analysis
+
 # Optional: Evaluate the trained model
 # evaluate_model:
 #     type: new                                       # Evaluate newly trained model
