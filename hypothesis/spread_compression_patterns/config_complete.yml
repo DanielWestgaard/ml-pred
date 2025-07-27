@@ -1,0 +1,56 @@
+hypothesis:
+  name: spread_compression_patterns
+
+# Data Pipeline: Process raw data with optimized 8-feature set
+data_pipeline:
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-06-01_2025-05-23.csv
+  spread_focused: true  # Enable bid-ask spread data preservation
+
+  selected_features:  # OPTIMIZED FEATURE SET - 8 CORE FEATURES (redundancy eliminated)
+    [
+      # Primary compression signal (most sensitive, no redundancy)
+      'compression_ratio_micro',      # 30min/3min timeframe (eliminated short due to 0.905 correlation)
+      'compression_consistency',      # Strongest predictor (-0.4169 correlation)
+      
+      # Enhanced signal strength (optimized weights)
+      'signal_strength_v2',           # Combines all signals with optimal weights
+      
+      # Volume confirmation suite (comprehensive coverage)
+      'volume_ratio',                 # 1.52x movement ratio (strongest individual)
+      'volume_acceleration',          # Volume momentum detection
+      'volume_breakout',              # Z-score > 2 breakout detection
+      
+      # Context features (market timing & price)
+      'london_session',               # Session timing (proven effective)
+      'price_momentum_5',             # 5-period price momentum
+      
+      # Target for binary classification
+      'future_price_change'
+    ]
+
+# Model Training: Random Forest Classifier optimized for Tier 2+ signals
+model_training:
+    type: random_forest                               # Random Forest Classifier for imbalanced data
+
+    # Will automatically use processed data from data_pipeline above
+    # processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv
+    
+    target_column: target_spread_compression_binary   # Use binary classification target (0/1) instead of multi-class
+
+    parameters:                                       # Optimized for spread compression (0.18% positive class)
+        n_estimators: 300                             # More trees for rare signal detection
+        max_depth: 10                                 # Deeper trees for complex market patterns
+        min_samples_split: 5                          # Lower threshold for rare Tier 2+ patterns
+        min_samples_leaf: 2                           # Sensitive to minority class patterns
+        class_weight: balanced                        # Critical for 0.18% positive class ratio
+        bootstrap: true                               # Enable bootstrap sampling
+        oob_score: true                               # Out-of-bag evaluation for validation
+        random_state: 42                              # Reproducible results
+        n_jobs: -1                                    # Use all available CPU cores
+        max_features: sqrt                            # sqrt(n_features) for classification
+
+# Optional: Evaluate the trained model
+# evaluate_model:
+#     type: new                                       # Evaluate newly trained model
+#     # type: stored                                  # Or evaluate pre-trained model
+#     # model_folder: storage/models/2025-07-27_14:30:00
