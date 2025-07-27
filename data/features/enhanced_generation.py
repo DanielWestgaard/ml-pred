@@ -162,7 +162,13 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
                     # Keep existing features in the list
                     feature_names = available + existing_features
                 else:
-                    feature_names = available
+                    # Even if no existing features detected, check for close_og specifically
+                    if 'close_og' in truly_missing and 'close_og' in self.df.columns:
+                        feature_names = available + ['close_og']
+                        truly_missing.remove('close_og')
+                        logger.debug(f"close_og found in processed data and will be preserved")
+                    else:
+                        feature_names = available
                     
                 if truly_missing:
                     logger.debug(f"Features scheduled for later generation in transformation step: {truly_missing}")
