@@ -131,7 +131,7 @@ class SpreadCompressionTrainer:
         # Risk-adjusted returns
 ```
 > [!NOTE]
-> This is meant to serve as an "overall, theoretical" structure. We will follow the current structure and pipelines already outlines in this project with configuration files under the hypothesis (`hypothesis/`).
+> This is meant to serve as an "overall, theoretical" structure. We will follow the current structure and pipelines already outlined in this project with configuration files under the hypothesis (`hypothesis/`).
 
 ### **Step 3: Hyperparameter Optimization**
 ```python
