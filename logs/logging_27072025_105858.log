@@ -1,0 +1,26 @@
+27-07-2025 10:58:58 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+27-07-2025 10:58:59 - __main__                                :19   - INFO     - Loaded processed data with 427741 rows
+27-07-2025 10:58:59 - __main__                                :29   - INFO     - === VALIDATING KEY METRICS FROM helpClaude.md ===
+27-07-2025 10:58:59 - __main__                                :37   - INFO     - Signal frequency: 26639/427741 = 6.23% of periods
+27-07-2025 10:58:59 - __main__                                :38   - INFO     - Estimated daily signals: 89.7
+27-07-2025 10:58:59 - __main__                                :44   - INFO     - Target tier distribution: {0: 401102, 1: 25890, 2: 655, 3: 42, 4: 52}
+27-07-2025 10:58:59 - __main__                                :45   - INFO     - Tier 2+ signals: 749
+27-07-2025 10:58:59 - __main__                                :48   - INFO     - === TIER MOVEMENT ANALYSIS ===
+27-07-2025 10:58:59 - __main__                                :53   - INFO     - Tier 1: 0.000671 avg movement (25890 events)
+27-07-2025 10:58:59 - __main__                                :53   - INFO     - Tier 2: 0.000858 avg movement (655 events)
+27-07-2025 10:58:59 - __main__                                :53   - INFO     - Tier 3: 0.000583 avg movement (42 events)
+27-07-2025 10:58:59 - __main__                                :53   - INFO     - Tier 4: 0.000755 avg movement (52 events)
+27-07-2025 10:58:59 - __main__                                :62   - INFO     - === FEATURE COMPLETENESS CHECK ===
+27-07-2025 10:58:59 - __main__                                :74   - INFO     - All required features present in dataset
+27-07-2025 10:58:59 - __main__                                :77   - INFO     - === MOVEMENT PREDICTION VALIDATION ===
+27-07-2025 10:58:59 - __main__                                :85   - INFO     - No signal average movement: 0.000216
+27-07-2025 10:58:59 - __main__                                :86   - INFO     - Signal average movement: 0.000675
+27-07-2025 10:58:59 - __main__                                :87   - INFO     - Movement prediction ratio: 3.13x
+27-07-2025 10:58:59 - __main__                                :91   - INFO     - Overall data completeness: 5.56%
+27-07-2025 10:58:59 - __main__                                :94   - INFO     - === SUCCESS CRITERIA VALIDATION ===
+27-07-2025 10:58:59 - __main__                                :107  - INFO     - ❌ FAIL: Daily signals in range 15-20
+27-07-2025 10:58:59 - __main__                                :107  - INFO     - ✅ PASS: Movement ratio > 1.2x
+27-07-2025 10:58:59 - __main__                                :107  - INFO     - ✅ PASS: Tier 2+ signals > 500
+27-07-2025 10:58:59 - __main__                                :107  - INFO     - ❌ FAIL: Data completeness > 99%
+27-07-2025 10:58:59 - __main__                                :107  - INFO     - ✅ PASS: All features present
+27-07-2025 10:58:59 - __main__                                :114  - ERROR    - ⚠️  Some validation criteria failed. Review the results above.
