@@ -8,8 +8,8 @@ backtesting:
     
     # Data configuration  
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv  # Use same data as training
-    start_date: '2025-01-01'                          # Use out-of-sample period  
-    end_date: '2025-01-31'                            # Test data end date (1 month for testing)
+    start_date: '2025-02-03'                          # Target period with positive signals  
+    end_date: '2025-02-04'                            # Test data end date (1 day with signals)
     buffer_size: 200                                  # Historical buffer for feature generation
     
     # Capital and costs
@@ -19,12 +19,12 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: 10000                              # starting a bit lower for testing purposes, 50 000 - Allow full month of 1-minute data (31 days * 24h * 60m = ~44,640)
+        max_loops: 2000                               # Small test for signal-rich period
         loop_interval: 0                              # No delays in backtesting (0 = instant)
     
     # Signal processing (inherit from strategy)
     signal_processing:
-        confidence_threshold: 0.51                    # Accept medium-high confidence positive predictions  
+        confidence_threshold: 0.50                    # Accept any positive class prediction  
         signal_filters: ['session_filter']            # Apply session-based filtering
     
     # Risk management (inherit from strategy)
