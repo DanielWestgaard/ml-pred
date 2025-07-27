@@ -453,7 +453,8 @@ class BacktestOrchestrator:
                             
                             if trade_result['success']:
                                 executed_trades += 1
-                                self.position_manager.add_position(trade_result)
+                                # Position tracking handled by SimulationBroker
+                                logger.debug(f"Trade executed successfully: {trade_result['position_id']}")
                     
                     # Update existing positions
                     self.simulation_broker.update_positions(
@@ -461,8 +462,8 @@ class BacktestOrchestrator:
                         timestamp=current_data['timestamp']
                     )
                     
-                    # Check for position closes (stop loss / take profit)
-                    self._check_position_closes(current_data)
+                    # Check for position closes (stop loss / take profit / model signal)
+                    self._check_position_closes(current_data, predictions, probabilities)
                     
                     # Update risk management
                     account_info = self.simulation_broker.get_account_info()
@@ -539,14 +540,27 @@ class BacktestOrchestrator:
             'market_data': current_data
         }
     
-    def _check_position_closes(self, current_data: Dict[str, Any]):
-        """Check and execute position closes based on stop loss / take profit"""
+    def _check_position_closes(self, current_data: Dict[str, Any], predictions: np.ndarray = None, probabilities: np.ndarray = None):
+        """Check and execute position closes based on stop loss / take profit / model signal"""
         open_positions = self.simulation_broker.get_open_positions()
         
         for position in open_positions:
+            # Check risk management rules (stop loss / take profit)
             close_info = self.risk_manager.should_close_position(
                 position, current_data['close']
             )
+            
+            # Check model signal for exit (if model predicts class 0, close position)
+            model_exit_signal = False
+            if predictions is not None and len(predictions) > 0:
+                latest_prediction = predictions[0]  # Most recent prediction
+                latest_probability = probabilities[0] if probabilities is not None else None
+                
+                # Exit if model predicts class 0 with high confidence (compression over)
+                if latest_prediction == 0 and (latest_probability is None or (1 - latest_probability) > 0.7):
+                    model_exit_signal = True
+                    close_info['should_close'] = True
+                    close_info['reason'] = 'model_exit_signal'
             
             if close_info['should_close']:
                 self.simulation_broker.close_position(
@@ -555,7 +569,8 @@ class BacktestOrchestrator:
                     timestamp=current_data['timestamp'],
                     reason=close_info['reason']
                 )
-                self.position_manager.close_position(position['id'])
+                # Position tracking handled by SimulationBroker
+                logger.debug(f"Position closed: {position['id']} - {close_info['reason']}")
     
     def _calculate_results(self) -> Dict[str, Any]:
         """Calculate comprehensive backtest results"""
