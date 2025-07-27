@@ -1,0 +1,28 @@
+backtesting:
+  buffer_size: 200
+  data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv
+  enabled: true
+  end_date: '2025-02-15'
+  execution:
+    loop_interval: 0
+    max_loops: 2000
+  initial_capital: 10000
+  model_folder: storage/models/2025-07-27_12:53:02
+  position_management:
+    max_concurrent_positions: 3
+    position_tracking: detailed
+  risk_management:
+    max_concurrent_positions: 3
+    max_drawdown: 0.05
+    max_position_size: 0.02
+    stop_loss_pct: 0.02
+    take_profit_pct: 0.04
+  signal_processing:
+    confidence_threshold: 0.5
+    signal_filters:
+    - session_filter
+  slippage: 0.0002
+  start_date: '2025-02-08'
+  transaction_costs: 0.0013
+hypothesis:
+  name: spread_compression_patterns
