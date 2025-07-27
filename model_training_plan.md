@@ -99,7 +99,7 @@ evaluation_metrics = {
 ### **Step 1: Feature Engineering Pipeline**
 - ✅ **Load optimized feature set** (already implemented)
 - ✅ **Generate Tier 2+ targets** (already implemented)
-- 🔄 **Feature scaling/normalization** for model stability
+- ✅ **Feature scaling/normalization** for model stability (already implemented in `data/features/transformation.py`?)
 - 🔄 **Time-aware train/test splits**
 
 ### **Step 2: Model Training Framework**
