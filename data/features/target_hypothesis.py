@@ -89,10 +89,11 @@ class TargetHypothesis(BaseProcessor):
         particularly during London session trading hours when market liquidity changes.
         """
         try:
-            # Required features check
+            # Required features check - Updated to match optimized 8-feature set
             required_features = [
-                'compression_ratio', 'spread_volatility_ewm', 'compression_consistency',
-                'volume_ratio', 'london_session', 'signal_strength_compression'
+                'compression_ratio_micro', 'compression_consistency', 'signal_strength_v2',
+                'volume_ratio', 'volume_acceleration', 'volume_breakout', 
+                'london_session', 'price_momentum_5'
             ]
             
             missing_features = [f for f in required_features if f not in self.df.columns]
@@ -107,9 +108,9 @@ class TargetHypothesis(BaseProcessor):
             
             # STEP 1: Analyze actual data distributions first
             logger.info("=== DATA DISTRIBUTION ANALYSIS ===")
-            logger.info(f"Compression ratio - Mean: {self.df['compression_ratio'].mean():.4f}, "
-                    f"Std: {self.df['compression_ratio'].std():.4f}, "
-                    f"95th percentile: {self.df['compression_ratio'].quantile(0.95):.4f}")
+            logger.info(f"Compression ratio micro - Mean: {self.df['compression_ratio_micro'].mean():.4f}, "
+                    f"Std: {self.df['compression_ratio_micro'].std():.4f}, "
+                    f"95th percentile: {self.df['compression_ratio_micro'].quantile(0.95):.4f}")
             
             logger.info(f"Compression consistency - Mean: {self.df['compression_consistency'].mean():.4f}, "
                     f"95th percentile: {self.df['compression_consistency'].quantile(0.95):.4f}")
@@ -121,7 +122,7 @@ class TargetHypothesis(BaseProcessor):
                     f"95th percentile: {abs(self.df['future_price_change']).quantile(0.95):.6f}")
             
             # STEP 2: Use adaptive thresholds based on actual data
-            compression_threshold = self.df['compression_ratio'].quantile(0.80)  # Top 20%
+            compression_threshold = self.df['compression_ratio_micro'].quantile(0.80)  # Top 20%
             consistency_threshold = self.df['compression_consistency'].quantile(0.70)  # Top 30%
             volume_threshold = max(1.1, self.df['volume_ratio'].quantile(0.75))  # Top 25% but at least 1.1
             movement_threshold = abs(self.df['future_price_change']).quantile(0.75)  # Top 25% movements
@@ -134,7 +135,7 @@ class TargetHypothesis(BaseProcessor):
             # STEP 3: Progressive signal strength (instead of hard AND conditions)
             
             # Basic compression signal
-            compression_signal = self.df['compression_ratio'] > compression_threshold
+            compression_signal = self.df['compression_ratio_micro'] > compression_threshold
             
             # Add consistency bonus
             compression_with_consistency = (
