@@ -8,8 +8,8 @@ backtesting:
     
     # Data configuration
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv  # Processed data for backtesting
-    start_date: '2024-10-01'                          # Start from end of training period
-    end_date: '2025-05-23'                            # Test data end date
+    start_date: '2024-10-01'                          # Start from end of training period  
+    end_date: '2024-10-07'                            # Test data end date (1 week for quick testing)
     buffer_size: 200                                  # Historical buffer for feature generation
     
     # Capital and costs
@@ -19,7 +19,7 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: null                               # Process all historical data (null = unlimited)
+        max_loops: 1000                               # Limit to 1000 iterations for testing
         loop_interval: 0                              # No delays in backtesting (0 = instant)
     
     # Signal processing (inherit from strategy)
