@@ -2,9 +2,9 @@
 
 ## 🏆 **VALIDATED FOUNDATION**
 - **8 optimized features** (redundancy eliminated)
-- **1.83x movement prediction** on multi-feature combinations
-- **721 Tier 2+ quality signals** with 0.000842 average movement
-- **427,741 1-minute data points** with 100% completeness
+- **3.13x movement prediction** on multi-feature combinations (Updated!)
+- **749 Tier 2+ quality signals** with 0.000858 average movement (Updated!)
+- **427,741 1-minute data points** with feature completeness verified
 
 ---
 
@@ -13,7 +13,7 @@
 ### **Phase 1: Data Preparation**
 ```python
 # Target: Focus on Tier 2+ signals (quality over quantity)
-target_strategy = "tier2_plus"  # 721 events vs 25,430 total signals
+target_strategy = "tier2_plus"  # 749 events vs 26,639 total signals
 
 # Features: Optimized 8-feature set
 features = [
@@ -77,8 +77,8 @@ walk_forward = {
 
 ### **Primary Goals**
 1. **Precision on Tier 2+ signals**: Minimize false positives (transaction costs)
-2. **Movement prediction accuracy**: Maintain 1.5x+ movement ratio
-3. **Signal frequency**: Generate 15-20 quality signals per day
+2. **Movement prediction accuracy**: Maintain 3.0x+ movement ratio (Updated baseline!)
+3. **Signal frequency**: Optimize Tier 2+ signal detection (749 premium events)
 4. **London session optimization**: Peak performance during optimal hours
 
 ### **Success Metrics**
@@ -86,7 +86,7 @@ walk_forward = {
 evaluation_metrics = {
     'precision_tier2': 0.65,       # 65% precision on Tier 2+ signals
     'recall_tier2': 0.40,          # 40% recall (find quality signals)
-    'movement_ratio': 1.5,         # Maintain predictive power
+    'movement_ratio': 3.0,         # Maintain superior predictive power (Updated!)
     'daily_signals': (15, 20),     # Target signal frequency
     'sharpe_ratio': 1.5            # Risk-adjusted returns
 }
@@ -154,8 +154,8 @@ scoring = 'precision'  # Custom scoring for Tier 2+ signals
 
 ### **Model Performance Targets**
 - **Tier 2+ Precision**: 60-70% (minimize false signals)
-- **Movement Prediction**: 1.5x+ ratio maintained
-- **Signal Frequency**: 15-20 quality signals per day
+- **Movement Prediction**: 3.0x+ ratio maintained (Updated baseline!)
+- **Signal Quality**: Focus on 749 Tier 2+ premium events
 - **Feature Importance**: compression_consistency and volume_ratio top features
 
 ### **Trading Strategy Results**
@@ -190,11 +190,11 @@ scoring = 'precision'  # Custom scoring for Tier 2+ signals
 
 ## 💡 **KEY INSIGHTS FOR SUCCESS**
 
-1. **Quality over Quantity**: Focus on Tier 2+ signals (721 events) rather than all signals
+1. **Quality over Quantity**: Focus on Tier 2+ signals (749 events) rather than all signals
 2. **Time-Series Awareness**: Use proper CV for 1-minute temporal data
 3. **Feature Optimization**: 8 core features eliminate redundancy while maintaining power
 4. **Realistic Testing**: Include transaction costs and execution delays
 5. **London Session Focus**: Optimize for peak trading hours
-6. **Movement Prediction**: Maintain 1.5x+ ratio for profitable trading
+6. **Movement Prediction**: Maintain 3.0x+ ratio for highly profitable trading (Updated!)
 
 **Your spread compression strategy is validated and ready for model training! 🎯**
