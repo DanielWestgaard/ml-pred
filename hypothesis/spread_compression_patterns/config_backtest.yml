@@ -19,12 +19,12 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: 1000                              # Increased limit for proper testing
+        max_loops: 1000                              # Smaller limit for temporary testing
         loop_interval: 0                              # No delays in backtesting (0 = instant)
     
     # Signal processing (inherit from strategy)
     signal_processing:
-        confidence_threshold: 0.2                     # Lower threshold for binary classification
+        confidence_threshold: 0.1                     # Very low threshold for binary classification
         signal_filters: ['session_filter']            # Apply session-based filtering
     
     # Risk management (inherit from strategy)
