@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
 import json
 import time
@@ -12,6 +12,7 @@ import pickle
 from utils.model.model_metadata_loader import load_model_metadata
 from utils.model.model_type_detector import ModelTypeDetector, PredictionProcessor, get_model_type
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
+from strategy.hypothesis_specific.spread_compression_strategy import SpreadCompressionSignalTracker
 
 # Import existing strategy components (reuse!)
 from strategy.components.signal_processor import SignalProcessor
@@ -330,6 +331,25 @@ class BacktestOrchestrator:
                 position_tracking=position_config.get('position_tracking', 'detailed')
             )
             
+            # Initialize intelligent exit strategy for spread compression
+            hypothesis_name = self.config.get('hypothesis_name', '')
+            if 'spread_compression' in hypothesis_name.lower():
+                signal_tracking_config = self.config.get('backtesting', {}).get('signal_tracking', {})
+                self.signal_tracker = SpreadCompressionSignalTracker(signal_tracking_config)
+                
+                # Exit strategy configuration
+                exit_config = self.config.get('backtesting', {}).get('exit_strategy', {})
+                self.confidence_exit_threshold = exit_config.get('confidence_exit_threshold', 0.30)
+                self.signal_decay_threshold = exit_config.get('signal_strength_decay', 0.25)
+                self.volatility_exit_multiplier = exit_config.get('volatility_exit_multiplier', 1.5)
+                self.minimum_signal_life = exit_config.get('minimum_signal_life', 3)  # minutes
+                
+                logger.info(f"Initialized intelligent exit strategy for spread compression:")
+                logger.info(f"  - Confidence exit threshold: {self.confidence_exit_threshold}")
+                logger.info(f"  - Signal decay threshold: {self.signal_decay_threshold}")
+            else:
+                self.signal_tracker = None
+            
             logger.info("All backtesting components initialized successfully")
             
         except Exception as e:
@@ -453,6 +473,27 @@ class BacktestOrchestrator:
                             
                             if trade_result['success']:
                                 executed_trades += 1
+                                
+                                # Track entry features for intelligent exits (spread compression specific)
+                                if self.signal_tracker:
+                                    position_id = trade_result['position_id']
+                                    entry_features = {
+                                        'compression_ratio_micro': current_data.get('compression_ratio_micro', 0),
+                                        'volume_ratio': current_data.get('volume_ratio', 0),
+                                        'signal_strength_v2': current_data.get('signal_strength_v2', 0),
+                                        'compression_consistency': current_data.get('compression_consistency', 0)
+                                    }
+                                    
+                                    # Store entry features in position (via simulation broker)
+                                    position = self.simulation_broker.get_position(position_id)
+                                    if position:
+                                        position['entry_features'] = entry_features
+                                        position['entry_time'] = pd.to_datetime(current_data['timestamp'])
+                                    
+                                    # Track with signal tracker
+                                    confidence = probabilities[0] if probabilities is not None and len(probabilities) > 0 else 0.8
+                                    self.signal_tracker.track_entry_signal(position_id, current_data, confidence)
+                                
                                 # Position tracking handled by SimulationBroker
                                 logger.debug(f"Trade executed successfully: {trade_result['position_id']}")
                     
@@ -541,7 +582,7 @@ class BacktestOrchestrator:
         }
     
     def _check_position_closes(self, current_data: Dict[str, Any], predictions: np.ndarray = None, probabilities: np.ndarray = None):
-        """Check and execute position closes based on stop loss / take profit / model signal"""
+        """Check and execute position closes based on stop loss / take profit / intelligent model signal"""
         open_positions = self.simulation_broker.get_open_positions()
         
         for position in open_positions:
@@ -550,17 +591,25 @@ class BacktestOrchestrator:
                 position, current_data['close']
             )
             
-            # Check model signal for exit (if model predicts class 0, close position)
-            model_exit_signal = False
-            if predictions is not None and len(predictions) > 0:
+            # Check for intelligent exit strategy (spread compression specific)
+            if not close_info['should_close'] and predictions is not None and len(predictions) > 0:
                 latest_prediction = predictions[0]  # Most recent prediction
                 latest_probability = probabilities[0] if probabilities is not None else None
                 
-                # Exit if model predicts class 0 with high confidence (compression over)
-                if latest_prediction == 0 and (latest_probability is None or (1 - latest_probability) > 0.7):
-                    model_exit_signal = True
-                    close_info['should_close'] = True
-                    close_info['reason'] = 'model_exit_signal'
+                # Use intelligent exit strategy if available
+                hypothesis_name = self.config.get('hypothesis_name', '')
+                if 'spread_compression' in hypothesis_name.lower():
+                    should_exit, exit_reason = self._check_intelligent_exit(
+                        position, current_data, latest_prediction, latest_probability
+                    )
+                    if should_exit:
+                        close_info['should_close'] = True
+                        close_info['reason'] = exit_reason
+                else:
+                    # Fallback to original model exit logic for other hypotheses
+                    if latest_prediction == 0 and (latest_probability is None or (1 - latest_probability) > 0.7):
+                        close_info['should_close'] = True
+                        close_info['reason'] = 'model_exit_signal'
             
             if close_info['should_close']:
                 self.simulation_broker.close_position(
@@ -571,6 +620,85 @@ class BacktestOrchestrator:
                 )
                 # Position tracking handled by SimulationBroker
                 logger.debug(f"Position closed: {position['id']} - {close_info['reason']}")
+    
+    def _check_intelligent_exit(self, position: Dict, current_data: Dict, prediction: int, probability: float) -> Tuple[bool, str]:
+        """
+        Intelligent exit logic specific to spread compression patterns.
+        
+        Returns:
+            Tuple of (should_exit: bool, exit_reason: str)
+        """
+        if not self.signal_tracker:
+            # Fallback to original logic if no signal tracker
+            if prediction == 0 and (probability is None or (1 - probability) > 0.7):
+                return True, 'model_exit_signal'
+            return False, None
+        
+        position_id = position.get('id', 'unknown')
+        current_confidence = probability if prediction == 1 else (1 - probability) if probability else 0
+        
+        # Update signal tracking
+        self.signal_tracker.update_signal_strength(position_id, current_data, current_confidence)
+        
+        # Check minimum signal life (not a hard constraint, just a filter)
+        entry_time = position.get('entry_time')
+        if entry_time:
+            from datetime import datetime
+            if isinstance(entry_time, str):
+                entry_time = pd.to_datetime(entry_time)
+            position_age_minutes = (pd.Timestamp.now() - entry_time).total_seconds() / 60
+            if position_age_minutes < self.minimum_signal_life:
+                # Only exit on very strong contrary signals during minimum life period
+                if prediction == 0 and current_confidence > 0.9:
+                    return True, "strong_contrary_signal"
+                return False, None
+        
+        # 1. Confidence-based exit: Exit when model confidence drops significantly
+        if prediction == 0 and current_confidence > self.confidence_exit_threshold:
+            logger.debug(f"Confidence exit triggered: {current_confidence:.4f} > {self.confidence_exit_threshold}")
+            return True, "confidence_drop"
+        
+        # 2. Signal strength decay: Exit when signal deteriorates significantly
+        signal_decay = self.signal_tracker.calculate_signal_decay(position_id)
+        if signal_decay > self.signal_decay_threshold:
+            logger.debug(f"Signal decay exit triggered: {signal_decay:.4f} > {self.signal_decay_threshold}")
+            return True, "signal_decay"
+        
+        # 3. Feature-based exit: Exit when core compression features reverse
+        if self._check_compression_reversal(position, current_data):
+            return True, "compression_reversal"
+        
+        return False, None
+    
+    def _check_compression_reversal(self, position: Dict, current_data: Dict) -> bool:
+        """Check if core compression features have reversed significantly."""
+        try:
+            # Check if compression ratio has deteriorated
+            current_compression = current_data.get('compression_ratio_micro', 0)
+            entry_compression = position.get('entry_features', {}).get('compression_ratio_micro', 0)
+            
+            # Check if volume confirmation has disappeared
+            current_volume_ratio = current_data.get('volume_ratio', 0)
+            entry_volume_ratio = position.get('entry_features', {}).get('volume_ratio', 0)
+            
+            # Exit if compression has reversed by more than 15%
+            if entry_compression != 0:
+                compression_change = (current_compression - entry_compression) / abs(entry_compression)
+                if compression_change < -0.15:  # 15% deterioration
+                    logger.debug(f"Compression reversal: {compression_change:.3f}")
+                    return True
+            
+            # Exit if volume confirmation has significantly weakened
+            if entry_volume_ratio != 0:
+                volume_change = (current_volume_ratio - entry_volume_ratio) / abs(entry_volume_ratio)
+                if volume_change < -0.3:  # 30% deterioration in volume confirmation
+                    logger.debug(f"Volume confirmation loss: {volume_change:.3f}")
+                    return True
+            
+        except (KeyError, TypeError, ValueError, ZeroDivisionError):
+            pass
+        
+        return False
     
     def _calculate_results(self) -> Dict[str, Any]:
         """Calculate comprehensive backtest results"""
