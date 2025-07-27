@@ -10,6 +10,7 @@ from utils.logging_utils import get_logger
 from utils.hypothesis.config_loader import load_hypothesis_config
 import pickle
 from utils.model.model_metadata_loader import load_model_metadata
+from utils.model.model_type_detector import ModelTypeDetector, PredictionProcessor, get_model_type
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
 
 # Import existing strategy components (reuse!)
@@ -44,6 +45,8 @@ class BacktestOrchestrator:
         self.config = None
         self.model = None
         self.model_metadata = None
+        self.model_type = None
+        self.prediction_processor = None
         self.feature_generator = None
         
         # Backtesting components
@@ -61,6 +64,7 @@ class BacktestOrchestrator:
         # Load configuration and initialize components
         self._load_configuration()
         self._load_model()
+        self._detect_model_type()
         self._initialize_components()
         
         logger.info("Backtest orchestrator initialized successfully")
@@ -138,7 +142,7 @@ class BacktestOrchestrator:
                 self.model = pickle.load(f)
             
             logger.info(f"Loaded model using utils/model utilities: {model_path}")
-            logger.info(f"Model type: {model_type}")
+            logger.info(f"Model class: {model_type}")
             
         except Exception as e:
             logger.error(f"Error loading model: {e}")
@@ -177,6 +181,36 @@ class BacktestOrchestrator:
         
         return None
     
+    def _detect_model_type(self):
+        """Detect and set up model type and prediction processor"""
+        try:
+            # Try multiple detection methods
+            model_metadata_path = Path(self.model_metadata['model_info']['storage_path']) / 'model_metadata.yml'
+            
+            self.model_type = get_model_type(
+                model=self.model,
+                metadata_path=model_metadata_path,
+                config=self.config
+            )
+            
+            if self.model_type is None:
+                # Fallback to model object detection
+                detector = ModelTypeDetector()
+                self.model_type = detector.detect_from_model(self.model)
+            
+            # Initialize prediction processor
+            self.prediction_processor = PredictionProcessor(self.model_type)
+            
+            logger.info(f"Model type detected: {self.model_type.value}")
+            
+        except Exception as e:
+            logger.error(f"Error detecting model type: {e}")
+            # Fallback to regression
+            from utils.model.model_type_detector import ModelType
+            self.model_type = ModelType.REGRESSION
+            self.prediction_processor = PredictionProcessor(self.model_type)
+            logger.warning("Defaulting to regression model type")
+    
     def _initialize_components(self):
         """Initialize backtesting components"""
         try:
@@ -213,7 +247,8 @@ class BacktestOrchestrator:
             signal_config = self.config.get('signal_processing', {})
             self.signal_processor = SignalProcessor(
                 confidence_threshold=signal_config.get('confidence_threshold', 0.6),
-                signal_filters=signal_config.get('signal_filters', [])
+                signal_filters=signal_config.get('signal_filters', []),
+                model_type=self.model_type
             )
             
             risk_config = self.config.get('risk_management', {})
@@ -306,15 +341,21 @@ class BacktestOrchestrator:
                     # Select only the features the model was trained on
                     prediction_features = latest_features[model_features]
                     
-                    # Make prediction with probability for confidence
-                    if hasattr(self.model, 'predict_proba'):
-                        prediction_proba = self.model.predict_proba(prediction_features)[0]
-                        prediction = prediction_proba[1]  # Use probability of positive class
-                    else:
-                        prediction = self.model.predict(prediction_features)[0]
+                    # Process predictions using the prediction processor
+                    prediction_results = self.prediction_processor.process_predictions(
+                        self.model, prediction_features
+                    )
+                    
+                    predictions = prediction_results['predictions']
+                    probabilities = prediction_results.get('positive_probabilities')
                     
                     # Process prediction into trading signals
-                    signals = self.signal_processor.process([prediction], data_buffer)
+                    signals = self.signal_processor.process(
+                        predictions, 
+                        data_buffer, 
+                        model=self.model,
+                        prediction_probabilities=probabilities
+                    )
                     signals_generated += len(signals['processed_signals'])
                     
                     # Process each signal
