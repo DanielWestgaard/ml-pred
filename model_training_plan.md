@@ -106,7 +106,7 @@ evaluation_metrics = {
 - ✅ **Load optimized feature set** (already implemented)
 - ✅ **Generate Tier 2+ targets** (already implemented)
 - ✅ **Feature scaling/normalization** for model stability (already implemented in `data/features/transformation.py`?)
-- 🔄 **Time-aware train/test splits**
+- ✅ **Time-aware train/test splits** (already implemented in `model/model_training.py` using `temporal_train_test_split` from `sktime.split`)
 
 ### **Step 2: Model Training Framework**
 ```python
