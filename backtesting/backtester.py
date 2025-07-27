@@ -384,21 +384,23 @@ class BacktestOrchestrator:
                 
                 # Use preprocessed features directly (no feature generation needed!)
                 try:
-                    # Get model features directly from preprocessed data
-                    model_features = self.model_metadata.get('dataset', {}).get('features', [])
-                    target_column = self.model_metadata.get('dataset', {}).get('target_column', '')
+                    # Get exact features the model expects (from model.feature_names_in_)
+                    if hasattr(self.model, 'feature_names_in_'):
+                        prediction_features_list = list(self.model.feature_names_in_)
+                    else:
+                        # Fallback: use features from metadata, but exclude only the binary target
+                        model_features = self.model_metadata.get('dataset', {}).get('features', [])
+                        target_column = self.model_metadata.get('dataset', {}).get('target_column', '')
+                        prediction_features_list = [f for f in model_features if f != target_column]
                     
-                    # Filter out target column from features
-                    prediction_features_list = [f for f in model_features if f != target_column]
-                    
-                    # Check for missing features
+                    # Check for missing features in current data
                     missing_features = [f for f in prediction_features_list if f not in current_row.index]
                     if missing_features:
-                        logger.debug(f"Missing features for prediction: {missing_features}")
+                        logger.debug(f"Missing features for prediction: {missing_features[:5]}...")  # Show first 5
                         self.current_data_index += 1
                         continue
                     
-                    # Extract features for this data point
+                    # Extract features for this data point in the exact order expected by model
                     prediction_features = current_row[prediction_features_list].to_frame().T
                     
                     # Process predictions using the prediction processor
