@@ -238,7 +238,7 @@ class FeatureTransformer(BaseProcessor):
         
         # Also identify binary/regime columns (that might be numeric but shouldn't be normalized)
         regime_indicators = [col for col in self.df.columns if 
-                            any(x in col for x in ['regime', 'is_', 'in_value_area', 'state'])]
+                            any(x in col for x in ['regime', 'is_', 'in_value_area', 'state', '_session', '_breakout'])]
         
         # Exclude target columns from normalization
         target_columns = [col for col in self.df.columns if col.startswith('target_')]
