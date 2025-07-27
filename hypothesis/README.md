@@ -73,9 +73,14 @@ data_pipeline:
 
 # Train a ML Model
 model_training:
-    type: <name-of-ml-model>                          # Must have. Eg. 'xgboost'
+    type: <name-of-ml-model>                          # Must have. Eg. 'xgboost', 'random_forest'
 
     processed_data: <path-to-processed-data>          # Optional: If this is not specified, I will assume you´ve ran Data Pipeline first (meaning using raw_source to get the processed)
+    
+    target_column: <target-column-name>               # Optional: Specific target column to use (e.g., 'target_spread_compression_binary')
+                                                      # If not specified, automatic detection:
+                                                      # - Classification models prefer binary targets  
+                                                      # - Regression models prefer continuous targets
 
     parameters:                                       # Completely or somewhat empty means using 'default' hyperparameter values
         - n_estimators: 100

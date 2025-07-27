@@ -46,6 +46,9 @@ class ModelTraining():
                 
                 self.model_type = configurations.get("model_training_type") or configurations.get("model_type")
                 
+                # Extract target column configuration (proper fix)
+                self.configured_target = configurations.get("model_training_target_column")
+                
                 try:
                     dataset = configurations.get("model_training_processed_data")
                     
@@ -81,11 +84,8 @@ class ModelTraining():
                 # Load dataset based on format
                 self.df, self.original_df = data_utils.check_and_return_df(dataset)
                         
-                # Assuming all target, hypothesis, columns starts with ´target_'
-                for col in self.df.columns:
-                    if 'target_' in col:
-                        self.target_col = col  # TODO: Logic to find target column
-                        logger.debug(f"Found hypothesis target : '{self.target_col}'")
+                # Determine target column (proper fix + simple fix)
+                self.target_col = self._determine_target_column()
             
             # Not Hypothesis flow: User must provide dataset and model_type
             else:
@@ -166,6 +166,56 @@ class ModelTraining():
         # Convert raw path to processed path using new symbol-based structure
         processed_path = raw_path.replace("/raw/", "/processed/")
         return processed_path
+    
+    def _determine_target_column(self):
+        """
+        Intelligently determine the target column for training.
+        
+        Priority order:
+        1. Use configured target_column if provided in hypothesis config
+        2. For classification models, prefer binary targets over multi-class
+        3. Fall back to first target_* column found
+        
+        Returns:
+            str: Target column name
+        """
+        # Priority 1: Use configured target if provided (proper fix)
+        if hasattr(self, 'configured_target') and self.configured_target:
+            if self.configured_target in self.df.columns:
+                logger.info(f"Using configured target column: '{self.configured_target}'")
+                return self.configured_target
+            else:
+                logger.warning(f"Configured target '{self.configured_target}' not found in data columns")
+        
+        # Priority 2: Smart automatic detection (simple fix)
+        target_columns = [col for col in self.df.columns if col.startswith('target_')]
+        
+        if not target_columns:
+            logger.error("No target columns found with 'target_' prefix")
+            raise ValueError("No target columns found")
+        
+        logger.debug(f"Found target columns: {target_columns}")
+        
+        # For classification models, prefer binary targets
+        if self.model_type in ['random_forest', 'logistic_regression', 'svm']:
+            binary_targets = [col for col in target_columns if 'binary' in col]
+            if binary_targets:
+                chosen_target = binary_targets[0]
+                logger.info(f"Selected binary target for classification: '{chosen_target}'")
+                return chosen_target
+        
+        # For regression models, prefer continuous targets
+        elif self.model_type in ['xgboost', 'linear_regression']:
+            continuous_targets = [col for col in target_columns if 'binary' not in col and 'multi' not in col]
+            if continuous_targets:
+                chosen_target = continuous_targets[0]
+                logger.info(f"Selected continuous target for regression: '{chosen_target}'")
+                return chosen_target
+        
+        # Fall back to first target found
+        chosen_target = target_columns[0]
+        logger.info(f"Using first available target column: '{chosen_target}'")
+        return chosen_target
         
     def _get_implemented_models(self):
         """

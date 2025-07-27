@@ -33,7 +33,9 @@ model_training:
     type: random_forest                               # Random Forest Classifier for imbalanced data
 
     # Will automatically use processed data from data_pipeline above
-    # processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
+    # processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv
+    
+    target_column: target_spread_compression_binary   # Use binary classification target (0/1) instead of multi-class
 
     parameters:                                       # Optimized for spread compression (0.18% positive class)
         n_estimators: 300                             # More trees for rare signal detection
