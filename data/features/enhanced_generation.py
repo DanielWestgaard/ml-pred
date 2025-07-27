@@ -153,10 +153,20 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
                 logger.info(f"Basic columns already available: {missing_basic}")
             
             if missing_features:
-                logger.debug(f"Features scheduled for later generation in transformation step: {missing_features}")
-                logger.info(f"Note: Some features (like 'close_og') are generated during transformation phase, not feature generation")
-                # Continue with available features
-                feature_names = available
+                # Check if missing features already exist in the data (e.g., close_og from processed data)
+                existing_features = [f for f in missing_features if f in self.df.columns]
+                truly_missing = [f for f in missing_features if f not in self.df.columns]
+                
+                if existing_features:
+                    logger.debug(f"Features already exist in data and will be preserved: {existing_features}")
+                    # Keep existing features in the list
+                    feature_names = available + existing_features
+                else:
+                    feature_names = available
+                    
+                if truly_missing:
+                    logger.debug(f"Features scheduled for later generation in transformation step: {truly_missing}")
+                    logger.info(f"Note: Some features (like transformation-based features) are generated during transformation phase, not feature generation")
         
         # Get required generators
         generators, missing = self._registry.get_generators_for_features(feature_names)

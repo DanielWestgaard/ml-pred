@@ -404,12 +404,11 @@ class BacktestOrchestrator:
         """Get required features from model metadata"""
         features = self.model_metadata.get('dataset', {}).get('features', [])
         
-        # Filter out non-feature columns
-        excluded_columns = ['target_spread_compression_binary', 'target_spread_compression_multi', 
-                          'future_price_change', 'open', 'high', 'low', 'close', 'volume', 
-                          'close_og', 'open_og', 'mid_price']
+        # Get target column from model metadata  
+        target_column = self.model_metadata.get('dataset', {}).get('target_column', '')
         
-        required_features = [f for f in features if f not in excluded_columns]
+        # Filter out only the target column - all other columns from model metadata are features
+        required_features = [f for f in features if f != target_column]
         
         logger.debug(f"Required features: {required_features}")
         return required_features
