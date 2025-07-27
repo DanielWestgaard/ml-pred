@@ -1,0 +1,63 @@
+hypothesis:
+  name: spread_compression_patterns
+
+# Backtesting: Improved configuration based on analysis
+backtesting:
+    enabled: true
+    model_folder: storage/models/2025-07-27_12:53:02
+    
+    # Data configuration - Using optimal period identified by analysis  
+    data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv
+    start_date: '2025-04-07'                          # Top-scoring period with 975 signals
+    end_date: '2025-04-10'                            # Shorter 3-day test period
+    buffer_size: 200
+    
+    # Capital and costs
+    initial_capital: 10000
+    transaction_costs: 0.0013
+    slippage: 0.0002
+    
+    # Execution settings
+    execution:
+        max_loops: 10000                              # Increased for 7-day period with high signal density
+        loop_interval: 0
+    
+    # Improved signal processing
+    signal_processing:
+        confidence_threshold: 0.75                    # Higher threshold for quality signals
+        signal_filters: ['session_filter']
+        
+        # Additional filters to improve signal quality
+        min_signal_strength: 0.3                      # Minimum signal strength threshold
+        volume_confirmation_required: true            # Require volume confirmation
+        
+    # Enhanced risk management
+    risk_management:
+        max_position_size: 0.015                      # Slightly smaller positions for better risk control
+        stop_loss_pct: 0.015                         # Tighter stop loss (1.5%)
+        take_profit_pct: 0.045                        # Wider take profit (4.5%) - better risk/reward
+        max_drawdown: 0.04                            # Tighter drawdown control (4%)
+        max_concurrent_positions: 2                   # Reduce to 2 concurrent positions
+        
+        # Risk scaling based on volatility
+        position_size_scaling: 'volatility'           # Scale position size based on current volatility
+        
+    # Position management improvements
+    position_management:
+        max_concurrent_positions: 2
+        position_tracking: detailed
+    
+    # Intelligent exit strategy (spread compression specific)
+    exit_strategy:
+        confidence_exit_threshold: 0.30               # Exit when model confidence drops below 30%
+        signal_strength_decay: 0.25                   # Exit when signal strength drops 25% from peak
+        volatility_exit_multiplier: 1.5               # Exit when volatility exceeds 1.5x entry volatility
+        minimum_signal_life: 3                        # Minimum 3 minutes before considering exits
+    
+    # Signal tracking for intelligent exits
+    signal_tracking:
+        signal_strength_features:
+            - compression_ratio_micro
+            - volume_ratio  
+            - signal_strength_v2
+            - compression_consistency

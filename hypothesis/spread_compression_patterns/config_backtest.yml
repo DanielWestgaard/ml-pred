@@ -24,7 +24,7 @@ backtesting:
     
     # Signal processing (inherit from strategy)
     signal_processing:
-        confidence_threshold: 0.50                    # Accept any positive class prediction
+        confidence_threshold: 0.70                    # Accept any positive class prediction - increased to reduce trade frequency
         signal_filters: ['session_filter']            # Apply session-based filtering
     
     # Risk management (inherit from strategy)
