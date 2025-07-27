@@ -111,6 +111,10 @@ class SignalProcessor:
         """
         Convert classification prediction to signal
         
+        For binary classification models like spread compression:
+        - Class 1 (positive) → BUY signal with high confidence
+        - Class 0 (negative) → NO SIGNAL (low confidence, filtered out)
+        
         Args:
             prediction: Class prediction (0 or 1)
             probability: Probability of positive class
@@ -118,14 +122,27 @@ class SignalProcessor:
         """
         # Use probability if available, otherwise use binary prediction
         if probability is not None:
-            confidence = max(probability, 1 - probability)  # Distance from 0.5
-            direction = 'BUY' if probability > 0.5 else 'SELL'
-            strength = abs(probability - 0.5) * 2  # Normalize to 0-1
+            # Only generate signals for positive class predictions
+            if probability > 0.5:  # Class 1 prediction
+                confidence = probability  # Use actual probability as confidence
+                direction = 'BUY'
+                strength = probability  # Probability itself is the strength
+            else:  # Class 0 prediction
+                # For negative predictions, set very low confidence to filter them out
+                confidence = 1 - probability  # Confidence in negative prediction
+                direction = 'BUY'  # Default direction, but will be filtered out
+                strength = 1 - probability
         else:
             # Binary prediction without probabilities
-            confidence = 0.8 if prediction == 1 else 0.2  # Fixed confidence for binary
-            direction = 'BUY' if prediction == 1 else 'SELL'
-            strength = 0.8 if prediction == 1 else 0.2
+            if prediction == 1:
+                confidence = 0.8  # High confidence for positive prediction
+                direction = 'BUY'
+                strength = 0.8
+            else:
+                # For class 0, set low confidence to ensure filtering
+                confidence = 0.05  # Very low confidence to trigger filtering
+                direction = 'BUY'  # Default direction, but will be filtered out
+                strength = 0.05
         
         return {
             'direction': direction,
