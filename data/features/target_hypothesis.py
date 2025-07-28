@@ -151,12 +151,12 @@ class TargetHypothesis(BaseProcessor):
             logger.info(f"Future price change - Std: {self.df['future_price_change'].std():.6f}, "
                     f"95th percentile: {abs(self.df['future_price_change']).quantile(0.95):.6f}")
             
-            # STEP 2: Use adaptive thresholds based on enhanced features
-            depth_stability_threshold = self.df['depth_stability'].quantile(0.75)  # Top 25%
-            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.80)  # Top 20% stress
-            volume_threshold = max(1.1, self.df['volume_ratio'].quantile(0.75))  # Top 25% but at least 1.1
-            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.60)  # Top 40%
-            movement_threshold = abs(self.df['future_price_change']).quantile(0.75)  # Top 25% movements
+            # STEP 2: Use adaptive thresholds based on enhanced features (RELAXED for better balance)
+            depth_stability_threshold = self.df['depth_stability'].quantile(0.60)  # Top 40% (more signals)
+            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.70)  # Top 30% stress (more signals)
+            volume_threshold = max(1.05, self.df['volume_ratio'].quantile(0.65))  # Top 35% but at least 1.05
+            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.50)  # Top 50% (more signals)
+            movement_threshold = abs(self.df['future_price_change']).quantile(0.65)  # Top 35% movements (more signals)
             
             logger.info(f"Enhanced thresholds - Depth stability: {depth_stability_threshold:.4f}, "
                     f"Liquidity stress: {liquidity_stress_threshold:.4f}, "
