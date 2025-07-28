@@ -273,9 +273,14 @@ class ModelTraining():
             # Need to change potential columns having dtype object to category, for model to 'accept'
             self.df = model_utils.handle_categories(df = self.df)
             
-            # Features (Input variables)
-            self.X = self.df.drop(self.target_col, axis=1)
-            logger.debug(f"Successfully set Features (X), with {len(self.X.columns)} columns/features ...")
+            # Features (Input variables) - Exclude ALL target columns and future-looking features to prevent data leakage
+            target_columns = [col for col in self.df.columns if col.startswith('target_')]
+            future_columns = [col for col in self.df.columns if col.startswith('future_')]
+            exclude_columns = target_columns + future_columns
+            
+            logger.info(f"Excluding columns to prevent data leakage: {exclude_columns}")
+            self.X = self.df.drop(exclude_columns, axis=1, errors='ignore')
+            logger.debug(f"Successfully set Features (X), with {len(self.X.columns)} columns/features (excluded {len(exclude_columns)} leaked columns)")
             # Target (Output variables)
             self.y = self.df[self.target_col]
             logger.debug(f"and Target (y), '{self.target_col}', {self.y.size} values.")
