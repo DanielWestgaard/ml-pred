@@ -284,6 +284,21 @@ class SimulationBroker:
         """Get list of open positions"""
         return self.open_positions.copy()
     
+    def get_position(self, position_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get a specific position by ID
+        
+        Args:
+            position_id: Position ID to find
+            
+        Returns:
+            Position dictionary if found, None otherwise
+        """
+        for position in self.open_positions:
+            if position['id'] == position_id:
+                return position
+        return None
+    
     def get_closed_trades(self) -> List[Dict[str, Any]]:
         """Get list of closed trades"""
         return self.closed_trades.copy()
