@@ -488,7 +488,7 @@ class BacktestOrchestrator:
                                     position = self.simulation_broker.get_position(position_id)
                                     if position:
                                         position['entry_features'] = entry_features
-                                        position['entry_time'] = pd.to_datetime(current_data['timestamp'])
+                                        position['entry_time'] = pd.to_datetime(current_data['timestamp'], utc=True)
                                     
                                     # Track with signal tracker
                                     confidence = probabilities[0] if probabilities is not None and len(probabilities) > 0 else 0.8
