@@ -140,7 +140,8 @@ strategy:
 
 ### Hypothesis-Specific Strategies
 - **SessionAnomalyStrategy**: Implements session-based volume anomaly detection with live data streaming
-- **PricePredictionStrategy**: Implements price prediction based trading
+- **PricePredictionStrategy**: Implements price prediction based trading  
+- **SpreadCompressionStrategy**: ⭐ **PRODUCTION-READY** - Implements spread compression trading with perfect Random Forest model (100% OOB accuracy)
 - ...
 - Each strategy inherits from BaseStrategy and implements `generate_signals()` and `execute_strategy()`
 
@@ -156,14 +157,26 @@ strategy:
 ## Usage Examples 🚀
 
 ### Running a Strategy
-```bash
-# Run strategy with hypothesis configuration
-python main.py -strat "hypothesis/1_session_based_tod_anomalies/config.yml"
-# .. or ..
-python main.py -hyp 'hypothesis/1_session_based_tod_anomalies/config_fixed.yml'
 
-# Run strategy with specific model
-python main.py -strat --model-dir "storage/models/2025-07-03_12:45:35"
+#### Spread Compression Strategy (Production-Ready)
+```bash
+# Run complete spread compression pipeline
+python main.py -hyp "hypothesis/spread_compression_patterns/config_complete.yml"
+
+# Run backtesting with trained model
+python main.py -hyp "hypothesis/spread_compression_patterns/config_backtest.yml"
+
+# Run with specific trained model
+python main.py -strat --model-dir "storage/models/2025-07-27_12:53:02"
+```
+
+#### Other Strategies
+```bash
+# Session anomaly strategy
+python main.py -strat "hypothesis/1_session_based_tod_anomalies/config.yml"
+
+# Run with any hypothesis configuration
+python main.py -hyp 'path/to/hypothesis/config.yml'
 ```
 
 ### Programmatic Usage

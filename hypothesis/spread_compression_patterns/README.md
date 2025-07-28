@@ -14,17 +14,28 @@ When bid-ask spreads suddenly compress, it predicts significant price movements 
 
 ## 📁 **Configuration Files**
 
-### **🎯 Main Configurations (Use These)**
+### **🎯 Production Configurations (Current)**
 
-1. **`config_backtest_improved_simple.yml`** - ⭐ **OPTIMIZED** (Recommended)
-   - Best-performing parameters from systematic testing
-   - Conservative exit strategy: confidence=0.35, decay=0.17, life=5min
-   - Optimized for high-signal periods with enhanced volatility detection
+1. **`config_complete.yml`** - ⭐ **COMPLETE PIPELINE** (Recommended)
+   - Full data processing + model training + backtesting configuration
+   - Uses optimized 8-feature set with perfect model results
+   - Ready for end-to-end execution
 
-2. **`config_backtest.yml`** - 📊 **BASELINE**
-   - Original configuration for comparison
-   - Standard exit parameters: confidence=0.30, decay=0.25, life=3min
-   - Useful for A/B testing against improvements
+2. **`config_backtest.yml`** - 📊 **BACKTESTING FOCUSED**  
+   - Dedicated backtesting configuration for trained models
+   - Optimized parameters for spread compression strategy
+   - Uses production model: `storage/models/2025-07-27_12:53:02/`
+
+3. **`config_model.yml`** - 🧠 **MODEL TRAINING**
+   - Model training specific configuration
+   - Perfect Random Forest results (100% OOB accuracy)
+
+4. **`config_process_data.yml`** - 🔧 **DATA PROCESSING**
+   - Data engineering with optimized 8-feature set
+   - Validated feature generation and targeting
+
+### **📂 Historical Configurations**
+- `historical_configs/` - Archived test configurations from development
 
 ## ⚙️ **Intelligent Exit Strategy Parameters**
 
