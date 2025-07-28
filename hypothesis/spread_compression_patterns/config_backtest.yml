@@ -48,7 +48,7 @@ backtesting:
         confidence_exit_threshold: 0.50               # Exit when model is 50%+ confident compression is over
         signal_strength_decay: 0.90                   # VERY HIGH - effectively disable decay exits  
         volatility_exit_multiplier: 5.0               # VERY HIGH - effectively disable volatility exits
-        minimum_signal_life: 60                       # LONGER - 1 hour minimum
+        minimum_signal_life: 15                       # 15 minutes minimum - allow faster exits
     
     # Signal tracking
     signal_tracking:
