@@ -89,10 +89,11 @@ The feature importance analysis is strategically placed **after feature generati
 ### Directory Organization
 ```
 storage/data_engineering_stats/feature_importance/
-├── feature_importance_YYYYMMDD_HHMMSS.png          # Visual comparison plot
-├── importance_results_YYYYMMDD_HHMMSS.csv          # Detailed method results
-├── importance_report_YYYYMMDD_HHMMSS.txt           # Text summary report  
-└── consensus_ranking_YYYYMMDD_HHMMSS.csv           # Final consensus ranking
+└── YYYY-MM-DD_HH-MM-SS/                            # Timestamped analysis session
+    ├── feature_importance_analysis.png             # Visual comparison plot
+    ├── importance_results.csv                      # Detailed method results
+    ├── importance_report.txt                       # Text summary report  
+    └── consensus_ranking.csv                       # Final consensus ranking
 ```
 
 ### Example Output

@@ -399,32 +399,31 @@ class FeatureImportanceAnalyzer:
     def analyze_and_save(self, output_dir: str = "storage/data_engineering_stats/feature_importance") -> Dict:
         """Complete analysis with automatic saving"""
         
-        # Create output directory
-        output_path = Path(output_dir)
+        # Create timestamped subdirectory
+        timestamp = pd.Timestamp.now().strftime("%Y-%m-%d_%H-%M-%S")
+        output_path = Path(output_dir) / timestamp
         output_path.mkdir(parents=True, exist_ok=True)
-        
-        timestamp = pd.Timestamp.now().strftime("%Y%m%d_%H%M%S")
         
         # Run analysis
         results = self.analyze_all_methods()
         consensus = self.get_consensus_ranking()
         
         # Save plot
-        plot_path = output_path / f"feature_importance_{timestamp}.png"
+        plot_path = output_path / "feature_importance_analysis.png"
         self.plot_importance_comparison(save_path=str(plot_path))
         
         # Save detailed results
-        results_path = output_path / f"importance_results_{timestamp}.csv"
+        results_path = output_path / "importance_results.csv"
         results_df = pd.DataFrame(results)
         results_df.to_csv(results_path)
         
         # Save summary report
-        report_path = output_path / f"importance_report_{timestamp}.txt"
+        report_path = output_path / "importance_report.txt"
         with open(report_path, 'w') as f:
             f.write(self.create_summary_report())
         
         # Save consensus ranking
-        consensus_path = output_path / f"consensus_ranking_{timestamp}.csv"
+        consensus_path = output_path / "consensus_ranking.csv"
         consensus.to_csv(consensus_path, header=['consensus_score'])
         
         logger.info(f"Feature importance analysis completed and saved to {output_path}")

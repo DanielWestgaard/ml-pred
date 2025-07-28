@@ -1,0 +1,4 @@
+28-07-2025 20:12:22 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+28-07-2025 20:12:22 - utils.data_utils                        :250  - DEBUG    - Loading storage/data/capital_com/GBPUSD/processed/1m/2025-05-15_2025-05-23.csv
+28-07-2025 20:12:22 - data.features.feature_importance        :133  - INFO     - Removing 2 constant features
+28-07-2025 20:12:22 - data.features.feature_importance        :76   - ERROR    - Error initializing FeatureImportanceAnalyzer: 'target_spread_compression_binary'
