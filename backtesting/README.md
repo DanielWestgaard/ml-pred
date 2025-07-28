@@ -59,6 +59,19 @@ backtesting/
 ├── backtest_data_manager.py         # BacktestDataManager - Historical data iteration  
 ├── performance_analyzer.py          # BacktestPerformanceAnalyzer - Comprehensive analytics
 ├── README.md                        # This documentation
+├── IMPROVEMENTS_LOG.md              # Development history and fixes
+│
+├── analysis_tools/                  # Advanced analysis and optimization tools
+│   ├── analyze_backtest_results.py      # Result analysis and pattern detection
+│   ├── extended_testing_framework.py    # Comprehensive parameter testing
+│   ├── fast_parameter_comparison.py     # Quick parameter comparison
+│   ├── identify_signal_rich_periods.py  # Find optimal testing periods
+│   ├── improve_exit_strategy.py         # Exit strategy optimization
+│   ├── intelligent_period_selection.py  # Smart period selection
+│   ├── parameter_tuning_guide.md        # Parameter optimization guide
+│   ├── quick_parameter_tuning.py        # Rapid parameter testing
+│   └── run_systematic_backtests.py      # Systematic testing framework
+│
 └── results/                         # Backtest results storage
     ├── backtest_results_YYYYMMDD_HHMMSS.json
     ├── trades_log_YYYYMMDD_HHMMSS.json
@@ -164,6 +177,25 @@ analyzer.create_equity_curve("equity_curve.png")
 
 # Export detailed analysis
 files = analyzer.export_detailed_analysis("analysis_output/")
+```
+
+### Parameter Optimization & Analysis Tools
+
+```bash
+# Quick parameter testing (4 configurations)
+python backtesting/analysis_tools/quick_parameter_tuning.py
+
+# Extended testing framework (27 parameter combinations)
+python backtesting/analysis_tools/extended_testing_framework.py
+
+# Analyze existing backtest results
+python backtesting/analysis_tools/analyze_backtest_results.py
+
+# Find signal-rich periods for testing
+python backtesting/analysis_tools/identify_signal_rich_periods.py
+
+# Systematic backtesting across multiple periods
+python backtesting/analysis_tools/run_systematic_backtests.py
 ```
 
 ## Component Details 🧩

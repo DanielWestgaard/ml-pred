@@ -3,39 +3,59 @@ hypothesis:
 
 # Backtesting: Rapid strategy validation with historical data
 backtesting:
-    enabled: true                                     # Enable backtesting mode
+    enabled: true
     model_folder: storage/models/2025-07-27_12:53:02
     
-    # Data configuration  
-    data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-06-01_2025-05-23.csv  # Use same data as training
-    start_date: '2025-02-03'                          # Target period with positive signals  
-    end_date: '2025-02-04'                            # Test data end date (1 day with signals)
-    buffer_size: 200                                  # Historical buffer for feature generation
+    # Test on signal-rich period with 1,291 positive signals (44.82% rate)
+    data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
+    start_date: '2024-10-01'                          # Signal-rich period with 1,291 positive signals
+    end_date: '2024-10-02'                            # Two days for proper testing
+    buffer_size: 200
     
     # Capital and costs
-    initial_capital: 10000                            # Starting capital for simulation
-    transaction_costs: 0.0013                        # 1.3 pips for GBPUSD (realistic spread)
-    slippage: 0.0002                                  # 0.2 pips average slippage
+    initial_capital: 10000
+    transaction_costs: 0.0013
+    slippage: 0.0002
     
     # Execution settings
     execution:
-        max_loops: 2000                               # Small test for signal-rich period
-        loop_interval: 0                              # No delays in backtesting (0 = instant)
+        max_loops: 2880                               # 48 hours * 60 min = 2880 loops for 2 days
+        loop_interval: 0
     
-    # Signal processing (inherit from strategy)
+    # High-quality signal processing (no session filtering for testing)
     signal_processing:
-        confidence_threshold: 0.50                    # Accept any positive class prediction  
-        signal_filters: ['session_filter']            # Apply session-based filtering
-    
-    # Risk management (inherit from strategy)
+        confidence_threshold: 0.75                    # Keep high entry threshold
+        signal_filters: []                            # No session filtering for testing
+        min_signal_strength: 0.3                      # Quality filter
+        volume_confirmation_required: true            # Volume confirmation
+        
+    # Conservative risk management
     risk_management:
-        max_position_size: 0.02                       # 2% of capital per position
-        stop_loss_pct: 0.02                          # 2% stop loss
-        take_profit_pct: 0.04                        # 4% take profit
-        max_drawdown: 0.05                           # 5% maximum drawdown limit
-        max_concurrent_positions: 3                   # Maximum 3 simultaneous positions
-    
+        max_position_size: 0.015                      # 1.5% position size
+        stop_loss_pct: 0.015                         # 1.5% stop loss
+        take_profit_pct: 0.045                        # 4.5% take profit (1:3 ratio)
+        max_drawdown: 0.04                            # 4% max drawdown
+        max_concurrent_positions: 2                   # Max 2 positions
+        position_size_scaling: 'volatility'           # Volatility scaling
+        
     # Position management
     position_management:
-        max_concurrent_positions: 3                   # Consistent with risk management
-        position_tracking: detailed                   # Detailed position tracking for analysis
+        max_concurrent_positions: 2
+        position_tracking: detailed
+    
+    # DISABLE confidence exits - test base strategy performance
+    exit_strategy:
+        confidence_exit_threshold: 0.999              # EXTREMELY HIGH - effectively disable confidence exits
+        signal_strength_decay: 0.90                   # VERY HIGH - effectively disable decay exits  
+        volatility_exit_multiplier: 5.0               # VERY HIGH - effectively disable volatility exits
+        minimum_signal_life: 60                       # LONGER - 1 hour minimum
+    
+    # Signal tracking
+    signal_tracking:
+        signal_strength_features:
+            - compression_ratio_micro
+            - volume_ratio
+            - signal_strength_v2
+            - compression_consistency
+            - volatility_short
+            - spread_baseline
