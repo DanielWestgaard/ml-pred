@@ -35,7 +35,7 @@ When bid-ask spreads suddenly compress, it predicts significant price movements 
    - Validated feature generation and targeting
 
 ### **📂 Historical Configurations**
-- `historical_configs/` - Archived test configurations from development
+- `historical_configs/` - Archived test configurations from development. Currently only backtest configs.
 
 ## ⚙️ **Intelligent Exit Strategy Parameters**
 
