@@ -107,15 +107,23 @@ class TargetHypothesis(BaseProcessor):
                 from data.features.enhanced_generation import ModelAwareFeatureGenerator
                 temp_generator = ModelAwareFeatureGenerator(self.df)
                 
+                # Map features to their generator methods
+                feature_generator_map = {
+                    'signal_strength_v2': 'enhanced_signal_strength_calculator',
+                    'volume_breakout': 'advanced_volume_confirmation_features', 
+                    'price_momentum_5': 'price_momentum_5_feature'
+                }
+                
                 # Generate missing features temporarily
                 for feature in missing_features:
-                    if hasattr(temp_generator, f'generate_{feature}'):
-                        logger.debug(f"Temporarily generating {feature}")
-                        temp_generator.__getattribute__(f'generate_{feature}')()
+                    generator_method = feature_generator_map.get(feature)
+                    if generator_method and hasattr(temp_generator, generator_method):
+                        logger.debug(f"Temporarily generating {feature} using {generator_method}")
+                        temp_generator.__getattribute__(generator_method)()
                         temp_generated_features.append(feature)
                         logger.debug(f"Successfully generated {feature}")
                     else:
-                        logger.error(f"Cannot generate missing feature: {feature}")
+                        logger.error(f"Cannot generate missing feature: {feature} (no method {generator_method})")
                         return
                 
                 # Update our dataframe with temporarily generated features
