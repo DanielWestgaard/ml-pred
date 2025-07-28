@@ -1,0 +1,56 @@
+================================================================================
+FEATURE IMPORTANCE ANALYSIS REPORT
+================================================================================
+Dataset: 11581 rows, 43 features
+Target: target_session_vol_anomaly (classification)
+Analysis Date: 2025-07-28 20:13:17
+
+CONSENSUS TOP FEATURES:
+----------------------------------------
+ 1. future_atr                     0.9142
+ 2. session_atr_mean               0.6347
+ 3. hour_of_week_sin               0.4995
+ 4. atr                            0.4942
+ 5. volatility_ratio               0.4884
+ 6. volatility_zscore              0.4497
+ 7. hour_of_week_cos               0.4345
+ 8. volatility_long                0.4093
+ 9. minutes_to_next_session        0.3629
+10. session_progress_cos           0.3277
+11. minutes_since_session_start    0.3212
+12. session_progress               0.3210
+13. hour_sin                       0.3161
+14. session_atr_std                0.3019
+15. hour_cos                       0.2948
+
+CORRELATION - TOP 5:
+------------------------------
+1. volatility_ratio          0.2540
+2. future_atr                0.2540
+3. atr                       0.2355
+4. vol_regime_high           0.2070
+5. session_atr_mean          0.2038
+
+MUTUAL INFORMATION - TOP 5:
+------------------------------
+1. hour_of_week_sin          0.1109
+2. hour_of_week_cos          0.1041
+3. future_atr                0.0729
+4. session_progress_cos      0.0724
+5. session_progress          0.0703
+
+RANDOM FOREST - TOP 5:
+------------------------------
+1. future_atr                0.0992
+2. session_atr_mean          0.0759
+3. volatility_long           0.0700
+4. minutes_to_next_session   0.0599
+5. minutes_since_session_start 0.0592
+
+PERMUTATION - TOP 5:
+------------------------------
+1. future_atr                0.0374
+2. session_atr_mean          0.0151
+3. minutes_to_next_session   0.0131
+4. volatility_long           0.0112
+5. minutes_since_session_start 0.0085
