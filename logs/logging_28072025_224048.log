@@ -1,0 +1,82 @@
+28-07-2025 22:40:48 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+28-07-2025 22:40:48 - __main__                                :43   - INFO     - Enhanced Feature Analyzer initialized with data: storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
+28-07-2025 22:40:48 - __main__                                :341  - INFO     - === STARTING COMPLETE ENHANCED FEATURE ANALYSIS ===
+28-07-2025 22:40:48 - __main__                                :49   - INFO     - Loading and preparing raw data...
+28-07-2025 22:40:49 - __main__                                :60   - INFO     - Loaded 302104 rows of data from 2024-10-01 00:00:00 to 2025-07-25 01:00:00
+28-07-2025 22:40:49 - __main__                                :61   - INFO     - Available columns: ['open', 'high', 'low', 'close', 'volume', 'bid_open', 'ask_open', 'bid_high', 'ask_high', 'bid_low', 'ask_low', 'bid_close', 'ask_close', 'spread_open', 'spread_high', 'spread_low', 'spread_close', 'spread_tight', 'spread_wide', 'spread_avg']
+28-07-2025 22:40:49 - __main__                                :74   - INFO     - === Generating Enhanced Spread Compression Features ===
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :58   - DEBUG    - Data validation passed
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :43   - INFO     - Enhanced Spread Features initialized with 302104 rows
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :62   - INFO     - === Generating Enhanced Spread Compression Features ===
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :94   - DEBUG    - Generating spread regime detection features
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :143  - DEBUG    - Generating spread volatility features
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :185  - DEBUG    - Generating spread momentum indicators
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :225  - DEBUG    - Generating institutional footprint features
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :269  - DEBUG    - Generating volume-spread divergence features
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :318  - DEBUG    - Generating order flow pressure indicators
+28-07-2025 22:40:49 - data.features.enhanced_spread_features  :360  - DEBUG    - Generating tick-level analysis features
+28-07-2025 22:41:06 - data.features.enhanced_spread_features  :411  - DEBUG    - Generating market depth approximation features
+28-07-2025 22:41:06 - data.features.enhanced_spread_features  :446  - DEBUG    - Generating liquidity stress indicators
+28-07-2025 22:41:06 - data.features.enhanced_spread_features  :485  - DEBUG    - Generating multi-timeframe confirmation features
+28-07-2025 22:41:06 - data.features.enhanced_spread_features  :530  - DEBUG    - Generating regime stability features
+28-07-2025 22:41:22 - data.features.enhanced_spread_features  :569  - DEBUG    - Generating predictive signal strength features
+28-07-2025 22:41:22 - data.features.enhanced_spread_features  :622  - DEBUG    - Generating market inefficiency detection features
+28-07-2025 22:41:44 - data.features.enhanced_spread_features  :87   - INFO     - Generated 39 enhanced features
+28-07-2025 22:41:44 - __main__                                :85   - INFO     - Successfully generated 39 enhanced features
+28-07-2025 22:41:44 - __main__                                :93   - INFO     - === Creating Spread Compression Targets ===
+28-07-2025 22:41:44 - __main__                                :116  - INFO     - Binary target distribution: {0: 226582, 1: 75522}
+28-07-2025 22:41:44 - __main__                                :119  - INFO     - Positive class rate: 25.00%
+28-07-2025 22:41:44 - __main__                                :120  - INFO     - Movement threshold: 0.000458
+28-07-2025 22:41:44 - __main__                                :132  - INFO     - === Analyzing Feature Importance ===
+28-07-2025 22:41:44 - __main__                                :151  - INFO     - Analyzing 55 numeric features
+28-07-2025 22:41:45 - __main__                                :162  - INFO     - Analysis dataset: 302104 samples, 55 features
+28-07-2025 22:41:45 - __main__                                :165  - INFO     - Computing correlations...
+28-07-2025 22:41:45 - __main__                                :176  - INFO     - Computing mutual information...
+28-07-2025 22:42:26 - __main__                                :185  - INFO     - Computing Random Forest importance...
+28-07-2025 22:42:46 - __main__                                :224  - INFO     - \n=== TOP 15 FEATURES ===
+28-07-2025 22:42:46 - __main__                                :226  - INFO     -  5. volume                         | Consensus: 0.9870 | Corr: 0.2985 | MI: 0.0502 | RF: 0.0518
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 40. depth_stability                | Consensus: 0.9533 | Corr: 0.2877 | MI: 0.0482 | RF: 0.0503
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 39. depth_variability              | Consensus: 0.7153 | Corr: 0.2591 | MI: 0.0452 | RF: 0.0213
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 41. liquidity_stress               | Consensus: 0.7089 | Corr: 0.2558 | MI: 0.0446 | RF: 0.0215
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 52. microstructure_health          | Consensus: 0.6813 | Corr: 0.2454 | MI: 0.0463 | RF: 0.0174
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 18. spread_tight                   | Consensus: 0.6685 | Corr: 0.2088 | MI: 0.0437 | RF: 0.0243
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 38. price_level_support            | Consensus: 0.5794 | Corr: 0.2059 | MI: 0.0238 | RF: 0.0306
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 48. spread_regime_stability        | Consensus: 0.5292 | Corr: 0.1109 | MI: 0.0508 | RF: 0.0126
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 37. tick_intensity                 | Consensus: 0.5222 | Corr: 0.0046 | MI: 0.0522 | RF: 0.0285
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 19. spread_wide                    | Consensus: 0.5156 | Corr: 0.1489 | MI: 0.0364 | RF: 0.0181
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 35. cumulative_order_flow          | Consensus: 0.4997 | Corr: 0.0121 | MI: 0.0381 | RF: 0.0377
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 34. intrabar_pressure              | Consensus: 0.4971 | Corr: 0.0018 | MI: 0.0480 | RF: 0.0293
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 53. signal_conviction              | Consensus: 0.4916 | Corr: 0.0294 | MI: 0.0485 | RF: 0.0232
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 43. price_impact_per_volume        | Consensus: 0.4773 | Corr: 0.1610 | MI: 0.0171 | RF: 0.0292
+28-07-2025 22:42:46 - __main__                                :226  - INFO     - 51. compression_prediction_strength | Consensus: 0.4336 | Corr: 0.0006 | MI: 0.0460 | RF: 0.0216
+28-07-2025 22:42:46 - __main__                                :238  - INFO     - === Testing Model Performance with Top 15 Features ===
+28-07-2025 22:42:46 - __main__                                :245  - INFO     - Testing with features: ['volume', 'depth_stability', 'depth_variability', 'liquidity_stress', 'microstructure_health', 'spread_tight', 'price_level_support', 'spread_regime_stability', 'tick_intensity', 'spread_wide', 'cumulative_order_flow', 'intrabar_pressure', 'signal_conviction', 'price_impact_per_volume', 'compression_prediction_strength']
+28-07-2025 22:42:46 - __main__                                :261  - INFO     - Training set: 241683 samples, Test set: 60421 samples
+28-07-2025 22:42:59 - __main__                                :278  - INFO     - \n=== MODEL PERFORMANCE ===
+28-07-2025 22:42:59 - __main__                                :279  - INFO     - \n              precision    recall  f1-score   support
+
+           0       0.79      0.97      0.87     47029
+           1       0.49      0.09      0.15     13392
+
+    accuracy                           0.78     60421
+   macro avg       0.64      0.53      0.51     60421
+weighted avg       0.72      0.78      0.71     60421
+
+28-07-2025 22:42:59 - __main__                                :287  - INFO     - \n=== TRAINED MODEL FEATURE IMPORTANCE ===
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - depth_stability               : 0.1294
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - volume                        : 0.1013
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - cumulative_order_flow         : 0.0930
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - price_impact_per_volume       : 0.0844
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - intrabar_pressure             : 0.0813
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - price_level_support           : 0.0788
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - tick_intensity                : 0.0744
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - signal_conviction             : 0.0727
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - compression_prediction_strength: 0.0721
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - spread_tight                  : 0.0436
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - depth_variability             : 0.0376
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - spread_regime_stability       : 0.0373
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - liquidity_stress              : 0.0368
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - spread_wide                   : 0.0310
+28-07-2025 22:42:59 - __main__                                :289  - INFO     - microstructure_health         : 0.0264
+28-07-2025 22:43:00 - __main__                                :334  - INFO     - Results saved to: storage/enhanced_feature_analysis/2025-07-28_22-42-59
+28-07-2025 22:43:00 - __main__                                :361  - INFO     - === ANALYSIS COMPLETE ===
