@@ -646,7 +646,7 @@ class BacktestOrchestrator:
             from datetime import datetime
             if isinstance(entry_time, str):
                 entry_time = pd.to_datetime(entry_time)
-            position_age_minutes = (pd.Timestamp.now() - entry_time).total_seconds() / 60
+            position_age_minutes = (pd.Timestamp.now(tz='UTC') - entry_time).total_seconds() / 60
             if position_age_minutes < self.minimum_signal_life:
                 # Only exit on very strong contrary signals during minimum life period
                 if prediction == 0 and current_confidence > 0.9:
