@@ -4,12 +4,12 @@ hypothesis:
 # Backtesting: Rapid strategy validation with historical data
 backtesting:
     enabled: true
-    model_folder: storage/models/2025-07-28_21:29:49
+    model_folder: storage/models/2025-07-28_23:12:12
     
-    # Test on signal-rich period with 1,291 positive signals (44.82% rate)
-    data_source: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
-    start_date: '2024-06-04'                          # Signal-rich period with 1,291 positive signals
-    end_date: '2024-06-08'                            # Two days for proper testing
+    # Extended test period for better statistical significance
+    data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
+    start_date: '2024-10-04'                          # Start of test period
+    end_date: '2024-10-15'                            # Extended to ~2 weeks for better testing
     buffer_size: 200
     
     # Capital and costs
@@ -19,15 +19,15 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: 1000                               # 48 hours * 60 min = 2880 loops for 2 days
+        max_loops: 5000                               # Extended for 2-week period (~11 days * 24h * 60min / 3)
         loop_interval: 0
     
-    # More realistic signal processing with cleaned model
+    # Adjusted signal processing for enhanced features model
     signal_processing:
-        confidence_threshold: 0.5                    # Lower threshold to get more signals
+        confidence_threshold: 0.15                   # Much lower threshold based on actual model output (0.01-0.09)
         signal_filters: []                            # No session filtering for testing
-        min_signal_strength: 0.3                      # Quality filter
-        volume_confirmation_required: true            # Volume confirmation
+        min_signal_strength: 0.1                     # Lower quality filter to match model behavior
+        volume_confirmation_required: false          # Disable to test pure model performance
         
     # Conservative risk management
     risk_management:
