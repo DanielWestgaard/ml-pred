@@ -8,18 +8,18 @@ backtesting:
     
     # Test on signal-rich period with 1,291 positive signals (44.82% rate)
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
-    start_date: '2024-06-01'                          # Signal-rich period with 1,291 positive signals
+    start_date: '2024-06-04'                          # Signal-rich period with 1,291 positive signals
     end_date: '2024-06-08'                            # Two days for proper testing
     buffer_size: 200
     
     # Capital and costs
     initial_capital: 10000
-    transaction_costs: 0.0013
+    transaction_costs: 0.0005 # temporarily low to isolate model performance from cost impact, was 0.0013
     slippage: 0.0002
     
     # Execution settings
     execution:
-        max_loops: 44640                               # 48 hours * 60 min = 2880 loops for 2 days
+        max_loops: 1000                               # 48 hours * 60 min = 2880 loops for 2 days
         loop_interval: 0
     
     # More realistic signal processing with cleaned model
@@ -45,7 +45,7 @@ backtesting:
     
     # Enable intelligent confidence-based exits  
     exit_strategy:
-        confidence_exit_threshold: 0.50               # Exit when model is 50%+ confident compression is over
+        confidence_exit_threshold: 0.75               # Exit when model is 75%+ confident compression is over
         signal_strength_decay: 0.90                   # VERY HIGH - effectively disable decay exits  
         volatility_exit_multiplier: 5.0               # VERY HIGH - effectively disable volatility exits
         minimum_signal_life: 15                       # 15 minutes minimum - allow faster exits
