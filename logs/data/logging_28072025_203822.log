@@ -265,3 +265,5 @@
 28-07-2025 20:38:43 - data.pipelines.engineer_pipeline        :119  - INFO     - As selected features were provided, pipeline will skip Feature Selection.
 28-07-2025 20:38:43 - data.pipelines.engineer_pipeline        :124  - INFO     - ---------- Data Pipeline finished all 'data steps'! ----------
 28-07-2025 20:38:43 - utils.data_utils                        :301  - INFO     - Saving processed file ...
+28-07-2025 20:38:56 - utils.data_utils                        :316  - INFO     - Successfully saved file! storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
+28-07-2025 20:38:56 - data.pipelines.engineer_pipeline        :133  - INFO     - ---------- Data Pipeline Finished ----------
