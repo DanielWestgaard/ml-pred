@@ -14,7 +14,7 @@ backtesting:
     
     # Capital and costs
     initial_capital: 10000
-    transaction_costs: 0.0013
+    transaction_costs: 0.0005 # temporarily low to isolate model performance from cost impact, was 0.0013
     slippage: 0.0002
     
     # Execution settings
@@ -45,7 +45,7 @@ backtesting:
     
     # Enable intelligent confidence-based exits  
     exit_strategy:
-        confidence_exit_threshold: 0.50               # Exit when model is 50%+ confident compression is over
+        confidence_exit_threshold: 0.75               # Exit when model is 75%+ confident compression is over
         signal_strength_decay: 0.90                   # VERY HIGH - effectively disable decay exits  
         volatility_exit_multiplier: 5.0               # VERY HIGH - effectively disable volatility exits
         minimum_signal_life: 15                       # 15 minutes minimum - allow faster exits
