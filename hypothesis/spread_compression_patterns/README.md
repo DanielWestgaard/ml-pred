@@ -16,7 +16,7 @@ When bid-ask spreads suddenly compress, it predicts significant price movements 
 
 ### **🎯 Production Configurations (Current)**
 
-1. **`config_complete.yml`** - ⭐ **COMPLETE PIPELINE** (Recommended)
+1. **`config_complete.yml`** - ⭐ **COMPLETE PIPELINE** - not tested if works
    - Full data processing + model training + backtesting configuration
    - Uses optimized 8-feature set with perfect model results
    - Ready for end-to-end execution
