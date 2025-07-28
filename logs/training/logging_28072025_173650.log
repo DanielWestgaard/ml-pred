@@ -1,0 +1,135 @@
+28-07-2025 17:36:50 - mixed                                   :149  - INFO     - Logging system initialized. Environment: development, Log category: training (Model training and hyperparameter tuning)
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'advanced_volume_confirmation_features' producing ['volume_acceleration', 'volume_breakout', 'volume_spread_correlation']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'average_directional_index' producing ['+di', '-di', 'adx']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'average_true_range' producing ['atr']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'bid_ask_spread_features' producing ['bid_ask_spread_bps', 'bid_ask_spread_relative']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'bollinger_bands' producing ['upper_band', 'lower_band', 'bb_width']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'commodity_channel_index' producing ['cci']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'day_of_week' producing ['day_of_week_sin', 'day_of_week_cos', 'is_monday', 'is_friday', 'is_midweek', 'friday_afternoon', 'sunday_evening']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'enhanced_signal_strength_calculator' producing ['signal_strength_v2']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'future_atr_features' producing ['future_atr']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'fx_activity_profile' producing ['activity']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'fx_trading_sessions' producing ['asian_session', 'london_session', 'ny_session', 'asian_london_overlap', 'london_ny_overlap', 'primary_session', 'session_intensity']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'holiday_features' producing ['is_holiday', 'days_to_next_holiday']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'hour_feature' producing ['hour']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'institutional_footprint_detection' producing ['momentum_volume_sync', 'flow_direction_strength', 'institutional_footprint']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'log_returns' producing ['log_return']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'market_microstructure_features' producing ['hl_spread_bps', 'hl_spread_ma_20', 'hl_spread_ratio']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'mid_price_feature' producing ['mid_price']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'money_flow_index' producing ['mfi']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'moving_average_convergence_divergence' producing ['macd_line', 'macd_signal', 'macd_histogram']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'moving_averages' producing ['sma_5', 'sma_10', 'sma_20', 'sma_50', 'sma_200', 'ema_5', 'ema_10', 'ema_20', 'ema_50', 'ema_200']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'mstl_decomposition' producing ['mstl_trend', 'mstl_residual']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'multi_timeframe_compression_features' producing ['compression_ratio_micro', 'compression_ratio_short', 'compression_ratio_medium']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'on_balance_volume' producing ['obv']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'order_flow_imbalance_basic' producing ['price_volume_imbalance', 'institutional_pressure', 'order_flow_momentum']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'order_flow_wick_analysis' producing ['wick_analysis', 'rejection_strength', 'absorption_capacity']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'price_momentum_5_feature' producing ['price_momentum_5']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'rate_of_change' producing ['roc_1', 'roc_5', 'roc_10', 'roc_20', 'roc_60']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'relative_strength_index' producing ['rsi_14']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'seasonal_decompose' producing ['seasonal_trend', 'seasonal_seasonal', 'seasonal_residual', 'seasonal_norm']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_atr_features' producing ['session_atr_mean', 'session_atr_std']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_timing_features' producing ['minutes_since_session_start', 'session_progress', 'session_progress_sin', 'session_progress_cos']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'session_transition_features' producing ['minutes_to_next_session', 'session_transition', 'pre_london', 'pre_ny', 'london_close']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'signal_strength_compression_feature' producing ['signal_strength_compression']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'spread_compression_features' producing ['spread_baseline', 'spread_recent', 'compression_ratio', 'compression_consistency', 'spread_volatility_ewm']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'spread_relative_features' producing ['spread_relative', 'spread_baseline_true', 'spread_recent_true', 'compression_ratio_true']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'spread_tight_features' producing ['spread_tight', 'spread_wide', 'spread_avg']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'stealth_institutional_activity' producing ['volume_price_divergence', 'stealth_accumulation', 'distribution_pressure']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'stl_decomposition' producing ['stl_trend', 'stl_seasonal', 'stl_residual', 'stl_seasonal_strength', 'stl_trend_strength']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'stochastic_oscillator' producing ['stoch_k', 'stoch_d']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'support_resistance' producing ['distance_from_high', 'distance_from_low']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_day' producing ['hour_sin', 'hour_cos']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_month' producing ['month_progress_sin', 'month_progress_cos', 'month_period', 'month_of_year_sin', 'month_of_year_cos']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'time_of_week' producing ['hour_of_week_sin', 'hour_of_week_cos', 'is_weekend']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'trend_strength_indicators' producing ['trend_strength', 'trend_regime', 'trend_regime_strong_trend', 'trend_regime_weak_trend', 'trend_regime_ranging']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volatility_regimes' producing ['returns', 'volatility_short', 'volatility_long', 'volatility_ratio', 'volatility_regime', 'volatility_zscore', 'volatility_change', 'vol_regime_high', 'vol_regime_low', 'vol_regime_medium']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_ma_20_feature' producing ['volume_ma_20']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_moving_averages' producing ['vma_7', 'vma_15', 'vma_30', 'vma_60', 'relative_volume_7', 'relative_volume_15', 'relative_volume_30', 'relative_volume_60']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_profile' producing ['vol_bin_0', 'vol_bin_1', 'vol_bin_2', 'vol_bin_3', 'vol_bin_4', 'vol_bin_5', 'vol_bin_6', 'vol_bin_7', 'vol_bin_8', 'vol_bin_9', 'vol_poc', 'vol_va_high', 'vol_va_low', 'vol_va_width', 'close_to_poc_pct', 'in_value_area', 'vol_concentration']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_rate_of_change' producing ['vroc_1', 'vroc_5', 'vroc_10', 'vroc_20']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_ratio_feature' producing ['volume_ratio']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'volume_recent_ratio_feature' producing ['volume_recent_ratio']
+28-07-2025 17:36:50 - data.features.feature_registry          :58   - DEBUG    - Registered feature generator 'vwap' producing ['vwap']
+28-07-2025 17:36:52 - __main__                                :128  - INFO     - User using pure hypothesis flow!
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/spread_compression_patterns/config_model.yml
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :173  - INFO     - Loaded hypothesis: spread_compression_patterns
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'data_pipeline' not found in configuration
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :150  - DEBUG    - Extracted model_training.type: random_forest
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :150  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :150  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 300, 'max_depth': 10, 'min_samples_split': 5, 'min_samples_leaf': 2, 'class_weight': 'balanced', 'bootstrap': True, 'oob_score': True, 'random_state': 42, 'n_jobs': -1, 'max_features': 'sqrt'}
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'evaluate_model' not found in configuration
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'strategy' not found in configuration
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'backtesting' not found in configuration
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :199  - DEBUG    - No spread_focused setting found, defaulting to False
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :204  - INFO     - Successfully loaded config sections: ['model_training']
+28-07-2025 17:36:52 - model.model_training                    :37   - INFO     - ---------- Initiating Model Training ----------
+28-07-2025 17:36:52 - model.model_training                    :42   - INFO     - Model Training was initialized with Hypothesis configuration!
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/spread_compression_patterns/config_model.yml
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :173  - INFO     - Loaded hypothesis: spread_compression_patterns
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'data_pipeline' not found in configuration
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :150  - DEBUG    - Extracted model_training.type: random_forest
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :150  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :150  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 300, 'max_depth': 10, 'min_samples_split': 5, 'min_samples_leaf': 2, 'class_weight': 'balanced', 'bootstrap': True, 'oob_score': True, 'random_state': 42, 'n_jobs': -1, 'max_features': 'sqrt'}
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'evaluate_model' not found in configuration
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'strategy' not found in configuration
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'backtesting' not found in configuration
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :199  - DEBUG    - No spread_focused setting found, defaulting to False
+28-07-2025 17:36:52 - utils.hypothesis.config_loader          :204  - INFO     - Successfully loaded config sections: ['model_training']
+28-07-2025 17:36:52 - utils.data_utils                        :250  - DEBUG    - Loading storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
+28-07-2025 17:36:55 - model.model_training                    :197  - DEBUG    - Found target columns: ['target_spread_compression_multi', 'target_spread_compression_binary']
+28-07-2025 17:36:55 - model.model_training                    :204  - INFO     - Selected binary target for classification: 'target_spread_compression_binary'
+28-07-2025 17:36:56 - model.model_training                    :110  - DEBUG    - Successfully made index to date
+28-07-2025 17:36:56 - model.model_training                    :124  - INFO     - ---------- Starting to run training of random_forest Model ... ----------
+28-07-2025 17:36:56 - model.model_training                    :249  - DEBUG    - Successfully imported model.model_factory.random_forest
+28-07-2025 17:36:56 - model.model_training                    :281  - INFO     - Excluding columns to prevent data leakage: ['target_spread_compression_multi', 'target_spread_compression_binary', 'future_price_change']
+28-07-2025 17:36:56 - model.model_training                    :283  - DEBUG    - Successfully set Features (X), with 27 columns/features (excluded 3 leaked columns)
+28-07-2025 17:36:56 - model.model_training                    :286  - DEBUG    - and Target (y), 'target_spread_compression_binary', 1311859 values.
+28-07-2025 17:36:56 - utils.model.model_utils                 :56   - DEBUG    - ✓ y is in correct format
+28-07-2025 17:36:56 - utils.model.model_utils                 :63   - DEBUG    - ✓ X is in correct format
+28-07-2025 17:36:56 - utils.model.model_utils                 :68   - DEBUG    - Index type: <class 'pandas.core.indexes.datetimes.DatetimeIndex'>
+28-07-2025 17:36:56 - utils.model.model_utils                 :69   - DEBUG    - Index dtype: datetime64[ns, UTC]
+28-07-2025 17:36:56 - utils.model.model_utils                 :70   - DEBUG    - Index sample: DatetimeIndex(['2023-01-02 00:42:00+00:00', '2023-01-02 00:43:00+00:00',
+               '2023-01-02 00:44:00+00:00', '2023-01-02 00:45:00+00:00',
+               '2023-01-02 00:46:00+00:00'],
+              dtype='datetime64[ns, UTC]', name='date', freq=None)
+28-07-2025 17:36:56 - utils.model.model_utils                 :71   - DEBUG    - Index frequency: None
+28-07-2025 17:36:56 - model.model_factory.random_forest       :37   - DEBUG    - ----- Initializing Random Forest Classifier Model -----
+28-07-2025 17:36:56 - model.model_factory.random_forest       :48   - DEBUG    - Training data shape: X_train (1049487, 27), y_train (1049487,)
+28-07-2025 17:36:56 - model.model_factory.random_forest       :49   - DEBUG    - Target distribution: {0: 987163, 1: 62324}
+28-07-2025 17:36:56 - model.model_factory.random_forest       :60   - INFO     - ---------- Starting to train Random Forest Classifier Model! ----------
+28-07-2025 17:36:56 - model.model_factory.random_forest       :85   - DEBUG    - Random Forest parameters: {'n_estimators': 300, 'max_depth': 10, 'min_samples_split': 5, 'min_samples_leaf': 2, 'class_weight': 'balanced', 'bootstrap': True, 'oob_score': True, 'random_state': 42, 'n_jobs': -1, 'warm_start': False, 'max_features': 'sqrt', 'max_samples': None}
+28-07-2025 17:36:56 - model.model_factory.random_forest       :89   - INFO     - Training on imbalanced data - Class distribution: {0: 987163, 1: 62324}
+28-07-2025 17:36:56 - model.model_factory.random_forest       :93   - INFO     - Imbalance ratio: 0.0631 (6.31%)
+28-07-2025 17:36:56 - model.model_factory.random_forest       :100  - DEBUG    - Fitting Random Forest Classifier...
+28-07-2025 17:38:14 - model.model_factory.random_forest       :104  - INFO     - Successfully trained Random Forest Classifier!
+28-07-2025 17:38:14 - model.model_factory.random_forest       :105  - INFO     - Model contains 300 trees
+28-07-2025 17:38:14 - model.model_factory.random_forest       :108  - INFO     - Out-of-bag score: 0.8594
+28-07-2025 17:38:14 - model.model_factory.random_forest       :133  - INFO     - Top 8 Most Important Features for Spread Compression:
+28-07-2025 17:38:14 - model.model_factory.random_forest       :135  - INFO     -   compression_ratio_micro: 0.6202
+28-07-2025 17:38:14 - model.model_factory.random_forest       :135  - INFO     -   price_volume_imbalance: 0.0639
+28-07-2025 17:38:14 - model.model_factory.random_forest       :135  - INFO     -   signal_strength_v2: 0.0446
+28-07-2025 17:38:14 - model.model_factory.random_forest       :135  - INFO     -   institutional_footprint: 0.0437
+28-07-2025 17:38:14 - model.model_factory.random_forest       :135  - INFO     -   volume: 0.0420
+28-07-2025 17:38:14 - model.model_factory.random_forest       :135  - INFO     -   flow_direction_strength: 0.0375
+28-07-2025 17:38:14 - model.model_factory.random_forest       :135  - INFO     -   volume_ratio: 0.0374
+28-07-2025 17:38:14 - model.model_factory.random_forest       :135  - INFO     -   compression_consistency: 0.0362
+28-07-2025 17:38:14 - model.model_factory.random_forest       :139  - DEBUG    - Key spread compression feature importance:
+28-07-2025 17:38:14 - model.model_factory.random_forest       :143  - DEBUG    -   compression_consistency: 0.0362
+28-07-2025 17:38:14 - model.model_factory.random_forest       :143  - DEBUG    -   volume_ratio: 0.0374
+28-07-2025 17:38:14 - model.model_factory.random_forest       :143  - DEBUG    -   signal_strength_v2: 0.0446
+28-07-2025 17:38:14 - model.model_factory.random_forest       :143  - DEBUG    -   compression_ratio_micro: 0.6202
+28-07-2025 17:38:14 - model.model_training                    :313  - DEBUG    - Creating directory now.
+28-07-2025 17:38:14 - model.model_training                    :321  - INFO     - Successfully saved trained model: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-28_17:38:14/random_forest.pkl
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/spread_compression_patterns/config_model.yml
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :173  - INFO     - Loaded hypothesis: spread_compression_patterns
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'data_pipeline' not found in configuration
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :150  - DEBUG    - Extracted model_training.type: random_forest
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :150  - DEBUG    - Extracted model_training.processed_data: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :150  - DEBUG    - Extracted model_training.parameters: {'n_estimators': 300, 'max_depth': 10, 'min_samples_split': 5, 'min_samples_leaf': 2, 'class_weight': 'balanced', 'bootstrap': True, 'oob_score': True, 'random_state': 42, 'n_jobs': -1, 'max_features': 'sqrt'}
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'evaluate_model' not found in configuration
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'strategy' not found in configuration
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :134  - DEBUG    - Section 'backtesting' not found in configuration
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :199  - DEBUG    - No spread_focused setting found, defaulting to False
+28-07-2025 17:38:14 - utils.hypothesis.config_loader          :204  - INFO     - Successfully loaded config sections: ['model_training']
+28-07-2025 17:38:14 - model.model_training                    :446  - INFO     - Successfully saved model metadata: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-28_17:38:14/model_metadata.yml
