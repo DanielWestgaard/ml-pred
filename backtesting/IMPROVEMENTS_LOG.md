@@ -6,6 +6,8 @@ The backtesting system was completely debugged and optimized, transforming it fr
 
 ---
 
+Not: Some periods genuinly dont have any positive signals (eg. April 2025 1min GBPUSD), leading to seemingly poor performance. Hence the importance of testing multiple periods
+
 ## ✅ **CRITICAL ISSUES RESOLVED**
 
 ### 1. **Position Closing Bug** 
