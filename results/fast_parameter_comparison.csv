@@ -1,5 +1,0 @@
-config,success,duration,confidence_threshold,signal_decay,min_signal_life,return_pct,total_trades,confidence_exits,signal_decay_exits,volatility_exits,stop_loss_exits,take_profit_exits,final_value,exit_summary
-baseline,True,29.674630880355835,0.3,0.25,3,-0.35,83,160,0,0,0,0,10000,Conf:160
-conservative,True,29.356081008911133,0.35,0.3,5,-0.34,83,160,0,0,0,0,10000,Conf:160
-aggressive,True,30.052427053451538,0.25,0.2,2,-0.34,83,160,0,0,0,0,10000,Conf:160
-balanced,True,29.187958002090454,0.28,0.23,4,-0.34,83,160,0,0,0,0,10000,Conf:160
