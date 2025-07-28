@@ -4,7 +4,7 @@ hypothesis:
 # Backtesting: Rapid strategy validation with historical data
 backtesting:
     enabled: true
-    model_folder: storage/models/2025-07-27_12:53:02
+    model_folder: storage/models/2025-07-28_10:29:05
     
     # Test on signal-rich period with 1,291 positive signals (44.82% rate)
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
@@ -22,9 +22,9 @@ backtesting:
         max_loops: 2880                               # 48 hours * 60 min = 2880 loops for 2 days
         loop_interval: 0
     
-    # High-quality signal processing (no session filtering for testing)
+    # More realistic signal processing with cleaned model
     signal_processing:
-        confidence_threshold: 0.75                    # Keep high entry threshold
+        confidence_threshold: 0.55                    # Lower threshold for realistic model
         signal_filters: []                            # No session filtering for testing
         min_signal_strength: 0.3                      # Quality filter
         volume_confirmation_required: true            # Volume confirmation
@@ -43,12 +43,12 @@ backtesting:
         max_concurrent_positions: 2
         position_tracking: detailed
     
-    # DISABLE confidence exits - test base strategy performance
+    # Enable intelligent confidence-based exits  
     exit_strategy:
-        confidence_exit_threshold: 0.999              # EXTREMELY HIGH - effectively disable confidence exits
+        confidence_exit_threshold: 0.50               # Exit when model is 50%+ confident compression is over
         signal_strength_decay: 0.90                   # VERY HIGH - effectively disable decay exits  
         volatility_exit_multiplier: 5.0               # VERY HIGH - effectively disable volatility exits
-        minimum_signal_life: 60                       # LONGER - 1 hour minimum
+        minimum_signal_life: 15                       # 15 minutes minimum - allow faster exits
     
     # Signal tracking
     signal_tracking:

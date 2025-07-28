@@ -22,10 +22,7 @@ data_pipeline:
       
       # Context features (market timing & price)
       'london_session',               # Session timing (proven effective)
-      'price_momentum_5',             # 5-period price momentum
-      
-      # Target for binary classification
-      'future_price_change'
+      'price_momentum_5'              # 5-period price momentum
     ]
 
 # Model Training: Random Forest Classifier optimized for Tier 2+ signals
@@ -66,7 +63,7 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: null                               # Process all historical data (null = unlimited)
+        max_loops: 5000                               # Process first 5000 iterations for testing
         loop_interval: 0                              # No delays in backtesting (0 = instant)
     
     # Signal processing (inherit from strategy)

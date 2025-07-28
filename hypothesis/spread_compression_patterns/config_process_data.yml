@@ -21,8 +21,5 @@ data_pipeline:
       
       # Context features (market timing & price)
       'london_session',               # Session timing (proven effective)
-      'price_momentum_5',             # 5-period price momentum
-      
-      # Target for validation
-      'future_price_change'
+      'price_momentum_5'              # 5-period price momentum  
     ]
