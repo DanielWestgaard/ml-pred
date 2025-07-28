@@ -100,6 +100,7 @@ def parse_arguments():
     # Feature importance analysis
     parser.add_argument('--feature-importance', '-fi', default=False, help='Analyze feature importance of processed dataset (path to CSV file).')
     parser.add_argument('--fi-target', default=None, help='Target column for feature importance analysis (auto-detected if not provided).')
+    parser.add_argument('--fi-in-pipeline', action='store_true', default=False, help='Enable feature importance analysis within data pipeline.')
 
     return parser.parse_args()
 
@@ -120,11 +121,14 @@ def main():
             # Use new path structure or fallback to legacy for compatibility
             default_raw_path = args.engineer_data or "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv"
             data_pipeline = EngineeringPipeline(raw_dataset=default_raw_path, 
-                                                save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
+                                                save_cleaned_data=save_cleaned_data, 
+                                                hypothesis_source=args.hypothesis,
+                                                analyze_feature_importance=args.fi_in_pipeline)
         else:
             default_raw_path = args.engineer_data or "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv"
             data_pipeline = EngineeringPipeline(raw_dataset=default_raw_path,
-                                                save_cleaned_data = save_cleaned_data)
+                                                save_cleaned_data=save_cleaned_data,
+                                                analyze_feature_importance=args.fi_in_pipeline)
         
         data_pipeline.run()
 
