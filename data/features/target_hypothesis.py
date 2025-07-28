@@ -97,9 +97,29 @@ class TargetHypothesis(BaseProcessor):
             ]
             
             missing_features = [f for f in required_features if f not in self.df.columns]
+            temp_generated_features = []
+            
             if missing_features:
-                logger.error(f"Missing required features: {missing_features}")
-                return
+                logger.warning(f"Missing required features for target generation: {missing_features}")
+                logger.info("Generating missing features temporarily for target creation...")
+                
+                # Import the ModelAwareFeatureGenerator for on-demand feature generation
+                from data.features.enhanced_generation import ModelAwareFeatureGenerator
+                temp_generator = ModelAwareFeatureGenerator(self.df)
+                
+                # Generate missing features temporarily
+                for feature in missing_features:
+                    if hasattr(temp_generator, f'generate_{feature}'):
+                        logger.debug(f"Temporarily generating {feature}")
+                        temp_generator.__getattribute__(f'generate_{feature}')()
+                        temp_generated_features.append(feature)
+                        logger.debug(f"Successfully generated {feature}")
+                    else:
+                        logger.error(f"Cannot generate missing feature: {feature}")
+                        return
+                
+                # Update our dataframe with temporarily generated features
+                self.df = temp_generator.df
             
             # Future price movement (next 15 periods = 75 minutes for 5m data)
             self.df['future_price_change'] = (
@@ -197,6 +217,12 @@ class TargetHypothesis(BaseProcessor):
             total_signals = (target_values > 0).sum()
             signal_frequency = total_signals / len(self.df) * 100
             logger.info(f"Signal frequency: {total_signals}/{len(self.df)} = {signal_frequency:.2f}% of periods")
+            
+            # Clean up temporarily generated features
+            if temp_generated_features:
+                logger.info(f"Cleaning up temporarily generated features: {temp_generated_features}")
+                self.df = self.df.drop(columns=temp_generated_features)
+                logger.debug("Temporary features removed - maintaining original feature selection")
             
             # Estimate daily frequency (assuming 5-minute bars)
             periods_per_day = 288  # 24 * 60 / 5
