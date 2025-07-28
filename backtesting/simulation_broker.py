@@ -260,13 +260,16 @@ class SimulationBroker:
         """
         total_unrealized_pnl = sum([pos['unrealized_pnl'] for pos in self.open_positions])
         
+        # CRITICAL FIX: Always update current_equity to reflect current balance + unrealized PnL
+        current_equity = self.current_balance + total_unrealized_pnl
+        
         return {
             'initial_capital': self.initial_capital,
             'current_balance': self.current_balance,
-            'current_equity': self.current_equity,
+            'current_equity': current_equity,  # Use calculated value, not stored value
             'unrealized_pnl': total_unrealized_pnl,
-            'total_return': (self.current_equity - self.initial_capital) / self.initial_capital,
-            'total_return_pct': ((self.current_equity - self.initial_capital) / self.initial_capital) * 100,
+            'total_return': (current_equity - self.initial_capital) / self.initial_capital,
+            'total_return_pct': ((current_equity - self.initial_capital) / self.initial_capital) * 100,
             'open_positions_count': len(self.open_positions),
             'total_trades': self.total_trades,
             'winning_trades': self.winning_trades,
