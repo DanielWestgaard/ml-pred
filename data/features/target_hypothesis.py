@@ -89,11 +89,10 @@ class TargetHypothesis(BaseProcessor):
         particularly during London session trading hours when market liquidity changes.
         """
         try:
-            # Required features check - Updated to match optimized 8-feature set
+            # Required features check - Updated to match enhanced feature set
             required_features = [
-                'compression_ratio_micro', 'compression_consistency', 'signal_strength_v2',
-                'volume_ratio', 'volume_acceleration', 'volume_breakout', 
-                'london_session', 'price_momentum_5'
+                'depth_stability', 'liquidity_stress', 'microstructure_health',
+                'volume_ratio', 'london_session', 'signal_conviction'
             ]
             
             missing_features = [f for f in required_features if f not in self.df.columns]
@@ -109,9 +108,12 @@ class TargetHypothesis(BaseProcessor):
                 
                 # Map features to their generator methods
                 feature_generator_map = {
-                    'signal_strength_v2': 'enhanced_signal_strength_calculator',
-                    'volume_breakout': 'advanced_volume_confirmation_features', 
-                    'price_momentum_5': 'price_momentum_5_feature'
+                    'depth_stability': 'enhanced_market_depth_features',
+                    'liquidity_stress': 'enhanced_market_depth_features',
+                    'microstructure_health': 'enhanced_microstructure_health',
+                    'signal_conviction': 'enhanced_predictive_signals',
+                    'volume_ratio': 'volume_ratio_feature',
+                    'london_session': 'fx_trading_sessions'
                 }
                 
                 # Generate missing features temporarily
@@ -134,14 +136,14 @@ class TargetHypothesis(BaseProcessor):
                 self.df['close'].shift(-15) - self.df['close']
             ) / self.df['close']
             
-            # STEP 1: Analyze actual data distributions first
-            logger.info("=== DATA DISTRIBUTION ANALYSIS ===")
-            logger.info(f"Compression ratio micro - Mean: {self.df['compression_ratio_micro'].mean():.4f}, "
-                    f"Std: {self.df['compression_ratio_micro'].std():.4f}, "
-                    f"95th percentile: {self.df['compression_ratio_micro'].quantile(0.95):.4f}")
+            # STEP 1: Analyze enhanced feature distributions
+            logger.info("=== ENHANCED FEATURE DISTRIBUTION ANALYSIS ===")
+            logger.info(f"Depth stability - Mean: {self.df['depth_stability'].mean():.4f}, "
+                    f"Std: {self.df['depth_stability'].std():.4f}, "
+                    f"95th percentile: {self.df['depth_stability'].quantile(0.95):.4f}")
             
-            logger.info(f"Compression consistency - Mean: {self.df['compression_consistency'].mean():.4f}, "
-                    f"95th percentile: {self.df['compression_consistency'].quantile(0.95):.4f}")
+            logger.info(f"Liquidity stress - Mean: {self.df['liquidity_stress'].mean():.4f}, "
+                    f"95th percentile: {self.df['liquidity_stress'].quantile(0.95):.4f}")
             
             logger.info(f"Volume ratio - Mean: {self.df['volume_ratio'].mean():.4f}, "
                     f"95th percentile: {self.df['volume_ratio'].quantile(0.95):.4f}")
@@ -149,49 +151,48 @@ class TargetHypothesis(BaseProcessor):
             logger.info(f"Future price change - Std: {self.df['future_price_change'].std():.6f}, "
                     f"95th percentile: {abs(self.df['future_price_change']).quantile(0.95):.6f}")
             
-            # STEP 2: Use adaptive thresholds based on actual data
-            compression_threshold = self.df['compression_ratio_micro'].quantile(0.80)  # Top 20%
-            consistency_threshold = self.df['compression_consistency'].quantile(0.70)  # Top 30%
+            # STEP 2: Use adaptive thresholds based on enhanced features
+            depth_stability_threshold = self.df['depth_stability'].quantile(0.75)  # Top 25%
+            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.80)  # Top 20% stress
             volume_threshold = max(1.1, self.df['volume_ratio'].quantile(0.75))  # Top 25% but at least 1.1
+            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.60)  # Top 40%
             movement_threshold = abs(self.df['future_price_change']).quantile(0.75)  # Top 25% movements
             
-            logger.info(f"Adaptive thresholds - Compression: {compression_threshold:.4f}, "
-                    f"Consistency: {consistency_threshold:.4f}, "
+            logger.info(f"Enhanced thresholds - Depth stability: {depth_stability_threshold:.4f}, "
+                    f"Liquidity stress: {liquidity_stress_threshold:.4f}, "
                     f"Volume: {volume_threshold:.4f}, "
+                    f"Microstructure health: {microstructure_health_threshold:.4f}, "
                     f"Movement: {movement_threshold:.6f}")
             
-            # STEP 3: Progressive signal strength (instead of hard AND conditions)
+            # STEP 3: Enhanced signal generation using top predictive features
             
-            # Basic compression signal
-            compression_signal = self.df['compression_ratio_micro'] > compression_threshold
+            # Depth-based signal (top predictor)
+            depth_signal = self.df['depth_stability'] > depth_stability_threshold
             
-            # Add consistency bonus
-            compression_with_consistency = (
-                compression_signal & 
-                (self.df['compression_consistency'] > consistency_threshold)
-            )
+            # Liquidity stress signal (indicates compression conditions)
+            stress_signal = self.df['liquidity_stress'] > liquidity_stress_threshold
             
-            # Add volume confirmation
-            strong_compression_signal = (
-                compression_with_consistency & 
-                (self.df['volume_ratio'] > volume_threshold)
-            )
+            # Volume confirmation
+            volume_signal = self.df['volume_ratio'] > volume_threshold
+            
+            # Microstructure health signal
+            health_signal = self.df['microstructure_health'] > microstructure_health_threshold
             
             # Future significant movement
             significant_movement = (
                 abs(self.df['future_price_change']) > movement_threshold
             )
             
-            # STEP 4: Create tiered targets
+            # STEP 4: Create enhanced tiered targets using top predictive features
             
-            # Tier 1: Basic compression + movement
-            basic_signal = compression_signal & significant_movement
+            # Tier 1: Basic depth signal + movement
+            basic_signal = depth_signal & significant_movement
             
-            # Tier 2: Compression + consistency + movement  
-            medium_signal = compression_with_consistency & significant_movement
+            # Tier 2: Depth + liquidity stress + movement (top predictors)
+            medium_signal = depth_signal & stress_signal & significant_movement
             
-            # Tier 3: Full signal (compression + consistency + volume + movement)
-            strong_signal = strong_compression_signal & significant_movement
+            # Tier 3: Multi-factor signal (depth + stress + volume + health + movement)
+            strong_signal = depth_signal & stress_signal & volume_signal & health_signal & significant_movement
             
             # Tier 4: London session bonus
             london_strong_signal = strong_signal & (self.df['london_session'] == 1)
