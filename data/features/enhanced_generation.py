@@ -2235,3 +2235,19 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         self.df['signal_conviction'] = (
             abs(self.df['compression_prediction_strength']) * microstructure_health
         )
+
+    @feature_generator(
+        output_features=['volume'],
+        description="Volume passthrough - ensures volume is available as feature",
+        category="volume"
+    )
+    def volume_passthrough(self):
+        """
+        Simple passthrough for volume column to satisfy feature registry requirements.
+        Volume is typically already available as a basic OHLCV column.
+        """
+        # Volume should already exist, but ensure it's available
+        if 'volume' not in self.df.columns:
+            logger.error("Volume column missing from OHLCV data")
+            self.df['volume'] = 0  # Fallback
+        # Volume already exists, no processing needed
