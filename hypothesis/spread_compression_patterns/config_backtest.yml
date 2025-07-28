@@ -43,9 +43,9 @@ backtesting:
         max_concurrent_positions: 2
         position_tracking: detailed
     
-    # DISABLE confidence exits - test base strategy performance
+    # Enable intelligent confidence-based exits  
     exit_strategy:
-        confidence_exit_threshold: 0.999              # EXTREMELY HIGH - effectively disable confidence exits
+        confidence_exit_threshold: 0.30               # Exit when model is 30%+ confident compression is over
         signal_strength_decay: 0.90                   # VERY HIGH - effectively disable decay exits  
         volatility_exit_multiplier: 5.0               # VERY HIGH - effectively disable volatility exits
         minimum_signal_life: 60                       # LONGER - 1 hour minimum
