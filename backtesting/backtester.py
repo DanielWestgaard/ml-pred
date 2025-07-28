@@ -238,7 +238,7 @@ class BacktestOrchestrator:
             
             # Use 'date' column as timestamp and rename for consistency
             if 'date' in full_data.columns:
-                full_data['timestamp'] = pd.to_datetime(full_data['date'])
+                full_data['timestamp'] = pd.to_datetime(full_data['date'], utc=True)  # Make timezone-aware to match start/end dates
             else:
                 raise ValueError("No 'date' column found in preprocessed data")
             
