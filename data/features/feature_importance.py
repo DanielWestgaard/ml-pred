@@ -126,6 +126,19 @@ class FeatureImportanceAnalyzer:
         # Handle missing values
         features_df = features_df.fillna(features_df.median())
         
+        # Handle infinity values and extremely large values
+        numeric_cols = features_df.select_dtypes(include=[np.number]).columns
+        for col in numeric_cols:
+            # Replace infinity values with NaN, then fill with median
+            features_df[col] = features_df[col].replace([np.inf, -np.inf], np.nan)
+            if features_df[col].isna().any():
+                features_df[col] = features_df[col].fillna(features_df[col].median())
+            
+            # Cap extremely large values at 99.9th percentile
+            upper_cap = features_df[col].quantile(0.999)
+            lower_cap = features_df[col].quantile(0.001)
+            features_df[col] = features_df[col].clip(lower_cap, upper_cap)
+        
         # Remove constant features
         constant_features = [col for col in features_df.columns 
                            if features_df[col].nunique() <= 1]
