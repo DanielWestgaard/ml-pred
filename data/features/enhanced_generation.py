@@ -126,7 +126,12 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             'spread_relative_features': ['spread_relative', 'spread_baseline_true', 'spread_recent_true', 'compression_ratio_true'],
             'multi_timeframe_compression_features': ['compression_ratio_micro', 'compression_ratio_short', 'compression_ratio_medium'],
             'advanced_volume_confirmation_features': ['volume_acceleration', 'volume_breakout', 'volume_spread_correlation'],
-            'enhanced_signal_strength_calculator': ['signal_strength_v2']
+            'enhanced_signal_strength_calculator': ['signal_strength_v2'],
+            'order_flow_imbalance_features': ['price_volume_imbalance', 'institutional_pressure', 'order_flow_momentum'],
+            'institutional_activity_features': ['volume_price_divergence', 'stealth_accumulation', 'distribution_pressure'],
+            'order_flow_wick_features': ['wick_analysis', 'rejection_strength', 'absorption_capacity'],
+            'institutional_footprint_features': ['momentum_volume_sync', 'flow_direction_strength', 'institutional_footprint'],
+            'all_order_flow_features': ['price_volume_imbalance', 'institutional_pressure', 'order_flow_momentum', 'volume_price_divergence', 'stealth_accumulation', 'distribution_pressure', 'wick_analysis', 'rejection_strength', 'absorption_capacity', 'momentum_volume_sync', 'flow_direction_strength', 'institutional_footprint']
         }
         
         for feature_name in feature_names:
@@ -1818,4 +1823,200 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             self.df['spread_baseline_true'] > 0,
             (self.df['spread_baseline_true'] - self.df['spread_recent_true']) / self.df['spread_baseline_true'],
             0
+        )
+
+    # ===== ORDER FLOW IMBALANCE FEATURES =====
+    # These features detect institutional vs retail activity patterns
+    
+    @feature_generator(
+        output_features=['price_volume_imbalance', 'institutional_pressure', 'order_flow_momentum'],
+        description="Order flow imbalance indicators for institutional activity detection",
+        category="order_flow"
+    )
+    def order_flow_imbalance_basic(self):
+        """
+        Detect institutional vs retail activity through price-volume relationships.
+        Based on 1-minute OHLCV patterns that reveal order flow imbalances.
+        """
+        # Price-Volume Imbalance: When large moves happen on small volume vs small moves on large volume
+        price_change = self.df['close'].pct_change()
+        volume_ma_20 = self.df['volume'].rolling(20).mean()
+        
+        # Normalize volume (relative to recent average)
+        relative_volume = np.where(
+            volume_ma_20 > 0,
+            self.df['volume'] / volume_ma_20,
+            1.0
+        )
+        
+        # Price-Volume Imbalance: High price change with low volume suggests institutional efficiency
+        # Low price change with high volume suggests retail noise
+        self.df['price_volume_imbalance'] = np.where(
+            relative_volume > 0,
+            price_change.abs() / relative_volume,  # Higher = more efficient moves (institutional)
+            0
+        )
+        
+        # Institutional Pressure: Sustained directional moves with decreasing volume
+        # Institutions often create price moves that continue even as volume decreases
+        price_momentum_3 = price_change.rolling(3).sum()
+        volume_trend_3 = (self.df['volume'] - self.df['volume'].shift(2)) / self.df['volume'].shift(2)
+        
+        # High momentum with decreasing volume = institutional pressure
+        self.df['institutional_pressure'] = np.where(
+            (price_momentum_3.abs() > 0.001) & (volume_trend_3 < 0),
+            price_momentum_3.abs() * (1 - volume_trend_3),  # Amplify when volume decreases
+            0
+        )
+        
+        # Order Flow Momentum: Persistent directional flow over multiple periods
+        # Institutions create sustained pressure in one direction
+        hl_position = (self.df['close'] - self.df['low']) / (self.df['high'] - self.df['low'])
+        hl_position = hl_position.fillna(0.5)  # Mid-range when high=low
+        
+        # Track if price consistently closes near high/low
+        momentum_signal = (hl_position - 0.5) * 2  # -1 to 1 scale
+        
+        self.df['order_flow_momentum'] = momentum_signal.rolling(5).mean()
+
+    @feature_generator(
+        output_features=['volume_price_divergence', 'stealth_accumulation', 'distribution_pressure'],
+        dependencies=['volume_ratio'],
+        description="Advanced volume-price divergence patterns indicating stealth institutional activity",
+        category="order_flow"
+    )
+    def stealth_institutional_activity(self):
+        """
+        Detect stealth institutional accumulation/distribution through volume-price divergences.
+        These patterns occur when institutions trade to minimize market impact.
+        """
+        price_change = self.df['close'].pct_change()
+        price_range = (self.df['high'] - self.df['low']) / self.df['low']
+        
+        # Volume-Price Divergence: Price moves opposite to what volume suggests
+        # High volume usually causes high volatility, except when institutions absorb flow
+        expected_volatility = self.df['volume_ratio'] * price_range.rolling(20).mean()
+        actual_volatility = price_range
+        
+        self.df['volume_price_divergence'] = np.where(
+            expected_volatility > 0,
+            (expected_volatility - actual_volatility) / expected_volatility,
+            0
+        )
+        
+        # Stealth Accumulation: Price drifts higher on lower-than-expected volume
+        # Institutions slowly accumulate while retail volume is absent
+        price_trend_10 = price_change.rolling(10).sum()
+        volume_expectation = self.df['volume_ratio'].rolling(10).mean()
+        
+        # Positive price trend with below-average volume = stealth accumulation
+        self.df['stealth_accumulation'] = np.where(
+            (price_trend_10 > 0.002) & (volume_expectation < 1.0),
+            price_trend_10 * (1.5 - volume_expectation),  # Stronger signal with lower volume
+            0
+        )
+        
+        # Distribution Pressure: Price weakens despite normal/high volume
+        # Institutions distribute while retail provides liquidity
+        self.df['distribution_pressure'] = np.where(
+            (price_trend_10 < -0.002) & (volume_expectation >= 1.0),
+            price_trend_10.abs() * volume_expectation,  # Stronger signal with higher volume
+            0
+        )
+
+    @feature_generator(
+        output_features=['wick_analysis', 'rejection_strength', 'absorption_capacity'],
+        description="Candlestick wick analysis for order flow absorption and rejection patterns",
+        category="order_flow"
+    )
+    def order_flow_wick_analysis(self):
+        """
+        Analyze candlestick wicks to detect order flow absorption and rejection.
+        Long wicks indicate failed attempts and strong opposing flow.
+        """
+        body_size = (self.df['close'] - self.df['open']).abs()
+        total_range = self.df['high'] - self.df['low']
+        
+        # Upper and lower wick sizes
+        upper_wick = np.where(
+            self.df['close'] >= self.df['open'],
+            self.df['high'] - self.df['close'],  # Green candle
+            self.df['high'] - self.df['open']    # Red candle
+        )
+        
+        lower_wick = np.where(
+            self.df['close'] >= self.df['open'],
+            self.df['open'] - self.df['low'],    # Green candle
+            self.df['close'] - self.df['low']    # Red candle
+        )
+        
+        # Wick Analysis: Ratio of wick to total range
+        self.df['wick_analysis'] = np.where(
+            total_range > 0,
+            (upper_wick + lower_wick) / total_range,
+            0
+        )
+        
+        # Rejection Strength: Long wicks with small bodies indicate strong rejection
+        # High rejection strength suggests institutional resistance at these levels
+        self.df['rejection_strength'] = np.where(
+            (total_range > 0) & (body_size < total_range * 0.3),  # Small body
+            (upper_wick + lower_wick) / total_range,
+            0
+        )
+        
+        # Absorption Capacity: Large body with small wicks indicates strong absorption
+        # High absorption suggests institutional support/resistance absorption
+        self.df['absorption_capacity'] = np.where(
+            (total_range > 0) & (body_size > total_range * 0.7),  # Large body
+            body_size / total_range,
+            0
+        )
+
+    @feature_generator(
+        output_features=['momentum_volume_sync', 'flow_direction_strength', 'institutional_footprint'],
+        dependencies=['volume_ratio'],
+        description="Momentum-volume synchronization patterns revealing institutional footprints",
+        category="order_flow"
+    )
+    def institutional_footprint_detection(self):
+        """
+        Detect institutional footprints through momentum-volume synchronization patterns.
+        Institutions create characteristic patterns in how momentum and volume interact.
+        """
+        price_change = self.df['close'].pct_change()
+        
+        # Momentum-Volume Synchronization
+        # When momentum and volume move together, it suggests authentic institutional flow
+        momentum_3 = price_change.rolling(3).sum()
+        volume_change_3 = self.df['volume_ratio'].rolling(3).mean() - 1
+        
+        # Correlation between momentum and volume changes
+        momentum_volume_corr = pd.Series(momentum_3 * volume_change_3, index=self.df.index)
+        self.df['momentum_volume_sync'] = momentum_volume_corr.rolling(10).mean()
+        
+        # Flow Direction Strength: Consistent directional flow with volume support
+        # Institutions maintain direction better than retail flow
+        up_flow = pd.Series(np.where(price_change > 0, price_change * self.df['volume_ratio'], 0), index=self.df.index)
+        down_flow = pd.Series(np.where(price_change < 0, price_change.abs() * self.df['volume_ratio'], 0), index=self.df.index)
+        
+        net_flow = (up_flow - down_flow).rolling(10).sum()
+        flow_volume = (up_flow + down_flow).rolling(10).sum()
+        
+        self.df['flow_direction_strength'] = np.where(
+            flow_volume > 0,
+            net_flow.abs() / flow_volume,  # Higher = more directional consistency
+            0
+        )
+        
+        # Institutional Footprint: Combined signal of all order flow indicators
+        # Institutions leave characteristic patterns across multiple dimensions
+        price_vol_imbalance = self.df.get('price_volume_imbalance', 0)
+        inst_pressure = self.df.get('institutional_pressure', 0)
+        
+        self.df['institutional_footprint'] = (
+            price_vol_imbalance * 0.3 +
+            inst_pressure * 0.3 +
+            self.df['momentum_volume_sync'].abs() * 0.2 +
+            self.df['flow_direction_strength'] * 0.2
         )
