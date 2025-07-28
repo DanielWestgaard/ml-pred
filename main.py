@@ -96,6 +96,10 @@ def parse_arguments():
     
     # Strategy Execution
     parser.add_argument('--strategy', '-strat', default=False, help='Run strategy with hypothesis config')
+    
+    # Feature importance analysis
+    parser.add_argument('--feature-importance', '-fi', default=False, help='Analyze feature importance of processed dataset (path to CSV file).')
+    parser.add_argument('--fi-target', default=None, help='Target column for feature importance analysis (auto-detected if not provided).')
 
     return parser.parse_args()
 
@@ -253,6 +257,22 @@ def main():
         strategy = StrategyOrchestrator(hypothesis_config=args.strategy)
         strategy_results = strategy.run()
         logger.info(f"Strategy execution completed: {strategy_results.get('status', 'unknown')}")
+    
+    # Feature importance analysis
+    if args.feature_importance:
+        logger.info(f"Starting feature importance analysis on: {args.feature_importance}")
+        from data.features.feature_importance import analyze_processed_data
+        results = analyze_processed_data(args.feature_importance, args.fi_target)
+        logger.info(f"Feature importance analysis completed. Results saved to: {results['output_directory']}")
+        
+        # Show top 10 consensus features in console
+        consensus = results['consensus']
+        print("\n" + "="*60)
+        print("TOP 10 CONSENSUS FEATURES:")
+        print("="*60)
+        for i, (feature, score) in enumerate(consensus.head(10).items(), 1):
+            print(f"{i:2d}. {feature:<30} {score:.4f}")
+        print("="*60)
 
 
 def _strategy_flow(hypothesis_config: str):
