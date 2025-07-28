@@ -6,7 +6,7 @@ model_training:
     type: random_forest                               # Random Forest Classifier optimized for imbalanced data
 
     # Optional: Will use processed data from data pipeline if not specified
-    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
+    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
 
     parameters:                                       # Optimized for spread compression patterns (0.18% positive class)
         n_estimators: 300                             # More trees for rare signal detection
