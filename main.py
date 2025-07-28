@@ -146,7 +146,7 @@ def main():
         conf_keys = conf.keys()
         
         if 'data_pipeline_raw_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
-            data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
+            data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis, analyze_feature_importance=True)
             data_pipeline.run()
         
         # Model Training

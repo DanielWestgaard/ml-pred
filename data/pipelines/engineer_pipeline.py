@@ -19,7 +19,7 @@ logger = get_logger()
 
 
 class EngineeringPipeline():
-    def __init__(self, raw_dataset:str = None, output_path:str = None, save_cleaned_data:bool = False, hypothesis_source:str = None, analyze_feature_importance:bool = False):
+    def __init__(self, raw_dataset:str = None, output_path:str = None, save_cleaned_data:bool = False, hypothesis_source:str = None, analyze_feature_importance:bool = True):
         """
         Pipeline and orchestrator for processing and engineering raw datasets
         into data ready to be used for training.
