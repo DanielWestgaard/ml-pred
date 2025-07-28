@@ -8,7 +8,7 @@ backtesting:
     
     # Test on signal-rich period with 1,291 positive signals (44.82% rate)
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
-    start_date: '2024-06-01'                          # Signal-rich period with 1,291 positive signals
+    start_date: '2024-06-04'                          # Signal-rich period with 1,291 positive signals
     end_date: '2024-06-08'                            # Two days for proper testing
     buffer_size: 200
     
@@ -19,7 +19,7 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: 44640                               # 48 hours * 60 min = 2880 loops for 2 days
+        max_loops: 1000                               # 48 hours * 60 min = 2880 loops for 2 days
         loop_interval: 0
     
     # More realistic signal processing with cleaned model
