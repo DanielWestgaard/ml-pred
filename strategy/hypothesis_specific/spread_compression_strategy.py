@@ -146,10 +146,10 @@ class SpreadCompressionStrategy(BaseStrategy):
                     return True, "strong_contrary_signal"
                 return False, None
         
-        # 1. Confidence-based exit: Exit when model confidence drops significantly
-        if current_prediction == 0 and current_confidence > self.confidence_exit_threshold:
-            logger.debug(f"Confidence exit triggered: {current_confidence:.4f} > {self.confidence_exit_threshold}")
-            return True, "confidence_drop"
+        # 1. Confidence-based exit: DISABLED FOR TESTING - model makes too confident predictions
+        # if current_prediction == 0 and current_confidence > self.confidence_exit_threshold:
+        #     logger.debug(f"Confidence exit triggered: {current_confidence:.4f} > {self.confidence_exit_threshold}")
+        #     return True, "confidence_drop"
         
         # 2. Signal strength decay: Exit when signal deteriorates significantly
         signal_decay = self.signal_tracker.calculate_signal_decay(position_id)

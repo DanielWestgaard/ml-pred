@@ -6,10 +6,10 @@ backtesting:
     enabled: true
     model_folder: storage/models/2025-07-27_12:53:02
     
-    # Test on different optimal period - second best scoring period
+    # Test on signal-rich period with 1,291 positive signals (44.82% rate)
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
-    start_date: '2025-04-14'                          # Second optimal period (Score: 35.2, 842 signals)
-    end_date: '2025-04-15'                            # Single day for quick testing
+    start_date: '2024-10-01'                          # Signal-rich period with 1,291 positive signals
+    end_date: '2024-10-02'                            # Two days for proper testing
     buffer_size: 200
     
     # Capital and costs
@@ -19,7 +19,7 @@ backtesting:
     
     # Execution settings
     execution:
-        max_loops: 1440                               # 24 hours * 60 min = 1440 loops
+        max_loops: 2880                               # 48 hours * 60 min = 2880 loops for 2 days
         loop_interval: 0
     
     # High-quality signal processing (no session filtering for testing)
@@ -43,12 +43,12 @@ backtesting:
         max_concurrent_positions: 2
         position_tracking: detailed
     
-    # MUCH MORE CONSERVATIVE exit strategy to allow pattern development
+    # DISABLE confidence exits - test base strategy performance
     exit_strategy:
-        confidence_exit_threshold: 0.15               # MUCH LOWER - allow pattern to develop (was 0.35)
-        signal_strength_decay: 0.40                   # HIGHER - less sensitive to decay (was 0.17)
-        volatility_exit_multiplier: 2.0               # HIGHER - less sensitive to volatility (was 1.3)
-        minimum_signal_life: 10                       # LONGER - 10 minutes minimum (was 5)
+        confidence_exit_threshold: 0.999              # EXTREMELY HIGH - effectively disable confidence exits
+        signal_strength_decay: 0.90                   # VERY HIGH - effectively disable decay exits  
+        volatility_exit_multiplier: 5.0               # VERY HIGH - effectively disable volatility exits
+        minimum_signal_life: 60                       # LONGER - 1 hour minimum
     
     # Signal tracking
     signal_tracking:
