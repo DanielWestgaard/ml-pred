@@ -19,7 +19,7 @@ logger = get_logger()
 
 
 class EngineeringPipeline():
-    def __init__(self, raw_dataset:str = None, output_path:str = None, save_cleaned_data:bool = False, hypothesis_source:str = None):
+    def __init__(self, raw_dataset:str = None, output_path:str = None, save_cleaned_data:bool = False, hypothesis_source:str = None, analyze_feature_importance:bool = False):
         """
         Pipeline and orchestrator for processing and engineering raw datasets
         into data ready to be used for training.
@@ -32,8 +32,10 @@ class EngineeringPipeline():
               the path to data is provided there and thet trumphs provided raw_dataset argument.
             - output_path: potential output path for processed data (csv format).
             - hypothesis_source: For running pipeline with hypothesis - The path of the hypothesis config.yml-file.
+            - analyze_feature_importance: If True, runs feature importance analysis after feature generation.
         """
         self.output_path = output_path
+        self.analyze_feature_importance = analyze_feature_importance
         
         if hypothesis_source is not None:
             configurations = config_loader.load_hypothesis_config(hypothesis_source).handle_hypothesis_source()
@@ -42,6 +44,7 @@ class EngineeringPipeline():
             self.selected_features = configurations.get('features')
             self.spread_focused = configurations.get('spread_focused', False)
         else:
+            self.hypothesis_name = None
             self.selected_features = None
             self.spread_focused = False
         
@@ -93,11 +96,19 @@ class EngineeringPipeline():
             # Also change target to the hypothesis
             self.hypo = TargetHypothesis(self.df, self.hypothesis_name or "session_based_tod_anomalies_X")
             self.df = self.hypo.run()
+            
+            # Feature importance analysis (after feature generation but before transformation)
+            if self.analyze_feature_importance:
+                self._run_feature_importance_analysis()
         else:
             logger.debug("User did not provide any specific features to be generated - generating all features.")
             self.skip_selection = True
             logger.debug(f"Also, Skip Selection is (currently set to ${self.skip_selection})")
             self.df = self.feature_generator.generate_all()
+            
+            # Feature importance analysis (after feature generation but before transformation)
+            if self.analyze_feature_importance:
+                self._run_feature_importance_analysis()
         
         # Transformation, scaling, handle missing values, etc. of newly generated features
         self.transformation = FeatureTransformer(self.df)
@@ -122,3 +133,37 @@ class EngineeringPipeline():
         logger.info("---------- Data Pipeline Finished ----------")
         
         return self.df
+    
+    def _run_feature_importance_analysis(self):
+        """Run feature importance analysis at optimal point in pipeline"""
+        try:
+            from data.features.feature_importance import FeatureImportanceAnalyzer
+            
+            logger.info("Running feature importance analysis...")
+            
+            # Determine target column
+            target_col = None
+            if hasattr(self, 'hypothesis_name') and self.hypothesis_name:
+                # Look for hypothesis-specific target
+                target_candidates = [col for col in self.df.columns if col.startswith('target_')]
+                if target_candidates:
+                    target_col = target_candidates[0]
+            
+            # Initialize analyzer
+            analyzer = FeatureImportanceAnalyzer(self.df, target_col)
+            
+            # Run analysis and save results
+            results = analyzer.analyze_and_save()
+            
+            # Log top features
+            consensus = results['consensus']
+            logger.info("Feature Importance Analysis Results:")
+            logger.info("Top 10 features by consensus ranking:")
+            for i, (feature, score) in enumerate(consensus.head(10).items(), 1):
+                logger.info(f"  {i:2d}. {feature:<25} {score:.4f}")
+            
+            logger.info(f"Full results saved to: {results['output_directory']}")
+            
+        except Exception as e:
+            logger.error(f"Feature importance analysis failed: {e}")
+            logger.info("Pipeline will continue without feature importance analysis")

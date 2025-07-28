@@ -1,0 +1,10 @@
+28-07-2025 20:09:51 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+28-07-2025 20:09:51 - uncaught_exception                      :164  - CRITICAL - Uncaught exception
+Traceback (most recent call last):
+  File "<string>", line 2, in <module>
+  File "/Users/dmartinsen/pers-prog/ml-pred/data/features/feature_importance.py", line 37, in <module>
+    class FeatureImportanceAnalyzer:
+  File "/Users/dmartinsen/pers-prog/ml-pred/data/features/feature_importance.py", line 276, in FeatureImportanceAnalyzer
+    def analyze_all_methods(self) -> Dict[str, pd.Series]:
+                                     ^^^^
+NameError: name 'Dict' is not defined

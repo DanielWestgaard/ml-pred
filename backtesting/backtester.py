@@ -238,7 +238,7 @@ class BacktestOrchestrator:
             
             # Use 'date' column as timestamp and rename for consistency
             if 'date' in full_data.columns:
-                full_data['timestamp'] = pd.to_datetime(full_data['date'])
+                full_data['timestamp'] = pd.to_datetime(full_data['date'], utc=True)  # Make timezone-aware to match start/end dates
             else:
                 raise ValueError("No 'date' column found in preprocessed data")
             
@@ -488,7 +488,7 @@ class BacktestOrchestrator:
                                     position = self.simulation_broker.get_position(position_id)
                                     if position:
                                         position['entry_features'] = entry_features
-                                        position['entry_time'] = pd.to_datetime(current_data['timestamp'])
+                                        position['entry_time'] = pd.to_datetime(current_data['timestamp'], utc=True)
                                     
                                     # Track with signal tracker
                                     confidence = probabilities[0] if probabilities is not None and len(probabilities) > 0 else 0.8
@@ -646,7 +646,7 @@ class BacktestOrchestrator:
             from datetime import datetime
             if isinstance(entry_time, str):
                 entry_time = pd.to_datetime(entry_time)
-            position_age_minutes = (pd.Timestamp.now() - entry_time).total_seconds() / 60
+            position_age_minutes = (pd.Timestamp.now(tz='UTC') - entry_time).total_seconds() / 60
             if position_age_minutes < self.minimum_signal_life:
                 # Only exit on very strong contrary signals during minimum life period
                 if prediction == 0 and current_confidence > 0.9:

@@ -97,9 +97,37 @@ class TargetHypothesis(BaseProcessor):
             ]
             
             missing_features = [f for f in required_features if f not in self.df.columns]
+            temp_generated_features = []
+            
             if missing_features:
-                logger.error(f"Missing required features: {missing_features}")
-                return
+                logger.warning(f"Missing required features for target generation: {missing_features}")
+                logger.info("Generating missing features temporarily for target creation...")
+                
+                # Import the ModelAwareFeatureGenerator for on-demand feature generation
+                from data.features.enhanced_generation import ModelAwareFeatureGenerator
+                temp_generator = ModelAwareFeatureGenerator(self.df)
+                
+                # Map features to their generator methods
+                feature_generator_map = {
+                    'signal_strength_v2': 'enhanced_signal_strength_calculator',
+                    'volume_breakout': 'advanced_volume_confirmation_features', 
+                    'price_momentum_5': 'price_momentum_5_feature'
+                }
+                
+                # Generate missing features temporarily
+                for feature in missing_features:
+                    generator_method = feature_generator_map.get(feature)
+                    if generator_method and hasattr(temp_generator, generator_method):
+                        logger.debug(f"Temporarily generating {feature} using {generator_method}")
+                        temp_generator.__getattribute__(generator_method)()
+                        temp_generated_features.append(feature)
+                        logger.debug(f"Successfully generated {feature}")
+                    else:
+                        logger.error(f"Cannot generate missing feature: {feature} (no method {generator_method})")
+                        return
+                
+                # Update our dataframe with temporarily generated features
+                self.df = temp_generator.df
             
             # Future price movement (next 15 periods = 75 minutes for 5m data)
             self.df['future_price_change'] = (
@@ -197,6 +225,15 @@ class TargetHypothesis(BaseProcessor):
             total_signals = (target_values > 0).sum()
             signal_frequency = total_signals / len(self.df) * 100
             logger.info(f"Signal frequency: {total_signals}/{len(self.df)} = {signal_frequency:.2f}% of periods")
+            
+            # Clean up temporarily generated features AND future_price_change (data leakage)
+            cleanup_features = temp_generated_features + ['future_price_change']
+            cleanup_features = [f for f in cleanup_features if f in self.df.columns]
+            
+            if cleanup_features:
+                logger.info(f"Cleaning up temporary and leakage features: {cleanup_features}")
+                self.df = self.df.drop(columns=cleanup_features)
+                logger.debug("Temporary and leakage features removed - maintaining clean training data")
             
             # Estimate daily frequency (assuming 5-minute bars)
             periods_per_day = 288  # 24 * 60 / 5

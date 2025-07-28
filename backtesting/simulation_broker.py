@@ -171,16 +171,20 @@ class SimulationBroker:
             
             # Calculate holding period safely
             try:
-                # Ensure timestamps are datetime objects
+                # Ensure timestamps are datetime objects with timezone awareness
                 if isinstance(timestamp, str):
-                    exit_time = pd.to_datetime(timestamp)
+                    exit_time = pd.to_datetime(timestamp, utc=True)
                 else:
                     exit_time = timestamp
+                    if exit_time.tz is None:
+                        exit_time = exit_time.tz_localize('UTC')
                     
                 if isinstance(position['entry_timestamp'], str):
-                    entry_time = pd.to_datetime(position['entry_timestamp'])
+                    entry_time = pd.to_datetime(position['entry_timestamp'], utc=True)
                 else:
                     entry_time = position['entry_timestamp']
+                    if entry_time.tz is None:
+                        entry_time = entry_time.tz_localize('UTC')
                     
                 holding_period_minutes = (exit_time - entry_time).total_seconds() / 60
             except Exception as e:
