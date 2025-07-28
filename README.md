@@ -22,6 +22,7 @@ The approach of using different hypotheses to test and find possible inefficienc
 ├── data/                   # Data engineering (historical & live data streaming)
 ├── model/                  # Model training and management
 ├── hypothesis/             # Hypothesis configurations and documentation
+├── backtesting/            # CURRENTLY UNDER WORK
 ├── evaluation/             # Model evaluation and performance analysis
 ├── strategy/               # Complete trading strategy execution system ✨
 ├── broker/                 # Broker integrations for live trading
