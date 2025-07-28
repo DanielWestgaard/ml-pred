@@ -24,7 +24,7 @@ backtesting:
     
     # More realistic signal processing with cleaned model
     signal_processing:
-        confidence_threshold: 0.55                    # Lower threshold for realistic model
+        confidence_threshold: 0.51                    # Lower threshold to get more signals
         signal_filters: []                            # No session filtering for testing
         min_signal_strength: 0.3                      # Quality filter
         volume_confirmation_required: true            # Volume confirmation
