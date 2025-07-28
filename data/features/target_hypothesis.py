@@ -226,11 +226,14 @@ class TargetHypothesis(BaseProcessor):
             signal_frequency = total_signals / len(self.df) * 100
             logger.info(f"Signal frequency: {total_signals}/{len(self.df)} = {signal_frequency:.2f}% of periods")
             
-            # Clean up temporarily generated features
-            if temp_generated_features:
-                logger.info(f"Cleaning up temporarily generated features: {temp_generated_features}")
-                self.df = self.df.drop(columns=temp_generated_features)
-                logger.debug("Temporary features removed - maintaining original feature selection")
+            # Clean up temporarily generated features AND future_price_change (data leakage)
+            cleanup_features = temp_generated_features + ['future_price_change']
+            cleanup_features = [f for f in cleanup_features if f in self.df.columns]
+            
+            if cleanup_features:
+                logger.info(f"Cleaning up temporary and leakage features: {cleanup_features}")
+                self.df = self.df.drop(columns=cleanup_features)
+                logger.debug("Temporary and leakage features removed - maintaining clean training data")
             
             # Estimate daily frequency (assuming 5-minute bars)
             periods_per_day = 288  # 24 * 60 / 5
