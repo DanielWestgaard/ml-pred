@@ -45,7 +45,7 @@ backtesting:
     
     # Enable intelligent confidence-based exits  
     exit_strategy:
-        confidence_exit_threshold: 0.30               # Exit when model is 30%+ confident compression is over
+        confidence_exit_threshold: 0.50               # Exit when model is 50%+ confident compression is over
         signal_strength_decay: 0.90                   # VERY HIGH - effectively disable decay exits  
         volatility_exit_multiplier: 5.0               # VERY HIGH - effectively disable volatility exits
         minimum_signal_life: 60                       # LONGER - 1 hour minimum
