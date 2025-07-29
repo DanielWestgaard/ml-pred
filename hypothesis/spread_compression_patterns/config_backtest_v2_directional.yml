@@ -3,7 +3,7 @@ hypothesis:
 
 # Backtesting configuration for the three-class directional model
 backtesting:
-  model_path: storage/models/2025-07-29_11:15:48  # Path to the new directional model
+  model_path: storage/models/2025-07-29_12:25:15  # Path to the new V2 directional model
   
   # Use processed data with directional targets
   processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
@@ -14,7 +14,7 @@ backtesting:
       
   # Signal processing configuration for three-class model (moved to backtesting level)
   signal_processing:
-    confidence_threshold: 0.15       # Conservative threshold for quality signals
+    confidence_threshold: 0.05       # Lower threshold for V2 three-class model
     signal_filters: []               # No additional filters
       
   # Position management for directional signals  
