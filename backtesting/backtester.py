@@ -10,7 +10,7 @@ from utils.logging_utils import get_logger
 from utils.hypothesis.config_loader import load_hypothesis_config
 import pickle
 from utils.model.model_metadata_loader import load_model_metadata
-from utils.model.model_type_detector import ModelTypeDetector, PredictionProcessor, get_model_type
+from utils.model.model_type_detector import ModelTypeDetector, PredictionProcessor, get_model_type, ModelType
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
 from strategy.hypothesis_specific.spread_compression_strategy import SpreadCompressionSignalTracker
 
@@ -212,7 +212,6 @@ class BacktestOrchestrator:
         except Exception as e:
             logger.error(f"Error detecting model type: {e}")
             # Fallback to regression
-            from utils.model.model_type_detector import ModelType
             self.model_type = ModelType.REGRESSION
             self.prediction_processor = PredictionProcessor(self.model_type)
             logger.warning("Defaulting to regression model type")
@@ -429,7 +428,12 @@ class BacktestOrchestrator:
                     )
                     
                     predictions = prediction_results['predictions']
-                    probabilities = prediction_results.get('positive_probabilities')
+                    
+                    # For multiclass models, use full probabilities; for binary, use positive_probabilities
+                    if self.model_type.value == 'multiclass_classification':
+                        probabilities = prediction_results.get('probabilities')
+                    else:
+                        probabilities = prediction_results.get('positive_probabilities')
                     
                     # Process prediction into trading signals (no data_buffer needed for preprocessed data)
                     signals = self.signal_processor.process(
@@ -491,7 +495,16 @@ class BacktestOrchestrator:
                                         position['entry_time'] = pd.to_datetime(current_data['timestamp'], utc=True)
                                     
                                     # Track with signal tracker
-                                    confidence = probabilities[0] if probabilities is not None and len(probabilities) > 0 else 0.8
+                                    if probabilities is not None and len(probabilities) > 0:
+                                        if self.model_type == ModelType.MULTICLASS_CLASSIFICATION:
+                                            # For multiclass, use the confidence of the predicted class
+                                            predicted_class = int(predictions[0])
+                                            confidence = float(probabilities[0][predicted_class])
+                                        else:
+                                            # For binary, use scalar probability
+                                            confidence = float(np.squeeze(probabilities[0]))
+                                    else:
+                                        confidence = 0.8
                                     self.signal_tracker.track_entry_signal(position_id, current_data, confidence)
                                 
                                 # Position tracking handled by SimulationBroker
@@ -594,7 +607,14 @@ class BacktestOrchestrator:
             # Check for intelligent exit strategy (spread compression specific)
             if not close_info['should_close'] and predictions is not None and len(predictions) > 0:
                 latest_prediction = predictions[0]  # Most recent prediction
-                latest_probability = probabilities[0] if probabilities is not None else None
+                # For multiclass models, pass the full probability array; for binary, extract scalar
+                if probabilities is not None:
+                    if self.model_type == ModelType.MULTICLASS_CLASSIFICATION:
+                        latest_probability = probabilities[0]  # Full array [prob_hold, prob_buy, prob_sell]
+                    else:
+                        latest_probability = probabilities[0] if isinstance(probabilities[0], (int, float)) else probabilities[0][1]
+                else:
+                    latest_probability = None
                 
                 # Use intelligent exit strategy if available
                 hypothesis_name = self.config.get('hypothesis_name', '')
@@ -607,9 +627,19 @@ class BacktestOrchestrator:
                         close_info['reason'] = exit_reason
                 else:
                     # Fallback to original model exit logic for other hypotheses
-                    if latest_prediction == 0 and (latest_probability is None or (1 - latest_probability) > 0.7):
-                        close_info['should_close'] = True
-                        close_info['reason'] = 'model_exit_signal'
+                    if latest_prediction == 0:
+                        if latest_probability is None:
+                            should_exit = True
+                        elif self.model_type == ModelType.MULTICLASS_CLASSIFICATION:
+                            # For multiclass, check HOLD confidence (class 0)
+                            should_exit = latest_probability[0] > 0.7 if hasattr(latest_probability, '__len__') else True
+                        else:
+                            # For binary, use inverse probability
+                            should_exit = (1 - latest_probability) > 0.7
+                        
+                        if should_exit:
+                            close_info['should_close'] = True
+                            close_info['reason'] = 'model_exit_signal'
             
             if close_info['should_close']:
                 self.simulation_broker.close_position(
@@ -630,8 +660,15 @@ class BacktestOrchestrator:
         """
         if not self.signal_tracker:
             # Fallback to original logic if no signal tracker
-            if prediction == 0 and (probability is None or (1 - probability) > 0.7):
-                return True, 'model_exit_signal'
+            if prediction == 0:
+                if probability is None:
+                    return True, 'model_exit_signal'
+                elif hasattr(probability, '__len__') and len(probability) == 3:
+                    # Multiclass: check HOLD confidence (class 0)
+                    return probability[0] > 0.7, 'model_exit_signal'
+                else:
+                    # Binary: use inverse probability
+                    return (1 - probability) > 0.7, 'model_exit_signal'
             return False, None
         
         position_id = position.get('id', 'unknown')

@@ -1,0 +1,2 @@
+29-07-2025 17:00:15 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+29-07-2025 17:00:17 - utils.model.model_type_detector         :161  - INFO     - Prediction processor initialized for multiclass_classification

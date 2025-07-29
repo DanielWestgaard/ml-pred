@@ -2,7 +2,7 @@ hypothesis:
   name: spread_compression_patterns_v2  # Uses the enhanced v2 target generation method
 
 data_pipeline:
-  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2025-03-02_2025-07-01.csv
   spread_focused: true  # Enable bid-ask spread data preservation (default: false)
 
   selected_features:  # ENHANCED PREDICTIVE FEATURES - Top 15 from comprehensive analysis

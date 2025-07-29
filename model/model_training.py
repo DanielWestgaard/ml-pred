@@ -24,7 +24,7 @@ logger = get_logger()
 
 class ModelTraining():
     """Train a specific ML Model."""
-    def __init__(self, dataset:str = None, model_type:str = None, target_col:str = 'close', hypothesis_source:str = None):
+    def __init__(self, dataset:str = None, model_type:str = None, target_col:str = 'close', hypothesis_source:str = None, use_walk_forward:bool = None):
         """
         Initialize the class by providing specifics.
         
@@ -48,6 +48,14 @@ class ModelTraining():
                 
                 # Extract target column configuration (proper fix)
                 self.configured_target = configurations.get("model_training_target_column")
+                
+                # Extract walk-forward validation configuration
+                self.walk_forward_config = configurations.get("walk_forward", {})
+                if use_walk_forward is None:
+                    # Auto-detect: use walk-forward if config exists or for time series data
+                    self.use_walk_forward = bool(self.walk_forward_config) or self._is_time_series_data()
+                else:
+                    self.use_walk_forward = use_walk_forward
                 
                 try:
                     dataset = configurations.get("model_training_processed_data")
@@ -98,9 +106,23 @@ class ModelTraining():
                 self.dataset_path = dataset
                 self.model_type = model_type
                 self.target_col = target_col
-            
+                
+                # Set walk-forward configuration for non-hypothesis case
+                self.walk_forward_config = {}
+                if use_walk_forward is None:
+                    # Auto-detect for time series data
+                    self.use_walk_forward = False  # Will be set to True after loading data if it's time series
+                else:
+                    self.use_walk_forward = use_walk_forward
+                
                 # Load dataset based on format
                 self.df, self.original_df = data_utils.check_and_return_df(dataset)
+                
+                # Auto-detect walk-forward for time series data in non-hypothesis case
+                if use_walk_forward is None:
+                    self.use_walk_forward = self._is_time_series_data()
+                    if self.use_walk_forward:
+                        logger.info("Auto-detected time series data, enabling walk-forward validation")
             
             # Reading directly from a .csv-file means df will have no index.
             if (self.df.index.name != 'date'):
@@ -132,15 +154,21 @@ class ModelTraining():
             class_name = f"{self.model_type.title().replace('_', '')}Model"
             model_class = getattr(self.model_module, class_name)
             
-            # Split data into train and test
-            self.temporal_train_test_split()
-            
-            # Instantiate model
-            model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
-            # Actually train the model
-            self.training_start_time = time.time()  # not really accurate starting it here, but short term solution
-            self.model = model_instance.train()
-            self.model.type = self.model_type
+            # Choose training approach based on configuration
+            if self.use_walk_forward:
+                logger.info(f"Using Walk-Forward Validation for model training")
+                self.model = self._train_with_walk_forward(model_class)
+            else:
+                logger.info(f"Using simple temporal train/test split for model training")
+                # Split data into train and test
+                self.temporal_train_test_split()
+                
+                # Instantiate model
+                model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+                # Actually train the model
+                self.training_start_time = time.time()  # not really accurate starting it here, but short term solution
+                self.model = model_instance.train()
+                self.model.type = self.model_type
             
             self.save_model()
             
@@ -394,7 +422,7 @@ class ModelTraining():
         # Create metadata dictionary
         metadata = {
             'hypothesis': {
-                'name': _hypothesis(self)
+                'name': self._hypothesis()
             },
             
             'model_info': {
@@ -409,7 +437,10 @@ class ModelTraining():
                 'duration_formatted': str(datetime.timedelta(seconds=int(training_duration))),
                 'completed_at': datetime.datetime.now().isoformat(),
                 'train_samples': int(len(self.X_train)),
-                'test_samples': int(len(self.X_test))
+                'test_samples': int(len(self.X_test)),
+                'validation_method': 'walk_forward' if self.use_walk_forward else 'temporal_split',
+                'walk_forward_periods': getattr(self, 'walk_forward_periods', None),
+                'final_training_period': getattr(self, 'final_training_period', None)
             },
             
             'dataset': {
@@ -452,11 +483,90 @@ class ModelTraining():
             file.write(yaml_content)
         
         logger.info(f"Successfully saved model metadata: {metadata_file}")
+    
+    def _is_time_series_data(self) -> bool:
+        """Check if the dataset appears to be time series data."""
+        if not hasattr(self, 'df') or self.df is None:
+            return False
+        
+        # Check if index is datetime
+        if hasattr(self.df.index, 'dtype') and 'datetime' in str(self.df.index.dtype):
+            return True
+        
+        # Check if there's a datetime column
+        datetime_columns = ['date', 'datetime', 'timestamp', 'time']
+        if any(col in self.df.columns for col in datetime_columns):
+            return True
+        
+        return False
+    
+    def _train_with_walk_forward(self, model_class):
+        """Train model using walk-forward validation approach."""
+        logger.info("Implementing walk-forward validation within model training")
+        
+        # Get walk-forward parameters with defaults
+        initial_training_months = self.walk_forward_config.get('initial_training_months', 6)
+        validation_period_months = self.walk_forward_config.get('validation_period_months', 1)
+        step_forward_months = self.walk_forward_config.get('step_forward_months', 1)
+        
+        # Import walk-forward validator to use its period creation logic
+        from model.walk_forward_validator import WalkForwardValidator
+        
+        # Create a temporary validator instance to use its period logic
+        temp_validator = WalkForwardValidator(
+            hypothesis_config_path=self.hypothesis_source,
+            validation_config={
+                'initial_training_months': initial_training_months,
+                'validation_period_months': validation_period_months,
+                'step_forward_months': step_forward_months,
+                'min_training_samples': 10000  # Lower threshold for model training
+            }
+        )
+        
+        # Load data and create periods
+        data = temp_validator.load_data()
+        periods = temp_validator.create_validation_periods(data)
+        
+        if not periods:
+            logger.warning("No walk-forward periods created, falling back to temporal split")
+            self.temporal_train_test_split()
+            model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+            self.training_start_time = time.time()
+            model = model_instance.train()
+            model.type = self.model_type
+            return model
+        
+        logger.info(f"Training final model using last period with {periods[-1]['training_samples']} samples")
+        
+        # Use the last (most recent) period for final model training
+        final_period = periods[-1]
+        training_data = data.loc[final_period['training_start']:final_period['training_end']].copy()
+        
+        # Set up training data like the regular flow
+        self.df = training_data
+        self.temporal_train_test_split()
+        
+        # Train the final model
+        model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+        self.training_start_time = time.time()
+        model = model_instance.train()
+        model.type = self.model_type
+        
+        # Store walk-forward validation metadata
+        self.walk_forward_periods = len(periods)
+        self.final_training_period = {
+            'start': final_period['training_start'].isoformat(),
+            'end': final_period['training_end'].isoformat(),
+            'samples': final_period['training_samples']
+        }
+        
+        logger.info(f"Walk-forward training completed using {len(periods)} periods")
+        return model
 
-def _hypothesis(self):
-    """Simple method to check if this model is trained on a hypothesis or not, and returns json ready answer."""
-    # If model is trained on hypothesis source: return json of the hypothesis_name
-    if self.hypothesis_source is not None:
-        return f"{config_loader.load_hypothesis_config(self.hypothesis_source).handle_hypothesis_source().get('hypothesis_name')}"
-    else:  # If not, return none
-        return f'{None}'
+    def _hypothesis(self):
+        """Simple method to check if this model is trained on a hypothesis or not, and returns json ready answer."""
+        # If model is trained on hypothesis source: return json of the hypothesis_name
+        if self.hypothesis_source is not None:
+            return f"{config_loader.load_hypothesis_config(self.hypothesis_source).handle_hypothesis_source().get('hypothesis_name')}"
+        else:  # If not, return none
+            return f'{None}'

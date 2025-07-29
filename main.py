@@ -101,6 +101,12 @@ def parse_arguments():
     parser.add_argument('--feature-importance', '-fi', default=False, help='Analyze feature importance of processed dataset (path to CSV file).')
     parser.add_argument('--fi-target', default=None, help='Target column for feature importance analysis (auto-detected if not provided).')
     parser.add_argument('--fi-in-pipeline', action='store_true', default=False, help='Enable feature importance analysis within data pipeline.')
+    
+    # Walk-forward validation
+    parser.add_argument('--walk-forward', '-wf', default=False, help='Run walk-forward validation with hypothesis config file.')
+    parser.add_argument('--wf-training-months', type=int, default=6, help='Initial training period in months for walk-forward validation.')
+    parser.add_argument('--wf-validation-months', type=int, default=1, help='Validation period length in months.')
+    parser.add_argument('--wf-step-months', type=int, default=1, help='Step size between validation periods in months.')
 
     return parser.parse_args()
 
@@ -201,7 +207,7 @@ def main():
         # Enable spread data collection for spread-focused analysis 
         # (use include_spreads=False for backward compatibility with existing pipelines)
         provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE",
-                                                  from_date="2023-01-01T00:00:00", to_date="2025-07-01T01:00:00",
+                                                  from_date="2025-03-02T00:00:00", to_date="2025-07-01T01:00:00",
                                                   print_answer=False, include_spreads=True)
         provider.end_session()
     
@@ -277,6 +283,36 @@ def main():
         for i, (feature, score) in enumerate(consensus.head(10).items(), 1):
             print(f"{i:2d}. {feature:<30} {score:.4f}")
         print("="*60)
+    
+    # Walk-forward validation
+    if args.walk_forward:
+        logger.info(f"Starting walk-forward validation with config: {args.walk_forward}")
+        from model.walk_forward_validator import WalkForwardValidator, create_walk_forward_config
+        
+        # Create validation configuration
+        validation_config = create_walk_forward_config(
+            initial_training_months=args.wf_training_months,
+            validation_period_months=args.wf_validation_months,
+            step_forward_months=args.wf_step_months
+        )
+        
+        validator = WalkForwardValidator(
+            hypothesis_config_path=args.walk_forward,
+            validation_config=validation_config
+        )
+        
+        results = validator.run_validation()
+        
+        # Display summary results
+        print("\n" + "="*80)
+        print("WALK-FORWARD VALIDATION SUMMARY")
+        print("="*80)
+        print(f"Total Validation Periods: {results['validation_summary']['total_periods']}")
+        print(f"Mean Return: {results['performance_metrics']['mean_return']:.4f}")
+        print(f"Mean Win Rate: {results['performance_metrics']['mean_win_rate']:.2%}")
+        print(f"Consistency Ratio: {results['consistency_metrics']['consistency_ratio']:.2%}")
+        print(f"Results saved to: {validator.validation_directory}")
+        print("="*80)
 
 
 def _strategy_flow(hypothesis_config: str):

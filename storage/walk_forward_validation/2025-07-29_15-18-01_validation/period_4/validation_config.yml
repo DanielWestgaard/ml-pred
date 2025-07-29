@@ -1,0 +1,9 @@
+backtesting:
+  confidence_threshold: 0.35
+  data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
+  end_date: '2025-07-02'
+  initial_balance: 10000
+  max_daily_trades: 10
+  max_position_size: 0.02
+  start_date: '2025-06-02'
+  transaction_cost: 0.0001

@@ -1,0 +1,68 @@
+hypothesis:
+  name: spread_compression_patterns_v2
+
+# Model training configuration for walk-forward validation
+model_training:
+    type: random_forest
+    
+    # Data path - will be overridden by walk-forward validator for each period
+    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
+    
+    # Target column for directional three-class system
+    target_column: target_spread_compression_v2_directional
+    
+    # Optimized parameters for three-class directional system
+    parameters:
+        n_estimators: 300
+        max_depth: 12
+        min_samples_split: 4
+        min_samples_leaf: 2
+        class_weight: balanced
+        bootstrap: true
+        oob_score: true
+        random_state: 42
+        n_jobs: -1
+        max_features: sqrt
+
+# Backtesting configuration for each validation period
+backtesting:
+    # Date range will be overridden by walk-forward validator
+    start_date: '2025-01-01'
+    end_date: '2025-07-25'
+    
+    # Trading parameters
+    initial_balance: 10000
+    transaction_cost: 0.0001
+    slippage: 0.00005
+    
+    # Model-based signal processing
+    confidence_threshold: 0.35      # Minimum confidence for trade signals
+    max_position_size: 0.02         # Maximum 2% position size
+    max_daily_trades: 10            # Limit daily trade frequency
+    
+    # Risk management
+    stop_loss_pct: 0.02            # 2% stop loss
+    take_profit_pct: 0.04          # 4% take profit
+    
+    # Exit strategy configuration
+    exit_strategy:
+        use_model_exits: true       # Use model confidence for position exits
+        min_hold_minutes: 15        # Minimum position hold time
+        max_hold_minutes: 75        # Maximum position hold time
+        exit_confidence_threshold: 0.3  # Exit when confidence drops below this
+
+# Walk-forward validation specific configuration
+walk_forward:
+    initial_training_months: 6      # Initial training period (6 months)
+    validation_period_months: 1     # Each validation period (1 month)
+    step_forward_months: 1          # Step between periods (1 month)
+    min_training_samples: 50000     # Minimum samples required for training
+    
+    # Optional: Advanced configuration
+    retrain_frequency: 'monthly'    # How often to retrain model
+    validation_metrics:             # Metrics to track across periods
+        - 'total_return'
+        - 'win_rate' 
+        - 'sharpe_ratio'
+        - 'max_drawdown'
+        - 'total_trades'

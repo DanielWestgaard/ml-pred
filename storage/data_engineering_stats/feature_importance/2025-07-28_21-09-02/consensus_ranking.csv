@@ -1,13 +1,3 @@
-,consensus_score
-compression_ratio_micro,1.0
-volume_price_divergence,0.615536506486467
-volume_ratio,0.5085860628502491
-volume_spread_correlation,0.3738503965010401
-flow_direction_strength,0.3533015983466829
-institutional_footprint,0.3532344119624279
-volume_acceleration,0.3058732002213518
-price_volume_imbalance,0.22098025820082529
-london_session,0.21053173357112484
-compression_consistency,0.18187185830672956
-mid_price,0.07202931279513598
-future_price_change,0.012453029998005436
+version https://git-lfs.github.com/spec/v1
+oid sha256:bb9ee07e6877706209038003c02563ffff0586e4d621428178bb8f1447ecc6bb
+size 482
