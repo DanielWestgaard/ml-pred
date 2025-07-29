@@ -100,6 +100,8 @@ class SignalProcessor:
         """
         if self.model_type == ModelType.BINARY_CLASSIFICATION:
             return self._convert_classification_prediction(prediction, probability, index)
+        elif self.model_type == ModelType.MULTICLASS_CLASSIFICATION:
+            return self._convert_classification_prediction(prediction, probability, index)
         elif self.model_type == ModelType.REGRESSION:
             return self._convert_regression_prediction(prediction, index)
         else:
