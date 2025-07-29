@@ -203,7 +203,7 @@ class PredictionProcessor:
         return {
             'predictions': predictions,
             'probabilities': probabilities,
-            'positive_probabilities': probabilities[:, 1] if probabilities is not None else None,
+            'positive_probabilities': probabilities[:, 1] if probabilities is not None and probabilities.shape[1] == 2 else None,
             'confidence_scores': confidence_scores
         }
     
