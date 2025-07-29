@@ -1,0 +1,90 @@
+hypothesis:
+  name: spread_compression_patterns_v2
+model_info:
+  model_type: random_forest
+  model_class: RandomForestClassifier
+  storage_path: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-29_20:54:53
+  created_at: '2025-07-29T20:54:53.585236'
+
+training:
+  duration_seconds: 27.78
+  duration_formatted: 0:00:27
+  completed_at: '2025-07-29T20:54:53.585248'
+  train_samples: 421632
+  test_samples: 105409
+  validation_method: walk_forward
+  walk_forward_periods: 5
+  final_training_period:
+    start: '2024-01-01T22:05:00+00:00'
+    end: '2025-01-01T22:05:00+00:00'
+    samples: 527041
+
+dataset:
+  dataset_path: storage/data/capital_com/GBPUSD/processed/1m/2024-01-01_2025-03-01.csv
+  target_column: target_spread_compression_v2_directional
+  feature_count: 25
+  features:
+  - microstructure_momentum_fusion
+  - cumulative_order_flow
+  - top_predictor_interaction
+  - price_level_support
+  - liquidity_stress
+  - microstructure_health
+  - low
+  - depth_stability_enhanced
+  - spread_regime_stability
+  - volume
+  - compression_prediction_strength
+  - open
+  - institutional_footprint
+  - volume_ratio
+  - depth_stability
+  - ultra_momentum_suite
+  - signal_conviction
+  - london_session
+  - intrabar_pressure
+  - close
+  - high
+  - volume_profile_enhanced
+  - depth_variability
+  - tick_intensity
+  - close_og
+  total_samples: 527041
+  date_range:
+    start: '2024-01-01 22:05:00+00:00'
+    end: '2025-01-01 22:05:00+00:00'
+  missing_values: 0
+
+model_parameters:
+  bootstrap: true
+  ccp_alpha: 0.0
+  class_weight: balanced
+  criterion: gini
+  max_depth: 10
+  max_features: sqrt
+  max_leaf_nodes: null
+  max_samples: null
+  min_impurity_decrease: 0.0
+  min_samples_leaf: 2
+  min_samples_split: 5
+  min_weight_fraction_leaf: 0.0
+  monotonic_cst: null
+  n_estimators: 300
+  n_jobs: -1
+  oob_score: true
+  random_state: 42
+  verbose: 0
+  warm_start: false
+
+system_info:
+  cpu: arm
+  cpu_cores: 10
+  cpu_threads: 10
+  memory_gb: 16.0
+  python_version: 3.11.13
+  os: Darwin 24.5.0
+
+data_split:
+  train_size: 421632
+  test_size: 105409
+  split_ratio: 421632/105409
