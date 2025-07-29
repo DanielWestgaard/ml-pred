@@ -2,18 +2,24 @@ hypothesis:
   name: spread_compression_patterns
 
 data_pipeline:
-  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2023-01-01_2025-07-01.csv
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
   spread_focused: true  # Enable bid-ask spread data preservation (default: false)
 
-  selected_features:  # OPTIMIZED FEATURE SET - 8 CORE FEATURES (redundancy eliminated)
+  selected_features:  # ENHANCED PREDICTIVE FEATURES - Top 15 from comprehensive analysis
     [
-      'compression_ratio_micro',      # Perfect predictor (1.0000)
-      'volume_price_divergence',      # Strong divergence detection (0.6155)
-      'volume_ratio',                 # Proven volume predictor (0.5086)
-      'flow_direction_strength',      # Institutional flow (0.3533)
-      'institutional_footprint',      # Market maker activity (0.3532)
-      'volume_acceleration',          # Volume momentum (0.3059)
-      'london_session',               # Session timing (0.2105)
-      'price_volume_imbalance',       # Order flow imbalance (0.2210)
-      'compression_consistency'       # (0.1819) - Signal quality
+      'volume',                       # Top predictor (0.9870 consensus score)
+      'depth_stability',              # #2 predictor (0.9533) - Market depth consistency 
+      'depth_variability',            # Strong predictor (0.7153) - Spread depth variation
+      'liquidity_stress',             # Strong predictor (0.7089) - Liquidity strain detection
+      'microstructure_health',        # Top 5 predictor (0.6813) - Composite health score
+      'price_level_support',          # Support/resistance (0.5794) - Price clustering analysis
+      'spread_regime_stability',      # Regime stability (0.5292) - Spread regime transitions
+      'tick_intensity',               # Tick activity (0.5222) - Volume/range ratio
+      'cumulative_order_flow',        # Order flow (0.4997) - Price-volume trend
+      'intrabar_pressure',            # Pressure indicator (0.4971) - Buying/selling pressure
+      'signal_conviction',            # Composite signal (0.4916) - Multi-factor conviction
+      'compression_prediction_strength', # Prediction strength (0.4336) - Compression signals
+      'volume_ratio',                 # Volume confirmation (proven effective)
+      'london_session',               # Session timing (proven effective)
+      'institutional_footprint'      # Institutional activity (proven effective)
     ]

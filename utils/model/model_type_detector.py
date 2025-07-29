@@ -44,8 +44,18 @@ class ModelTypeDetector:
         classification_keywords = ['classifier', 'classification']
         if any(keyword in model_class_name for keyword in classification_keywords):
             if hasattr(model, 'predict_proba'):
-                logger.info(f"Detected binary classification model: {model.__class__.__name__}")
-                return ModelType.BINARY_CLASSIFICATION
+                # Check number of classes to distinguish binary vs multi-class
+                if hasattr(model, 'classes_'):
+                    n_classes = len(model.classes_)
+                    if n_classes == 2:
+                        logger.info(f"Detected binary classification model: {model.__class__.__name__} (2 classes)")
+                        return ModelType.BINARY_CLASSIFICATION
+                    elif n_classes > 2:
+                        logger.info(f"Detected multi-class classification model: {model.__class__.__name__} ({n_classes} classes)")
+                        return ModelType.MULTICLASS_CLASSIFICATION
+                else:
+                    logger.info(f"Detected binary classification model (assumed): {model.__class__.__name__}")
+                    return ModelType.BINARY_CLASSIFICATION
             logger.info(f"Detected classification model (no probabilities): {model.__class__.__name__}")
             return ModelType.BINARY_CLASSIFICATION
         
@@ -163,6 +173,8 @@ class PredictionProcessor:
         """
         if self.model_type == ModelType.BINARY_CLASSIFICATION:
             return self._process_classification_predictions(model, features)
+        elif self.model_type == ModelType.MULTICLASS_CLASSIFICATION:
+            return self._process_multiclass_predictions(model, features)
         elif self.model_type == ModelType.REGRESSION:
             return self._process_regression_predictions(model, features)
         else:
@@ -192,6 +204,30 @@ class PredictionProcessor:
             'predictions': predictions,
             'probabilities': probabilities,
             'positive_probabilities': probabilities[:, 1] if probabilities is not None else None,
+            'confidence_scores': confidence_scores
+        }
+    
+    def _process_multiclass_predictions(self, model: Any, features: np.ndarray) -> Dict[str, np.ndarray]:
+        """Process multi-class classification predictions"""
+        predictions = model.predict(features)
+        
+        # Get probabilities if available
+        probabilities = None
+        confidence_scores = None
+        
+        if hasattr(model, 'predict_proba'):
+            probabilities = model.predict_proba(features)
+            # For multi-class, confidence is the maximum probability across all classes
+            confidence_scores = np.max(probabilities, axis=1)
+        else:
+            # No probabilities available - use fixed confidence based on predicted class
+            # For three-class directional: higher confidence for non-hold classes
+            confidence_scores = np.where(predictions == 0, 0.3, 0.7)  # HOLD=0.3, BUY/SELL=0.7
+        
+        return {
+            'predictions': predictions,
+            'probabilities': probabilities,
+            'positive_probabilities': None,  # Not applicable for multi-class
             'confidence_scores': confidence_scores
         }
     

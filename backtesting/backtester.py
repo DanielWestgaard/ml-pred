@@ -635,7 +635,20 @@ class BacktestOrchestrator:
             return False, None
         
         position_id = position.get('id', 'unknown')
-        current_confidence = probability if prediction == 1 else (1 - probability) if probability else 0
+        # Handle three-class model probabilities correctly
+        if probability is not None:
+            if hasattr(probability, '__len__') and len(probability) == 3:
+                # Three-class model: [prob_hold, prob_buy, prob_sell]
+                current_confidence = probability[prediction]
+            elif prediction == 1:
+                # Binary model: prediction 1 uses direct probability
+                current_confidence = probability
+            else:
+                # Binary model: prediction 0 uses inverse probability
+                current_confidence = 1 - probability if probability is not None else 0
+        else:
+            # No probability available - use default confidence
+            current_confidence = 0.6 if prediction > 0 else 0.4
         
         # Update signal tracking
         self.signal_tracker.update_signal_strength(position_id, current_data, current_confidence)

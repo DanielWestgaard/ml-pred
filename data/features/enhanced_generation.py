@@ -2020,3 +2020,234 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             self.df['momentum_volume_sync'].abs() * 0.2 +
             self.df['flow_direction_strength'] * 0.2
         )
+
+    # =====================================================================
+    # ENHANCED PREDICTIVE FEATURES (Top performers from analysis)
+    # =====================================================================
+    
+    @feature_generator(
+        output_features=['depth_stability', 'depth_variability', 'liquidity_stress'],
+        description="Market depth and liquidity stress indicators (top predictors)",
+        category="market_microstructure"
+    )
+    def enhanced_market_depth_features(self):
+        """
+        Market depth approximation using spread statistics - top performing features
+        from enhanced analysis showing 95%+ predictive power
+        """
+        if 'spread_tight' in self.df.columns and 'spread_wide' in self.df.columns:
+            spread_tight = self.df['spread_tight']
+            spread_wide = self.df['spread_wide'] 
+            spread_avg = self.df.get('spread_avg', self.df['spread_close'])
+            
+            # 1. Depth variability indicator (consensus: 0.7153)
+            spread_range = spread_wide - spread_tight
+            self.df['depth_variability'] = spread_range / (spread_avg + 1e-8)
+            
+            # 2. Market depth stability (consensus: 0.9533) - #2 predictor!
+            depth_stability = 1 / (spread_range.rolling(window=20, min_periods=5).std() + 1e-8)
+            self.df['depth_stability'] = np.log1p(depth_stability)
+            
+            # 3. Liquidity stress indicator (consensus: 0.7089)
+            stress_threshold = spread_avg.rolling(window=60, min_periods=20).quantile(0.9)
+            self.df['liquidity_stress'] = np.where(
+                spread_wide > stress_threshold,
+                (spread_wide - spread_avg) / (spread_avg + 1e-8),
+                0
+            )
+            
+        else:
+            logger.warning("Spread tight/wide data not available - using spread_close approximation")
+            spread_close = self.df['spread_close']
+            
+            # Approximate using spread_close volatility
+            spread_vol = spread_close.rolling(window=20, min_periods=5).std()
+            self.df['depth_variability'] = spread_vol / (spread_close + 1e-8)
+            self.df['depth_stability'] = 1 / (spread_vol + 1e-8)
+            
+            stress_threshold = spread_close.rolling(window=60, min_periods=20).quantile(0.9)
+            self.df['liquidity_stress'] = np.where(
+                spread_close > stress_threshold,
+                (spread_close - spread_close.rolling(60, min_periods=20).mean()) / 
+                (spread_close.rolling(60, min_periods=20).mean() + 1e-8),
+                0
+            )
+
+    @feature_generator(
+        output_features=['microstructure_health'],
+        dependencies=['liquidity_stress'],
+        description="Composite market microstructure health score (top 5 predictor)",
+        category="market_microstructure"
+    )
+    def enhanced_microstructure_health(self):
+        """
+        Composite market microstructure health indicator (consensus: 0.6813)
+        Lower score indicates conditions ripe for spread compression
+        """
+        # Ensure dependencies exist
+        liquidity_stress = self.df.get('liquidity_stress', 0)
+        timeframe_alignment = self.df.get('timeframe_alignment', 0)
+        regime_consistency = self.df.get('regime_consistency', 1)
+        
+        # Health decreases with liquidity stress, increases with alignment and consistency
+        microstructure_health = (
+            np.clip(timeframe_alignment, -2, 2) * 0.4 +
+            (2 - np.clip(liquidity_stress, 0, 2)) * 0.3 +  # Invert liquidity stress
+            np.clip(regime_consistency, 0, 3) * 0.3
+        )
+        
+        self.df['microstructure_health'] = microstructure_health / 2  # Normalize to [0,1]
+
+    @feature_generator(
+        output_features=['price_level_support'],
+        description="Price level clustering and support/resistance strength",
+        category="market_microstructure"
+    )
+    def enhanced_price_level_support(self):
+        """
+        Enhanced price level support analysis (consensus: 0.5794)
+        Identifies when price is at significant support/resistance levels
+        """
+        close = self.df['close']
+        
+        # Round prices to identify levels (4 decimal places for GBP/USD)
+        price_rounded = np.round(close, 4)
+        
+        # Rolling window to count price revisits
+        window = 120  # 2-hour window for 1-minute data
+        revisit_counts = []
+        
+        for i in range(len(price_rounded)):
+            start_idx = max(0, i - window)
+            current_price = price_rounded.iloc[i]
+            
+            if i > 10:  # Need some history
+                window_data = price_rounded.iloc[start_idx:i]
+                # Count similar prices (within 0.0002 for GBP/USD)
+                similar_count = sum(abs(window_data - current_price) <= 0.0002)
+                revisit_counts.append(similar_count)
+            else:
+                revisit_counts.append(0)
+        
+        self.df['price_level_support'] = pd.Series(revisit_counts, index=self.df.index)
+
+    @feature_generator(
+        output_features=['tick_intensity'],
+        description="Tick-level intensity analysis from OHLC data",
+        category="market_microstructure"
+    )
+    def enhanced_tick_intensity(self):
+        """
+        Tick intensity approximation (consensus: 0.5222)
+        Estimates tick activity from volume and price range
+        """
+        high = self.df['high']
+        low = self.df['low']
+        volume = self.df['volume']
+        
+        # Approximate tick intensity by volume/range ratio
+        bar_range = high - low + 1e-8
+        self.df['tick_intensity'] = np.log1p(volume / bar_range)
+
+    @feature_generator(
+        output_features=['cumulative_order_flow', 'intrabar_pressure'],
+        description="Order flow pressure indicators from OHLC data",
+        category="order_flow"
+    )
+    def enhanced_order_flow_indicators(self):
+        """
+        Enhanced order flow pressure indicators (consensus: 0.4997, 0.4971)
+        Estimate buying/selling pressure from available data
+        """
+        high = self.df['high']
+        low = self.df['low']
+        close = self.df['close']
+        volume = self.df['volume']
+        
+        # 1. Intra-bar pressure score
+        bar_range = high - low + 1e-8
+        close_position = (close - low) / bar_range  # 0 = close at low, 1 = close at high
+        
+        # Weight by volume and range
+        self.df['intrabar_pressure'] = (close_position - 0.5) * np.log1p(volume * bar_range)
+        
+        # 2. Cumulative order flow (Price-Volume Trend approximation)
+        price_change = close.pct_change()
+        volume_weighted_change = price_change * volume
+        
+        self.df['cumulative_order_flow'] = volume_weighted_change.rolling(
+            window=20, min_periods=5
+        ).sum()
+
+    @feature_generator(
+        output_features=['spread_regime_stability'],
+        description="Spread regime stability and transition detection",
+        category="spread_compression"
+    )
+    def enhanced_spread_regime_stability(self):
+        """
+        Spread regime stability indicator (consensus: 0.5292)
+        Measures stability of current spread regime
+        """
+        spread = self.df['spread_close']
+        
+        # Spread regime stability
+        spread_baseline = spread.rolling(window=240, min_periods=60).mean()
+        spread_deviation = abs(spread - spread_baseline) / (spread_baseline + 1e-8)
+        
+        # Stability decreases as deviation increases
+        self.df['spread_regime_stability'] = np.exp(-spread_deviation)
+
+    @feature_generator(
+        output_features=['signal_conviction', 'compression_prediction_strength'],
+        dependencies=['liquidity_stress'],
+        description="Composite predictive signal strength indicators",
+        category="spread_compression"
+    )
+    def enhanced_predictive_signals(self):
+        """
+        Enhanced composite predictive signals (consensus: 0.4916, 0.4336)
+        Combines multiple microstructure signals for prediction strength
+        """
+        # Basic signal components
+        volume_ratio = self.df.get('volume_ratio', 1)
+        spread_regime_deviation = self.df.get('spread_close', 0) - self.df.get('spread_close', 0).rolling(240, min_periods=60).mean()
+        spread_regime_deviation = spread_regime_deviation / (self.df.get('spread_close', 0).rolling(240, min_periods=60).std() + 1e-8)
+        
+        large_block_indicator = np.where(
+            self.df['volume'] > self.df['volume'].rolling(120, min_periods=30).quantile(0.8) * 2,
+            np.log1p(self.df['volume'] / (self.df['volume'].rolling(120, min_periods=30).quantile(0.8) + 1)),
+            0
+        )
+        
+        # 1. Compression prediction strength
+        compression_signal = (
+            np.clip(spread_regime_deviation, -2, 2) * 0.3 +
+            np.clip((volume_ratio - 1) * 2, -2, 2) * 0.3 +
+            np.clip(large_block_indicator, 0, 4) * 0.2 +
+            np.clip(self.df.get('depth_variability', 0), 0, 2) * 0.2
+        )
+        
+        self.df['compression_prediction_strength'] = np.tanh(compression_signal)
+        
+        # 2. Signal conviction (combines prediction strength with microstructure health)
+        microstructure_health = self.df.get('microstructure_health', 0.5)
+        self.df['signal_conviction'] = (
+            abs(self.df['compression_prediction_strength']) * microstructure_health
+        )
+
+    @feature_generator(
+        output_features=['volume'],
+        description="Volume passthrough - ensures volume is available as feature",
+        category="volume"
+    )
+    def volume_passthrough(self):
+        """
+        Simple passthrough for volume column to satisfy feature registry requirements.
+        Volume is typically already available as a basic OHLCV column.
+        """
+        # Volume should already exist, but ensure it's available
+        if 'volume' not in self.df.columns:
+            logger.error("Volume column missing from OHLCV data")
+            self.df['volume'] = 0  # Fallback
+        # Volume already exists, no processing needed

@@ -9,7 +9,8 @@
       "Bash(mkdir:*)",
       "Bash(rm:*)",
       "Bash(mv:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(cut:*)"
     ],
     "deny": []
   }
