@@ -1,5 +1,5 @@
 hypothesis:
-  name: spread_compression_patterns
+  name: spread_compression_patterns_v2
 
 # Data Pipeline: Process raw data with optimized 8-feature set
 data_pipeline:

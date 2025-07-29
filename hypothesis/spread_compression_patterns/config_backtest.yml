@@ -1,5 +1,5 @@
 hypothesis:
-  name: spread_compression_patterns
+  name: spread_compression_patterns_v2
 
 # Backtesting: Rapid strategy validation with historical data
 backtesting:

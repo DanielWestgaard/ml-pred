@@ -1,5 +1,5 @@
 hypothesis:
-  name: spread_compression_model_training_walk_forward
+  name: spread_compression_patterns_v2
 
 # Model training with walk-forward validation (no backtesting)
 model_training:
