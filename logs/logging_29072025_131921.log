@@ -1,0 +1,127 @@
+29-07-2025 13:19:21 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+29-07-2025 13:19:21 - __main__                                :26   - INFO     - 🚀 Starting clean model retraining to fix class imbalance
+29-07-2025 13:19:21 - __main__                                :27   - INFO     - ======================================================================
+29-07-2025 13:19:21 - __main__                                :30   - INFO     - 📊 Step 1: Loading processed data...
+29-07-2025 13:19:22 - __main__                                :38   - INFO     - ✅ Loaded 427,741 rows of data
+29-07-2025 13:19:22 - __main__                                :41   - INFO     - 🎯 Step 2: Generating clean V2 directional targets...
+29-07-2025 13:19:22 - utils.data_utils                        :250  - DEBUG    - Loading                              date  ...  close_og
+0       2024-10-01 00:00:00+00:00  ...   1.33773
+1       2024-10-01 00:01:00+00:00  ...   1.33774
+2       2024-10-01 00:02:00+00:00  ...   1.33773
+3       2024-10-01 00:03:00+00:00  ...   1.33777
+4       2024-10-01 00:04:00+00:00  ...   1.33779
+...                           ...  ...       ...
+427736  2025-07-25 00:56:00+00:00  ...   1.35054
+427737  2025-07-25 00:57:00+00:00  ...   1.35069
+427738  2025-07-25 00:58:00+00:00  ...   1.35068
+427739  2025-07-25 00:59:00+00:00  ...   1.35075
+427740  2025-07-25 01:00:00+00:00  ...   1.35089
+
+[427741 rows x 25 columns]
+29-07-2025 13:19:22 - data.features.target_hypothesis         :39   - INFO     - ---------- Running Hypothesis Targeting ----------
+29-07-2025 13:19:22 - utils.shared_utils                      :124  - DEBUG    - Starting shared utility method list_of_functions_in_class().
+29-07-2025 13:19:22 - utils.shared_utils                      :141  - DEBUG    - Successfully populated list with functions in provided class! ['session_based_tod_anomalies', 'spread_compression_patterns', 'spread_compression_patterns_v2']
+29-07-2025 13:19:22 - utils.shared_utils                      :98   - DEBUG    - Starting shared utility method safely_execute().
+29-07-2025 13:19:22 - data.features.target_hypothesis         :319  - INFO     - === ENHANCED TARGET V2 ANALYSIS ===
+29-07-2025 13:19:22 - data.features.target_hypothesis         :320  - INFO     - Depth stability (TOP predictor): Mean 8.4908, 70th: 8.8961, 80th: 9.0687
+29-07-2025 13:19:22 - data.features.target_hypothesis         :324  - INFO     - Institutional footprint: Mean 0.0512, 75th: 0.0875
+29-07-2025 13:19:22 - data.features.target_hypothesis         :329  - INFO     - Price volatility thresholds: 75th percentile: 0.884505, 90th percentile: 2.446584
+29-07-2025 13:19:22 - data.features.target_hypothesis         :349  - INFO     - ENHANCED V2 Thresholds:
+29-07-2025 13:19:22 - data.features.target_hypothesis         :350  - INFO     -   Depth stability (primary): 8.5845
+29-07-2025 13:19:22 - data.features.target_hypothesis         :351  - INFO     -   Institutional activity: 0.0556
+29-07-2025 13:19:22 - data.features.target_hypothesis         :352  - INFO     -   Liquidity stress: 1.1538
+29-07-2025 13:19:22 - data.features.target_hypothesis         :353  - INFO     -   Volume confirmation: 1.0200
+29-07-2025 13:19:22 - data.features.target_hypothesis         :354  - INFO     -   Movement threshold: 28.537607
+29-07-2025 13:19:22 - data.features.target_hypothesis         :395  - INFO     - Market bias distribution (no future data):
+29-07-2025 13:19:22 - data.features.target_hypothesis         :396  - INFO     -   Bullish bias: 13107 (3.1%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :397  - INFO     -   Bearish bias: 23826 (5.6%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :398  - INFO     -   Neutral bias: 390808 (91.4%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :499  - INFO     - === DIRECTIONAL TARGET V2 RESULTS ===
+29-07-2025 13:19:22 - data.features.target_hypothesis         :500  - INFO     - Three-class directional distribution: {0: 406157, 1: 9736, 2: 11848}
+29-07-2025 13:19:22 - data.features.target_hypothesis         :501  - INFO     -   Class 0 (HOLD): 406157 (95.0%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :502  - INFO     -   Class 1 (BUY):  9736 (2.3%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :503  - INFO     -   Class 2 (SELL): 11848 (2.8%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :505  - INFO     - Long signal score distribution: {0: 418005, 1: 4377, 2: 5359}
+29-07-2025 13:19:22 - data.features.target_hypothesis         :506  - INFO     - Short signal score distribution: {0: 415893, 1: 5976, 2: 5872}
+29-07-2025 13:19:22 - data.features.target_hypothesis         :507  - INFO     - Binary distribution (any signal): {0: 406157, 1: 21584}
+29-07-2025 13:19:22 - data.features.target_hypothesis         :518  - INFO     - Signal frequency breakdown:
+29-07-2025 13:19:22 - data.features.target_hypothesis         :519  - INFO     -   Long signals:  9736/427741 = 2.28%
+29-07-2025 13:19:22 - data.features.target_hypothesis         :520  - INFO     -   Short signals: 11848/427741 = 2.77%
+29-07-2025 13:19:22 - data.features.target_hypothesis         :521  - INFO     -   Total signals: 21584/427741 = 5.05%
+29-07-2025 13:19:22 - data.features.target_hypothesis         :526  - INFO     - Long/Short balance ratio: 0.822 (1.0 = perfect balance)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :529  - INFO     - ✅ GOOD: Balanced long/short signal distribution
+29-07-2025 13:19:22 - data.features.target_hypothesis         :540  - INFO     - Three-class balance: 95.0% hold / 2.3% buy / 2.8% sell
+29-07-2025 13:19:22 - data.features.target_hypothesis         :556  - INFO     - === SIGNAL DISTRIBUTION ANALYSIS ===
+29-07-2025 13:19:22 - data.features.target_hypothesis         :559  - INFO     - Long signal distribution by quality level:
+29-07-2025 13:19:22 - data.features.target_hypothesis         :564  - INFO     -   Long Level 1: 4377 signals (1.023%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :564  - INFO     -   Long Level 2: 5359 signals (1.253%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :566  - INFO     - Short signal distribution by quality level:
+29-07-2025 13:19:22 - data.features.target_hypothesis         :571  - INFO     -   Short Level 1: 5976 signals (1.397%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :571  - INFO     -   Short Level 2: 5872 signals (1.373%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :578  - INFO     - ✅ Total long signals: 9736 (2.28%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :581  - INFO     - ✅ Total short signals: 11848 (2.77%)
+29-07-2025 13:19:22 - data.features.target_hypothesis         :583  - INFO     - ✅ Enhanced target generation V2 completed successfully!
+29-07-2025 13:19:22 - utils.shared_utils                      :105  - DEBUG    - Successfully ran function spread_compression_patterns_v2().
+29-07-2025 13:19:22 - __main__                                :57   - INFO     - ✅ Clean targets generated successfully
+29-07-2025 13:19:23 - __main__                                :64   - INFO     - 📈 Class distribution analysis:
+29-07-2025 13:19:23 - __main__                                :68   - INFO     -   HOLD (Class 0): 406,157 samples (94.95%)
+29-07-2025 13:19:23 - __main__                                :68   - INFO     -   BUY (Class 1): 9,736 samples (2.28%)
+29-07-2025 13:19:23 - __main__                                :68   - INFO     -   SELL (Class 2): 11,848 samples (2.77%)
+29-07-2025 13:19:23 - __main__                                :75   - INFO     - ✅ Smallest class is 2.28% - reasonable for balanced training
+29-07-2025 13:19:23 - __main__                                :78   - INFO     - 🤖 Step 3: Training Random Forest with balanced class weights...
+29-07-2025 13:19:27 - __main__                                :87   - INFO     - 💾 Saved clean training data to storage/temp_clean_training_data.csv
+29-07-2025 13:19:27 - model.model_training                    :37   - INFO     - ---------- Initiating Model Training ----------
+29-07-2025 13:19:27 - model.model_training                    :92   - INFO     - Model Training initialized without hypothesis configuration.
+29-07-2025 13:19:27 - utils.data_utils                        :250  - DEBUG    - Loading storage/temp_clean_training_data.csv
+29-07-2025 13:19:28 - model.model_training                    :110  - DEBUG    - Successfully made index to date
+29-07-2025 13:19:28 - __main__                                :97   - INFO     - 🏋️  Starting model training...
+29-07-2025 13:19:28 - model.model_training                    :124  - INFO     - ---------- Starting to run training of random_forest Model ... ----------
+29-07-2025 13:19:28 - model.model_training                    :257  - DEBUG    - Successfully imported model.model_factory.random_forest
+29-07-2025 13:19:28 - model.model_training                    :289  - INFO     - Excluding columns to prevent data leakage: ['target_spread_compression_v2_long_score', 'target_spread_compression_v2_short_score', 'target_spread_compression_v2_directional', 'target_spread_compression_v2_binary']
+29-07-2025 13:19:28 - model.model_training                    :291  - DEBUG    - Successfully set Features (X), with 20 columns/features (excluded 4 leaked columns)
+29-07-2025 13:19:28 - model.model_training                    :294  - DEBUG    - and Target (y), 'target_spread_compression_v2_directional', 427741 values.
+29-07-2025 13:19:28 - utils.model.model_utils                 :56   - DEBUG    - ✓ y is in correct format
+29-07-2025 13:19:28 - utils.model.model_utils                 :63   - DEBUG    - ✓ X is in correct format
+29-07-2025 13:19:28 - utils.model.model_utils                 :68   - DEBUG    - Index type: <class 'pandas.core.indexes.datetimes.DatetimeIndex'>
+29-07-2025 13:19:28 - utils.model.model_utils                 :69   - DEBUG    - Index dtype: datetime64[ns, UTC]
+29-07-2025 13:19:28 - utils.model.model_utils                 :70   - DEBUG    - Index sample: DatetimeIndex(['2024-10-01 00:00:00+00:00', '2024-10-01 00:01:00+00:00',
+               '2024-10-01 00:02:00+00:00', '2024-10-01 00:03:00+00:00',
+               '2024-10-01 00:04:00+00:00'],
+              dtype='datetime64[ns, UTC]', name='date', freq=None)
+29-07-2025 13:19:28 - utils.model.model_utils                 :71   - DEBUG    - Index frequency: None
+29-07-2025 13:19:28 - model.model_factory.random_forest       :37   - DEBUG    - ----- Initializing Random Forest Classifier Model -----
+29-07-2025 13:19:28 - model.model_factory.random_forest       :46   - WARNING  - Random Forest Classifier expects binary classification, but found 3 unique targets: [0 1 2]
+29-07-2025 13:19:28 - model.model_factory.random_forest       :48   - DEBUG    - Training data shape: X_train (342192, 20), y_train (342192,)
+29-07-2025 13:19:28 - model.model_factory.random_forest       :49   - DEBUG    - Target distribution: {0: 325127, 2: 9392, 1: 7673}
+29-07-2025 13:19:28 - model.model_factory.random_forest       :60   - INFO     - ---------- Starting to train Random Forest Classifier Model! ----------
+29-07-2025 13:19:28 - model.model_factory.random_forest       :85   - DEBUG    - Random Forest parameters: {'n_estimators': 300, 'max_depth': 10, 'min_samples_split': 5, 'min_samples_leaf': 2, 'class_weight': 'balanced', 'bootstrap': True, 'oob_score': True, 'random_state': 42, 'n_jobs': -1, 'warm_start': False, 'max_features': 'sqrt', 'max_samples': None}
+29-07-2025 13:19:28 - model.model_factory.random_forest       :89   - INFO     - Training on imbalanced data - Class distribution: {0: 325127, 2: 9392, 1: 7673}
+29-07-2025 13:19:28 - model.model_factory.random_forest       :100  - DEBUG    - Fitting Random Forest Classifier...
+29-07-2025 13:19:43 - model.model_factory.random_forest       :104  - INFO     - Successfully trained Random Forest Classifier!
+29-07-2025 13:19:43 - model.model_factory.random_forest       :105  - INFO     - Model contains 300 trees
+29-07-2025 13:19:43 - model.model_factory.random_forest       :108  - INFO     - Out-of-bag score: 0.9847
+29-07-2025 13:19:43 - model.model_factory.random_forest       :133  - INFO     - Top 8 Most Important Features for Spread Compression:
+29-07-2025 13:19:43 - model.model_factory.random_forest       :135  - INFO     -   volume_ratio: 0.3113
+29-07-2025 13:19:43 - model.model_factory.random_forest       :135  - INFO     -   volume: 0.2107
+29-07-2025 13:19:43 - model.model_factory.random_forest       :135  - INFO     -   institutional_footprint: 0.1332
+29-07-2025 13:19:43 - model.model_factory.random_forest       :135  - INFO     -   depth_stability: 0.0922
+29-07-2025 13:19:43 - model.model_factory.random_forest       :135  - INFO     -   close: 0.0586
+29-07-2025 13:19:43 - model.model_factory.random_forest       :135  - INFO     -   low: 0.0348
+29-07-2025 13:19:43 - model.model_factory.random_forest       :135  - INFO     -   high: 0.0344
+29-07-2025 13:19:43 - model.model_factory.random_forest       :135  - INFO     -   price_level_support: 0.0236
+29-07-2025 13:19:43 - model.model_factory.random_forest       :139  - DEBUG    - Key spread compression feature importance:
+29-07-2025 13:19:43 - model.model_factory.random_forest       :143  - DEBUG    -   volume_ratio: 0.3113
+29-07-2025 13:19:43 - model.model_training                    :321  - DEBUG    - Creating directory now.
+29-07-2025 13:19:43 - model.model_training                    :329  - INFO     - Successfully saved trained model: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-29_13:19:43/random_forest.pkl
+29-07-2025 13:19:43 - model.model_training                    :454  - INFO     - Successfully saved model metadata: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-29_13:19:43/model_metadata.yml
+29-07-2025 13:19:43 - __main__                                :104  - INFO     - ✅ Model training completed successfully
+29-07-2025 13:19:43 - __main__                                :108  - INFO     - 📁 New model saved to: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-29_13:19:43
+29-07-2025 13:19:43 - __main__                                :132  - INFO     - ✅ Updated config to use new model: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-29_13:19:43
+29-07-2025 13:19:43 - __main__                                :139  - INFO     - 🧹 Cleaned up temporary files
+29-07-2025 13:19:43 - __main__                                :141  - INFO     - 🎉 Clean model retraining completed successfully!
+29-07-2025 13:19:43 - __main__                                :142  - INFO     - ======================================================================
+29-07-2025 13:19:43 - __main__                                :143  - INFO     - Next steps:
+29-07-2025 13:19:43 - __main__                                :144  - INFO     - 1. Run backtesting with updated config
+29-07-2025 13:19:43 - __main__                                :145  - INFO     - 2. Monitor for improved performance vs previous -5% return
+29-07-2025 13:19:43 - __main__                                :146  - INFO     - 3. Check that model uses proper three-class predictions
+29-07-2025 13:19:44 - __main__                                :156  - INFO     - ✅ All done!

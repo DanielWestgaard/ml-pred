@@ -4,7 +4,7 @@ hypothesis:
 # Backtesting: Rapid strategy validation with historical data
 backtesting:
     enabled: true
-    model_folder: storage/models/2025-07-29_11:15:48
+    model_folder: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-29_13:19:43
     
     # Extended test period for better statistical significance
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
@@ -24,7 +24,7 @@ backtesting:
     
     # Adjusted signal processing for enhanced features model
     signal_processing:
-        confidence_threshold: 0.15                   # Much lower threshold based on actual model output (0.01-0.09)
+        confidence_threshold: 0.35                   # Increased threshold for three-class model with balanced weights
         signal_filters: []                            # No session filtering for testing
         min_signal_strength: 0.1                     # Lower quality filter to match model behavior
         volume_confirmation_required: false          # Disable to test pure model performance

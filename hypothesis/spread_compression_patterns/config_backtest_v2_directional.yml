@@ -26,7 +26,7 @@ backtesting:
   risk_management:
     stop_loss: 0.0015               # 1.5 pips stop loss
     take_profit: 0.003              # 3.0 pips take profit (2:1 reward:risk)
-    max_daily_loss: 0.02            # 2% max daily loss
+    # max_daily_loss: 0.02            # 2% max daily loss
       
   # Backtesting parameters
   parameters:
