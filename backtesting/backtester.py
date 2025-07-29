@@ -429,7 +429,12 @@ class BacktestOrchestrator:
                     )
                     
                     predictions = prediction_results['predictions']
-                    probabilities = prediction_results.get('positive_probabilities')
+                    
+                    # For multiclass models, use full probabilities; for binary, use positive_probabilities
+                    if self.model_type.value == 'multiclass_classification':
+                        probabilities = prediction_results.get('probabilities')
+                    else:
+                        probabilities = prediction_results.get('positive_probabilities')
                     
                     # Process prediction into trading signals (no data_buffer needed for preprocessed data)
                     signals = self.signal_processor.process(
