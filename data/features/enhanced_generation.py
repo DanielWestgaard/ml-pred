@@ -2247,6 +2247,201 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         Volume is typically already available as a basic OHLCV column.
         """
         # Volume should already exist, but ensure it's available
+
+    # ================================================================================
+    # ENHANCED FEATURES FOR 1-MINUTE PREDICTION OPTIMIZATION
+    # ================================================================================
+    # These features address gaps identified in the feature analysis for ultra-short
+    # prediction horizons, building on proven top performers.
+
+    @feature_generator(
+        output_features=['depth_stability_enhanced', 'depth_volume_confluence', 'depth_regime_shift'],
+        dependencies=['depth_stability', 'volume_ratio'],
+        description="Enhanced depth stability with momentum, volume confirmation, and regime detection",
+        category="microstructure_enhanced"
+    )
+    def enhanced_depth_stability_features(self):
+        """
+        PRIORITY 1: Enhance the top predictor (depth_stability: 96.7% consensus)
+        
+        Adds momentum acceleration, volume confirmation, and regime change detection
+        to amplify the predictive power of the strongest existing feature.
+        """
+        # Ensure dependencies exist
+        if 'depth_stability' not in self.df.columns or 'volume_ratio' not in self.df.columns:
+            logger.warning("Missing dependencies for enhanced depth stability features")
+            return
+        
+        # 1. Depth stability momentum and acceleration
+        depth_momentum = self.df['depth_stability'].diff()
+        depth_acceleration = depth_momentum.diff()
+        
+        # 2. Volume-confirmed depth signals (confluence of top 2 predictors)
+        self.df['depth_volume_confluence'] = (
+            self.df['depth_stability'] * self.df['volume_ratio']
+        ).rolling(window=3, min_periods=1).mean()
+        
+        # 3. Depth stability regime changes (detecting shifts in market structure)
+        depth_baseline = self.df['depth_stability'].rolling(window=20, min_periods=5).quantile(0.8)
+        self.df['depth_regime_shift'] = (
+            self.df['depth_stability'] > depth_baseline
+        ).astype(float)
+        
+        # 4. Enhanced depth stability composite
+        self.df['depth_stability_enhanced'] = (
+            self.df['depth_stability'] * 1.0 +                    # Base signal (100%)
+            depth_momentum.fillna(0) * 0.3 +                      # Momentum component (30%)
+            depth_acceleration.fillna(0) * 0.2 +                  # Acceleration component (20%)
+            self.df['depth_regime_shift'] * 0.5                   # Regime shift bonus (50%)
+        )
+        
+        # Clip to prevent extreme values
+        self.df['depth_stability_enhanced'] = np.clip(self.df['depth_stability_enhanced'], -3, 3)
+        
+        logger.debug("Enhanced depth stability features generated successfully")
+
+    @feature_generator(
+        output_features=['ultra_momentum_1min', 'ultra_momentum_2min', 'momentum_persistence', 
+                        'momentum_volume_sync', 'ultra_momentum_suite'],
+        dependencies=[],
+        description="Ultra-high-frequency momentum optimized for 1-minute predictions",
+        category="momentum_enhanced"
+    )
+    def ultra_high_frequency_momentum(self):
+        """
+        PRIORITY 2: Add ultra-high-frequency momentum suite
+        
+        Fills the critical gap for 1-minute prediction horizons with:
+        - Ultra-short momentum (1-2 periods)
+        - Momentum persistence scoring
+        - Volume-momentum synchronization
+        """
+        # 1. Ultra-short momentum with noise filtering
+        self.df['ultra_momentum_1min'] = self.df['close'].pct_change(periods=1)
+        self.df['ultra_momentum_2min'] = self.df['close'].pct_change(periods=2)
+        
+        # 2. Momentum persistence scoring (directional consistency)
+        momentum_1_direction = (self.df['ultra_momentum_1min'] > 0).astype(int) - (self.df['ultra_momentum_1min'] < 0).astype(int)
+        momentum_2_direction = (self.df['ultra_momentum_2min'] > 0).astype(int) - (self.df['ultra_momentum_2min'] < 0).astype(int)
+        
+        self.df['momentum_persistence'] = (
+            momentum_1_direction + momentum_2_direction
+        ) / 2.0  # Normalize to [-1, 1]
+        
+        # 3. Momentum with volume confirmation (sync between price and volume momentum)
+        volume_momentum = self.df.get('volume_ratio', 1) - 1.0  # Volume above/below baseline
+        self.df['momentum_volume_sync'] = self.df['ultra_momentum_1min'] * volume_momentum
+        
+        # 4. Ultra momentum suite composite
+        self.df['ultra_momentum_suite'] = (
+            self.df['momentum_persistence'] * 0.5 +               # Persistence (50%)
+            self.df['momentum_volume_sync'] * 0.3 +               # Volume sync (30%)
+            np.tanh(self.df['ultra_momentum_1min'] * 100) * 0.2   # Normalized momentum (20%)
+        )
+        
+        # Clip extreme values
+        self.df['ultra_momentum_suite'] = np.clip(self.df['ultra_momentum_suite'], -2, 2)
+        
+        logger.debug("Ultra-high-frequency momentum features generated successfully")
+
+    @feature_generator(
+        output_features=['volume_percentile', 'volume_compression_confluence', 
+                        'volume_efficiency', 'volume_profile_enhanced'],
+        dependencies=['volume_ratio'],
+        description="Enhanced volume profile analysis for professional-grade volume signals",
+        category="volume_enhanced"
+    )
+    def enhanced_volume_analysis(self):
+        """
+        PRIORITY 3: Enhanced volume profile analysis
+        
+        Builds on volume_ratio (91.2% consensus) with:
+        - Volume percentile ranking
+        - Volume-compression confluence detection
+        - Volume-weighted price movement efficiency
+        """
+        # Ensure volume_ratio dependency exists
+        if 'volume_ratio' not in self.df.columns:
+            logger.warning("Missing volume_ratio dependency for enhanced volume analysis")
+            return
+        
+        # 1. Volume percentile ranking (detect unusual volume)
+        self.df['volume_percentile'] = (
+            self.df['volume'].rolling(window=240, min_periods=60).rank(pct=True)
+        )
+        
+        # 2. Volume-compression confluence (unusual volume during compression)
+        compression_signal = self.df.get('compression_ratio_micro', 0)
+        compression_threshold = compression_signal.rolling(window=120, min_periods=30).quantile(0.7)
+        
+        self.df['volume_compression_confluence'] = (
+            (self.df['volume_percentile'] > 0.9) & 
+            (compression_signal > compression_threshold)
+        ).astype(float)
+        
+        # 3. Volume-weighted price movement efficiency
+        price_change = abs(self.df['close'].pct_change())
+        self.df['volume_efficiency'] = price_change / (self.df['volume_ratio'] + 1e-8)
+        
+        # 4. Volume profile enhanced composite
+        self.df['volume_profile_enhanced'] = (
+            self.df['volume_percentile'] * 0.4 +                  # Percentile ranking (40%)
+            self.df['volume_compression_confluence'] * 0.3 +      # Confluence detection (30%)
+            np.tanh(self.df['volume_efficiency'] * 10) * 0.3      # Efficiency normalized (30%)
+        )
+        
+        # Clip extreme values
+        self.df['volume_profile_enhanced'] = np.clip(self.df['volume_profile_enhanced'], 0, 2)
+        
+        logger.debug("Enhanced volume profile features generated successfully")
+
+    @feature_generator(
+        output_features=['top_predictor_interaction', 'microstructure_momentum_fusion'],
+        dependencies=['depth_stability', 'volume_ratio', 'institutional_footprint'],
+        description="Feature interactions combining top predictors for enhanced signal quality",
+        category="interactions_enhanced"
+    )
+    def enhanced_feature_interactions(self):
+        """
+        PRIORITY 4: Feature interaction combinations
+        
+        Intelligently combines top 3 predictors:
+        - depth_stability (96.7% consensus)
+        - volume_ratio (91.2% consensus) 
+        - institutional_footprint (87.8% consensus)
+        """
+        # Ensure dependencies exist
+        required_features = ['depth_stability', 'volume_ratio', 'institutional_footprint']
+        missing_features = [f for f in required_features if f not in self.df.columns]
+        
+        if missing_features:
+            logger.warning(f"Missing features for interactions: {missing_features}")
+            return
+        
+        # 1. Top predictor interaction (multiplicative combination of top 3)
+        self.df['top_predictor_interaction'] = (
+            self.df['depth_stability'] * 
+            self.df['volume_ratio'] * 
+            self.df['institutional_footprint']
+        )
+        
+        # Apply cube root to reduce extreme values while preserving sign
+        self.df['top_predictor_interaction'] = np.sign(self.df['top_predictor_interaction']) * \
+                                              np.abs(self.df['top_predictor_interaction']) ** (1/3)
+        
+        # 2. Microstructure-momentum fusion
+        ultra_momentum = self.df.get('ultra_momentum_suite', 0)
+        microstructure_health = self.df.get('microstructure_health', 0.5)
+        
+        self.df['microstructure_momentum_fusion'] = (
+            self.df['top_predictor_interaction'] * 0.6 +         # Structural signal (60%)
+            ultra_momentum * microstructure_health * 0.4         # Momentum with health filter (40%)
+        )
+        
+        # Clip extreme values
+        self.df['microstructure_momentum_fusion'] = np.clip(self.df['microstructure_momentum_fusion'], -2, 2)
+        
+        logger.debug("Enhanced feature interactions generated successfully")
         if 'volume' not in self.df.columns:
             logger.error("Volume column missing from OHLCV data")
             self.df['volume'] = 0  # Fallback
