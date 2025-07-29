@@ -5,9 +5,9 @@ data_pipeline:
   raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-01-01_2025-03-01.csv
   spread_focused: true
 
-  selected_features:  # TEST COMBINATION 1: Top 3 traditional features
+  selected_features:  # TEST COMBINATION 2: Top 3 Enhanced features (RETRY)
     [
-      'depth_stability',                 # 0.967 - TOP traditional predictor  
-      'volume_ratio',                    # 0.912 - Strong volume confirmation
-      'institutional_footprint'          # 0.878 - Institutional detection
+      'microstructure_momentum_fusion',  # 0.999 - Best enhanced feature
+      'top_predictor_interaction',       # 0.905 - Combined top predictors
+      'volume_profile_enhanced'          # 0.600 - Enhanced volume analysis
     ]
