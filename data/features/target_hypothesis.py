@@ -131,10 +131,7 @@ class TargetHypothesis(BaseProcessor):
                 # Update our dataframe with temporarily generated features
                 self.df = temp_generator.df
             
-            # Future price movement (next 15 periods = 75 minutes for 5m data)
-            self.df['future_price_change'] = (
-                self.df['close'].shift(-15) - self.df['close']
-            ) / self.df['close']
+            # REMOVED: Future price movement causes data leakage in target generation
             
             # STEP 1: Analyze enhanced feature distributions
             logger.info("=== ENHANCED FEATURE DISTRIBUTION ANALYSIS ===")
@@ -148,15 +145,15 @@ class TargetHypothesis(BaseProcessor):
             logger.info(f"Volume ratio - Mean: {self.df['volume_ratio'].mean():.4f}, "
                     f"95th percentile: {self.df['volume_ratio'].quantile(0.95):.4f}")
             
-            logger.info(f"Future price change - Std: {self.df['future_price_change'].std():.6f}, "
-                    f"95th percentile: {abs(self.df['future_price_change']).quantile(0.95):.6f}")
-            
             # STEP 2: Use adaptive thresholds based on enhanced features (RELAXED for better balance)
             depth_stability_threshold = self.df['depth_stability'].quantile(0.60)  # Top 40% (more signals)
             liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.70)  # Top 30% stress (more signals)
             volume_threshold = max(1.05, self.df['volume_ratio'].quantile(0.65))  # Top 35% but at least 1.05
             microstructure_health_threshold = self.df['microstructure_health'].quantile(0.50)  # Top 50% (more signals)
-            movement_threshold = abs(self.df['future_price_change']).quantile(0.65)  # Top 35% movements (more signals)
+            
+            # Use price volatility for movement threshold instead of future data
+            price_volatility = self.df['close'].pct_change().rolling(window=100).std()
+            movement_threshold = price_volatility.quantile(0.75)  # Top 25% volatility periods
             
             logger.info(f"Enhanced thresholds - Depth stability: {depth_stability_threshold:.4f}, "
                     f"Liquidity stress: {liquidity_stress_threshold:.4f}, "
@@ -178,10 +175,9 @@ class TargetHypothesis(BaseProcessor):
             # Microstructure health signal
             health_signal = self.df['microstructure_health'] > microstructure_health_threshold
             
-            # Future significant movement
-            significant_movement = (
-                abs(self.df['future_price_change']) > movement_threshold
-            )
+            # Use current volatility for movement detection (no future data)
+            current_volatility = self.df['close'].pct_change().rolling(window=5).std()
+            significant_movement = current_volatility > movement_threshold
             
             # STEP 4: Create enhanced tiered targets using top predictive features
             
@@ -227,26 +223,26 @@ class TargetHypothesis(BaseProcessor):
             signal_frequency = total_signals / len(self.df) * 100
             logger.info(f"Signal frequency: {total_signals}/{len(self.df)} = {signal_frequency:.2f}% of periods")
             
-            # Clean up temporarily generated features AND future_price_change (data leakage)
-            cleanup_features = temp_generated_features + ['future_price_change']
+            # Clean up temporarily generated features (no future data was created)
+            cleanup_features = temp_generated_features
             cleanup_features = [f for f in cleanup_features if f in self.df.columns]
             
             if cleanup_features:
-                logger.info(f"Cleaning up temporary and leakage features: {cleanup_features}")
+                logger.info(f"Cleaning up temporary features: {cleanup_features}")
                 self.df = self.df.drop(columns=cleanup_features)
-                logger.debug("Temporary and leakage features removed - maintaining clean training data")
+                logger.debug("Temporary features cleaned up")
             
             # Estimate daily frequency (assuming 5-minute bars)
             periods_per_day = 288  # 24 * 60 / 5
             estimated_daily_signals = signal_frequency / 100 * periods_per_day
             logger.info(f"Estimated daily signals: {estimated_daily_signals:.1f}")
             
-            # STEP 7: Quick validation of each tier
+            # STEP 7: Signal tier distribution (no future validation to prevent data leakage)
             for tier in [1, 2, 3, 4]:
-                tier_mask = target_values == tier
-                if tier_mask.sum() > 0:
-                    tier_movement = abs(self.df[tier_mask]['future_price_change']).mean()
-                    logger.info(f"Tier {tier} average movement: {tier_movement:.6f} ({tier_mask.sum()} events)")
+                tier_count = (target_values == tier).sum()
+                if tier_count > 0:
+                    tier_pct = tier_count / len(self.df) * 100
+                    logger.info(f"Tier {tier}: {tier_count} events ({tier_pct:.3f}%)")
             
             return True
             
@@ -316,10 +312,8 @@ class TargetHypothesis(BaseProcessor):
                 # Update our dataframe with temporarily generated features
                 self.df = temp_generator.df
             
-            # Future price movement (next 15 periods for target validation)
-            self.df['future_price_change'] = (
-                self.df['close'].shift(-15) - self.df['close']
-            ) / self.df['close']
+            # REMOVED: Future price movement causes data leakage
+            # Target generation should be based only on current market conditions
             
             # STEP 1: Enhanced feature distribution analysis
             logger.info("=== ENHANCED TARGET V2 ANALYSIS ===")
@@ -330,9 +324,11 @@ class TargetHypothesis(BaseProcessor):
             logger.info(f"Institutional footprint: Mean {self.df['institutional_footprint'].mean():.4f}, "
                     f"75th: {self.df['institutional_footprint'].quantile(0.75):.4f}")
             
-            logger.info(f"Movement threshold candidates: "
-                    f"60th: {abs(self.df['future_price_change']).quantile(0.60):.6f}, "
-                    f"65th: {abs(self.df['future_price_change']).quantile(0.65):.6f}")
+            # Use price volatility statistics instead of future data
+            price_returns = self.df['close'].pct_change()
+            logger.info(f"Price volatility thresholds: "
+                    f"75th percentile: {abs(price_returns).quantile(0.75):.6f}, "
+                    f"90th percentile: {abs(price_returns).quantile(0.90):.6f}")
             
             # STEP 2: ENHANCED THRESHOLDS - Much more sensitive for 10%+ target
             # Primary filter: Top predictor (depth_stability) - lowered to 50th percentile for more signals
@@ -345,8 +341,10 @@ class TargetHypothesis(BaseProcessor):
             volume_threshold = max(1.02, self.df['volume_ratio'].quantile(0.60))        # Lowered from 70th and 1.05
             signal_conviction_threshold = self.df['signal_conviction'].quantile(0.60)    # Lowered from 70th
             
-            # Movement threshold - more sensitive for more signals
-            movement_threshold = abs(self.df['future_price_change']).quantile(0.50)      # Lowered from 60th
+            # Movement threshold - use statistical thresholds instead of future data
+            # Base movement threshold on historical price volatility
+            price_volatility = self.df['close'].pct_change().rolling(window=100).std()
+            movement_threshold = price_volatility.quantile(0.75)  # Top 25% volatility periods
             
             logger.info(f"ENHANCED V2 Thresholds:")
             logger.info(f"  Depth stability (primary): {depth_stability_threshold:.4f}")
@@ -372,34 +370,49 @@ class TargetHypothesis(BaseProcessor):
             # London session amplifier
             london_bonus = (self.df['london_session'] == 1)
             
-            # STEP 4: DIRECTIONAL SIGNAL GENERATION - Three-class system
+            # STEP 4: DIRECTIONAL SIGNAL GENERATION - Based on current market conditions only
             
-            # Directional movement detection
-            upward_movement = self.df['future_price_change'] > movement_threshold      # BUY signals
-            downward_movement = self.df['future_price_change'] < -movement_threshold   # SELL signals
-            no_movement = (abs(self.df['future_price_change']) <= movement_threshold)  # HOLD signals
+            # Use current price momentum and volume patterns for direction detection
+            # This removes data leakage while maintaining directional logic
+            price_momentum = self.df['close'].pct_change(periods=5)  # 5-period momentum
+            volume_momentum = self.df['volume_ratio'] - 1.0  # Volume above baseline
             
-            logger.info(f"Directional movement distribution:")
-            logger.info(f"  Upward movements: {upward_movement.sum()} ({upward_movement.mean()*100:.1f}%)")
-            logger.info(f"  Downward movements: {downward_movement.sum()} ({downward_movement.mean()*100:.1f}%)")
-            logger.info(f"  No significant movement: {no_movement.sum()} ({no_movement.mean()*100:.1f}%)")
+            # Directional bias detection using current market structure
+            bullish_bias = (
+                (price_momentum > 0) & 
+                (volume_momentum > 0) &
+                (self.df['depth_stability'] > depth_stability_threshold)
+            )
             
-            # Quality Signal Level 1: Primary + Directional Movement
-            quality_signal_long_basic = primary_signal & upward_movement      # Long signals
-            quality_signal_short_basic = primary_signal & downward_movement   # Short signals
+            bearish_bias = (
+                (price_momentum < 0) & 
+                (volume_momentum > 0) &
+                (self.df['depth_stability'] > depth_stability_threshold)
+            )
+            
+            neutral_bias = ~(bullish_bias | bearish_bias)
+            
+            logger.info(f"Market bias distribution (no future data):")
+            logger.info(f"  Bullish bias: {bullish_bias.sum()} ({bullish_bias.mean()*100:.1f}%)")
+            logger.info(f"  Bearish bias: {bearish_bias.sum()} ({bearish_bias.mean()*100:.1f}%)")
+            logger.info(f"  Neutral bias: {neutral_bias.sum()} ({neutral_bias.mean()*100:.1f}%)")
+            
+            # Quality Signal Level 1: Primary + Market Bias
+            quality_signal_long_basic = primary_signal & bullish_bias      # Long signals
+            quality_signal_short_basic = primary_signal & bearish_bias     # Short signals
             
             # Quality Signal Level 2: Add stress + volume confirmation  
             quality_signal_long_medium = (
                 primary_signal & 
                 stress_confirmation & 
                 volume_confirmation & 
-                upward_movement
+                bullish_bias
             )
             quality_signal_short_medium = (
                 primary_signal & 
                 stress_confirmation & 
                 volume_confirmation & 
-                downward_movement
+                bearish_bias
             )
             
             # Quality Signal Level 3: Add health + conviction filters
@@ -409,7 +422,7 @@ class TargetHypothesis(BaseProcessor):
                 volume_confirmation & 
                 health_filter &
                 conviction_filter &
-                upward_movement
+                bullish_bias
             )
             quality_signal_short_strong = (
                 primary_signal &
@@ -417,7 +430,7 @@ class TargetHypothesis(BaseProcessor):
                 volume_confirmation & 
                 health_filter &
                 conviction_filter &
-                downward_movement
+                bearish_bias
             )
             
             # Quality Signal Level 4: London session premium
@@ -530,50 +543,42 @@ class TargetHypothesis(BaseProcessor):
                 logger.info("✅ TARGET ACHIEVED: >10% trading signals for better model training")
                 logger.info("✅ DIRECTIONAL SYSTEM: Model will learn proper buy/sell directions")
             
-            # Clean up temporary features AND future_price_change (data leakage prevention)
-            cleanup_features = temp_generated_features + ['future_price_change']
+            # Clean up temporary features only - no future data was generated
+            cleanup_features = temp_generated_features
             cleanup_features = [f for f in cleanup_features if f in self.df.columns]
             
             if cleanup_features:
-                logger.info(f"Cleaning up temporary and leakage features: {cleanup_features}")
+                logger.info(f"Cleaning up temporary features: {cleanup_features}")
                 self.df = self.df.drop(columns=cleanup_features)
-                logger.debug("Clean training data maintained - no data leakage")
+                logger.debug("Temporary features cleaned up")
             
-            # STEP 7: Quality validation for each signal level - Directional
-            logger.info("=== DIRECTIONAL SIGNAL QUALITY VALIDATION ===")
+            # STEP 7: Signal level distribution analysis (no future data validation)
+            logger.info("=== SIGNAL DISTRIBUTION ANALYSIS ===")
             
-            # Validate long signals by quality level
-            logger.info("Long signal quality by level:")
+            # Count signals by quality level
+            logger.info("Long signal distribution by quality level:")
             for level in [1, 2, 3, 4]:
-                level_mask = long_score == level
-                if level_mask.sum() > 0:
-                    if 'future_price_change' in self.df.columns:
-                        level_movement = self.df[level_mask]['future_price_change'].mean()  # Keep directional info
-                        level_abs_movement = abs(self.df[level_mask]['future_price_change']).mean()
-                        logger.info(f"  Long Level {level}: {level_mask.sum()} signals, avg movement: {level_movement:.6f} (abs: {level_abs_movement:.6f})")
+                level_count = (long_score == level).sum()
+                if level_count > 0:
+                    level_pct = level_count / len(self.df) * 100
+                    logger.info(f"  Long Level {level}: {level_count} signals ({level_pct:.3f}%)")
             
-            # Validate short signals by quality level  
-            logger.info("Short signal quality by level:")
+            logger.info("Short signal distribution by quality level:")
             for level in [1, 2, 3, 4]:
-                level_mask = short_score == level
-                if level_mask.sum() > 0:
-                    if 'future_price_change' in self.df.columns:
-                        level_movement = self.df[level_mask]['future_price_change'].mean()  # Keep directional info
-                        level_abs_movement = abs(self.df[level_mask]['future_price_change']).mean()
-                        logger.info(f"  Short Level {level}: {level_mask.sum()} signals, avg movement: {level_movement:.6f} (abs: {level_abs_movement:.6f})")
+                level_count = (short_score == level).sum()
+                if level_count > 0:
+                    level_pct = level_count / len(self.df) * 100
+                    logger.info(f"  Short Level {level}: {level_count} signals ({level_pct:.3f}%)")
             
-            # Overall directional validation
-            if 'future_price_change' in self.df.columns:
-                all_long_mask = long_score > 0
-                all_short_mask = short_score > 0
-                
-                if all_long_mask.sum() > 0:
-                    avg_long_movement = self.df[all_long_mask]['future_price_change'].mean()
-                    logger.info(f"✅ All long signals avg movement: {avg_long_movement:.6f} (should be > 0)")
+            # Signal quality distribution
+            total_long_signals = (long_score > 0).sum()
+            total_short_signals = (short_score > 0).sum()
+            
+            if total_long_signals > 0:
+                logger.info(f"✅ Total long signals: {total_long_signals} ({total_long_signals/len(self.df)*100:.2f}%)")
                     
-                if all_short_mask.sum() > 0:
-                    avg_short_movement = self.df[all_short_mask]['future_price_change'].mean()
-                    logger.info(f"✅ All short signals avg movement: {avg_short_movement:.6f} (should be < 0)")
+            if total_short_signals > 0:
+                logger.info(f"✅ Total short signals: {total_short_signals} ({total_short_signals/len(self.df)*100:.2f}%)")
             
             logger.info("✅ Enhanced target generation V2 completed successfully!")
             return True
