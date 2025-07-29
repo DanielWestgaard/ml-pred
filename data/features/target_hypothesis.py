@@ -612,4 +612,3 @@ class TargetHypothesis(BaseProcessor):
 
     # IMPORTANT FOR FURTHER DEVELOPMENT: Remember to add the prefix 'target_*' for the target column to the hypothesis.
     # This is because the normalization step after generation and this step will not normalize columns that starts with 'target_'.
-
