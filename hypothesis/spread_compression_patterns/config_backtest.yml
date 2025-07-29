@@ -4,12 +4,12 @@ hypothesis:
 # Backtesting: Rapid strategy validation with historical data
 backtesting:
     enabled: true
-    model_folder: storage/models/2025-07-29_16:12:37
+    model_folder: storage/models/2025-07-29_20:54:53
     
     # Extended test period for better statistical significance
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
-    start_date: '2025-06-14'                          # Start of test period
-    end_date: '2025-06-25'                            # Extended to ~2 weeks for better testing
+    start_date: '2025-05-20'                          # Start of test period
+    end_date: '2025-05-30'                            # Extended to ~2 weeks for better testing
     buffer_size: 200
     
     # Capital and costs
