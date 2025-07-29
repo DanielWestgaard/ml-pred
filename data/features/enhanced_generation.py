@@ -2371,8 +2371,13 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         )
         
         # 2. Volume-compression confluence (unusual volume during compression)
-        compression_signal = self.df.get('compression_ratio_micro', 0)
-        compression_threshold = compression_signal.rolling(window=120, min_periods=30).quantile(0.7)
+        if 'compression_ratio_micro' in self.df.columns:
+            compression_signal = self.df['compression_ratio_micro']
+            compression_threshold = compression_signal.rolling(window=120, min_periods=30).quantile(0.7)
+        else:
+            # Fallback: use volume percentile as compression proxy
+            compression_signal = self.df['volume_percentile']
+            compression_threshold = 0.7
         
         self.df['volume_compression_confluence'] = (
             (self.df['volume_percentile'] > 0.9) & 
