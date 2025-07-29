@@ -1,0 +1,55 @@
+================================================================================
+FEATURE IMPORTANCE ANALYSIS REPORT
+================================================================================
+Dataset: 427741 rows, 14 features
+Target: target_spread_compression_multi (classification)
+Analysis Date: 2025-07-28 23:10:52
+
+CONSENSUS TOP FEATURES:
+----------------------------------------
+ 1. depth_stability                1.0000
+ 2. london_session                 0.2983
+ 3. spread_regime_stability        0.2976
+ 4. tick_intensity                 0.2852
+ 5. depth_variability              0.2801
+ 6. price_level_support            0.2376
+ 7. institutional_footprint        0.2323
+ 8. signal_conviction              0.2069
+ 9. compression_prediction_strength 0.1953
+10. cumulative_order_flow          0.1888
+11. intrabar_pressure              0.1761
+12. microstructure_health          0.1732
+13. volume_ratio                   0.1694
+14. liquidity_stress               0.1269
+
+CORRELATION - TOP 5:
+------------------------------
+1. depth_stability           0.2420
+2. depth_variability         0.1208
+3. tick_intensity            0.1000
+4. institutional_footprint   0.0844
+5. london_session            0.0808
+
+MUTUAL INFORMATION - TOP 5:
+------------------------------
+1. depth_stability           0.0650
+2. spread_regime_stability   0.0606
+3. london_session            0.0428
+4. microstructure_health     0.0335
+5. depth_variability         0.0310
+
+RANDOM FOREST - TOP 5:
+------------------------------
+1. depth_stability           0.2138
+2. cumulative_order_flow     0.0910
+3. institutional_footprint   0.0882
+4. intrabar_pressure         0.0818
+5. tick_intensity            0.0799
+
+PERMUTATION - TOP 5:
+------------------------------
+1. depth_stability           0.0105
+2. london_session            0.0016
+3. cumulative_order_flow     0.0001
+4. intrabar_pressure         0.0000
+5. spread_regime_stability   0.0000

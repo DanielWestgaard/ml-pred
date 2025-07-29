@@ -1,0 +1,15 @@
+28-07-2025 20:12:36 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+28-07-2025 20:12:36 - utils.data_utils                        :250  - DEBUG    - Loading storage/data/capital_com/GBPUSD/processed/1m/2025-05-15_2025-05-23.csv
+28-07-2025 20:12:36 - data.features.feature_importance        :133  - INFO     - Removing 2 constant features
+28-07-2025 20:12:36 - data.features.feature_importance        :72   - INFO     - FeatureImportanceAnalyzer initialized: 43 features, task: classification, target: target_session_vol_anomaly
+28-07-2025 20:12:36 - data.features.feature_importance        :280  - INFO     - Starting comprehensive feature importance analysis...
+28-07-2025 20:12:36 - data.features.feature_importance        :167  - INFO     - Correlation analysis completed. Top feature: volatility_ratio (0.2540)
+28-07-2025 20:12:37 - data.features.feature_importance        :182  - INFO     - Mutual information analysis completed. Top feature: hour_of_week_sin (0.1109)
+28-07-2025 20:12:37 - data.features.feature_importance        :207  - INFO     - Random Forest analysis completed. Top feature: future_atr (0.0992)
+28-07-2025 20:12:37 - data.features.feature_importance        :218  - INFO     - Lasso importance skipped (classification task)
+28-07-2025 20:12:45 - data.features.feature_importance        :270  - INFO     - Permutation importance analysis completed. Top feature: future_atr (0.0374)
+28-07-2025 20:12:45 - data.features.feature_importance        :315  - INFO     - Consensus ranking completed. Top feature: future_atr (0.9142)
+28-07-2025 20:12:45 - data.features.feature_importance        :315  - INFO     - Consensus ranking completed. Top feature: future_atr (0.9142)
+28-07-2025 20:12:46 - data.features.feature_importance        :360  - INFO     - Feature importance plot saved to storage/data_engineering_stats/feature_importance/feature_importance_20250728_201236.png
+28-07-2025 20:13:17 - data.features.feature_importance        :315  - INFO     - Consensus ranking completed. Top feature: future_atr (0.9142)
+28-07-2025 20:13:17 - data.features.feature_importance        :430  - INFO     - Feature importance analysis completed and saved to storage/data_engineering_stats/feature_importance

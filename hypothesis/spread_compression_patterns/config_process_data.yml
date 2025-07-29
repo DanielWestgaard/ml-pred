@@ -5,21 +5,21 @@ data_pipeline:
   raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-10-01_2025-07-25.csv
   spread_focused: true  # Enable bid-ask spread data preservation (default: false)
 
-  selected_features:  # OPTIMIZED FEATURE SET - 8 CORE FEATURES (redundancy eliminated)
+  selected_features:  # ENHANCED PREDICTIVE FEATURES - Top 15 from comprehensive analysis
     [
-      # Primary compression signal (most sensitive, no redundancy)
-      'compression_ratio_micro',      # 30min/3min timeframe (eliminated short due to 0.905 correlation)
-      'compression_consistency',      # Strongest predictor (-0.4169 correlation)
-      
-      # Enhanced signal strength (optimized weights)
-      'signal_strength_v2',           # Combines all signals with optimal weights
-      
-      # Volume confirmation suite (comprehensive coverage)
-      'volume_ratio',                 # 1.40x movement ratio (strongest individual)
-      'volume_acceleration',          # Volume momentum detection
-      'volume_breakout',              # Z-score > 2 breakout detection
-      
-      # Context features (market timing & price)
+      'volume',                       # Top predictor (0.9870 consensus score)
+      'depth_stability',              # #2 predictor (0.9533) - Market depth consistency 
+      'depth_variability',            # Strong predictor (0.7153) - Spread depth variation
+      'liquidity_stress',             # Strong predictor (0.7089) - Liquidity strain detection
+      'microstructure_health',        # Top 5 predictor (0.6813) - Composite health score
+      'price_level_support',          # Support/resistance (0.5794) - Price clustering analysis
+      'spread_regime_stability',      # Regime stability (0.5292) - Spread regime transitions
+      'tick_intensity',               # Tick activity (0.5222) - Volume/range ratio
+      'cumulative_order_flow',        # Order flow (0.4997) - Price-volume trend
+      'intrabar_pressure',            # Pressure indicator (0.4971) - Buying/selling pressure
+      'signal_conviction',            # Composite signal (0.4916) - Multi-factor conviction
+      'compression_prediction_strength', # Prediction strength (0.4336) - Compression signals
+      'volume_ratio',                 # Volume confirmation (proven effective)
       'london_session',               # Session timing (proven effective)
-      'price_momentum_5'              # 5-period price momentum  
+      'institutional_footprint'      # Institutional activity (proven effective)
     ]

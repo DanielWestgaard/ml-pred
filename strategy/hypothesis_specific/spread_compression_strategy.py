@@ -32,7 +32,7 @@ class SpreadCompressionSignalTracker:
     def track_entry_signal(self, position_id: str, features: Dict, model_confidence: float):
         """Track signal characteristics at entry."""
         self.entry_signals[position_id] = {
-            'entry_time': datetime.now(),
+            'entry_time': datetime.now().replace(tzinfo=pd.Timestamp.now(tz='UTC').tz),
             'entry_confidence': model_confidence,
             'entry_features': {feat: features.get(feat, 0) for feat in self.signal_strength_features},
             'peak_signal_strength': model_confidence,
@@ -46,7 +46,7 @@ class SpreadCompressionSignalTracker:
             return
         
         entry_data = self.entry_signals[position_id]
-        current_time = datetime.now()
+        current_time = datetime.now().replace(tzinfo=pd.Timestamp.now(tz='UTC').tz)
         
         # Calculate signal decay metrics
         current_features = {feat: features.get(feat, 0) for feat in self.signal_strength_features}
@@ -139,7 +139,7 @@ class SpreadCompressionStrategy(BaseStrategy):
         # Check minimum signal life (not a hard constraint, just a filter)
         entry_time = position.get('entry_time')
         if entry_time:
-            position_age_minutes = (datetime.now() - entry_time).total_seconds() / 60
+            position_age_minutes = (datetime.now().replace(tzinfo=pd.Timestamp.now(tz='UTC').tz) - entry_time).total_seconds() / 60
             if position_age_minutes < self.minimum_signal_life:
                 # Only exit on very strong contrary signals during minimum life period
                 if current_prediction == 0 and current_confidence > 0.9:
@@ -223,7 +223,7 @@ class SpreadCompressionStrategy(BaseStrategy):
                 'compression_consistency': market_data.get('compression_consistency', 0)
             }
             position['entry_volatility'] = market_data.get('volatility_short', 0)
-            position['entry_time'] = datetime.now()
+            position['entry_time'] = datetime.now().replace(tzinfo=pd.Timestamp.now(tz='UTC').tz)
             
             # Track with signal tracker
             self.signal_tracker.track_entry_signal(
@@ -256,5 +256,5 @@ class SpreadCompressionStrategy(BaseStrategy):
         return {
             'strategy_type': 'spread_compression',
             'exit_strategy': 'intelligent',
-            'executed_at': datetime.now().isoformat()
+            'executed_at': datetime.now().replace(tzinfo=pd.Timestamp.now(tz='UTC').tz).isoformat()
         }

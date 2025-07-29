@@ -96,6 +96,11 @@ def parse_arguments():
     
     # Strategy Execution
     parser.add_argument('--strategy', '-strat', default=False, help='Run strategy with hypothesis config')
+    
+    # Feature importance analysis
+    parser.add_argument('--feature-importance', '-fi', default=False, help='Analyze feature importance of processed dataset (path to CSV file).')
+    parser.add_argument('--fi-target', default=None, help='Target column for feature importance analysis (auto-detected if not provided).')
+    parser.add_argument('--fi-in-pipeline', action='store_true', default=False, help='Enable feature importance analysis within data pipeline.')
 
     return parser.parse_args()
 
@@ -116,11 +121,14 @@ def main():
             # Use new path structure or fallback to legacy for compatibility
             default_raw_path = args.engineer_data or "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv"
             data_pipeline = EngineeringPipeline(raw_dataset=default_raw_path, 
-                                                save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
+                                                save_cleaned_data=save_cleaned_data, 
+                                                hypothesis_source=args.hypothesis,
+                                                analyze_feature_importance=args.fi_in_pipeline)
         else:
             default_raw_path = args.engineer_data or "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv"
             data_pipeline = EngineeringPipeline(raw_dataset=default_raw_path,
-                                                save_cleaned_data = save_cleaned_data)
+                                                save_cleaned_data=save_cleaned_data,
+                                                analyze_feature_importance=args.fi_in_pipeline)
         
         data_pipeline.run()
 
@@ -138,7 +146,7 @@ def main():
         conf_keys = conf.keys()
         
         if 'data_pipeline_raw_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
-            data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis)
+            data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis, analyze_feature_importance=True)
             data_pipeline.run()
         
         # Model Training
@@ -193,7 +201,7 @@ def main():
         # Enable spread data collection for spread-focused analysis 
         # (use include_spreads=False for backward compatibility with existing pipelines)
         provider.fetch_and_save_historical_data(symbol="GBPUSD", timeframe="MINUTE",
-                                                  from_date="2024-06-01T00:00:00", to_date="2025-05-23T01:00:00",
+                                                  from_date="2023-01-01T00:00:00", to_date="2025-07-01T01:00:00",
                                                   print_answer=False, include_spreads=True)
         provider.end_session()
     
@@ -253,6 +261,22 @@ def main():
         strategy = StrategyOrchestrator(hypothesis_config=args.strategy)
         strategy_results = strategy.run()
         logger.info(f"Strategy execution completed: {strategy_results.get('status', 'unknown')}")
+    
+    # Feature importance analysis
+    if args.feature_importance:
+        logger.info(f"Starting feature importance analysis on: {args.feature_importance}")
+        from data.features.feature_importance import analyze_processed_data
+        results = analyze_processed_data(args.feature_importance, args.fi_target)
+        logger.info(f"Feature importance analysis completed. Results saved to: {results['output_directory']}")
+        
+        # Show top 10 consensus features in console
+        consensus = results['consensus']
+        print("\n" + "="*60)
+        print("TOP 10 CONSENSUS FEATURES:")
+        print("="*60)
+        for i, (feature, score) in enumerate(consensus.head(10).items(), 1):
+            print(f"{i:2d}. {feature:<30} {score:.4f}")
+        print("="*60)
 
 
 def _strategy_flow(hypothesis_config: str):

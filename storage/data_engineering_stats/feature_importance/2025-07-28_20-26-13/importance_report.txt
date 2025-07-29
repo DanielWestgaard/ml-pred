@@ -1,0 +1,27 @@
+================================================================================
+FEATURE IMPORTANCE ANALYSIS REPORT
+================================================================================
+Dataset: 1311859 rows, 10 features
+Target: target_spread_compression_multi (classification)
+Analysis Date: 2025-07-28 20:26:21
+
+CONSENSUS TOP FEATURES:
+----------------------------------------
+ 1. compression_ratio_micro        1.0000
+ 2. volume_ratio                   0.5086
+ 3. volume_acceleration            0.3059
+ 4. london_session                 0.2105
+ 5. compression_consistency        0.1819
+ 6. signal_strength_v2             0.1199
+ 7. volume_breakout                0.1143
+ 8. mid_price                      0.0720
+ 9. future_price_change            0.0125
+10. price_momentum_5               0.0118
+
+CORRELATION - TOP 5:
+------------------------------
+1. compression_ratio_micro   0.3428
+2. volume_ratio              0.1744
+3. volume_acceleration       0.1049
+4. london_session            0.0722
+5. compression_consistency   0.0624

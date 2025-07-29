@@ -1,0 +1,6 @@
+28-07-2025 20:10:14 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+28-07-2025 20:10:14 - utils.data_utils                        :250  - DEBUG    - Loading storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
+28-07-2025 20:10:18 - data.features.feature_importance        :72   - INFO     - FeatureImportanceAnalyzer initialized: 22 features, task: classification, target: target_spread_compression_binary
+28-07-2025 20:10:18 - data.features.feature_importance        :280  - INFO     - Starting comprehensive feature importance analysis...
+28-07-2025 20:10:21 - data.features.feature_importance        :167  - INFO     - Correlation analysis completed. Top feature: compression_ratio_micro (0.3429)
+28-07-2025 20:12:02 - data.features.feature_importance        :182  - INFO     - Mutual information analysis completed. Top feature: compression_ratio_micro (0.1106)

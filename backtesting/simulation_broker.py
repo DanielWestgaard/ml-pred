@@ -171,16 +171,20 @@ class SimulationBroker:
             
             # Calculate holding period safely
             try:
-                # Ensure timestamps are datetime objects
+                # Ensure timestamps are datetime objects with timezone awareness
                 if isinstance(timestamp, str):
-                    exit_time = pd.to_datetime(timestamp)
+                    exit_time = pd.to_datetime(timestamp, utc=True)
                 else:
                     exit_time = timestamp
+                    if exit_time.tz is None:
+                        exit_time = exit_time.tz_localize('UTC')
                     
                 if isinstance(position['entry_timestamp'], str):
-                    entry_time = pd.to_datetime(position['entry_timestamp'])
+                    entry_time = pd.to_datetime(position['entry_timestamp'], utc=True)
                 else:
                     entry_time = position['entry_timestamp']
+                    if entry_time.tz is None:
+                        entry_time = entry_time.tz_localize('UTC')
                     
                 holding_period_minutes = (exit_time - entry_time).total_seconds() / 60
             except Exception as e:
@@ -260,13 +264,16 @@ class SimulationBroker:
         """
         total_unrealized_pnl = sum([pos['unrealized_pnl'] for pos in self.open_positions])
         
+        # CRITICAL FIX: Always update current_equity to reflect current balance + unrealized PnL
+        current_equity = self.current_balance + total_unrealized_pnl
+        
         return {
             'initial_capital': self.initial_capital,
             'current_balance': self.current_balance,
-            'current_equity': self.current_equity,
+            'current_equity': current_equity,  # Use calculated value, not stored value
             'unrealized_pnl': total_unrealized_pnl,
-            'total_return': (self.current_equity - self.initial_capital) / self.initial_capital,
-            'total_return_pct': ((self.current_equity - self.initial_capital) / self.initial_capital) * 100,
+            'total_return': (current_equity - self.initial_capital) / self.initial_capital,
+            'total_return_pct': ((current_equity - self.initial_capital) / self.initial_capital) * 100,
             'open_positions_count': len(self.open_positions),
             'total_trades': self.total_trades,
             'winning_trades': self.winning_trades,
@@ -280,6 +287,21 @@ class SimulationBroker:
     def get_open_positions(self) -> List[Dict[str, Any]]:
         """Get list of open positions"""
         return self.open_positions.copy()
+    
+    def get_position(self, position_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get a specific position by ID
+        
+        Args:
+            position_id: Position ID to find
+            
+        Returns:
+            Position dictionary if found, None otherwise
+        """
+        for position in self.open_positions:
+            if position['id'] == position_id:
+                return position
+        return None
     
     def get_closed_trades(self) -> List[Dict[str, Any]]:
         """Get list of closed trades"""

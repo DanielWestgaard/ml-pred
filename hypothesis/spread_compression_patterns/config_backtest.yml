@@ -4,30 +4,30 @@ hypothesis:
 # Backtesting: Rapid strategy validation with historical data
 backtesting:
     enabled: true
-    model_folder: storage/models/2025-07-28_10:29:05
+    model_folder: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-29_13:19:43
     
-    # Test on signal-rich period with 1,291 positive signals (44.82% rate)
+    # Extended test period for better statistical significance
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
-    start_date: '2024-10-01'                          # Signal-rich period with 1,291 positive signals
-    end_date: '2024-10-02'                            # Two days for proper testing
+    start_date: '2025-05-04'                          # Start of test period
+    end_date: '2025-05-15'                            # Extended to ~2 weeks for better testing
     buffer_size: 200
     
     # Capital and costs
     initial_capital: 10000
-    transaction_costs: 0.0013
+    transaction_costs: 0.0005 # temporarily low to isolate model performance from cost impact, was 0.0013
     slippage: 0.0002
     
     # Execution settings
     execution:
-        max_loops: 2880                               # 48 hours * 60 min = 2880 loops for 2 days
+        max_loops: 5000                               # Extended for 2-week period (~11 days * 24h * 60min / 3)
         loop_interval: 0
     
-    # More realistic signal processing with cleaned model
+    # Adjusted signal processing for enhanced features model
     signal_processing:
-        confidence_threshold: 0.55                    # Lower threshold for realistic model
+        confidence_threshold: 0.35                   # Increased threshold for three-class model with balanced weights
         signal_filters: []                            # No session filtering for testing
-        min_signal_strength: 0.3                      # Quality filter
-        volume_confirmation_required: true            # Volume confirmation
+        min_signal_strength: 0.1                     # Lower quality filter to match model behavior
+        volume_confirmation_required: false          # Disable to test pure model performance
         
     # Conservative risk management
     risk_management:
@@ -45,7 +45,7 @@ backtesting:
     
     # Enable intelligent confidence-based exits  
     exit_strategy:
-        confidence_exit_threshold: 0.50               # Exit when model is 50%+ confident compression is over
+        confidence_exit_threshold: 0.75               # Exit when model is 75%+ confident compression is over
         signal_strength_decay: 0.90                   # VERY HIGH - effectively disable decay exits  
         volatility_exit_multiplier: 5.0               # VERY HIGH - effectively disable volatility exits
         minimum_signal_life: 15                       # 15 minutes minimum - allow faster exits

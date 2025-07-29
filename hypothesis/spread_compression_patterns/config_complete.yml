@@ -3,26 +3,20 @@ hypothesis:
 
 # Data Pipeline: Process raw data with optimized 8-feature set
 data_pipeline:
-  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-06-01_2025-05-23.csv
-  spread_focused: true  # Enable bid-ask spread data preservation
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2023-01-01_2025-07-01.csv
+  spread_focused: true  # Enable bid-ask spread data preservation (default: false)
 
   selected_features:  # OPTIMIZED FEATURE SET - 8 CORE FEATURES (redundancy eliminated)
     [
-      # Primary compression signal (most sensitive, no redundancy)
-      'compression_ratio_micro',      # 30min/3min timeframe (eliminated short due to 0.905 correlation)
-      'compression_consistency',      # Strongest predictor (-0.4169 correlation)
-      
-      # Enhanced signal strength (optimized weights)
-      'signal_strength_v2',           # Combines all signals with optimal weights
-      
-      # Volume confirmation suite (comprehensive coverage)
-      'volume_ratio',                 # 1.52x movement ratio (strongest individual)
-      'volume_acceleration',          # Volume momentum detection
-      'volume_breakout',              # Z-score > 2 breakout detection
-      
-      # Context features (market timing & price)
-      'london_session',               # Session timing (proven effective)
-      'price_momentum_5'              # 5-period price momentum
+      'compression_ratio_micro',      # Perfect predictor (1.0000)
+      'volume_price_divergence',      # Strong divergence detection (0.6155)
+      'volume_ratio',                 # Proven volume predictor (0.5086)
+      'flow_direction_strength',      # Institutional flow (0.3533)
+      'institutional_footprint',      # Market maker activity (0.3532)
+      'volume_acceleration',          # Volume momentum (0.3059)
+      'london_session',               # Session timing (0.2105)
+      'price_volume_imbalance',       # Order flow imbalance (0.2210)
+      'compression_consistency'       # (0.1819) - Signal quality
     ]
 
 # Model Training: Random Forest Classifier optimized for Tier 2+ signals

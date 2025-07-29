@@ -126,7 +126,12 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             'spread_relative_features': ['spread_relative', 'spread_baseline_true', 'spread_recent_true', 'compression_ratio_true'],
             'multi_timeframe_compression_features': ['compression_ratio_micro', 'compression_ratio_short', 'compression_ratio_medium'],
             'advanced_volume_confirmation_features': ['volume_acceleration', 'volume_breakout', 'volume_spread_correlation'],
-            'enhanced_signal_strength_calculator': ['signal_strength_v2']
+            'enhanced_signal_strength_calculator': ['signal_strength_v2'],
+            'order_flow_imbalance_features': ['price_volume_imbalance', 'institutional_pressure', 'order_flow_momentum'],
+            'institutional_activity_features': ['volume_price_divergence', 'stealth_accumulation', 'distribution_pressure'],
+            'order_flow_wick_features': ['wick_analysis', 'rejection_strength', 'absorption_capacity'],
+            'institutional_footprint_features': ['momentum_volume_sync', 'flow_direction_strength', 'institutional_footprint'],
+            'all_order_flow_features': ['price_volume_imbalance', 'institutional_pressure', 'order_flow_momentum', 'volume_price_divergence', 'stealth_accumulation', 'distribution_pressure', 'wick_analysis', 'rejection_strength', 'absorption_capacity', 'momentum_volume_sync', 'flow_direction_strength', 'institutional_footprint']
         }
         
         for feature_name in feature_names:
@@ -1819,3 +1824,430 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             (self.df['spread_baseline_true'] - self.df['spread_recent_true']) / self.df['spread_baseline_true'],
             0
         )
+
+    # ===== ORDER FLOW IMBALANCE FEATURES =====
+    # These features detect institutional vs retail activity patterns
+    
+    @feature_generator(
+        output_features=['price_volume_imbalance', 'institutional_pressure', 'order_flow_momentum'],
+        description="Order flow imbalance indicators for institutional activity detection",
+        category="order_flow"
+    )
+    def order_flow_imbalance_basic(self):
+        """
+        Detect institutional vs retail activity through price-volume relationships.
+        Based on 1-minute OHLCV patterns that reveal order flow imbalances.
+        """
+        # Price-Volume Imbalance: When large moves happen on small volume vs small moves on large volume
+        price_change = self.df['close'].pct_change()
+        volume_ma_20 = self.df['volume'].rolling(20).mean()
+        
+        # Normalize volume (relative to recent average)
+        relative_volume = np.where(
+            volume_ma_20 > 0,
+            self.df['volume'] / volume_ma_20,
+            1.0
+        )
+        
+        # Price-Volume Imbalance: High price change with low volume suggests institutional efficiency
+        # Low price change with high volume suggests retail noise
+        self.df['price_volume_imbalance'] = np.where(
+            relative_volume > 0,
+            price_change.abs() / relative_volume,  # Higher = more efficient moves (institutional)
+            0
+        )
+        
+        # Institutional Pressure: Sustained directional moves with decreasing volume
+        # Institutions often create price moves that continue even as volume decreases
+        price_momentum_3 = price_change.rolling(3).sum()
+        volume_trend_3 = (self.df['volume'] - self.df['volume'].shift(2)) / self.df['volume'].shift(2)
+        
+        # High momentum with decreasing volume = institutional pressure
+        self.df['institutional_pressure'] = np.where(
+            (price_momentum_3.abs() > 0.001) & (volume_trend_3 < 0),
+            price_momentum_3.abs() * (1 - volume_trend_3),  # Amplify when volume decreases
+            0
+        )
+        
+        # Order Flow Momentum: Persistent directional flow over multiple periods
+        # Institutions create sustained pressure in one direction
+        hl_position = (self.df['close'] - self.df['low']) / (self.df['high'] - self.df['low'])
+        hl_position = hl_position.fillna(0.5)  # Mid-range when high=low
+        
+        # Track if price consistently closes near high/low
+        momentum_signal = (hl_position - 0.5) * 2  # -1 to 1 scale
+        
+        self.df['order_flow_momentum'] = momentum_signal.rolling(5).mean()
+
+    @feature_generator(
+        output_features=['volume_price_divergence', 'stealth_accumulation', 'distribution_pressure'],
+        dependencies=['volume_ratio'],
+        description="Advanced volume-price divergence patterns indicating stealth institutional activity",
+        category="order_flow"
+    )
+    def stealth_institutional_activity(self):
+        """
+        Detect stealth institutional accumulation/distribution through volume-price divergences.
+        These patterns occur when institutions trade to minimize market impact.
+        """
+        price_change = self.df['close'].pct_change()
+        price_range = (self.df['high'] - self.df['low']) / self.df['low']
+        
+        # Volume-Price Divergence: Price moves opposite to what volume suggests
+        # High volume usually causes high volatility, except when institutions absorb flow
+        expected_volatility = self.df['volume_ratio'] * price_range.rolling(20).mean()
+        actual_volatility = price_range
+        
+        self.df['volume_price_divergence'] = np.where(
+            expected_volatility > 0,
+            (expected_volatility - actual_volatility) / expected_volatility,
+            0
+        )
+        
+        # Stealth Accumulation: Price drifts higher on lower-than-expected volume
+        # Institutions slowly accumulate while retail volume is absent
+        price_trend_10 = price_change.rolling(10).sum()
+        volume_expectation = self.df['volume_ratio'].rolling(10).mean()
+        
+        # Positive price trend with below-average volume = stealth accumulation
+        self.df['stealth_accumulation'] = np.where(
+            (price_trend_10 > 0.002) & (volume_expectation < 1.0),
+            price_trend_10 * (1.5 - volume_expectation),  # Stronger signal with lower volume
+            0
+        )
+        
+        # Distribution Pressure: Price weakens despite normal/high volume
+        # Institutions distribute while retail provides liquidity
+        self.df['distribution_pressure'] = np.where(
+            (price_trend_10 < -0.002) & (volume_expectation >= 1.0),
+            price_trend_10.abs() * volume_expectation,  # Stronger signal with higher volume
+            0
+        )
+
+    @feature_generator(
+        output_features=['wick_analysis', 'rejection_strength', 'absorption_capacity'],
+        description="Candlestick wick analysis for order flow absorption and rejection patterns",
+        category="order_flow"
+    )
+    def order_flow_wick_analysis(self):
+        """
+        Analyze candlestick wicks to detect order flow absorption and rejection.
+        Long wicks indicate failed attempts and strong opposing flow.
+        """
+        body_size = (self.df['close'] - self.df['open']).abs()
+        total_range = self.df['high'] - self.df['low']
+        
+        # Upper and lower wick sizes
+        upper_wick = np.where(
+            self.df['close'] >= self.df['open'],
+            self.df['high'] - self.df['close'],  # Green candle
+            self.df['high'] - self.df['open']    # Red candle
+        )
+        
+        lower_wick = np.where(
+            self.df['close'] >= self.df['open'],
+            self.df['open'] - self.df['low'],    # Green candle
+            self.df['close'] - self.df['low']    # Red candle
+        )
+        
+        # Wick Analysis: Ratio of wick to total range
+        self.df['wick_analysis'] = np.where(
+            total_range > 0,
+            (upper_wick + lower_wick) / total_range,
+            0
+        )
+        
+        # Rejection Strength: Long wicks with small bodies indicate strong rejection
+        # High rejection strength suggests institutional resistance at these levels
+        self.df['rejection_strength'] = np.where(
+            (total_range > 0) & (body_size < total_range * 0.3),  # Small body
+            (upper_wick + lower_wick) / total_range,
+            0
+        )
+        
+        # Absorption Capacity: Large body with small wicks indicates strong absorption
+        # High absorption suggests institutional support/resistance absorption
+        self.df['absorption_capacity'] = np.where(
+            (total_range > 0) & (body_size > total_range * 0.7),  # Large body
+            body_size / total_range,
+            0
+        )
+
+    @feature_generator(
+        output_features=['momentum_volume_sync', 'flow_direction_strength', 'institutional_footprint'],
+        dependencies=['volume_ratio'],
+        description="Momentum-volume synchronization patterns revealing institutional footprints",
+        category="order_flow"
+    )
+    def institutional_footprint_detection(self):
+        """
+        Detect institutional footprints through momentum-volume synchronization patterns.
+        Institutions create characteristic patterns in how momentum and volume interact.
+        """
+        price_change = self.df['close'].pct_change()
+        
+        # Momentum-Volume Synchronization
+        # When momentum and volume move together, it suggests authentic institutional flow
+        momentum_3 = price_change.rolling(3).sum()
+        volume_change_3 = self.df['volume_ratio'].rolling(3).mean() - 1
+        
+        # Correlation between momentum and volume changes
+        momentum_volume_corr = pd.Series(momentum_3 * volume_change_3, index=self.df.index)
+        self.df['momentum_volume_sync'] = momentum_volume_corr.rolling(10).mean()
+        
+        # Flow Direction Strength: Consistent directional flow with volume support
+        # Institutions maintain direction better than retail flow
+        up_flow = pd.Series(np.where(price_change > 0, price_change * self.df['volume_ratio'], 0), index=self.df.index)
+        down_flow = pd.Series(np.where(price_change < 0, price_change.abs() * self.df['volume_ratio'], 0), index=self.df.index)
+        
+        net_flow = (up_flow - down_flow).rolling(10).sum()
+        flow_volume = (up_flow + down_flow).rolling(10).sum()
+        
+        self.df['flow_direction_strength'] = np.where(
+            flow_volume > 0,
+            net_flow.abs() / flow_volume,  # Higher = more directional consistency
+            0
+        )
+        
+        # Institutional Footprint: Combined signal of all order flow indicators
+        # Institutions leave characteristic patterns across multiple dimensions
+        price_vol_imbalance = self.df.get('price_volume_imbalance', 0)
+        inst_pressure = self.df.get('institutional_pressure', 0)
+        
+        self.df['institutional_footprint'] = (
+            price_vol_imbalance * 0.3 +
+            inst_pressure * 0.3 +
+            self.df['momentum_volume_sync'].abs() * 0.2 +
+            self.df['flow_direction_strength'] * 0.2
+        )
+
+    # =====================================================================
+    # ENHANCED PREDICTIVE FEATURES (Top performers from analysis)
+    # =====================================================================
+    
+    @feature_generator(
+        output_features=['depth_stability', 'depth_variability', 'liquidity_stress'],
+        description="Market depth and liquidity stress indicators (top predictors)",
+        category="market_microstructure"
+    )
+    def enhanced_market_depth_features(self):
+        """
+        Market depth approximation using spread statistics - top performing features
+        from enhanced analysis showing 95%+ predictive power
+        """
+        if 'spread_tight' in self.df.columns and 'spread_wide' in self.df.columns:
+            spread_tight = self.df['spread_tight']
+            spread_wide = self.df['spread_wide'] 
+            spread_avg = self.df.get('spread_avg', self.df['spread_close'])
+            
+            # 1. Depth variability indicator (consensus: 0.7153)
+            spread_range = spread_wide - spread_tight
+            self.df['depth_variability'] = spread_range / (spread_avg + 1e-8)
+            
+            # 2. Market depth stability (consensus: 0.9533) - #2 predictor!
+            depth_stability = 1 / (spread_range.rolling(window=20, min_periods=5).std() + 1e-8)
+            self.df['depth_stability'] = np.log1p(depth_stability)
+            
+            # 3. Liquidity stress indicator (consensus: 0.7089)
+            stress_threshold = spread_avg.rolling(window=60, min_periods=20).quantile(0.9)
+            self.df['liquidity_stress'] = np.where(
+                spread_wide > stress_threshold,
+                (spread_wide - spread_avg) / (spread_avg + 1e-8),
+                0
+            )
+            
+        else:
+            logger.warning("Spread tight/wide data not available - using spread_close approximation")
+            spread_close = self.df['spread_close']
+            
+            # Approximate using spread_close volatility
+            spread_vol = spread_close.rolling(window=20, min_periods=5).std()
+            self.df['depth_variability'] = spread_vol / (spread_close + 1e-8)
+            self.df['depth_stability'] = 1 / (spread_vol + 1e-8)
+            
+            stress_threshold = spread_close.rolling(window=60, min_periods=20).quantile(0.9)
+            self.df['liquidity_stress'] = np.where(
+                spread_close > stress_threshold,
+                (spread_close - spread_close.rolling(60, min_periods=20).mean()) / 
+                (spread_close.rolling(60, min_periods=20).mean() + 1e-8),
+                0
+            )
+
+    @feature_generator(
+        output_features=['microstructure_health'],
+        dependencies=['liquidity_stress'],
+        description="Composite market microstructure health score (top 5 predictor)",
+        category="market_microstructure"
+    )
+    def enhanced_microstructure_health(self):
+        """
+        Composite market microstructure health indicator (consensus: 0.6813)
+        Lower score indicates conditions ripe for spread compression
+        """
+        # Ensure dependencies exist
+        liquidity_stress = self.df.get('liquidity_stress', 0)
+        timeframe_alignment = self.df.get('timeframe_alignment', 0)
+        regime_consistency = self.df.get('regime_consistency', 1)
+        
+        # Health decreases with liquidity stress, increases with alignment and consistency
+        microstructure_health = (
+            np.clip(timeframe_alignment, -2, 2) * 0.4 +
+            (2 - np.clip(liquidity_stress, 0, 2)) * 0.3 +  # Invert liquidity stress
+            np.clip(regime_consistency, 0, 3) * 0.3
+        )
+        
+        self.df['microstructure_health'] = microstructure_health / 2  # Normalize to [0,1]
+
+    @feature_generator(
+        output_features=['price_level_support'],
+        description="Price level clustering and support/resistance strength",
+        category="market_microstructure"
+    )
+    def enhanced_price_level_support(self):
+        """
+        Enhanced price level support analysis (consensus: 0.5794)
+        Identifies when price is at significant support/resistance levels
+        """
+        close = self.df['close']
+        
+        # Round prices to identify levels (4 decimal places for GBP/USD)
+        price_rounded = np.round(close, 4)
+        
+        # Rolling window to count price revisits
+        window = 120  # 2-hour window for 1-minute data
+        revisit_counts = []
+        
+        for i in range(len(price_rounded)):
+            start_idx = max(0, i - window)
+            current_price = price_rounded.iloc[i]
+            
+            if i > 10:  # Need some history
+                window_data = price_rounded.iloc[start_idx:i]
+                # Count similar prices (within 0.0002 for GBP/USD)
+                similar_count = sum(abs(window_data - current_price) <= 0.0002)
+                revisit_counts.append(similar_count)
+            else:
+                revisit_counts.append(0)
+        
+        self.df['price_level_support'] = pd.Series(revisit_counts, index=self.df.index)
+
+    @feature_generator(
+        output_features=['tick_intensity'],
+        description="Tick-level intensity analysis from OHLC data",
+        category="market_microstructure"
+    )
+    def enhanced_tick_intensity(self):
+        """
+        Tick intensity approximation (consensus: 0.5222)
+        Estimates tick activity from volume and price range
+        """
+        high = self.df['high']
+        low = self.df['low']
+        volume = self.df['volume']
+        
+        # Approximate tick intensity by volume/range ratio
+        bar_range = high - low + 1e-8
+        self.df['tick_intensity'] = np.log1p(volume / bar_range)
+
+    @feature_generator(
+        output_features=['cumulative_order_flow', 'intrabar_pressure'],
+        description="Order flow pressure indicators from OHLC data",
+        category="order_flow"
+    )
+    def enhanced_order_flow_indicators(self):
+        """
+        Enhanced order flow pressure indicators (consensus: 0.4997, 0.4971)
+        Estimate buying/selling pressure from available data
+        """
+        high = self.df['high']
+        low = self.df['low']
+        close = self.df['close']
+        volume = self.df['volume']
+        
+        # 1. Intra-bar pressure score
+        bar_range = high - low + 1e-8
+        close_position = (close - low) / bar_range  # 0 = close at low, 1 = close at high
+        
+        # Weight by volume and range
+        self.df['intrabar_pressure'] = (close_position - 0.5) * np.log1p(volume * bar_range)
+        
+        # 2. Cumulative order flow (Price-Volume Trend approximation)
+        price_change = close.pct_change()
+        volume_weighted_change = price_change * volume
+        
+        self.df['cumulative_order_flow'] = volume_weighted_change.rolling(
+            window=20, min_periods=5
+        ).sum()
+
+    @feature_generator(
+        output_features=['spread_regime_stability'],
+        description="Spread regime stability and transition detection",
+        category="spread_compression"
+    )
+    def enhanced_spread_regime_stability(self):
+        """
+        Spread regime stability indicator (consensus: 0.5292)
+        Measures stability of current spread regime
+        """
+        spread = self.df['spread_close']
+        
+        # Spread regime stability
+        spread_baseline = spread.rolling(window=240, min_periods=60).mean()
+        spread_deviation = abs(spread - spread_baseline) / (spread_baseline + 1e-8)
+        
+        # Stability decreases as deviation increases
+        self.df['spread_regime_stability'] = np.exp(-spread_deviation)
+
+    @feature_generator(
+        output_features=['signal_conviction', 'compression_prediction_strength'],
+        dependencies=['liquidity_stress'],
+        description="Composite predictive signal strength indicators",
+        category="spread_compression"
+    )
+    def enhanced_predictive_signals(self):
+        """
+        Enhanced composite predictive signals (consensus: 0.4916, 0.4336)
+        Combines multiple microstructure signals for prediction strength
+        """
+        # Basic signal components
+        volume_ratio = self.df.get('volume_ratio', 1)
+        spread_regime_deviation = self.df.get('spread_close', 0) - self.df.get('spread_close', 0).rolling(240, min_periods=60).mean()
+        spread_regime_deviation = spread_regime_deviation / (self.df.get('spread_close', 0).rolling(240, min_periods=60).std() + 1e-8)
+        
+        large_block_indicator = np.where(
+            self.df['volume'] > self.df['volume'].rolling(120, min_periods=30).quantile(0.8) * 2,
+            np.log1p(self.df['volume'] / (self.df['volume'].rolling(120, min_periods=30).quantile(0.8) + 1)),
+            0
+        )
+        
+        # 1. Compression prediction strength
+        compression_signal = (
+            np.clip(spread_regime_deviation, -2, 2) * 0.3 +
+            np.clip((volume_ratio - 1) * 2, -2, 2) * 0.3 +
+            np.clip(large_block_indicator, 0, 4) * 0.2 +
+            np.clip(self.df.get('depth_variability', 0), 0, 2) * 0.2
+        )
+        
+        self.df['compression_prediction_strength'] = np.tanh(compression_signal)
+        
+        # 2. Signal conviction (combines prediction strength with microstructure health)
+        microstructure_health = self.df.get('microstructure_health', 0.5)
+        self.df['signal_conviction'] = (
+            abs(self.df['compression_prediction_strength']) * microstructure_health
+        )
+
+    @feature_generator(
+        output_features=['volume'],
+        description="Volume passthrough - ensures volume is available as feature",
+        category="volume"
+    )
+    def volume_passthrough(self):
+        """
+        Simple passthrough for volume column to satisfy feature registry requirements.
+        Volume is typically already available as a basic OHLCV column.
+        """
+        # Volume should already exist, but ensure it's available
+        if 'volume' not in self.df.columns:
+            logger.error("Volume column missing from OHLCV data")
+            self.df['volume'] = 0  # Fallback
+        # Volume already exists, no processing needed

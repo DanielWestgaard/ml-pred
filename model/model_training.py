@@ -196,8 +196,16 @@ class ModelTraining():
         
         logger.debug(f"Found target columns: {target_columns}")
         
-        # For classification models, prefer binary targets
+        # For classification models, prefer directional targets over binary targets
         if self.model_type in ['random_forest', 'logistic_regression', 'svm']:
+            # Priority 1: Directional targets (three-class) for better signal quality
+            directional_targets = [col for col in target_columns if 'directional' in col]
+            if directional_targets:
+                chosen_target = directional_targets[0]
+                logger.info(f"Selected directional target for classification: '{chosen_target}'")
+                return chosen_target
+                
+            # Priority 2: Binary targets (fallback for legacy compatibility)
             binary_targets = [col for col in target_columns if 'binary' in col]
             if binary_targets:
                 chosen_target = binary_targets[0]
