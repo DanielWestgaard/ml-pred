@@ -1,0 +1,21 @@
+hypothesis:
+  name: spread_compression_patterns_v2  # Uses the enhanced V2 directional target system
+
+# Use processed data from config_process_data_v2.yml pipeline (with directional targets)
+model_training:
+    type: random_forest                               # Random Forest Classifier for three-class directional prediction
+
+    # Use V2 processed data with directional targets
+    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
+
+    parameters:                                       # Optimized for three-class directional system (87.7/6.2/6.2 distribution)
+        n_estimators: 300                             # More trees for complex three-class patterns
+        max_depth: 12                                 # Slightly deeper for directional complexity
+        min_samples_split: 4                          # Lower for quality signal detection
+        min_samples_leaf: 2                           # Sensitive to directional patterns
+        class_weight: balanced                        # Critical for three-class imbalanced data
+        bootstrap: true                               # Enable bootstrap sampling
+        oob_score: true                               # Out-of-bag evaluation
+        random_state: 42                              # Reproducible results
+        n_jobs: -1                                    # Use all CPU cores
+        max_features: sqrt                            # sqrt(n_features) for classification
