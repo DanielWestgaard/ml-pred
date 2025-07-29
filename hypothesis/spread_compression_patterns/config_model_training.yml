@@ -4,7 +4,7 @@ hypothesis:
 # Model training with walk-forward validation (no backtesting)
 model_training:
     type: random_forest
-    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
+    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-01-01_2025-03-01.csv
     target_column: target_spread_compression_v2_directional
     parameters:
         n_estimators: 300
