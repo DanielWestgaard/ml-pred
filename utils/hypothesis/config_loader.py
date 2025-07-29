@@ -113,6 +113,22 @@ class LoadHypothesisConfigMetadata:
                 if 'enabled' in backtesting and not isinstance(backtesting['enabled'], bool):
                     errors.append("Field 'backtesting.enabled' must be a boolean")
         
+        # Validate walk_forward if present
+        walk_forward = self._safe_get(['walk_forward'])
+        if walk_forward:
+            if not isinstance(walk_forward, dict):
+                errors.append("Section 'walk_forward' must be a dictionary")
+            else:
+                # Validate walk-forward specific parameters
+                if 'initial_training_months' in walk_forward and not isinstance(walk_forward['initial_training_months'], int):
+                    errors.append("Field 'walk_forward.initial_training_months' must be an integer")
+                
+                if 'validation_period_months' in walk_forward and not isinstance(walk_forward['validation_period_months'], int):
+                    errors.append("Field 'walk_forward.validation_period_months' must be an integer")
+                
+                if 'step_forward_months' in walk_forward and not isinstance(walk_forward['step_forward_months'], int):
+                    errors.append("Field 'walk_forward.step_forward_months' must be an integer")
+        
         return errors
     
     def _safe_get(self, path: List[str], default: Any = None) -> Any:
@@ -178,7 +194,8 @@ class LoadHypothesisConfigMetadata:
             ('model_training', ['type']),       # type is required if section exists  
             ('evaluate_model', None),           # No required fields
             ('strategy', None),                 # No required fields
-            ('backtesting', None)               # No required fields (all backtesting params are optional)
+            ('backtesting', None),              # No required fields (all backtesting params are optional)
+            ('walk_forward', None)              # No required fields (all walk-forward params are optional with defaults)
         ]
         
         for section_name, required_fields in sections_to_extract:
@@ -199,7 +216,7 @@ class LoadHypothesisConfigMetadata:
             logger.debug("No spread_focused setting found, defaulting to False")
         
         # Log summary
-        sections_found = [section for section in ['data_pipeline', 'model_training', 'evaluate_model', 'strategy', 'backtesting'] 
+        sections_found = [section for section in ['data_pipeline', 'model_training', 'evaluate_model', 'strategy', 'backtesting', 'walk_forward'] 
                          if section in config]
         logger.info(f"Successfully loaded config sections: {sections_found}")
         

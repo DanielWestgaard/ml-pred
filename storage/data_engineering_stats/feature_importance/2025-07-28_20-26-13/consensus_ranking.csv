@@ -1,11 +1,3 @@
-,consensus_score
-compression_ratio_micro,1.0
-volume_ratio,0.5085860628502491
-volume_acceleration,0.3058732002213518
-london_session,0.21053173357112484
-compression_consistency,0.18187185830672956
-signal_strength_v2,0.11985386328649718
-volume_breakout,0.11428766127565992
-mid_price,0.07202931279513598
-future_price_change,0.012453029998005436
-price_momentum_5,0.011783853480909483
+version https://git-lfs.github.com/spec/v1
+oid sha256:3425805ab124407689dec94644fcdbfe7c558ae1408561292a87cba228125f2e
+size 379

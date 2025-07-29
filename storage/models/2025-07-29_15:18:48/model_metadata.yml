@@ -1,0 +1,79 @@
+hypothesis:
+  name: walk_forward_validation_period_4
+model_info:
+  model_type: random_forest
+  model_class: RandomForestClassifier
+  storage_path: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-07-29_15:18:48
+  created_at: '2025-07-29T15:18:48.906815'
+
+training:
+  duration_seconds: 13.67
+  duration_formatted: 0:00:13
+  completed_at: '2025-07-29T15:18:48.906824'
+  train_samples: 279936
+  test_samples: 69985
+
+dataset:
+  dataset_path: /Users/dmartinsen/pers-prog/ml-pred/storage/walk_forward_validation/2025-07-29_15-18-01_validation/period_4/training_data.csv
+  target_column: target_spread_compression_v2_directional
+  feature_count: 20
+  features:
+  - low
+  - price_level_support
+  - spread_regime_stability
+  - microstructure_health
+  - high
+  - depth_variability
+  - tick_intensity
+  - london_session
+  - liquidity_stress
+  - depth_stability
+  - compression_prediction_strength
+  - intrabar_pressure
+  - institutional_footprint
+  - cumulative_order_flow
+  - signal_conviction
+  - volume_ratio
+  - close
+  - open
+  - volume
+  - close_og
+  total_samples: 349921
+  date_range:
+    start: '2024-10-01 00:00:00+00:00'
+    end: '2025-06-01 00:00:00+00:00'
+  missing_values: 0
+
+model_parameters:
+  bootstrap: true
+  ccp_alpha: 0.0
+  class_weight: balanced
+  criterion: gini
+  max_depth: 10
+  max_features: sqrt
+  max_leaf_nodes: null
+  max_samples: null
+  min_impurity_decrease: 0.0
+  min_samples_leaf: 2
+  min_samples_split: 5
+  min_weight_fraction_leaf: 0.0
+  monotonic_cst: null
+  n_estimators: 300
+  n_jobs: -1
+  oob_score: true
+  random_state: 42
+  verbose: 0
+  warm_start: false
+
+system_info:
+  cpu: arm
+  cpu_cores: 10
+  cpu_threads: 10
+  memory_gb: 16.0
+  python_version: 3.11.13
+  os: Darwin 24.5.0
+
+data_split:
+  train_size: 279936
+  test_size: 69985
+  split_ratio: 279936/69985

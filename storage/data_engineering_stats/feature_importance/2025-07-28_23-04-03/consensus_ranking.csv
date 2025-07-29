@@ -1,15 +1,3 @@
-,consensus_score
-price_level_support,0.7813955048654038
-spread_regime_stability,0.7455656045027668
-depth_stability,0.7225761740436369
-tick_intensity,0.6858698360986628
-institutional_footprint,0.6069244468007072
-cumulative_order_flow,0.555295257563615
-microstructure_health,0.39530557521268145
-liquidity_stress,0.3887183538401946
-intrabar_pressure,0.3662558452526529
-depth_variability,0.35679986412970904
-volume_ratio,0.32388884195243184
-signal_conviction,0.29001286017750705
-compression_prediction_strength,0.2746528737662202
-london_session,0.08748291641639486
+version https://git-lfs.github.com/spec/v1
+oid sha256:7bae40ea5a1017d627d9b99f616b0a314305de532c0bfaa2676e08e3f52ead1f
+size 561
