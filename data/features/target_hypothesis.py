@@ -254,6 +254,225 @@ class TargetHypothesis(BaseProcessor):
             logger.error(f"Unable to calculate fixed target: {e}")
             return False
 
+    def spread_compression_patterns_v2(self):
+        """
+        Enhanced target for spread compression pattern hypothesis - VERSION 2.
+        
+        FOCUS: Quality Tier 2+ signals only, eliminating noisy Tier 1 signals.
+        GOAL: Better class balance (85/15 vs 93.9/6.1) with higher signal quality.
+        
+        Key improvements:
+        - Skip Tier 1 noise signals entirely
+        - More sensitive thresholds for Tier 2+ detection 
+        - Feature interaction logic using top predictors
+        - Enhanced volume and institutional confirmation
+        """
+        try:
+            # Required features check - Enhanced set focusing on top predictors
+            required_features = [
+                'depth_stability',        # TOP predictor (0.399 correlation)
+                'institutional_footprint', # Strong institutional signal
+                'liquidity_stress',       # Compression detection  
+                'microstructure_health',  # Signal quality filter
+                'volume_ratio',           # Volume confirmation
+                'london_session',         # Session timing
+                'signal_conviction'       # Composite signal strength
+            ]
+            
+            missing_features = [f for f in required_features if f not in self.df.columns]
+            temp_generated_features = []
+            
+            if missing_features:
+                logger.warning(f"Missing required features for enhanced target generation: {missing_features}")
+                logger.info("Generating missing features temporarily for target creation...")
+                
+                # Import the ModelAwareFeatureGenerator for on-demand feature generation
+                from data.features.enhanced_generation import ModelAwareFeatureGenerator
+                temp_generator = ModelAwareFeatureGenerator(self.df)
+                
+                # Map features to their generator methods
+                feature_generator_map = {
+                    'depth_stability': 'enhanced_market_depth_features',
+                    'liquidity_stress': 'enhanced_market_depth_features', 
+                    'institutional_footprint': 'enhanced_institutional_analysis',
+                    'microstructure_health': 'enhanced_microstructure_health',
+                    'signal_conviction': 'enhanced_predictive_signals',
+                    'volume_ratio': 'volume_ratio_feature',
+                    'london_session': 'fx_trading_sessions'
+                }
+                
+                # Generate missing features temporarily
+                for feature in missing_features:
+                    generator_method = feature_generator_map.get(feature)
+                    if generator_method and hasattr(temp_generator, generator_method):
+                        logger.debug(f"Temporarily generating {feature} using {generator_method}")
+                        temp_generator.__getattribute__(generator_method)()
+                        temp_generated_features.append(feature)
+                        logger.debug(f"Successfully generated {feature}")
+                    else:
+                        logger.error(f"Cannot generate missing feature: {feature} (no method {generator_method})")
+                        return
+                
+                # Update our dataframe with temporarily generated features
+                self.df = temp_generator.df
+            
+            # Future price movement (next 15 periods for target validation)
+            self.df['future_price_change'] = (
+                self.df['close'].shift(-15) - self.df['close']
+            ) / self.df['close']
+            
+            # STEP 1: Enhanced feature distribution analysis
+            logger.info("=== ENHANCED TARGET V2 ANALYSIS ===")
+            logger.info(f"Depth stability (TOP predictor): Mean {self.df['depth_stability'].mean():.4f}, "
+                    f"70th: {self.df['depth_stability'].quantile(0.70):.4f}, "
+                    f"80th: {self.df['depth_stability'].quantile(0.80):.4f}")
+            
+            logger.info(f"Institutional footprint: Mean {self.df['institutional_footprint'].mean():.4f}, "
+                    f"75th: {self.df['institutional_footprint'].quantile(0.75):.4f}")
+            
+            logger.info(f"Movement threshold candidates: "
+                    f"60th: {abs(self.df['future_price_change']).quantile(0.60):.6f}, "
+                    f"65th: {abs(self.df['future_price_change']).quantile(0.65):.6f}")
+            
+            # STEP 2: ENHANCED THRESHOLDS - Much more sensitive for 10%+ target
+            # Primary filter: Top predictor (depth_stability) - lowered to 50th percentile for more signals
+            depth_stability_threshold = self.df['depth_stability'].quantile(0.50)  # Much more sensitive
+            
+            # Secondary filters - significantly more sensitive
+            institutional_threshold = self.df['institutional_footprint'].quantile(0.60)  # Lowered from 75th
+            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.65)     # Lowered from 75th
+            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.50)  # Lowered from 60th
+            volume_threshold = max(1.02, self.df['volume_ratio'].quantile(0.60))        # Lowered from 70th and 1.05
+            signal_conviction_threshold = self.df['signal_conviction'].quantile(0.60)    # Lowered from 70th
+            
+            # Movement threshold - more sensitive for more signals
+            movement_threshold = abs(self.df['future_price_change']).quantile(0.50)      # Lowered from 60th
+            
+            logger.info(f"ENHANCED V2 Thresholds:")
+            logger.info(f"  Depth stability (primary): {depth_stability_threshold:.4f}")
+            logger.info(f"  Institutional activity: {institutional_threshold:.4f}")
+            logger.info(f"  Liquidity stress: {liquidity_stress_threshold:.4f}")
+            logger.info(f"  Volume confirmation: {volume_threshold:.4f}")
+            logger.info(f"  Movement threshold: {movement_threshold:.6f}")
+            
+            # STEP 3: FEATURE INTERACTION LOGIC - Quality-first approach
+            
+            # Primary signal: Top predictor + institutional confirmation
+            primary_signal = (
+                (self.df['depth_stability'] > depth_stability_threshold) &
+                (self.df['institutional_footprint'] > institutional_threshold)
+            )
+            
+            # Quality filters
+            stress_confirmation = self.df['liquidity_stress'] > liquidity_stress_threshold
+            volume_confirmation = self.df['volume_ratio'] > volume_threshold
+            health_filter = self.df['microstructure_health'] > microstructure_health_threshold
+            conviction_filter = self.df['signal_conviction'] > signal_conviction_threshold
+            
+            # London session amplifier
+            london_bonus = (self.df['london_session'] == 1)
+            
+            # Movement requirement
+            significant_movement = abs(self.df['future_price_change']) > movement_threshold
+            
+            # STEP 4: QUALITY-FOCUSED SIGNAL GENERATION (Skip Tier 1 entirely)
+            
+            # Quality Signal Level 1: Primary + Movement (minimum viable signal)
+            quality_signal_basic = primary_signal & significant_movement
+            
+            # Quality Signal Level 2: Add stress + volume confirmation  
+            quality_signal_medium = (
+                primary_signal & 
+                stress_confirmation & 
+                volume_confirmation & 
+                significant_movement
+            )
+            
+            # Quality Signal Level 3: Add health + conviction filters
+            quality_signal_strong = (
+                primary_signal &
+                stress_confirmation &
+                volume_confirmation & 
+                health_filter &
+                conviction_filter &
+                significant_movement
+            )
+            
+            # Quality Signal Level 4: London session premium
+            quality_signal_premium = quality_signal_strong & london_bonus
+            
+            # STEP 5: BINARY TARGET - Quality signals vs No signals (NO TIER 1 NOISE)
+            
+            # Create gradient scoring for better model training
+            target_score = np.where(
+                quality_signal_premium, 4,    # Premium signals
+                np.where(
+                    quality_signal_strong, 3,  # Strong signals  
+                    np.where(
+                        quality_signal_medium, 2,  # Medium signals
+                        np.where(
+                            quality_signal_basic, 1,  # Basic quality signals
+                            0  # No signal
+                        )
+                    )
+                )
+            )
+            
+            # Multi-class target for analysis
+            self.df['target_spread_compression_v2_multi'] = target_score
+            
+            # Binary target: ANY quality signal vs NO signal
+            self.df['target_spread_compression_v2_binary'] = (target_score > 0).astype(int)
+            
+            # STEP 6: Results Analysis
+            target_distribution = pd.Series(target_score).value_counts().sort_index()
+            binary_dist = self.df['target_spread_compression_v2_binary'].value_counts()
+            
+            logger.info(f"ENHANCED V2 Multi-class distribution: {target_distribution.to_dict()}")
+            logger.info(f"ENHANCED V2 Binary distribution: {binary_dist.to_dict()}")
+            
+            # Calculate improvements
+            total_quality_signals = (target_score > 0).sum()
+            quality_signal_rate = total_quality_signals / len(self.df) * 100
+            
+            logger.info(f"Quality signal frequency: {total_quality_signals}/{len(self.df)} = {quality_signal_rate:.2f}%")
+            
+            # Compare to original system
+            if quality_signal_rate > 6.1:  # Original was 6.1%
+                improvement = quality_signal_rate - 6.1
+                logger.info(f"✅ IMPROVEMENT: +{improvement:.1f}% more quality signals than original system")
+            
+            # Estimate class balance improvement
+            negative_rate = (1 - quality_signal_rate/100) * 100
+            logger.info(f"Enhanced class balance: {negative_rate:.1f}% negative / {quality_signal_rate:.1f}% positive")
+            
+            if quality_signal_rate > 10:
+                logger.info("✅ TARGET ACHIEVED: >10% positive class for better model training")
+            
+            # Clean up temporary features AND future_price_change (data leakage prevention)
+            cleanup_features = temp_generated_features + ['future_price_change']
+            cleanup_features = [f for f in cleanup_features if f in self.df.columns]
+            
+            if cleanup_features:
+                logger.info(f"Cleaning up temporary and leakage features: {cleanup_features}")
+                self.df = self.df.drop(columns=cleanup_features)
+                logger.debug("Clean training data maintained - no data leakage")
+            
+            # STEP 7: Quality validation for each signal level
+            logger.info("=== SIGNAL QUALITY VALIDATION ===")
+            for level in [1, 2, 3, 4]:
+                level_mask = target_score == level
+                if level_mask.sum() > 0:
+                    level_movement = abs(self.df[level_mask]['future_price_change']).mean() if 'future_price_change' in self.df.columns else 0
+                    logger.info(f"Quality Level {level}: {level_mask.sum()} signals, avg movement: {level_movement:.6f}")
+            
+            logger.info("✅ Enhanced target generation V2 completed successfully!")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to generate enhanced target V2: {e}")
+            return False
+
     # IMPORTANT FOR FURTHER DEVELOPMENT: Remember to add the prefix 'target_*' for the target column to the hypothesis.
     # This is because the normalization step after generation and this step will not normalize columns that starts with 'target_'.
 
