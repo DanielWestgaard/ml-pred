@@ -496,7 +496,7 @@ class BacktestOrchestrator:
                                         position['entry_time'] = pd.to_datetime(current_data['timestamp'], utc=True)
                                     
                                     # Track with signal tracker
-                                    confidence = probabilities[0] if probabilities is not None and len(probabilities) > 0 else 0.8
+                                    confidence = float(np.squeeze(probabilities[0])) if probabilities is not None and len(probabilities) > 0 else 0.8
                                     self.signal_tracker.track_entry_signal(position_id, current_data, confidence)
                                 
                                 # Position tracking handled by SimulationBroker
