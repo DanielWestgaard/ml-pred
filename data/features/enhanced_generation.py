@@ -2058,6 +2058,12 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             
         else:
             logger.warning("Spread tight/wide data not available - using spread_close approximation")
+            
+            # Check if spread_close exists, if not create it from high-low
+            if 'spread_close' not in self.df.columns:
+                logger.info("Creating spread_close approximation from high-low spread")
+                self.df['spread_close'] = self.df['high'] - self.df['low']
+            
             spread_close = self.df['spread_close']
             
             # Approximate using spread_close volatility

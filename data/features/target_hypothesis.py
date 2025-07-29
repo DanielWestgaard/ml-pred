@@ -290,7 +290,7 @@ class TargetHypothesis(BaseProcessor):
                 feature_generator_map = {
                     'depth_stability': 'enhanced_market_depth_features',
                     'liquidity_stress': 'enhanced_market_depth_features', 
-                    'institutional_footprint': 'enhanced_institutional_analysis',
+                    'institutional_footprint': 'institutional_footprint_detection',
                     'microstructure_health': 'enhanced_microstructure_health',
                     'signal_conviction': 'enhanced_predictive_signals',
                     'volume_ratio': 'volume_ratio_feature',
