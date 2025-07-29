@@ -4,7 +4,7 @@ hypothesis:
 # Backtesting: Rapid strategy validation with historical data
 backtesting:
     enabled: true
-    model_folder: storage/models/2025-07-28_23:31:27
+    model_folder: storage/models/2025-07-29_10:35:20
     
     # Extended test period for better statistical significance
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
