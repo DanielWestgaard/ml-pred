@@ -1,0 +1,41 @@
+================================================================================
+FEATURE IMPORTANCE ANALYSIS REPORT
+================================================================================
+Dataset: 172980 rows, 4 features
+Target: target_spread_compression_v2_long_score (classification)
+Analysis Date: 2025-07-30 00:54:41
+
+CONSENSUS TOP FEATURES:
+----------------------------------------
+ 1. volume_ratio                   0.8775
+ 2. institutional_footprint        0.8113
+ 3. cumulative_order_flow          0.7829
+ 4. volume_profile_enhanced        0.4668
+
+CORRELATION - TOP 5:
+------------------------------
+1. volume_ratio              0.2026
+2. institutional_footprint   0.1755
+3. cumulative_order_flow     0.1010
+4. volume_profile_enhanced   0.0508
+
+MUTUAL INFORMATION - TOP 5:
+------------------------------
+1. volume_ratio              0.0345
+2. institutional_footprint   0.0251
+3. cumulative_order_flow     0.0218
+4. volume_profile_enhanced   0.0216
+
+RANDOM FOREST - TOP 5:
+------------------------------
+1. cumulative_order_flow     0.2976
+2. institutional_footprint   0.2527
+3. volume_ratio              0.2479
+4. volume_profile_enhanced   0.2019
+
+PERMUTATION - TOP 5:
+------------------------------
+1. cumulative_order_flow     0.0049
+2. institutional_footprint   0.0040
+3. volume_ratio              0.0033
+4. volume_profile_enhanced   0.0015

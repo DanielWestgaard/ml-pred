@@ -2,12 +2,13 @@ hypothesis:
   name: spread_compression_patterns_v2
 
 data_pipeline:
-  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-01-01_2025-03-01.csv
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2025-03-02_2025-07-01.csv
   spread_focused: true
 
-  selected_features:  # TEST COMBINATION 2: Top 3 Enhanced features (RETRY)
+  selected_features:  # TEST COMBINATION 4: Volume-Focused (Volume + Institutional Activity)
     [
-      'microstructure_momentum_fusion',  # 0.999 - Best enhanced feature
-      'top_predictor_interaction',       # 0.905 - Combined top predictors
-      'volume_profile_enhanced'          # 0.600 - Enhanced volume analysis
+      'volume_ratio',                  # 0.912 - Strong traditional volume confirmation
+      'volume_profile_enhanced',       # 0.600 - Enhanced volume analysis
+      'institutional_footprint',       # 0.878 - Traditional institutional activity  
+      'cumulative_order_flow'          # Order flow volume dynamics
     ]
