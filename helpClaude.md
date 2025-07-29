@@ -290,3 +290,79 @@ After fixing data leakage, discovered severe class imbalance in target distribut
 5. **Target Generation**: Clean `target_spread_compression_v2_directional` system
 
 **Status: PROFITABLE TRADING SYSTEM OPERATIONAL ✅ | READY FOR PRODUCTION TESTING ✅**
+
+---
+
+## **⚠️ CRITICAL DISCOVERY: DATA LEAKAGE ANALYSIS (July 29, 2025)**
+
+### **🔍 Temporal Data Leakage Investigation**
+
+**Problem Discovered**: After achieving +9.54% returns, further testing revealed **temporal data leakage** in model training:
+
+**Evidence of Data Leakage:**
+- **Successful test**: Oct 4-15, 2024 → **9.54% return, 100% win rate, 60 trades**
+- **Failed tests**: Mar/May 2025 periods → **-41.74% and -144.35% returns, 0% win rates**
+- **Root cause**: Training data (Oct 1, 2024 - Jul 25, 2025) **includes successful test period**
+
+### **🔧 TRAINING IMPLEMENTATION ANALYSIS**
+
+**Current Implementation Status:**
+
+#### **✅ Temporal Split Implemented Correctly**
+- **File**: `model_training.py:300`
+- **Method**: Uses `sktime.temporal_train_test_split()` 
+- **Purpose**: Avoids lookahead bias with proper temporal ordering
+- **Split**: 80/20 temporal split within training dataset
+
+#### **❌ No Walk-Forward Validation**
+- **Current**: Single 80/20 split, not rolling windows
+- **Missing**: Incremental retraining on new data
+- **Impact**: Model doesn't adapt to changing market conditions
+
+#### **✅ Data Period Sufficient**
+- **Training data**: 2023-01-01 to 2025-07-01 (2.5 years)
+- **Volume**: Ample 1-minute data for pattern recognition
+- **Coverage**: Multiple market regimes and conditions
+
+#### **❌ Temporal Boundary Violations**
+- **Critical issue**: Training period overlaps test periods
+- **Current**: Train on 2024-10-01 to 2025-07-25, test on 2024-10-04 to 2024-10-15
+- **Required**: Strict separation - train only on data **before** test periods
+
+### **🎯 REQUIRED FIXES**
+
+#### **1. Temporal Separation Enforcement**
+```yaml
+# Fixed approach
+training:
+  period: 2023-01-01 to 2025-07-01  # Train only on data before test
+  
+backtesting:
+  period: 2025-07-02 onwards         # Test only on truly unseen data
+```
+
+#### **2. Walk-Forward Validation Implementation**
+- **Expanding window**: Incrementally add new data to training
+- **Rolling retraining**: Retrain model as new periods become available
+- **Proper validation**: Multiple out-of-sample periods for robust testing
+
+#### **3. Realistic Performance Assessment**
+- **Expected**: 0% win rates on clean periods indicate model needs enhancement
+- **Reality check**: Without data leakage, current features lack predictive power
+- **Next steps**: Feature engineering focused on genuine market inefficiencies
+
+### **📊 CORRECTED STATUS**
+
+**Current Implementation:**
+- ✅ **Temporal split methodology**: Correct approach using sktime
+- ❌ **Walk-forward validation**: Not implemented
+- ✅ **Data sufficiency**: 2.5 years adequate for training
+- ❌ **Temporal boundaries**: Training/test overlap creates leakage
+
+**Required for Production:**
+1. **Strict temporal separation**: Train 2023-2025, test 2025+
+2. **Walk-forward validation**: Rolling window retraining
+3. **Enhanced features**: Current features insufficient without leakage
+4. **Realistic expectations**: Model needs fundamental improvement
+
+**Status: DATA LEAKAGE IDENTIFIED ⚠️ | TEMPORAL BOUNDARIES REQUIRE FIXING ❌ | TRAINING METHODOLOGY SOUND ✅**
