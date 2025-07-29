@@ -303,3 +303,47 @@
 29-07-2025 23:30:23 - data.features.feature_importance        :195  - INFO     - Mutual information analysis completed. Top feature: microstructure_momentum_fusion (0.0381)
 29-07-2025 23:30:25 - data.features.feature_importance        :220  - INFO     - Random Forest analysis completed. Top feature: microstructure_momentum_fusion (0.2693)
 29-07-2025 23:30:25 - data.features.feature_importance        :231  - INFO     - Lasso importance skipped (classification task)
+29-07-2025 23:30:33 - data.features.feature_importance        :283  - INFO     - Permutation importance analysis completed. Top feature: volume_profile_enhanced (0.0011)
+29-07-2025 23:30:33 - data.features.feature_importance        :328  - INFO     - Consensus ranking completed. Top feature: microstructure_momentum_fusion (0.9372)
+29-07-2025 23:30:33 - data.features.feature_importance        :328  - INFO     - Consensus ranking completed. Top feature: microstructure_momentum_fusion (0.9372)
+29-07-2025 23:30:34 - data.features.feature_importance        :373  - INFO     - Feature importance plot saved to storage/data_engineering_stats/feature_importance/2025-07-29_23-30-21/feature_importance_analysis.png
+29-07-2025 23:30:36 - data.features.feature_importance        :328  - INFO     - Consensus ranking completed. Top feature: microstructure_momentum_fusion (0.9372)
+29-07-2025 23:30:36 - data.features.feature_importance        :442  - INFO     - Feature importance analysis completed and saved to storage/data_engineering_stats/feature_importance/2025-07-29_23-30-21
+29-07-2025 23:30:36 - data.pipelines.engineer_pipeline        :160  - INFO     - Feature Importance Analysis Results:
+29-07-2025 23:30:36 - data.pipelines.engineer_pipeline        :161  - INFO     - Top 10 features by consensus ranking:
+29-07-2025 23:30:36 - data.pipelines.engineer_pipeline        :163  - INFO     -    1. microstructure_momentum_fusion 0.9372
+29-07-2025 23:30:36 - data.pipelines.engineer_pipeline        :163  - INFO     -    2. top_predictor_interaction 0.8808
+29-07-2025 23:30:36 - data.pipelines.engineer_pipeline        :163  - INFO     -    3. volume_profile_enhanced   0.6689
+29-07-2025 23:30:36 - data.pipelines.engineer_pipeline        :163  - INFO     -    4. ultra_momentum_suite      0.5561
+29-07-2025 23:30:36 - data.pipelines.engineer_pipeline        :165  - INFO     - Full results saved to: storage/data_engineering_stats/feature_importance/2025-07-29_23-30-21
+29-07-2025 23:30:36 - utils.data_utils                        :250  - DEBUG    - Loading                            volume  ...  target_spread_compression_v2_binary
+2025-03-02 22:01:00+00:00       1  ...                                    0
+2025-03-02 22:02:00+00:00       3  ...                                    0
+2025-03-02 22:03:00+00:00       3  ...                                    0
+2025-03-02 22:04:00+00:00       4  ...                                    0
+2025-03-02 22:05:00+00:00      16  ...                                    0
+...                           ...  ...                                  ...
+2025-07-01 00:56:00+00:00      33  ...                                    0
+2025-07-01 00:57:00+00:00      23  ...                                    0
+2025-07-01 00:58:00+00:00      41  ...                                    0
+2025-07-01 00:59:00+00:00      35  ...                                    0
+2025-07-01 01:00:00+00:00      44  ...                                    0
+
+[172980 rows x 14 columns]
+29-07-2025 23:30:36 - data.features.transformation            :38   - INFO     - ---------- Running Feature Transformer ----------
+29-07-2025 23:30:36 - data.features.transformation            :63   - WARNING  - Dataset has features containing empty values. Will drop relevant features.
+29-07-2025 23:30:36 - data.features.transformation            :79   - DEBUG    - Starting to filter features based on missing values...
+29-07-2025 23:30:36 - data.features.transformation            :103  - DEBUG    - No columns exceeded NaN threshold
+29-07-2025 23:30:36 - data.features.transformation            :126  - INFO     - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 172980
+29-07-2025 23:30:36 - data.features.transformation            :139  - INFO     - Applying forward fill to 5 columns with scattered NaNs
+29-07-2025 23:30:36 - data.features.transformation            :151  - INFO     - Forward fill imputed 146295 values
+29-07-2025 23:30:36 - data.features.transformation            :155  - WARNING  - After forward fill, 88 NaN values remain
+29-07-2025 23:30:36 - data.features.transformation            :156  - WARNING  - These are likely at the beginning of the series - consider additional treatment
+29-07-2025 23:30:36 - data.features.transformation            :161  - DEBUG    - Columns still containing NaNs: ['microstructure_momentum_fusion', 'volume_profile_enhanced', 'top_predictor_interaction', 'ultra_momentum_suite', 'depth_stability_enhanced']
+29-07-2025 23:30:36 - data.features.transformation            :173  - INFO     - Filled beginning NaNs with first valid values
+29-07-2025 23:30:36 - data.features.transformation            :200  - DEBUG    - No categorical columns found to encode
+29-07-2025 23:30:36 - data.pipelines.engineer_pipeline        :119  - INFO     - As selected features were provided, pipeline will skip Feature Selection.
+29-07-2025 23:30:36 - data.pipelines.engineer_pipeline        :124  - INFO     - ---------- Data Pipeline finished all 'data steps'! ----------
+29-07-2025 23:30:36 - utils.data_utils                        :301  - INFO     - Saving processed file ...
+29-07-2025 23:30:37 - utils.data_utils                        :316  - INFO     - Successfully saved file! storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
+29-07-2025 23:30:37 - data.pipelines.engineer_pipeline        :133  - INFO     - ---------- Data Pipeline Finished ----------
