@@ -111,17 +111,44 @@ class SignalProcessor:
         """
         Convert classification prediction to signal
         
-        For binary classification models like spread compression:
+        For three-class directional models:
+        - Class 0 (hold) → NO SIGNAL (low confidence, filtered out)
+        - Class 1 (buy) → BUY signal with high confidence  
+        - Class 2 (sell) → SELL signal with high confidence
+        
+        For binary classification models:
         - Class 1 (positive) → BUY signal with high confidence
         - Class 0 (negative) → NO SIGNAL (low confidence, filtered out)
         
         Args:
-            prediction: Class prediction (0 or 1)
-            probability: Probability of positive class
+            prediction: Class prediction (0, 1, or 2 for three-class; 0 or 1 for binary)
+            probability: Probability array or single probability
             index: Prediction index
         """
-        # Use probability if available, otherwise use binary prediction
-        if probability is not None:
+        # Handle three-class directional predictions
+        if hasattr(probability, '__len__') and len(probability) == 3:
+            # Three-class model: [prob_hold, prob_buy, prob_sell]
+            prob_hold, prob_buy, prob_sell = probability
+            predicted_class = int(prediction)
+            
+            if predicted_class == 1:  # BUY signal (Class 1)
+                confidence = prob_buy
+                direction = 'BUY'
+                strength = prob_buy
+            elif predicted_class == 2:  # SELL signal (Class 2)
+                confidence = prob_sell  
+                direction = 'SELL'
+                strength = prob_sell
+            else:  # HOLD signal (Class 0) 
+                confidence = prob_hold  # Low confidence to filter out
+                direction = 'BUY'  # Default direction, but will be filtered out
+                strength = prob_hold
+                
+        # Handle binary classification (legacy support)
+        elif probability is not None:
+            if isinstance(probability, (list, tuple)):
+                probability = probability[1] if len(probability) > 1 else probability[0]
+                
             # Only generate signals for positive class predictions
             if probability > 0.5:  # Class 1 prediction
                 confidence = probability  # Use actual probability as confidence
