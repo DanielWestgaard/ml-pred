@@ -53,6 +53,106 @@ class TargetHypothesis(BaseProcessor):
         
         return self.df
     
+    def _generate_features_with_dependencies(self, required_features, feature_dependency_map):
+        """
+        Reusable method to generate required features and their dependencies.
+        
+        Args:
+            required_features: List of feature names that are required
+            feature_dependency_map: Dict mapping feature_name -> (generator_method, [dependencies])
+                                   e.g., {'volume_ratio': ('volume_ratio_feature', ['volume_ma_20'])}
+        
+        Returns:
+            tuple: (successfully_generated_features, temp_generator_df)
+        """
+        from data.features.enhanced_generation import ModelAwareFeatureGenerator
+        
+        missing_features = [f for f in required_features if f not in self.df.columns]
+        if not missing_features:
+            return [], self.df
+            
+        logger.warning(f"Missing required features for enhanced target generation: {missing_features}")
+        logger.info("Generating missing features temporarily for target creation...")
+        
+        temp_generator = ModelAwareFeatureGenerator(self.df)
+        
+        # Ensure datetime index for session features
+        if 'date' in temp_generator.df.columns:
+            temp_generator.df.set_index('date', inplace=True)
+            temp_generator.df.index = pd.to_datetime(temp_generator.df.index)
+        
+        # Build complete dependency graph including transitive dependencies
+        all_needed_features = set(missing_features)
+        
+        def add_dependencies_recursively(feature_name):
+            if feature_name in feature_dependency_map:
+                _, dependencies = feature_dependency_map[feature_name]
+                if dependencies:
+                    for dep in dependencies:
+                        if dep not in temp_generator.df.columns:
+                            all_needed_features.add(dep)
+                            add_dependencies_recursively(dep)
+        
+        for feature in missing_features:
+            add_dependencies_recursively(feature)
+        
+        # Topologically sort features based on dependencies
+        def topological_sort():
+            visited = set()
+            temp_visited = set()
+            result = []
+            
+            def visit(feature):
+                if feature in temp_visited:
+                    logger.warning(f"Circular dependency detected involving {feature}")
+                    return
+                if feature in visited:
+                    return
+                    
+                temp_visited.add(feature)
+                
+                if feature in feature_dependency_map:
+                    _, dependencies = feature_dependency_map[feature]
+                    if dependencies:
+                        for dep in dependencies:
+                            if dep in all_needed_features:
+                                visit(dep)
+                
+                temp_visited.remove(feature)
+                visited.add(feature)
+                result.append(feature)
+            
+            for feature in all_needed_features:
+                if feature not in visited:
+                    visit(feature)
+            
+            return result
+        
+        generation_order = topological_sort()
+        successfully_generated = []
+        
+        # Generate features in dependency order
+        for feature_name in generation_order:
+            if feature_name not in temp_generator.df.columns:
+                if feature_name in feature_dependency_map:
+                    generator_method, _ = feature_dependency_map[feature_name]
+                    if generator_method and hasattr(temp_generator, generator_method):
+                        try:
+                            logger.debug(f"Temporarily generating {feature_name} using {generator_method}")
+                            temp_generator.__getattribute__(generator_method)()
+                            if feature_name in temp_generator.df.columns:
+                                successfully_generated.append(feature_name)
+                                logger.debug(f"Successfully generated {feature_name}")
+                            else:
+                                logger.warning(f"Feature {feature_name} not found after generation")
+                        except Exception as e:
+                            logger.warning(f"Failed to generate {feature_name}: {e}")
+                    else:
+                        logger.warning(f"Cannot generate missing feature: {feature_name} (no method {generator_method})")
+        
+        logger.info(f"Successfully generated {len(successfully_generated)} features: {successfully_generated}")
+        return successfully_generated, temp_generator.df
+    
     def session_based_tod_anomalies(self):
         """
         This target captures when future volatility is abnormally high relative to that specific session's
@@ -275,65 +375,34 @@ class TargetHypothesis(BaseProcessor):
                 'signal_conviction'       # Composite signal strength
             ]
             
-            missing_features = [f for f in required_features if f not in self.df.columns]
-            temp_generated_features = []
+            # Define feature dependency mapping for this hypothesis
+            feature_dependency_map = {
+                'volume_ma_20': ('volume_ma_20_feature', []),
+                'volume_ratio': ('volume_ratio_feature', ['volume_ma_20']),
+                'depth_stability': ('enhanced_market_depth_features', []),
+                'liquidity_stress': ('enhanced_market_depth_features', []),
+                'institutional_footprint': ('institutional_footprint_detection', ['volume_ratio']),
+                'microstructure_health': ('enhanced_microstructure_health', []),
+                'signal_conviction': ('enhanced_predictive_signals', []),
+                'london_session': ('fx_trading_sessions', [])
+            }
             
-            if missing_features:
-                logger.warning(f"Missing required features for enhanced target generation: {missing_features}")
-                logger.info("Generating missing features temporarily for target creation...")
-                
-                # Import the ModelAwareFeatureGenerator for on-demand feature generation
-                from data.features.enhanced_generation import ModelAwareFeatureGenerator
-                temp_generator = ModelAwareFeatureGenerator(self.df)
-                
-                # Map features to their generator methods with dependencies
-                feature_dependency_order = [
-                    ('volume_ma_20', 'volume_ma_20_feature'),      # First: base volume dependency
-                    ('volume_ratio', 'volume_ratio_feature'),      # Second: depends on volume_ma_20
-                    ('depth_stability', 'enhanced_market_depth_features'),
-                    ('liquidity_stress', 'enhanced_market_depth_features'), 
-                    ('institutional_footprint', 'institutional_footprint_detection'),  # Depends on volume_ratio
-                    ('microstructure_health', 'enhanced_microstructure_health'),
-                    ('signal_conviction', 'enhanced_predictive_signals'),
-                    ('london_session', 'fx_trading_sessions')
-                ]
-                
-                # Ensure datetime index for session features
-                if 'date' in temp_generator.df.columns:
-                    temp_generator.df.set_index('date', inplace=True)
-                    temp_generator.df.index = pd.to_datetime(temp_generator.df.index)
-                
-                # Generate missing features temporarily with robust error handling and dependency order
-                successfully_generated = []
-                for feature_name, generator_method in feature_dependency_order:
-                    if feature_name in missing_features:
-                        if generator_method and hasattr(temp_generator, generator_method):
-                            try:
-                                logger.debug(f"Temporarily generating {feature_name} using {generator_method}")
-                                temp_generator.__getattribute__(generator_method)()
-                                if feature_name in temp_generator.df.columns:
-                                    successfully_generated.append(feature_name)
-                                    temp_generated_features.append(feature_name)
-                                    logger.debug(f"Successfully generated {feature_name}")
-                                else:
-                                    logger.warning(f"Feature {feature_name} not found after generation")
-                            except Exception as e:
-                                logger.warning(f"Failed to generate {feature_name}: {e}")
-                        else:
-                            logger.warning(f"Cannot generate missing feature: {feature_name} (no method {generator_method})")
-                
-                # Check if we have the minimum required features for target generation
-                critical_features = ['depth_stability', 'institutional_footprint', 'volume_ratio', 'microstructure_health']
-                missing_critical = [f for f in critical_features if f not in temp_generator.df.columns]
-                
-                if missing_critical:
-                    logger.error(f"Cannot proceed with target generation - missing critical features: {missing_critical}")
-                    return False
-                
-                logger.info(f"Successfully generated {len(successfully_generated)} features temporarily: {successfully_generated}")
-                
-                # Update our dataframe with temporarily generated features
-                self.df = temp_generator.df
+            # Use reusable dependency resolution method
+            successfully_generated, updated_df = self._generate_features_with_dependencies(
+                required_features, feature_dependency_map
+            )
+            
+            # Update dataframe and track temporary features
+            self.df = updated_df
+            temp_generated_features = successfully_generated
+            
+            # Check if we have the minimum required features for target generation
+            critical_features = ['depth_stability', 'institutional_footprint', 'volume_ratio', 'microstructure_health']
+            missing_critical = [f for f in critical_features if f not in self.df.columns]
+            
+            if missing_critical:
+                logger.error(f"Cannot proceed with target generation - missing critical features: {missing_critical}")
+                return False
             
             # REMOVED: Future price movement causes data leakage
             # Target generation should be based only on current market conditions

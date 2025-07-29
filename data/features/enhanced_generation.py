@@ -2215,10 +2215,19 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         Enhanced composite predictive signals (consensus: 0.4916, 0.4336)
         Combines multiple microstructure signals for prediction strength
         """
-        # Basic signal components
-        volume_ratio = self.df.get('volume_ratio', 1)
-        spread_regime_deviation = self.df.get('spread_close', 0) - self.df.get('spread_close', 0).rolling(240, min_periods=60).mean()
-        spread_regime_deviation = spread_regime_deviation / (self.df.get('spread_close', 0).rolling(240, min_periods=60).std() + 1e-8)
+        # Basic signal components - ensure proper Series objects
+        if 'volume_ratio' in self.df.columns:
+            volume_ratio = self.df['volume_ratio']
+        else:
+            volume_ratio = pd.Series(1.0, index=self.df.index)
+            
+        if 'spread_close' in self.df.columns:
+            spread_close = self.df['spread_close']
+        else:
+            spread_close = pd.Series(0.0, index=self.df.index)
+            
+        spread_regime_deviation = spread_close - spread_close.rolling(240, min_periods=60).mean()
+        spread_regime_deviation = spread_regime_deviation / (spread_close.rolling(240, min_periods=60).std() + 1e-8)
         
         large_block_indicator = np.where(
             self.df['volume'] > self.df['volume'].rolling(120, min_periods=30).quantile(0.8) * 2,
@@ -2227,17 +2236,26 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         )
         
         # 1. Compression prediction strength
+        if 'depth_variability' in self.df.columns:
+            depth_variability = self.df['depth_variability']
+        else:
+            depth_variability = pd.Series(0.0, index=self.df.index)
+            
         compression_signal = (
             np.clip(spread_regime_deviation, -2, 2) * 0.3 +
             np.clip((volume_ratio - 1) * 2, -2, 2) * 0.3 +
             np.clip(large_block_indicator, 0, 4) * 0.2 +
-            np.clip(self.df.get('depth_variability', 0), 0, 2) * 0.2
+            np.clip(depth_variability, 0, 2) * 0.2
         )
         
         self.df['compression_prediction_strength'] = np.tanh(compression_signal)
         
         # 2. Signal conviction (combines prediction strength with microstructure health)
-        microstructure_health = self.df.get('microstructure_health', 0.5)
+        if 'microstructure_health' in self.df.columns:
+            microstructure_health = self.df['microstructure_health']
+        else:
+            microstructure_health = pd.Series(0.5, index=self.df.index)
+            
         self.df['signal_conviction'] = (
             abs(self.df['compression_prediction_strength']) * microstructure_health
         )
