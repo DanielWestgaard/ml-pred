@@ -1,36 +1,13 @@
 hypothesis:
-  name: spread_compression_patterns_v2  # Uses the enhanced v2 target generation method
+  name: spread_compression_patterns_v2
 
 data_pipeline:
-  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2025-03-02_2025-07-01.csv
-  spread_focused: true  # Enable bid-ask spread data preservation (default: false)
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2024-01-01_2025-03-01.csv
+  spread_focused: true
 
-  selected_features:  # ENHANCED PREDICTIVE FEATURES - Top 15 from comprehensive analysis
+  selected_features:  # TEST COMBINATION 1: Top 3 traditional features
     [
-      # 'volume',                       # Top predictor (0.9870 consensus score)
-      # 'depth_stability',              # #2 predictor (0.9533) - Market depth consistency 
-      # 'depth_variability',            # Strong predictor (0.7153) - Spread depth variation
-      # 'liquidity_stress',             # Strong predictor (0.7089) - Liquidity strain detection
-      # 'microstructure_health',        # Top 5 predictor (0.6813) - Composite health score
-      # 'price_level_support',          # Support/resistance (0.5794) - Price clustering analysis
-      # 'spread_regime_stability',      # Regime stability (0.5292) - Spread regime transitions
-      # 'tick_intensity',               # Tick activity (0.5222) - Volume/range ratio
-      # 'cumulative_order_flow',        # Order flow (0.4997) - Price-volume trend
-      # 'intrabar_pressure',            # Pressure indicator (0.4971) - Buying/selling pressure
-      # 'signal_conviction',            # Composite signal (0.4916) - Multi-factor conviction
-      # 'compression_prediction_strength', # Prediction strength (0.4336) - Compression signals
-      # 'volume_ratio',                 # Volume confirmation (proven effective)
-      # 'london_session',               # Session timing (proven effective)
-      # 'institutional_footprint',      # Institutional activity (proven effective)
-      # 'depth_stability_enhanced',      # Enhanced top predictor
-      # 'ultra_momentum_suite',          # 1-minute momentum
-      # 'volume_profile_enhanced',       # Enhanced volume  
-      # 'top_predictor_interaction',     # Combined top 3
-      # 'microstructure_momentum_fusion', # Best hybrid signal
-      # ENHANCED FEATURES ONLY - Dependencies generated temporarily for target creation
-      'microstructure_momentum_fusion',  # Best hybrid signal (65.3% consensus)
-      'top_predictor_interaction',       # Combined top 3 predictors (59.4% consensus) 
-      'ultra_momentum_suite',            # 1-minute optimized momentum (37.9% consensus)
-      'volume_profile_enhanced',         # Professional volume analysis (27.7% consensus)
-      'depth_stability_enhanced'         # Enhanced top predictor
+      'depth_stability',                 # 0.967 - TOP traditional predictor  
+      'volume_ratio',                    # 0.912 - Strong volume confirmation
+      'institutional_footprint'          # 0.878 - Institutional detection
     ]
