@@ -141,10 +141,10 @@ class SignalProcessor:
                 confidence = prob_sell  
                 direction = 'SELL'
                 strength = prob_sell
-            else:  # HOLD signal (Class 0) 
-                confidence = prob_hold  # Low confidence to filter out
-                direction = 'BUY'  # Default direction, but will be filtered out
-                strength = prob_hold
+            else:  # HOLD signal (Class 0) - should NOT generate trading signals
+                confidence = 0.0  # Force low confidence to filter out HOLD predictions
+                direction = 'HOLD'  # Proper direction for HOLD
+                strength = 0.0  # No strength for HOLD signals
                 
         # Handle binary classification (legacy support)
         elif probability is not None:
