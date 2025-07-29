@@ -63,18 +63,21 @@ class TargetHypothesis(BaseProcessor):
                                    e.g., {'volume_ratio': ('volume_ratio_feature', ['volume_ma_20'])}
         
         Returns:
-            tuple: (successfully_generated_features, temp_generator_df)
+            tuple: (successfully_generated_features, all_added_features, temp_generator_df)
         """
         from data.features.enhanced_generation import ModelAwareFeatureGenerator
         
         missing_features = [f for f in required_features if f not in self.df.columns]
         if not missing_features:
-            return [], self.df
+            return [], [], self.df
             
         logger.warning(f"Missing required features for enhanced target generation: {missing_features}")
         logger.info("Generating missing features temporarily for target creation...")
         
         temp_generator = ModelAwareFeatureGenerator(self.df)
+        
+        # Track original columns to identify all added features
+        original_columns = set(temp_generator.df.columns)
         
         # Ensure datetime index for session features
         if 'date' in temp_generator.df.columns:
@@ -150,8 +153,14 @@ class TargetHypothesis(BaseProcessor):
                     else:
                         logger.warning(f"Cannot generate missing feature: {feature_name} (no method {generator_method})")
         
+        # Identify all features that were added during the process
+        final_columns = set(temp_generator.df.columns)
+        all_added_features = list(final_columns - original_columns)
+        
         logger.info(f"Successfully generated {len(successfully_generated)} features: {successfully_generated}")
-        return successfully_generated, temp_generator.df
+        logger.debug(f"Total features added during process: {len(all_added_features)} - {all_added_features}")
+        
+        return successfully_generated, all_added_features, temp_generator.df
     
     def session_based_tod_anomalies(self):
         """
@@ -388,13 +397,13 @@ class TargetHypothesis(BaseProcessor):
             }
             
             # Use reusable dependency resolution method
-            successfully_generated, updated_df = self._generate_features_with_dependencies(
+            _, all_added_features, updated_df = self._generate_features_with_dependencies(
                 required_features, feature_dependency_map
             )
             
-            # Update dataframe and track temporary features
+            # Update dataframe and track ALL features added (not just successfully generated)
             self.df = updated_df
-            temp_generated_features = successfully_generated
+            temp_generated_features = all_added_features  # Track ALL added features for cleanup
             
             # Check if we have the minimum required features for target generation
             critical_features = ['depth_stability', 'institutional_footprint', 'volume_ratio', 'microstructure_health']
