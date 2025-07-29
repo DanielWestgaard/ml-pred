@@ -372,82 +372,163 @@ class TargetHypothesis(BaseProcessor):
             # London session amplifier
             london_bonus = (self.df['london_session'] == 1)
             
-            # Movement requirement
-            significant_movement = abs(self.df['future_price_change']) > movement_threshold
+            # STEP 4: DIRECTIONAL SIGNAL GENERATION - Three-class system
             
-            # STEP 4: QUALITY-FOCUSED SIGNAL GENERATION (Skip Tier 1 entirely)
+            # Directional movement detection
+            upward_movement = self.df['future_price_change'] > movement_threshold      # BUY signals
+            downward_movement = self.df['future_price_change'] < -movement_threshold   # SELL signals
+            no_movement = (abs(self.df['future_price_change']) <= movement_threshold)  # HOLD signals
             
-            # Quality Signal Level 1: Primary + Movement (minimum viable signal)
-            quality_signal_basic = primary_signal & significant_movement
+            logger.info(f"Directional movement distribution:")
+            logger.info(f"  Upward movements: {upward_movement.sum()} ({upward_movement.mean()*100:.1f}%)")
+            logger.info(f"  Downward movements: {downward_movement.sum()} ({downward_movement.mean()*100:.1f}%)")
+            logger.info(f"  No significant movement: {no_movement.sum()} ({no_movement.mean()*100:.1f}%)")
+            
+            # Quality Signal Level 1: Primary + Directional Movement
+            quality_signal_long_basic = primary_signal & upward_movement      # Long signals
+            quality_signal_short_basic = primary_signal & downward_movement   # Short signals
             
             # Quality Signal Level 2: Add stress + volume confirmation  
-            quality_signal_medium = (
+            quality_signal_long_medium = (
                 primary_signal & 
                 stress_confirmation & 
                 volume_confirmation & 
-                significant_movement
+                upward_movement
+            )
+            quality_signal_short_medium = (
+                primary_signal & 
+                stress_confirmation & 
+                volume_confirmation & 
+                downward_movement
             )
             
             # Quality Signal Level 3: Add health + conviction filters
-            quality_signal_strong = (
+            quality_signal_long_strong = (
                 primary_signal &
                 stress_confirmation &
                 volume_confirmation & 
                 health_filter &
                 conviction_filter &
-                significant_movement
+                upward_movement
+            )
+            quality_signal_short_strong = (
+                primary_signal &
+                stress_confirmation &
+                volume_confirmation & 
+                health_filter &
+                conviction_filter &
+                downward_movement
             )
             
             # Quality Signal Level 4: London session premium
-            quality_signal_premium = quality_signal_strong & london_bonus
+            quality_signal_long_premium = quality_signal_long_strong & london_bonus
+            quality_signal_short_premium = quality_signal_short_strong & london_bonus
             
-            # STEP 5: BINARY TARGET - Quality signals vs No signals (NO TIER 1 NOISE)
+            # STEP 5: THREE-CLASS DIRECTIONAL TARGET SYSTEM
             
-            # Create gradient scoring for better model training
-            target_score = np.where(
-                quality_signal_premium, 4,    # Premium signals
+            # Create separate scoring for long and short signals
+            long_score = np.where(
+                quality_signal_long_premium, 4,    # Premium long signals
                 np.where(
-                    quality_signal_strong, 3,  # Strong signals  
+                    quality_signal_long_strong, 3,  # Strong long signals  
                     np.where(
-                        quality_signal_medium, 2,  # Medium signals
+                        quality_signal_long_medium, 2,  # Medium long signals
                         np.where(
-                            quality_signal_basic, 1,  # Basic quality signals
-                            0  # No signal
+                            quality_signal_long_basic, 1,  # Basic long signals
+                            0  # No long signal
                         )
                     )
                 )
             )
             
-            # Multi-class target for analysis
-            self.df['target_spread_compression_v2_multi'] = target_score
+            short_score = np.where(
+                quality_signal_short_premium, 4,    # Premium short signals
+                np.where(
+                    quality_signal_short_strong, 3,  # Strong short signals  
+                    np.where(
+                        quality_signal_short_medium, 2,  # Medium short signals
+                        np.where(
+                            quality_signal_short_basic, 1,  # Basic short signals
+                            0  # No short signal
+                        )
+                    )
+                )
+            )
             
-            # Binary target: ANY quality signal vs NO signal
-            self.df['target_spread_compression_v2_binary'] = (target_score > 0).astype(int)
+            # Create three-class directional target
+            # Class 0: Hold (no quality signal)
+            # Class 1: Buy (quality long signal)  
+            # Class 2: Sell (quality short signal)
+            directional_target = np.where(
+                long_score > 0, 1,      # Any quality long signal → BUY (Class 1)
+                np.where(
+                    short_score > 0, 2,  # Any quality short signal → SELL (Class 2)
+                    0                    # No quality signals → HOLD (Class 0)
+                )
+            )
             
-            # STEP 6: Results Analysis
-            target_distribution = pd.Series(target_score).value_counts().sort_index()
+            # Multi-class targets for analysis
+            self.df['target_spread_compression_v2_long_score'] = long_score
+            self.df['target_spread_compression_v2_short_score'] = short_score
+            
+            # Main three-class directional target
+            self.df['target_spread_compression_v2_directional'] = directional_target
+            
+            # Legacy binary target for compatibility (any signal vs no signal)
+            self.df['target_spread_compression_v2_binary'] = (directional_target > 0).astype(int)
+            
+            # STEP 6: Results Analysis - Directional Target System
+            directional_dist = pd.Series(directional_target).value_counts().sort_index()
+            long_dist = pd.Series(long_score).value_counts().sort_index()  
+            short_dist = pd.Series(short_score).value_counts().sort_index()
             binary_dist = self.df['target_spread_compression_v2_binary'].value_counts()
             
-            logger.info(f"ENHANCED V2 Multi-class distribution: {target_distribution.to_dict()}")
-            logger.info(f"ENHANCED V2 Binary distribution: {binary_dist.to_dict()}")
+            logger.info(f"=== DIRECTIONAL TARGET V2 RESULTS ===")
+            logger.info(f"Three-class directional distribution: {directional_dist.to_dict()}")
+            logger.info(f"  Class 0 (HOLD): {directional_dist.get(0, 0)} ({directional_dist.get(0, 0)/len(self.df)*100:.1f}%)")
+            logger.info(f"  Class 1 (BUY):  {directional_dist.get(1, 0)} ({directional_dist.get(1, 0)/len(self.df)*100:.1f}%)")
+            logger.info(f"  Class 2 (SELL): {directional_dist.get(2, 0)} ({directional_dist.get(2, 0)/len(self.df)*100:.1f}%)")
             
-            # Calculate improvements
-            total_quality_signals = (target_score > 0).sum()
+            logger.info(f"Long signal score distribution: {long_dist.to_dict()}")
+            logger.info(f"Short signal score distribution: {short_dist.to_dict()}")
+            logger.info(f"Binary distribution (any signal): {binary_dist.to_dict()}")
+            
+            # Calculate signal rates
+            total_long_signals = (long_score > 0).sum()
+            total_short_signals = (short_score > 0).sum()
+            total_quality_signals = total_long_signals + total_short_signals
+            
+            long_signal_rate = total_long_signals / len(self.df) * 100
+            short_signal_rate = total_short_signals / len(self.df) * 100
             quality_signal_rate = total_quality_signals / len(self.df) * 100
             
-            logger.info(f"Quality signal frequency: {total_quality_signals}/{len(self.df)} = {quality_signal_rate:.2f}%")
+            logger.info(f"Signal frequency breakdown:")
+            logger.info(f"  Long signals:  {total_long_signals}/{len(self.df)} = {long_signal_rate:.2f}%")
+            logger.info(f"  Short signals: {total_short_signals}/{len(self.df)} = {short_signal_rate:.2f}%")
+            logger.info(f"  Total signals: {total_quality_signals}/{len(self.df)} = {quality_signal_rate:.2f}%")
+            
+            # Check balance between long and short signals
+            if total_long_signals > 0 and total_short_signals > 0:
+                balance_ratio = min(total_long_signals, total_short_signals) / max(total_long_signals, total_short_signals)
+                logger.info(f"Long/Short balance ratio: {balance_ratio:.3f} (1.0 = perfect balance)")
+                
+                if balance_ratio > 0.7:
+                    logger.info("✅ GOOD: Balanced long/short signal distribution")
+                else:
+                    logger.warning(f"⚠️  IMBALANCED: {('Long' if total_long_signals > total_short_signals else 'Short')} signals dominate")
             
             # Compare to original system
             if quality_signal_rate > 6.1:  # Original was 6.1%
                 improvement = quality_signal_rate - 6.1
                 logger.info(f"✅ IMPROVEMENT: +{improvement:.1f}% more quality signals than original system")
             
-            # Estimate class balance improvement
-            negative_rate = (1 - quality_signal_rate/100) * 100
-            logger.info(f"Enhanced class balance: {negative_rate:.1f}% negative / {quality_signal_rate:.1f}% positive")
+            # Estimate class balance for three-class system
+            hold_rate = directional_dist.get(0, 0) / len(self.df) * 100
+            logger.info(f"Three-class balance: {hold_rate:.1f}% hold / {long_signal_rate:.1f}% buy / {short_signal_rate:.1f}% sell")
             
             if quality_signal_rate > 10:
-                logger.info("✅ TARGET ACHIEVED: >10% positive class for better model training")
+                logger.info("✅ TARGET ACHIEVED: >10% trading signals for better model training")
+                logger.info("✅ DIRECTIONAL SYSTEM: Model will learn proper buy/sell directions")
             
             # Clean up temporary features AND future_price_change (data leakage prevention)
             cleanup_features = temp_generated_features + ['future_price_change']
@@ -458,13 +539,41 @@ class TargetHypothesis(BaseProcessor):
                 self.df = self.df.drop(columns=cleanup_features)
                 logger.debug("Clean training data maintained - no data leakage")
             
-            # STEP 7: Quality validation for each signal level
-            logger.info("=== SIGNAL QUALITY VALIDATION ===")
+            # STEP 7: Quality validation for each signal level - Directional
+            logger.info("=== DIRECTIONAL SIGNAL QUALITY VALIDATION ===")
+            
+            # Validate long signals by quality level
+            logger.info("Long signal quality by level:")
             for level in [1, 2, 3, 4]:
-                level_mask = target_score == level
+                level_mask = long_score == level
                 if level_mask.sum() > 0:
-                    level_movement = abs(self.df[level_mask]['future_price_change']).mean() if 'future_price_change' in self.df.columns else 0
-                    logger.info(f"Quality Level {level}: {level_mask.sum()} signals, avg movement: {level_movement:.6f}")
+                    if 'future_price_change' in self.df.columns:
+                        level_movement = self.df[level_mask]['future_price_change'].mean()  # Keep directional info
+                        level_abs_movement = abs(self.df[level_mask]['future_price_change']).mean()
+                        logger.info(f"  Long Level {level}: {level_mask.sum()} signals, avg movement: {level_movement:.6f} (abs: {level_abs_movement:.6f})")
+            
+            # Validate short signals by quality level  
+            logger.info("Short signal quality by level:")
+            for level in [1, 2, 3, 4]:
+                level_mask = short_score == level
+                if level_mask.sum() > 0:
+                    if 'future_price_change' in self.df.columns:
+                        level_movement = self.df[level_mask]['future_price_change'].mean()  # Keep directional info
+                        level_abs_movement = abs(self.df[level_mask]['future_price_change']).mean()
+                        logger.info(f"  Short Level {level}: {level_mask.sum()} signals, avg movement: {level_movement:.6f} (abs: {level_abs_movement:.6f})")
+            
+            # Overall directional validation
+            if 'future_price_change' in self.df.columns:
+                all_long_mask = long_score > 0
+                all_short_mask = short_score > 0
+                
+                if all_long_mask.sum() > 0:
+                    avg_long_movement = self.df[all_long_mask]['future_price_change'].mean()
+                    logger.info(f"✅ All long signals avg movement: {avg_long_movement:.6f} (should be > 0)")
+                    
+                if all_short_mask.sum() > 0:
+                    avg_short_movement = self.df[all_short_mask]['future_price_change'].mean()
+                    logger.info(f"✅ All short signals avg movement: {avg_short_movement:.6f} (should be < 0)")
             
             logger.info("✅ Enhanced target generation V2 completed successfully!")
             return True
