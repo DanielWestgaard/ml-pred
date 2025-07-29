@@ -8,8 +8,8 @@ backtesting:
     
     # Extended test period for better statistical significance
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2024-10-01_2025-07-25.csv
-    start_date: '2024-10-04'                          # Start of test period
-    end_date: '2024-10-15'                            # Extended to ~2 weeks for better testing
+    start_date: '2025-05-04'                          # Start of test period
+    end_date: '2025-05-15'                            # Extended to ~2 weeks for better testing
     buffer_size: 200
     
     # Capital and costs
