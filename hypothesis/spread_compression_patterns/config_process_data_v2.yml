@@ -21,5 +21,10 @@ data_pipeline:
       'compression_prediction_strength', # Prediction strength (0.4336) - Compression signals
       'volume_ratio',                 # Volume confirmation (proven effective)
       'london_session',               # Session timing (proven effective)
-      'institutional_footprint'      # Institutional activity (proven effective)
+      'institutional_footprint',      # Institutional activity (proven effective)
+      'depth_stability_enhanced',      # Enhanced top predictor
+      'ultra_momentum_suite',          # 1-minute momentum
+      'volume_profile_enhanced',       # Enhanced volume  
+      'top_predictor_interaction',     # Combined top 3
+      'microstructure_momentum_fusion', # Best hybrid signal
     ]
