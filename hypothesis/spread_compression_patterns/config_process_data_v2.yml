@@ -27,19 +27,10 @@ data_pipeline:
       # 'volume_profile_enhanced',       # Enhanced volume  
       # 'top_predictor_interaction',     # Combined top 3
       # 'microstructure_momentum_fusion', # Best hybrid signal
-      # Enhanced features (our new implementations)
-      'microstructure_momentum_fusion',
-      'top_predictor_interaction',
-      'ultra_momentum_suite',
-      'volume_profile_enhanced',
-      'depth_stability_enhanced',
-      
-      # Required dependencies for target generation
-      'volume_ratio',                 # Required by target generation
-      'depth_stability',              # Required by target generation
-      'institutional_footprint',      # Required by target generation
-      'liquidity_stress',             # Required by target generation
-      'microstructure_health',        # Required by target generation
-      'london_session',               # Required by target generation
-      'signal_conviction'             # Required by target generation
+      # ENHANCED FEATURES ONLY - Dependencies generated temporarily for target creation
+      'microstructure_momentum_fusion',  # Best hybrid signal (65.3% consensus)
+      'top_predictor_interaction',       # Combined top 3 predictors (59.4% consensus) 
+      'ultra_momentum_suite',            # 1-minute optimized momentum (37.9% consensus)
+      'volume_profile_enhanced',         # Professional volume analysis (27.7% consensus)
+      'depth_stability_enhanced'         # Enhanced top predictor
     ]

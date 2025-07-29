@@ -286,28 +286,51 @@ class TargetHypothesis(BaseProcessor):
                 from data.features.enhanced_generation import ModelAwareFeatureGenerator
                 temp_generator = ModelAwareFeatureGenerator(self.df)
                 
-                # Map features to their generator methods
-                feature_generator_map = {
-                    'depth_stability': 'enhanced_market_depth_features',
-                    'liquidity_stress': 'enhanced_market_depth_features', 
-                    'institutional_footprint': 'institutional_footprint_detection',
-                    'microstructure_health': 'enhanced_microstructure_health',
-                    'signal_conviction': 'enhanced_predictive_signals',
-                    'volume_ratio': 'volume_ratio_feature',
-                    'london_session': 'fx_trading_sessions'
-                }
+                # Map features to their generator methods with dependencies
+                feature_dependency_order = [
+                    ('volume_ma_20', 'volume_ma_20_feature'),      # First: base volume dependency
+                    ('volume_ratio', 'volume_ratio_feature'),      # Second: depends on volume_ma_20
+                    ('depth_stability', 'enhanced_market_depth_features'),
+                    ('liquidity_stress', 'enhanced_market_depth_features'), 
+                    ('institutional_footprint', 'institutional_footprint_detection'),  # Depends on volume_ratio
+                    ('microstructure_health', 'enhanced_microstructure_health'),
+                    ('signal_conviction', 'enhanced_predictive_signals'),
+                    ('london_session', 'fx_trading_sessions')
+                ]
                 
-                # Generate missing features temporarily
-                for feature in missing_features:
-                    generator_method = feature_generator_map.get(feature)
-                    if generator_method and hasattr(temp_generator, generator_method):
-                        logger.debug(f"Temporarily generating {feature} using {generator_method}")
-                        temp_generator.__getattribute__(generator_method)()
-                        temp_generated_features.append(feature)
-                        logger.debug(f"Successfully generated {feature}")
-                    else:
-                        logger.error(f"Cannot generate missing feature: {feature} (no method {generator_method})")
-                        return
+                # Ensure datetime index for session features
+                if 'date' in temp_generator.df.columns:
+                    temp_generator.df.set_index('date', inplace=True)
+                    temp_generator.df.index = pd.to_datetime(temp_generator.df.index)
+                
+                # Generate missing features temporarily with robust error handling and dependency order
+                successfully_generated = []
+                for feature_name, generator_method in feature_dependency_order:
+                    if feature_name in missing_features:
+                        if generator_method and hasattr(temp_generator, generator_method):
+                            try:
+                                logger.debug(f"Temporarily generating {feature_name} using {generator_method}")
+                                temp_generator.__getattribute__(generator_method)()
+                                if feature_name in temp_generator.df.columns:
+                                    successfully_generated.append(feature_name)
+                                    temp_generated_features.append(feature_name)
+                                    logger.debug(f"Successfully generated {feature_name}")
+                                else:
+                                    logger.warning(f"Feature {feature_name} not found after generation")
+                            except Exception as e:
+                                logger.warning(f"Failed to generate {feature_name}: {e}")
+                        else:
+                            logger.warning(f"Cannot generate missing feature: {feature_name} (no method {generator_method})")
+                
+                # Check if we have the minimum required features for target generation
+                critical_features = ['depth_stability', 'institutional_footprint', 'volume_ratio', 'microstructure_health']
+                missing_critical = [f for f in critical_features if f not in temp_generator.df.columns]
+                
+                if missing_critical:
+                    logger.error(f"Cannot proceed with target generation - missing critical features: {missing_critical}")
+                    return False
+                
+                logger.info(f"Successfully generated {len(successfully_generated)} features temporarily: {successfully_generated}")
                 
                 # Update our dataframe with temporarily generated features
                 self.df = temp_generator.df
