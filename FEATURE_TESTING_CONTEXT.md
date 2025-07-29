@@ -93,11 +93,13 @@ selected_features: ['compression_prediction_strength', 'signal_conviction', 'mic
 ### **Step-by-Step Process**
 1. **Update Config**: Modify `hypothesis/spread_compression_patterns/config_process_data_v2.yml` with test features
 2. **Process Data**: Run `python main.py --hyp 'hypothesis/.../config_process_data_v2.yml'`
-3. **Train Model**: Automatic (included in data processing pipeline)
+3. **Train Model**: Could be Automatic (included in data processing pipeline), but to be sure, run `python main.py --hyp 'hypothesis/.../config_model_training.yml'` (switch out `model_training.processed_data`) with the processed data.
 4. **Extract Model Path**: Look for `storage/models/YYYY-MM-DD_HH:MM:SS` in output
 5. **Update Backtest Config**: Set `model_folder` in `config_backtest.yml`
 6. **Run Backtest**: Run `python main.py --hyp 'hypothesis/.../config_backtest.yml'`
 7. **Record Results**: Extract performance metrics from final output
+> [!NOTE]
+> To ensure not backtesting on trained data, I've been using `storage/data/capital_com/GBPUSD/raw/1m/2024-01-01_2025-03-01.csv` for training and `storage/data/capital_com/GBPUSD/raw/1m/2025-03-02_2025-07-01.csv` (in processed version) to ensure model is backtested on unseed data. If you store them "as is"; This means both of those files needs to be processed with the same features/config, but the `2024-01-01_2025-03-01` file is the one to train the model and `2025-03-02_2025-07-01` file is the one to backtest.
 
 ### **Key Metrics to Track**
 - **Return %**: Total return percentage
