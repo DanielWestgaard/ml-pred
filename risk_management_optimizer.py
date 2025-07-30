@@ -16,6 +16,9 @@ Usage:
     python risk_management_optimizer.py <config_file> [--quick-test]
 """
 
+import json
+import os
+import time
 import pandas as pd
 import numpy as np
 import yaml
@@ -748,7 +751,7 @@ def optimize_risk_management(config_path: str, test_type: str = 'quick') -> Dict
     Path(report_path).parent.mkdir(parents=True, exist_ok=True)
     
     report = optimizer.generate_report(report_path)
-    print(report)
+    logger.info(report)
     
     return {
         'optimizer': optimizer,
@@ -774,45 +777,45 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    print(f"🚀 Starting Risk Management Optimization")
-    print(f"   Config: {args.config_file}")
-    print(f"   Test Type: {args.test_type}")
-    print(f"   Max Concurrent: {args.max_concurrent}")
-    print("=" * 60)
+    logger.info(f"🚀 Starting Risk Management Optimization")
+    logger.info(f"   Config: {args.config_file}")
+    logger.info(f"   Test Type: {args.test_type}")
+    logger.info(f"   Max Concurrent: {args.max_concurrent}")
+    logger.info("=" * 60)
     
     if args.dry_run:
-        print("🔍 DRY RUN MODE - Generating parameters only")
+        logger.info("🔍 DRY RUN MODE - Generating parameters only")
         optimizer = RiskManagementOptimizer(args.config_file)
         combinations = optimizer.generate_test_parameter_grid(args.test_type)
         
-        print(f"\n📊 Generated {len(combinations)} parameter combinations:")
+        logger.info(f"\n📊 Generated {len(combinations)} parameter combinations:")
         for i, params in enumerate(combinations[:10]):  # Show first 10
-            print(f"  {i+1:3d}. {params}")
+            logger.info(f"  {i+1:3d}. {params}")
         
         if len(combinations) > 10:
-            print(f"  ... and {len(combinations) - 10} more combinations")
+            logger.info(f"  ... and {len(combinations) - 10} more combinations")
         
-        print(f"\n💡 Remove --dry-run to execute actual optimization")
+        logger.info(f"\n💡 Remove --dry-run to execute actual optimization")
     else:
-        print("🔥 LIVE MODE - Running actual backtests")
+        logger.info("🔥 LIVE MODE - Running actual backtests")
         results = optimize_risk_management(args.config_file, args.test_type)
-        print(f"\n✅ Optimization completed!")
-        print(f"📊 Report saved to: {results['report_path']}")
+        logger.info(f"\n✅ Optimization completed!")
+        logger.info(f"📊 Report saved to: {results['report_path']}")
         
         # Show quick summary
         analysis = results['analysis']
         if analysis.get('successful_count', 0) > 0:
-            print(f"\n🎯 Quick Results Summary:")
-            print(f"   Successful tests: {analysis['successful_count']}/{analysis['total_tested']}")
+            logger.info(f"\n🎯 Quick Results Summary:")
+            logger.info(f"   Successful tests: {analysis['successful_count']}/{analysis['total_tested']}")
             
             if analysis.get('best_win_rate'):
                 best_wr = analysis['best_win_rate']
-                print(f"   Best win rate: {best_wr['value']:.1f}%")
-                print(f"   Best parameters: {best_wr['parameters']}")
+                logger.info(f"   Best win rate: {best_wr['value']:.1f}%")
+                logger.info(f"   Best parameters: {best_wr['parameters']}")
                 
             if analysis.get('parameter_sensitivity'):
                 sens = analysis['parameter_sensitivity']
                 most_sensitive = max(sens.items(), key=lambda x: x[1]['sensitivity'])
-                print(f"   Most sensitive parameter: {most_sensitive[0]} (impact: {most_sensitive[1]['sensitivity']:.2f})")
+                logger.info(f"   Most sensitive parameter: {most_sensitive[0]} (impact: {most_sensitive[1]['sensitivity']:.2f})")
         else:
-            print("⚠️  No successful results found. Check your configuration and system setup.")
+            logger.info("⚠️  No successful results found. Check your configuration and system setup.")
