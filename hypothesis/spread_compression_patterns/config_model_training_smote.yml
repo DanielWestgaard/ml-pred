@@ -1,0 +1,36 @@
+hypothesis:
+  name: spread_compression_patterns_v2
+
+# Model training with SMOTE oversampling for extreme class imbalance
+model_training:
+    type: random_forest
+    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-01-01_2025-03-01.csv
+    target_column: target_spread_compression_v2_directional
+    exclude_basic_ohlc: true  # Focus on hybrid features only, exclude basic OHLC
+    parameters:
+        # Random Forest parameters
+        n_estimators: 300
+        max_depth: 12
+        min_samples_split: 4
+        min_samples_leaf: 2
+        class_weight: balanced    # Use balanced instead of extreme weights with SMOTE
+        bootstrap: true
+        oob_score: true
+        random_state: 42
+        n_jobs: -1
+        max_features: sqrt
+        
+        # SMOTE oversampling parameters
+        use_smote: true
+        smote_strategy: "not majority"  # Oversample minority classes to match majority
+        # Alternative strategies:
+        # - "minority": oversample only the minority class
+        # - "all": oversample all classes to have same number as majority
+        # - {0: 100000, 1: 100000, 2: 100000}: specific target counts
+
+# Walk-forward validation configuration
+walk_forward:
+    initial_training_months: 4
+    validation_period_months: 1
+    step_forward_months: 1
+    min_training_samples: 50000
