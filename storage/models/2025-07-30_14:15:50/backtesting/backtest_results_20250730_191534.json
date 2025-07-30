@@ -1,0 +1,45 @@
+{
+  "backtest_summary": {
+    "hypothesis_name": "spread_compression_patterns_v3",
+    "model_type": "random_forest",
+    "initial_capital": 10000,
+    "final_equity": 9999.086868521239,
+    "total_return": -9.131314787609882e-05,
+    "total_return_pct": -0.009131314787609882,
+    "execution_time_seconds": 162.15228009223938
+  },
+  "trading_performance": {
+    "total_trades": 2,
+    "winning_trades": 1,
+    "losing_trades": 1,
+    "win_rate": 0.5,
+    "total_fees": 0.7913484446341537,
+    "max_drawdown": 6.516584529344982e-05,
+    "max_drawdown_pct": 0.0065165845293449825
+  },
+  "risk_metrics": {
+    "sharpe_ratio": -0.02467370812126693,
+    "sortino_ratio": 0.0,
+    "profit_factor": 0.999236040451569,
+    "average_win": 0.06768184795818522,
+    "average_loss": -0.06773359368382953,
+    "largest_win": 0.06768184795818522,
+    "largest_loss": -0.06773359368382953
+  },
+  "trade_analysis": {
+    "average_holding_period_minutes": 2754.5,
+    "median_holding_period_minutes": 2754.5,
+    "average_pnl_per_trade": -0.2587286282215473,
+    "median_pnl_per_trade": -0.2587286282215473,
+    "pnl_std": 677.0772082100738,
+    "consecutive_wins_max": 1,
+    "consecutive_losses_max": 1,
+    "exit_reasons": {
+      "backtest_end": 2
+    }
+  },
+  "data_period": {
+    "start": "2025-03-10 00:00:00+00:00",
+    "end": "2025-03-20 00:00:00+00:00"
+  }
+}

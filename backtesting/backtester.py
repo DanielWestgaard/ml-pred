@@ -15,7 +15,7 @@ from data.features.enhanced_generation import ModelAwareFeatureGenerator
 from strategy.hypothesis_specific.spread_compression_strategy import SpreadCompressionSignalTracker
 
 # Import existing strategy components (reuse!)
-from strategy.components.signal_processor import SignalProcessor
+from strategy.components.signal_processor import SignalProcessor, AdvancedSignalProcessor
 from strategy.components.risk_manager import RiskManager
 from strategy.components.position_manager import PositionManager
 
@@ -309,11 +309,34 @@ class BacktestOrchestrator:
             
             # Strategy components (reuse existing components!)
             signal_config = self.config.get('backtesting', {}).get('signal_processing', {})
-            self.signal_processor = SignalProcessor(
-                confidence_threshold=signal_config.get('confidence_threshold', 0.6),
-                signal_filters=signal_config.get('signal_filters', []),
-                model_type=self.model_type
-            )
+            
+            # Debug: Log config structure to understand the issue
+            logger.debug(f"Full config keys: {list(self.config.keys())}")
+            logger.debug(f"Backtesting config: {self.config.get('backtesting', {})}")
+            logger.debug(f"Signal config found: {signal_config}")
+            
+            # Use AdvancedSignalProcessor if advanced filtering is enabled, otherwise use basic SignalProcessor
+            use_advanced_filtering = signal_config.get('use_advanced_filtering', False)
+            logger.info(f"Advanced filtering enabled: {use_advanced_filtering}")
+            
+            if use_advanced_filtering:
+                self.signal_processor = AdvancedSignalProcessor(
+                    confidence_threshold=signal_config.get('confidence_threshold', 0.49),
+                    signal_filters=signal_config.get('signal_filters', []),
+                    model_type=self.model_type,
+                    cooldown_minutes=signal_config.get('cooldown_minutes', 30),
+                    min_confidence_delta=signal_config.get('min_confidence_delta', 0.05),
+                    max_signals_per_hour=signal_config.get('max_signals_per_hour', 2),
+                    confidence_window_minutes=signal_config.get('confidence_window_minutes', 10)
+                )
+                logger.info("Using AdvancedSignalProcessor for intelligent signal filtering")
+            else:
+                self.signal_processor = SignalProcessor(
+                    confidence_threshold=signal_config.get('confidence_threshold', 0.6),
+                    signal_filters=signal_config.get('signal_filters', []),
+                    model_type=self.model_type
+                )
+                logger.info("Using basic SignalProcessor")
             
             risk_config = self.config.get('backtesting', {}).get('risk_management', {})
             self.risk_manager = RiskManager(
@@ -535,12 +558,19 @@ class BacktestOrchestrator:
                 if iteration % progress_interval == 0:
                     progress_pct = (self.current_data_index / total_data_points) * 100
                     account_info = self.simulation_broker.get_account_info()
+                    
+                    # Get filtering stats if using AdvancedSignalProcessor
+                    filter_stats_str = ""
+                    if isinstance(self.signal_processor, AdvancedSignalProcessor):
+                        stats = self.signal_processor.get_filter_stats()
+                        filter_stats_str = f" | Filter: {stats['signals_last_hour']}/hr, Avg:{stats['avg_confidence']:.3f}"
+                    
                     logger.info(f"Progress: {progress_pct:.1f}% | "
                                f"Iteration: {iteration}/{max_loops} | "
                                f"Data: {self.current_data_index}/{total_data_points} | "
                                f"Equity: ${account_info['current_equity']:.2f} | "
                                f"Trades: {executed_trades} | "
-                               f"Signals: {signals_generated}")
+                               f"Signals: {signals_generated}{filter_stats_str}")
             
             # Close all remaining positions at end of backtest
             if self.current_data_index > 0:

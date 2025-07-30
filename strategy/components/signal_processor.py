@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from typing import Dict, List, Any, Optional
 from enum import Enum
+from datetime import datetime, timedelta
+from collections import deque
 
 from utils.logging_utils import get_logger
 from utils.model.model_type_detector import ModelType
@@ -299,3 +301,216 @@ class SignalProcessor:
             logger.info("Signals filtered out due to inactive trading session")
         
         return signals
+
+
+class AdvancedSignalProcessor(SignalProcessor):
+    """
+    Advanced signal processor with intelligent filtering to reduce signal noise.
+    Implements temporal cooldown, confidence delta detection, and directional change filters.
+    """
+    
+    def __init__(self, confidence_threshold: float = 0.49,
+                 signal_filters: List[str] = None,
+                 model_type: Optional[ModelType] = None,
+                 cooldown_minutes: int = 30,
+                 min_confidence_delta: float = 0.05,
+                 max_signals_per_hour: int = 2,
+                 confidence_window_minutes: int = 10,
+                 **kwargs):
+        """
+        Initialize advanced signal processor with intelligent filtering
+        
+        Args:
+            confidence_threshold: Minimum confidence required for signal generation
+            signal_filters: List of filter names to apply to signals
+            model_type: Type of model (auto-detected if not specified)
+            cooldown_minutes: Minimum minutes between signals in same direction
+            min_confidence_delta: Minimum confidence increase required vs recent average
+            max_signals_per_hour: Maximum signals allowed per hour
+            confidence_window_minutes: Window for calculating confidence average
+        """
+        super().__init__(confidence_threshold, signal_filters, model_type, **kwargs)
+        
+        # Advanced filtering parameters
+        self.cooldown_minutes = cooldown_minutes
+        self.min_confidence_delta = min_confidence_delta
+        self.max_signals_per_hour = max_signals_per_hour
+        self.confidence_window_minutes = confidence_window_minutes
+        
+        # State tracking
+        self.last_signal_time = {}  # Per direction: {'BUY': timestamp, 'SELL': timestamp}
+        self.confidence_history = deque(maxlen=100)  # Rolling confidence history
+        self.hourly_signal_count = deque(maxlen=60)  # Track signals per minute for hourly count
+        self.last_signal_direction = None
+        
+        logger.info(f"AdvancedSignalProcessor initialized:")
+        logger.info(f"  - Cooldown: {cooldown_minutes}min")
+        logger.info(f"  - Min confidence delta: {min_confidence_delta}")
+        logger.info(f"  - Max signals/hour: {max_signals_per_hour}")
+    
+    def process(self, predictions: np.ndarray, market_data: pd.DataFrame = None,
+                model=None, prediction_probabilities: np.ndarray = None) -> Dict[str, Any]:
+        """
+        Process predictions with advanced filtering
+        """
+        # Get base signals first
+        signals = super().process(predictions, market_data, model, prediction_probabilities)
+        
+        # Apply advanced filtering
+        signals = self._apply_advanced_filters(signals, market_data)
+        
+        return signals
+    
+    def _apply_advanced_filters(self, signals: Dict[str, Any], market_data: pd.DataFrame) -> Dict[str, Any]:
+        """
+        Apply advanced filtering layers to reduce signal noise
+        """
+        if not signals['processed_signals']:
+            return signals
+        
+        current_time = datetime.now()
+        filtered_signals = []
+        filtered_strengths = []
+        filtered_directions = []
+        filtered_confidences = []
+        
+        for i, signal in enumerate(signals['processed_signals']):
+            direction = signal['direction']
+            confidence = signal['confidence']
+            
+            # Update confidence history for delta calculation
+            self.confidence_history.append({
+                'timestamp': current_time,
+                'confidence': confidence,
+                'direction': direction
+            })
+            
+            # Layer 1: Temporal Cooldown Filter
+            if not self._passes_temporal_filter(direction, current_time):
+                logger.debug(f"Signal filtered by temporal cooldown: {direction}")
+                continue
+            
+            # Layer 2: Confidence Delta Filter  
+            if not self._passes_confidence_delta_filter(confidence, direction, current_time):
+                logger.debug(f"Signal filtered by confidence delta: {confidence:.4f}")
+                continue
+            
+            # Layer 3: Hourly Signal Limit
+            if not self._passes_hourly_limit_filter(current_time):
+                logger.debug(f"Signal filtered by hourly limit")
+                continue
+            
+            # Layer 4: Directional Change Priority
+            priority_boost = self._calculate_directional_change_priority(direction)
+            signal['priority_boost'] = priority_boost
+            
+            # Signal passed all filters
+            filtered_signals.append(signal)
+            filtered_strengths.append(signals['signal_strength'][i])
+            filtered_directions.append(signals['signal_direction'][i])
+            filtered_confidences.append(signals['confidence_scores'][i])
+            
+            # Update tracking state
+            self.last_signal_time[direction] = current_time
+            self.last_signal_direction = direction
+            self._update_hourly_counter(current_time)
+            
+            logger.info(f"Advanced signal accepted: {direction} confidence={confidence:.4f} (delta priority: {priority_boost:.2f})")
+        
+        # Update signals with filtered results
+        signals['processed_signals'] = filtered_signals
+        signals['signal_strength'] = filtered_strengths
+        signals['signal_direction'] = filtered_directions
+        signals['confidence_scores'] = filtered_confidences
+        
+        filter_summary = f"Advanced filtering: {len(signals['raw_predictions'])} predictions → {len(filtered_signals)} signals"
+        logger.info(filter_summary)
+        
+        return signals
+    
+    def _passes_temporal_filter(self, direction: str, current_time: datetime) -> bool:
+        """
+        Check if enough time has passed since last signal in this direction
+        """
+        if direction not in self.last_signal_time:
+            return True
+        
+        time_since_last = current_time - self.last_signal_time[direction]
+        return time_since_last.total_seconds() >= (self.cooldown_minutes * 60)
+    
+    def _passes_confidence_delta_filter(self, confidence: float, direction: str, current_time: datetime) -> bool:
+        """
+        Check if confidence represents significant improvement over recent average
+        """
+        if len(self.confidence_history) < 3:  # Need some history
+            return True
+        
+        # Calculate recent average confidence for same direction
+        cutoff_time = current_time - timedelta(minutes=self.confidence_window_minutes)
+        
+        recent_same_direction = [
+            h['confidence'] for h in self.confidence_history
+            if h['timestamp'] > cutoff_time and h['direction'] == direction
+        ]
+        
+        if not recent_same_direction:
+            # No recent signals in same direction, allow this one
+            return True
+        
+        recent_avg = np.mean(recent_same_direction)
+        confidence_delta = confidence - recent_avg
+        
+        logger.debug(f"Confidence delta check: {confidence:.4f} vs avg {recent_avg:.4f} = delta {confidence_delta:.4f}")
+        
+        return confidence_delta >= self.min_confidence_delta
+    
+    def _passes_hourly_limit_filter(self, current_time: datetime) -> bool:
+        """
+        Check if we haven't exceeded hourly signal limit
+        """
+        # Clean old entries from hourly counter
+        cutoff_time = current_time - timedelta(hours=1)
+        while self.hourly_signal_count and self.hourly_signal_count[0] < cutoff_time:
+            self.hourly_signal_count.popleft()
+        
+        return len(self.hourly_signal_count) < self.max_signals_per_hour
+    
+    def _calculate_directional_change_priority(self, direction: str) -> float:
+        """
+        Calculate priority boost for signals that change direction
+        """
+        if self.last_signal_direction is None:
+            return 1.0  # No previous direction
+        
+        if direction != self.last_signal_direction:
+            return 2.0  # Direction change gets priority boost
+        else:
+            return 0.5  # Same direction gets lower priority
+    
+    def _update_hourly_counter(self, current_time: datetime):
+        """
+        Update hourly signal counter
+        """
+        self.hourly_signal_count.append(current_time)
+    
+    def get_filter_stats(self) -> Dict[str, Any]:
+        """
+        Get current filtering statistics for monitoring
+        """
+        current_time = datetime.now()
+        
+        # Recent signals in last hour
+        hour_ago = current_time - timedelta(hours=1)
+        recent_signals = len([t for t in self.hourly_signal_count if t > hour_ago])
+        
+        # Confidence history stats
+        recent_confidences = [h['confidence'] for h in self.confidence_history]
+        avg_confidence = np.mean(recent_confidences) if recent_confidences else 0.0
+        
+        return {
+            'signals_last_hour': recent_signals,
+            'avg_confidence': avg_confidence,
+            'confidence_history_size': len(self.confidence_history),
+            'last_signal_times': dict(self.last_signal_time),
+            'last_direction': self.last_signal_direction
+        }
