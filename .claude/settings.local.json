@@ -11,7 +11,9 @@
       "Bash(mv:*)",
       "Bash(true)",
       "Bash(cut:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }
