@@ -3,12 +3,12 @@ Read `README.md` for and overview of the project, and `hypothesis/spread_compres
 I've really been struggling to make my model profitable (backtesting showed consistently "0% win rate and always negative returns, with extremly low confidence on BUY/SELL"). However, after now being confident I've solved some key, major issues, we're finally getting somewhere.
 
 ## Previous "fixes" which helped results
-- "No" lookahead bias in features
+- "No" lookahead bias in features (`data/features/enhanced_generation.py`)
 - Features are "optimized" and picked out the best feature of both worlds ("hybrid")
 - Not using OHLCV in training, only `close_og` (un-normalized original `close` prices) as this is needed for placing orders
-- Improved the hypothsesis target, now using v3
-- "Fixed"/reduced chances of data leakage with Walk-Forward Validation in model training (Random Forest)
-- Tested a bunch of different feature combinations and parameters in both model training and backtesting
+- Improved the hypothsesis target, now using v3 (`data/features/target_hypothesis.py`)
+- "Fixed"/reduced chances of data leakage with Walk-Forward Validation in model training (Random Forest) (`model/model_training.py` and `model/walk_forward_validator.py`)
+- Tested a bunch of different feature combinations and parameters in both model training (`model/`) and backtesting (`backtesting/`)
 
 ## Current obstacle - Extreme Class Imbalance
 Then, we figured out that the last (major) issue was extreme class imbalance: Eg. 
