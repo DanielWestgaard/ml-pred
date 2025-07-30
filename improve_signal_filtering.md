@@ -96,19 +96,6 @@ The most effective approach would be layered filtering:
 - Prefer high-activity trading sessions
 - Avoid low-liquidity periods
 
-#### 💡 Immediate Quick Fix
-
-Before implementing full filtering, we could add a simple cooldown mechanism:
-
-signal_processing:
-confidence_threshold: 0.49    # Just below 0.4948
-cooldown_minutes: 30          # Wait 30min between signals
-max_signals_per_hour: 2       # Hard limit
-
-Which filtering approach is the best?
-1. Temporal spacing (quickest to implement)
-2. Confidence delta detection (highest quality improvement)
-3. Multi-feature confluence (most sophisticated)
-4. All of the above in phases
+---
 
 **The goal** is to transform "1000+ low-value signals" into "10-20 high-value signals" per day.
