@@ -165,8 +165,9 @@ class ModelTraining():
                 # Split data into train and test
                 self.temporal_train_test_split()
                 
-                # Instantiate model
-                model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+                # Instantiate model with parameters
+                model_params = getattr(self.config, 'model_training_parameters', {})
+                model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train, model_params=model_params)
                 # Actually train the model
                 self.training_start_time = time.time()  # not really accurate starting it here, but short term solution
                 self.model = model_instance.train()
@@ -542,7 +543,8 @@ class ModelTraining():
         if not periods:
             logger.warning("No walk-forward periods created, falling back to temporal split")
             self.temporal_train_test_split()
-            model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+            model_params = getattr(self.config, 'model_training_parameters', {})
+            model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train, model_params=model_params)
             self.training_start_time = time.time()
             model = model_instance.train()
             model.type = self.model_type

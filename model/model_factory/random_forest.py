@@ -22,7 +22,7 @@ class RandomForestModel(BaseModel):
     - Feature importance analysis for market microstructure patterns
     """
     
-    def __init__(self, dataset: pd.DataFrame, X_train: pd.DataFrame, y_train: pd.DataFrame):
+    def __init__(self, dataset: pd.DataFrame, X_train: pd.DataFrame, y_train: pd.DataFrame, model_params: dict = None):
         """
         Initialize Random Forest Classifier optimized for spread compression patterns.
         
@@ -30,6 +30,7 @@ class RandomForestModel(BaseModel):
             dataset: The processed/engineered data for training and testing (pd.DataFrame)
             X_train: Training features (pd.DataFrame)
             y_train: Training targets - should be binary classification labels (pd.DataFrame/Series)
+            model_params: Optional model parameters from configuration (dict)
             
         Returns:
             Trained Random Forest model optimized for imbalanced financial data
@@ -39,6 +40,7 @@ class RandomForestModel(BaseModel):
         self.df = dataset
         self.X_train = X_train
         self.y_train = y_train
+        self.model_params = model_params or {}
         
         # Validate that target is binary classification
         unique_targets = np.unique(y_train)
@@ -59,8 +61,8 @@ class RandomForestModel(BaseModel):
         """
         logger.info(f"---------- Starting to train Random Forest Classifier Model! ----------")
         
-        # Optimized parameters for spread compression patterns
-        params = {
+        # Default parameters optimized for spread compression patterns
+        default_params = {
             # Core ensemble parameters
             'n_estimators': 300,              # More trees for rare signal detection
             'max_depth': 10,                  # Deeper trees for complex market patterns
@@ -81,6 +83,10 @@ class RandomForestModel(BaseModel):
             'max_features': 'sqrt',          # sqrt(n_features) for classification
             'max_samples': None,             # Use all samples for each tree
         }
+        
+        # Merge default parameters with configuration parameters
+        params = {**default_params, **self.model_params}
+        logger.info(f"Using model parameters: {params}")
         
         logger.debug(f"Random Forest parameters: {params}")
         

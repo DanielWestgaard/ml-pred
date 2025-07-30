@@ -431,16 +431,16 @@ class TargetHypothesis(BaseProcessor):
                     f"75th percentile: {abs(price_returns).quantile(0.75):.6f}, "
                     f"90th percentile: {abs(price_returns).quantile(0.90):.6f}")
             
-            # STEP 2: ENHANCED THRESHOLDS - Much more sensitive for 10%+ target
-            # Primary filter: Top predictor (depth_stability) - lowered to 50th percentile for more signals
-            depth_stability_threshold = self.df['depth_stability'].quantile(0.50)  # Much more sensitive
+            # STEP 2: ULTRA-AGGRESSIVE THRESHOLDS - Target 15-20% signals for better balance
+            # Primary filter: Top predictor (depth_stability) - VERY sensitive
+            depth_stability_threshold = self.df['depth_stability'].quantile(0.30)  # Ultra-sensitive: top 70%
             
-            # Secondary filters - significantly more sensitive
-            institutional_threshold = self.df['institutional_footprint'].quantile(0.60)  # Lowered from 75th
-            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.65)     # Lowered from 75th
-            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.50)  # Lowered from 60th
-            volume_threshold = max(1.02, self.df['volume_ratio'].quantile(0.60))        # Lowered from 70th and 1.05
-            signal_conviction_threshold = self.df['signal_conviction'].quantile(0.60)    # Lowered from 70th
+            # Secondary filters - ULTRA sensitive  
+            institutional_threshold = self.df['institutional_footprint'].quantile(0.40)  # Top 60%
+            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.45)     # Top 55%
+            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.35)  # Top 65%
+            volume_threshold = max(1.01, self.df['volume_ratio'].quantile(0.45))        # Top 55%, minimum 1.01
+            signal_conviction_threshold = self.df['signal_conviction'].quantile(0.45)    # Top 55%
             
             # Movement threshold - use statistical thresholds instead of future data
             # Base movement threshold on historical price volatility
