@@ -99,6 +99,41 @@ class RandomForestModel(BaseModel):
         if len(class_counts) == 2:
             imbalance_ratio = class_counts.min() / class_counts.max()
             logger.info(f"Imbalance ratio: {imbalance_ratio:.4f} ({imbalance_ratio*100:.2f}%)")
+        elif len(class_counts) == 3:
+            minority_class_pct = (class_counts[1] + class_counts[2]) / class_counts.sum() * 100
+            logger.info(f"Minority classes (BUY+SELL): {minority_class_pct:.1f}% of total data")
+        
+        # Check if SMOTE oversampling should be applied
+        X_train_final = self.X_train
+        y_train_final = self.y_train
+        
+        # Apply SMOTE if extreme imbalance detected (minority classes < 10%)
+        if len(class_counts) >= 2 and 'use_smote' in self.model_params and self.model_params['use_smote']:
+            try:
+                from imblearn.over_sampling import SMOTE
+                logger.info("Applying SMOTE oversampling for extreme class imbalance...")
+                
+                # Configure SMOTE
+                smote_strategy = self.model_params.get('smote_strategy', 'auto')  # Can be 'minority', 'not majority', 'all', or dict
+                smote_k_neighbors = min(5, class_counts.min() - 1) if class_counts.min() > 1 else 1
+                
+                smote = SMOTE(
+                    sampling_strategy=smote_strategy,
+                    k_neighbors=smote_k_neighbors,
+                    random_state=42
+                )
+                
+                X_train_final, y_train_final = smote.fit_resample(self.X_train, self.y_train)
+                
+                # Log new distribution
+                new_class_counts = pd.Series(y_train_final).value_counts()
+                logger.info(f"After SMOTE - Class distribution: {new_class_counts.to_dict()}")
+                logger.info(f"Training samples increased from {len(self.y_train)} to {len(y_train_final)}")
+                
+            except ImportError:
+                logger.warning("SMOTE oversampling requested but imblearn not available. Install with: pip install imbalanced-learn")
+            except Exception as e:
+                logger.warning(f"SMOTE oversampling failed: {e}. Continuing with original data.")
         
         # Create and train model
         try:
@@ -106,7 +141,7 @@ class RandomForestModel(BaseModel):
             
             # Fit the model
             logger.debug("Fitting Random Forest Classifier...")
-            model = rf_classifier.fit(self.X_train, self.y_train)
+            model = rf_classifier.fit(X_train_final, y_train_final)
             
             # Log training results
             logger.info(f"Successfully trained Random Forest Classifier!")
