@@ -16,7 +16,7 @@ Then, we figured out that the last (major) issue was extreme class imbalance: Eg
 - **Class 1 (Basic signal)**: 78,392 samples (6.0%) 
 - **Class 2+ (Strong signals)**: 2,065 samples (0.15%)
 
-This led to model learning and only predicting HOLD ("no signal"), and also very low confidence on positive predictions: still 0% win rate and always negative returns (varying from -9% to -0,5%).
+This led to model learning and only predicting HOLD ("no signal"), and also very low confidence on positive predictions: still 0% win rate and always negative returns (varying from -9% to -0,5%). Eg. from this logfile `logs/mixed/logging_30072025_134550.log`
 
 I tried to change and specify `model_training.parameters.class_weight: {0: 1, 1: 40, 2: 40}` instead of using the `balanced` (standard/default), but his didn't help either.
 
