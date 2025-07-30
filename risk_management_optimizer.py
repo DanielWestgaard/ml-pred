@@ -81,14 +81,14 @@ class RiskManagementOptimizer:
     def _generate_quick_grid(self) -> List[Dict]:
         """Generate minimal parameter grid for quick testing"""
         
-        # Focus on most likely culprits based on analysis
+        # Focus on confidence threshold issue - model producing 0.0000 confidence
         grid_params = {
-            'confidence_threshold': [0.45, 0.48, 0.51],  # Around current 0.485
-            'stop_loss_pct': [0.1, 0.2, 0.3],           # Very tight to loose
-            'take_profit_pct': [0.2, 0.4, 0.6],         # Conservative ratios
+            'confidence_threshold': [0.01, 0.05, 0.1, 0.15, 0.2, 0.3],  # MUCH lower thresholds
+            'stop_loss_pct': [0.05, 0.1, 0.2],          # Tighter stops for small margins
+            'take_profit_pct': [0.1, 0.2, 0.4],         # Conservative ratios
             'min_confidence_delta': [0.0, 0.01],        # Current and slightly higher
             'cooldown_minutes': [5, 10],                 # Current and faster
-            'max_signals_per_hour': [4, 8]              # Current and more restrictive
+            'max_signals_per_hour': [4, 8, 12]          # Allow more signals if confidence is very low
         }
         
         # Generate combinations (3*3*3*2*2*2 = 216 tests)
@@ -302,9 +302,11 @@ class RiskManagementOptimizer:
                     win_rate = result.get('win_rate', 0)
                     total_return = result.get('total_return_pct', 0)
                     total_trades = result.get('total_trades', 0)
+                    equity = result.get('equity', 0)
                     
                     logger.info(f"  Result: {win_rate:.1f}% win rate, "
-                              f"{total_return:+.2f}% return, {total_trades} trades")
+                              f"{total_return:+.2f}% return, {total_trades} trades, "
+                              f"${equity:.2f} equity")
                     
                     # Early stopping for clearly good results
                     if win_rate > 60 and total_return > 5 and total_trades > 50:
@@ -408,15 +410,17 @@ class RiskManagementOptimizer:
             # Look for key metrics in the output
             import re
             
-            # Common patterns to look for in your backtesting output
+            # Patterns for your backtesting system output
             patterns = {
-                'total_return_pct': r'Total Return.*?([+-]?\d+\.?\d*)%',
-                'win_rate': r'Win Rate.*?(\d+\.?\d*)%',
-                'total_trades': r'Total Trades.*?(\d+)',
+                'total_return_pct': r'Return:\s*([+-]?\d+\.?\d*)%',  # "Return: -0.01%"
+                'win_rate': r'Win Rate:\s*(\d+\.?\d*)%',            # "Win Rate: 0.0%"
+                'total_trades': r'Trades:\s*(\d+)',                # "Trades: 2"
                 'sharpe_ratio': r'Sharpe.*?([+-]?\d+\.?\d*)',
                 'max_drawdown_pct': r'Max Drawdown.*?([+-]?\d+\.?\d*)%',
                 'profitable_trades': r'Profitable.*?(\d+)',
-                'losing_trades': r'Losing.*?(\d+)'
+                'losing_trades': r'Losing.*?(\d+)',
+                'iterations': r'Iterations:\s*(\d+)/(\d+)',        # "Iterations: 3000/3000"
+                'equity': r'Equity:\s*\$([+-]?\d+\.?\d*)'          # "Equity: $9999.11"
             }
             
             results = {}
