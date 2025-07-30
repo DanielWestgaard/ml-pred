@@ -137,7 +137,9 @@ class RandomForestModel(BaseModel):
         
         # Create and train model
         try:
-            rf_classifier = RandomForestClassifier(**params)
+            # Filter out SMOTE-specific parameters before creating RandomForestClassifier
+            rf_params = {k: v for k, v in params.items() if k not in ['use_smote', 'smote_strategy']}
+            rf_classifier = RandomForestClassifier(**rf_params)
             
             # Fit the model
             logger.debug("Fitting Random Forest Classifier...")

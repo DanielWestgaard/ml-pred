@@ -23,7 +23,7 @@ model_training:
         
         # SMOTE oversampling parameters - AGGRESSIVE  
         use_smote: true
-        smote_strategy: {0: 200000, 1: 200000, 2: 200000}  # Force equal distribution
+        smote_strategy: {1: 200000, 2: 200000}  # Oversample minorities to 200k each
         
         # Additional parameters for generalization
         min_impurity_decrease: 0.001   # Prevent overfitting to training noise

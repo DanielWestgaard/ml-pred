@@ -7,3 +7,11 @@
 1. Perfect V3 Target Generation: 84.4% HOLD, 7.8% BUY, 7.9% SELL balance
 2. Successful Model Training: 74.4% OOB accuracy with balanced weights
 3. Proper Pipeline: Dynamic feature generation and cleanup working
+
+However, worse results than before on backtest: 
+- "Return: -7.93%, Trades: 1963, Win Rate: 0.0%"
+- "Return: -7.74%, Trades: 1778, Win Rate: 0.0%"
+
+
+## Next try - with smote in model training
+I trained a new model on `python main.py --hyp hypothesis/spread_compression_patterns/config_model_training_v3_smote_aggressive.yml` (same features/dataset as above), and then ran `python main.py --hyp hypothesis/spread_compression_patterns/config_backtest_v3.yml`

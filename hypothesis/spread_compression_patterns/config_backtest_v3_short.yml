@@ -1,0 +1,51 @@
+hypothesis:
+  name: spread_compression_patterns_v3
+
+# Short backtesting configuration for SMOTE V3 model
+backtesting:
+  enabled: true
+  model_folder: storage/models/2025-07-30_14:15:50  # SMOTE-trained V3 model
+  data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
+  start_date: "2025-06-20"
+  end_date: "2025-06-21"  # Just 1 day for quick results
+  buffer_size: 200
+  initial_capital: 10000
+  transaction_costs: 0.0005
+  slippage: 0.0002
+
+  execution:
+    max_loops: 2000  # Lower limit for quick completion
+    loop_interval: 0
+
+  signal_processing:
+    confidence_threshold: 0.02    # Normal threshold for balanced model
+    signal_filters: []
+    min_signal_strength: 0.02
+    volume_confirmation_required: false
+
+  risk_management:
+    max_position_size: 0.08
+    stop_loss_pct: 0.012
+    take_profit_pct: 0.035
+    max_drawdown: 0.5
+    max_concurrent_positions: 2
+    position_size_scaling: "volatility"
+
+  position_management:
+    max_concurrent_positions: 2
+    position_tracking: "detailed"
+
+  exit_strategy:
+    confidence_exit_threshold: 0.85
+    signal_strength_decay: 0.8
+    volatility_exit_multiplier: 2.5
+    minimum_signal_life: 8
+
+  signal_tracking:
+    signal_strength_features:
+      - compression_ratio_micro
+      - volume_ratio
+      - signal_strength_v2
+      - compression_consistency
+      - volatility_short
+      - spread_baseline

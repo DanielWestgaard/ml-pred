@@ -4,7 +4,7 @@ hypothesis:
 # Ultra-low confidence thresholds for SMOTE-trained models
 backtesting:
   enabled: true
-  model_folder: storage/models/2025-07-30_13:32:31  # Will need to update after SMOTE training
+  model_folder: storage/models/2025-07-30_14:15:50  # SMOTE-trained model
   data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
   start_date: "2025-06-08"
   end_date: "2025-06-16"
