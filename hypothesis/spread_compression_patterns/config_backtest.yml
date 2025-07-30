@@ -8,8 +8,8 @@ backtesting:
     
     # Extended test period for better statistical significance
     data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
-    start_date: '2025-05-20'                          # Start of test period
-    end_date: '2025-05-30'                            # Extended to ~2 weeks for better testing
+    start_date: '2025-03-04'                          # Start of test period
+    end_date: '2025-03-10'                            # Extended to ~2 weeks for better testing
     buffer_size: 200
     
     # Capital and costs
@@ -24,7 +24,7 @@ backtesting:
     
     # Adjusted signal processing for enhanced features model
     signal_processing:
-        confidence_threshold: 0.30                   # Increased threshold for three-class model with balanced weights
+        confidence_threshold: 0.15                   # Increased threshold for three-class model with balanced weights
         signal_filters: []                            # No session filtering for testing
         min_signal_strength: 0.1                     # Lower quality filter to match model behavior
         volume_confirmation_required: false          # Disable to test pure model performance
