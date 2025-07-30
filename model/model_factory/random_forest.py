@@ -84,9 +84,11 @@ class RandomForestModel(BaseModel):
             'max_samples': None,             # Use all samples for each tree
         }
         
-        # Merge default parameters with configuration parameters
+        # Merge default parameters with configuration parameters (config overrides defaults)
         params = {**default_params, **self.model_params}
-        logger.info(f"Using model parameters: {params}")
+        logger.info(f"Default parameters: {default_params}")
+        logger.info(f"Config parameters: {self.model_params}")
+        logger.info(f"Final merged parameters: {params}")
         
         logger.debug(f"Random Forest parameters: {params}")
         

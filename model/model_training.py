@@ -50,6 +50,8 @@ class ModelTraining():
                 self.configured_target = configurations.get("model_training_target_column")
                 # exclude basic OHLC features while keeping enhanced features
                 self.exclude_basic_ohlc = configurations.get("model_training_exclude_basic_ohlc")
+                # Extract model parameters for training
+                self.model_training_parameters = configurations.get("model_training_parameters", {})
                 
                 # Extract walk-forward validation configuration
                 self.walk_forward_config = configurations.get("walk_forward", {})
@@ -166,7 +168,18 @@ class ModelTraining():
                 self.temporal_train_test_split()
                 
                 # Instantiate model with parameters
+                # Debug: check all available config attributes
+                config_attrs = [attr for attr in dir(self.config) if not attr.startswith('_')]
+                logger.info(f"DEBUG: Available config attributes: {config_attrs}")
+                
+                # Try different attribute names based on config loader pattern
                 model_params = getattr(self.config, 'model_training_parameters', {})
+                if not model_params:
+                    # This is probably the correct one based on config loader logs
+                    model_params = getattr(self.config, 'model_training_parameters', {})
+                logger.info(f"DEBUG: Retrieved model_params from config: {model_params}")
+                logger.info(f"DEBUG: Model params type: {type(model_params)}")
+                logger.info(f"DEBUG: Model params content: {model_params}")
                 model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train, model_params=model_params)
                 # Actually train the model
                 self.training_start_time = time.time()  # not really accurate starting it here, but short term solution
