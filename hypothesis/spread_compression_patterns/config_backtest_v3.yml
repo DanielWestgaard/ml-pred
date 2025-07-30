@@ -5,9 +5,11 @@ hypothesis:
 backtesting:
   enabled: true
   model_folder: storage/models/2025-07-30_15:45:40  # SMOTE-trained V3 model
+
   data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
   start_date: "2025-03-12"
   end_date: "2025-03-24"
+  
   buffer_size: 200
   initial_capital: 10000
   transaction_costs: 0.0005

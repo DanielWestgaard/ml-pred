@@ -14,31 +14,15 @@ When bid-ask spreads suddenly compress, it predicts significant price movements 
 
 ## 📁 **Configuration Files**
 
-### **🎯 Production Configurations (Current)**
-
-1. **`config_complete.yml`** - ⭐ **COMPLETE PIPELINE** - not tested if works
-   - Full data processing + model training + backtesting configuration
-   - Uses optimized 8-feature set with perfect model results
-   - Ready for end-to-end execution
-
-2. **`config_backtest.yml`** - 📊 **BACKTESTING FOCUSED**  
-   - Dedicated backtesting configuration for trained models
-   - Optimized parameters for spread compression strategy
-   - Uses production model: `storage/models/2025-07-27_12:53:02/`
-
-3. **`config_model.yml`** - 🧠 **MODEL TRAINING**
-   - Model training specific configuration
-   - Perfect Random Forest results (100% OOB accuracy)
-
-4. **`config_process_data.yml`** - 🔧 **DATA PROCESSING**
-   - Data engineering with optimized 8-feature set
-   - Validated feature generation and targeting
-
-### **📂 Historical Configurations**
-- `historical_configs/` - Archived test configurations from development. Currently only backtest configs.
+### **🎯 Configurations (Current)**
+The configuration files often vary, change, and gets removed, but are often marked with what they're targeting/doing. Eg.<br>
+1. `hypothesis/spread_compression_patterns/config_process_data_v3.yml` for pure data processing (specifying target and features).
+2. `hypothesis/spread_compression_patterns/config_model_training_smote.yml` for training a model on processed data.
+3. `hypothesis/spread_compression_patterns/config_backtest_v3.yml` for backtesting a trained model.
 
 ## ⚙️ **Intelligent Exit Strategy Parameters**
-
+> [!WARNING]
+> These results are from very early in the project, and most likely don't hold up to the current progress this hypothesis has come to. `TODO`: find optimal parameters when model works.
 ### **🎯 Confidence Exit Threshold** (`confidence_exit_threshold`)
 Exit when model confidence for opposite direction exceeds threshold.
 
@@ -80,73 +64,28 @@ Exit when volatility exceeds this multiple of entry volatility.
 ## 🚀 **Usage**
 
 ### **Quick Start**
+Eg.
 ```bash
 # Run optimized configuration (recommended)
-python main.py -hyp 'hypothesis/spread_compression_patterns/config_backtest_improved_simple.yml'
+python main.py --hyp 'hypothesis/spread_compression_patterns/config_backtest_improved_simple.yml'
 
 # Run baseline for comparison
-python main.py -hyp 'hypothesis/spread_compression_patterns/config_backtest.yml'
+python main.py --hyp 'hypothesis/spread_compression_patterns/config_backtest.yml'
 ```
 
-### **Parameter Testing**
-```bash
-# Quick parameter comparison (30s per test)
-python tools/fast_parameter_comparison.py
-
-# Extended testing across multiple periods
-python tools/extended_testing_framework.py
-```
-
-## 📊 **Performance Improvements**
-
-### **Parameter Tuning Results**
-Based on systematic testing across 4 parameter combinations:
-
-| Configuration | Return | Trades/Day | Exit Quality | Status |
-|---------------|---------|------------|--------------|---------|
-| **Optimized** | **-0.34%** | 83 | 100% confidence exits | ⭐ **Recommended** |
-| Aggressive | -0.34% | 83 | High responsiveness | Alternative |
-| Balanced | -0.34% | 83 | Moderate approach | Alternative |
-| Baseline | **-0.35%** | 83 | Standard exits | Comparison |
-
-### **Key Improvements vs Original**
-- ✅ **0.01% better performance** than baseline
-- ✅ **Enhanced signal decay sensitivity** (0.17 vs 0.25)
-- ✅ **Conservative confidence threshold** (0.35 vs 0.30)
-- ✅ **Better volatility detection** (1.3x vs 1.5x)
-- ✅ **Extended signal protection** (5min vs 3min)
-- ✅ **All exits confidence-based** (no premature model exits)
-
-## 📈 **Validated Performance Targets**
-
-- **Signal Frequency**: 17.1 signals per day (premium quality: ~15.7 daily)
-- **Movement Prediction**: 1.83x ratio for multi-feature combinations
-- **Tier 2+ Quality Signals**: 721 events with 0.000823 average movement (3.8x baseline)
-- **Optimal Trading Hours**: London session (proven effective in validation)
-- **Data Requirement**: 1-minute data critical for capturing compression patterns
-
-## 🔧 **Optimized Feature Set (8 Core Features)**
-
+## 🔧 **Optimized Feature Set (5 Enhanced Hybrid Features)**
+Came to this conclusion by testing: using feature importance, training model and backtesting it:
 ```python
-# === PRIMARY COMPRESSION SIGNALS (2 features) ===
-'compression_ratio_micro'      # Most sensitive (30min baseline, 3min recent)
-'compression_consistency'      # Strongest predictor (-0.4169 correlation)
-
-# === ENHANCED SIGNAL STRENGTH (1 feature) ===  
-'signal_strength_v2'          # Optimized weights: volume(2.0x) + compression(1.5x) + acceleration(1.2x)
-
-# === VOLUME CONFIRMATION SUITE (3 features) ===
-'volume_ratio'                 # 1.40x movement ratio (strongest individual)
-'volume_acceleration'          # Volume momentum detection
-'volume_breakout'              # Z-score > 2 breakout detection
-
-# === CONTEXT FEATURES (2 features) ===
-'london_session'               # Session timing (proven effective)
-'price_momentum_5'             # 5-period price momentum
+'microstructure_momentum_fusion',
+'depth_stability', 
+'volume_ratio',
+'institutional_footprint',
+'top_predictor_interaction'
 ```
 
 ## 🎛️ **Signal Tracking for Intelligent Exits**
-
+> [!WARNING]
+> Old info.
 The optimized configuration tracks these features for decay detection:
 - `compression_ratio_micro` - Core compression measurement
 - `volume_ratio` - Volume confirmation
@@ -162,6 +101,13 @@ High-signal periods identified by analysis:
 2. **2025-04-14 to 2025-04-21** - Score: 35.2, 842 signals
 3. **2025-03-31 to 2025-04-07** - Score: 32.8, 756 signals
 
+Important **datasets used for training/backtesting** to ensure model is testing on unseen data:
+- Training set: `storage/data/capital_com/GBPUSD/processed/1m/2024-01-01_2025-03-01.csv`
+- Backtesting set: `storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv`
+
+> [!NOTE]
+> If the features you're focusing on change, **both** of these datasets must be processed again! That path is easy: their `raw` counterparts are at the equivalent place `storage/data/capital_com/GBPUSD/raw/`
+
 ## 🎯 **Target Distribution**
 
 **Validated Target Distribution** (Training Focus):
@@ -170,30 +116,6 @@ High-signal periods identified by analysis:
 - **Tier 2**: 626 events (+ consistency) - **Highest quality (0.000842 avg movement)**
 - **Tier 3+4**: 95 events (+ volume + London session)
 
-## 🔄 **Implementation Status**
-
-- ✅ **Strategy Validated**: 1.83x movement prediction ratio
-- ✅ **Intelligent Exits Implemented**: Confidence + decay + volatility detection
-- ✅ **Parameters Optimized**: Systematic testing completed
-- ✅ **Performance Improved**: 0.01% better than baseline
-- ✅ **Production Ready**: Consolidated configurations
-
 ## 📚 **Documentation**
 
 - **Implementation Details:** `docs/SPREAD_COMPRESSION_IMPLEMENTATION_SUMMARY.md`
-- **Performance Analysis:** `results/final_performance_comparison.md`
-- **Parameter Tuning:** `results/parameter_tuning_analysis.md`
-- **Testing Framework:** `tools/parameter_tuning_guide.md`
-
-## 🔄 **Next Steps**
-
-1. **Extended Validation:** Test optimized parameters across multiple periods
-2. **Live Paper Trading:** Deploy with real-time data
-3. **Parameter Refinement:** Fine-tune based on extended results
-4. **Multi-Timeframe Analysis:** Extend to different timeframes
-
----
-
-**Status:** ✅ Production Ready with Optimized Parameters  
-**Last Updated:** 2025-07-27  
-**Model Performance:** Perfect accuracy with intelligent exit strategies
