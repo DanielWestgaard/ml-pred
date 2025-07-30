@@ -36,6 +36,9 @@ strong feature correlations
 - Market regime mismatch (training vs testing periods?)
 3. **The model ISN'T learning wrong patterns** - The features correlate strongly with targets, proving the logic is sound
 
+### 🎯 NEXT STEPS:
+Since your V3 target is generating excellent balanced signals with strong feature correlations, the 0%
+win rate issue is likely in:
 
 ## 2. Feature quality assessment
 
@@ -44,5 +47,8 @@ strong feature correlations
 
 
 ## 4. Risk management tuning
-
+Based on the results in `Step 1`, since the V3 target is generating excellent balanced signals with strong feature correlations, the 0% win rate issue is likely in:
+1. **Backtesting parameters** - Check your stop-loss/take-profit settings
+2. **Signal processor thresholds** - Your 0.485 confidence threshold might be too aggressive
+3. **Market timing** - Verify your entry/exit execution logic
 
