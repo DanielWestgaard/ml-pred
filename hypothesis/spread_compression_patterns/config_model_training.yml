@@ -6,6 +6,7 @@ model_training:
     type: random_forest
     processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-01-01_2025-03-01.csv
     target_column: target_spread_compression_v2_directional
+    exclude_basic_ohlc: true  # NEW: Focus on hybrid features only, exclude basic OHLC
     parameters:
         n_estimators: 300
         max_depth: 12
