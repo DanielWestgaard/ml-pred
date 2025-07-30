@@ -168,18 +168,8 @@ class ModelTraining():
                 self.temporal_train_test_split()
                 
                 # Instantiate model with parameters
-                # Debug: check all available config attributes
-                config_attrs = [attr for attr in dir(self.config) if not attr.startswith('_')]
-                logger.info(f"DEBUG: Available config attributes: {config_attrs}")
-                
-                # Try different attribute names based on config loader pattern
-                model_params = getattr(self.config, 'model_training_parameters', {})
-                if not model_params:
-                    # This is probably the correct one based on config loader logs
-                    model_params = getattr(self.config, 'model_training_parameters', {})
-                logger.info(f"DEBUG: Retrieved model_params from config: {model_params}")
-                logger.info(f"DEBUG: Model params type: {type(model_params)}")
-                logger.info(f"DEBUG: Model params content: {model_params}")
+                model_params = getattr(self, 'model_training_parameters', {})
+                logger.info(f"Using model parameters: {model_params}")
                 model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train, model_params=model_params)
                 # Actually train the model
                 self.training_start_time = time.time()  # not really accurate starting it here, but short term solution
@@ -556,7 +546,7 @@ class ModelTraining():
         if not periods:
             logger.warning("No walk-forward periods created, falling back to temporal split")
             self.temporal_train_test_split()
-            model_params = getattr(self.config, 'model_training_parameters', {})
+            model_params = getattr(self, 'model_training_parameters', {})
             model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train, model_params=model_params)
             self.training_start_time = time.time()
             model = model_instance.train()
@@ -574,7 +564,8 @@ class ModelTraining():
         self.temporal_train_test_split()
         
         # Train the final model
-        model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+        model_params = getattr(self, 'model_training_parameters', {})
+        model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train, model_params=model_params)
         self.training_start_time = time.time()
         model = model_instance.train()
         model.type = self.model_type

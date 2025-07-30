@@ -34,7 +34,7 @@ class ModelMetadataLoader:
     def _load_metadata(self) -> Dict[str, Any]:
         """Load metadata from YAML file."""
         try:
-            # Add numpy scalar constructor to handle numpy serialization issues
+            # Add numpy scalar constructor to Ar numpy serialization issues
             def numpy_scalar_constructor(loader, node):
                 """Handle numpy scalars in YAML by reconstructing the numpy scalar safely"""
                 try:
