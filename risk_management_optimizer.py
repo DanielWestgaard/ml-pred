@@ -223,7 +223,7 @@ class RiskManagementOptimizer:
         import copy
         test_config = copy.deepcopy(base_config)
         
-        # Map parameters to configuration paths
+        # Map parameters to configuration paths (based on your config structure)
         param_mapping = {
             'confidence_threshold': ['backtesting', 'signal_processing', 'confidence_threshold'],
             'stop_loss_pct': ['backtesting', 'risk_management', 'stop_loss_pct'],
@@ -233,7 +233,12 @@ class RiskManagementOptimizer:
             'max_signals_per_hour': ['backtesting', 'signal_processing', 'max_signals_per_hour'],
             'risk_reward_ratio': ['backtesting', 'risk_management', 'risk_reward_ratio'],
             'trailing_stop': ['backtesting', 'risk_management', 'use_trailing_stop'],
-            'breakeven_after_pct': ['backtesting', 'risk_management', 'breakeven_after_pct']
+            'breakeven_after_pct': ['backtesting', 'risk_management', 'breakeven_after_pct'],
+            'min_signal_strength': ['backtesting', 'signal_processing', 'min_signal_strength'],
+            'max_position_size': ['backtesting', 'risk_management', 'max_position_size'],
+            'max_concurrent_positions': ['backtesting', 'risk_management', 'max_concurrent_positions'],
+            'transaction_costs': ['backtesting', 'transaction_costs'],
+            'slippage': ['backtesting', 'slippage']
         }
         
         # Apply parameter overrides
@@ -315,30 +320,254 @@ class RiskManagementOptimizer:
     
     def _run_single_backtest(self, test_config: Dict, params: Dict) -> Optional[Dict]:
         """
-        Run single backtest with test configuration
-        
-        Note: This is a placeholder - you'll need to integrate with your actual 
-        backtesting system. This should:
-        1. Save test_config to a temporary file
-        2. Run your backtesting command
-        3. Parse and return results
+        Run single backtest with test configuration using your backtesting system
         """
-        # PLACEHOLDER IMPLEMENTATION
-        # You'll need to replace this with actual backtesting integration
+        import tempfile
+        import subprocess
+        import os
         
-        logger.warning("_run_single_backtest is a placeholder - implement with your backtesting system")
+        try:
+            # Create temporary config file
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.yml', delete=False) as f:
+                yaml.dump(test_config, f, default_flow_style=False)
+                temp_config_path = f.name
+            
+            # Run backtesting using your main.py command
+            cmd = [
+                'python', 'main.py', 
+                '--hyp', temp_config_path
+            ]
+            
+            logger.debug(f"Running backtest command: {' '.join(cmd)}")
+            
+            # Execute backtest with timeout
+            result = subprocess.run(
+                cmd, 
+                capture_output=True, 
+                text=True, 
+                timeout=300,  # 5 minute timeout per backtest
+                cwd='/Users/dmartinsen/pers-prog/ml-pred'
+            )
+            
+            # Clean up temporary file
+            try:
+                os.unlink(temp_config_path)
+            except:
+                pass
+            
+            if result.returncode != 0:
+                logger.error(f"Backtest failed with return code {result.returncode}")
+                logger.error(f"STDERR: {result.stderr}")
+                return None
+            
+            # Parse results from output or find results file
+            backtest_results = self._parse_backtest_results(result.stdout, result.stderr, params)
+            
+            return backtest_results
+            
+        except subprocess.TimeoutExpired:
+            logger.error(f"Backtest timed out for params: {params}")
+            return None
+        except Exception as e:
+            logger.error(f"Failed to run backtest: {e}")
+            return None
+    
+    def _parse_backtest_results(self, stdout: str, stderr: str, params: Dict) -> Optional[Dict]:
+        """
+        Parse backtest results from output or results files
+        """
+        try:
+            # Method 1: Parse from stdout/stderr
+            results = self._parse_output_results(stdout, stderr)
+            if results:
+                return results
+            
+            # Method 2: Look for results files (your system might save results to files)
+            results = self._parse_results_files(params)
+            if results:
+                return results
+            
+            # Method 3: Parse log files for results
+            results = self._parse_log_results()
+            if results:
+                return results
+                
+            logger.warning("Could not parse backtest results from any source")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to parse backtest results: {e}")
+            return None
+    
+    def _parse_output_results(self, stdout: str, stderr: str) -> Optional[Dict]:
+        """Parse results from command output"""
+        try:
+            # Look for key metrics in the output
+            import re
+            
+            # Common patterns to look for in your backtesting output
+            patterns = {
+                'total_return_pct': r'Total Return.*?([+-]?\d+\.?\d*)%',
+                'win_rate': r'Win Rate.*?(\d+\.?\d*)%',
+                'total_trades': r'Total Trades.*?(\d+)',
+                'sharpe_ratio': r'Sharpe.*?([+-]?\d+\.?\d*)',
+                'max_drawdown_pct': r'Max Drawdown.*?([+-]?\d+\.?\d*)%',
+                'profitable_trades': r'Profitable.*?(\d+)',
+                'losing_trades': r'Losing.*?(\d+)'
+            }
+            
+            results = {}
+            full_output = stdout + "\n" + stderr
+            
+            for metric, pattern in patterns.items():
+                match = re.search(pattern, full_output, re.IGNORECASE)
+                if match:
+                    try:
+                        results[metric] = float(match.group(1))
+                    except ValueError:
+                        results[metric] = match.group(1)
+            
+            # Calculate derived metrics
+            if 'profitable_trades' in results and 'losing_trades' in results:
+                total = results['profitable_trades'] + results['losing_trades']
+                if total > 0:
+                    results['win_rate'] = results['profitable_trades'] / total * 100
+                    results['total_trades'] = total
+            
+            # Return results if we found key metrics
+            if len(results) >= 2:  # Need at least 2 metrics
+                logger.debug(f"Parsed results from output: {results}")
+                return results
+                
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to parse output results: {e}")
+            return None
+    
+    def _parse_results_files(self, params: Dict) -> Optional[Dict]:
+        """Parse results from saved results files"""
+        try:
+            # Look for recent results files in common locations
+            import glob
+            from pathlib import Path
+            
+            # Common result file locations
+            search_paths = [
+                'storage/backtesting/results/*.json',
+                'storage/backtesting/results/*.csv',
+                'logs/backtesting/*.json',
+                'results/*.json'
+            ]
+            
+            latest_file = None
+            latest_time = 0
+            
+            for pattern in search_paths:
+                files = glob.glob(pattern)
+                for file_path in files:
+                    file_time = os.path.getmtime(file_path)
+                    if file_time > latest_time:
+                        latest_time = file_time
+                        latest_file = file_path
+            
+            if latest_file and (time.time() - latest_time) < 60:  # File created in last minute
+                logger.debug(f"Found recent results file: {latest_file}")
+                
+                if latest_file.endswith('.json'):
+                    with open(latest_file, 'r') as f:
+                        data = json.load(f)
+                    return self._extract_metrics_from_json(data)
+                
+                elif latest_file.endswith('.csv'):
+                    df = pd.read_csv(latest_file)
+                    return self._extract_metrics_from_dataframe(df)
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to parse results files: {e}")
+            return None
+    
+    def _parse_log_results(self) -> Optional[Dict]:
+        """Parse results from recent log files"""
+        try:
+            # Look for recent log files
+            log_patterns = [
+                'logs/logging_*.log',
+                'logs/backtesting_*.log'
+            ]
+            
+            latest_log = None
+            latest_time = 0
+            
+            for pattern in log_patterns:
+                import glob
+                files = glob.glob(pattern)
+                for file_path in files:
+                    file_time = os.path.getmtime(file_path)
+                    if file_time > latest_time:
+                        latest_time = file_time
+                        latest_log = file_path
+            
+            if latest_log and (time.time() - latest_time) < 120:  # Log updated in last 2 minutes
+                with open(latest_log, 'r') as f:
+                    log_content = f.read()
+                
+                # Parse log content for results
+                return self._parse_output_results(log_content, "")
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Failed to parse log results: {e}")
+            return None
+    
+    def _extract_metrics_from_json(self, data: Dict) -> Dict:
+        """Extract standard metrics from JSON results"""
+        metrics = {}
         
-        # Simulate results for demonstration
-        import random
-        random.seed(hash(str(params)) % 2**32)  # Deterministic based on params
-        
-        return {
-            'win_rate': random.uniform(0, 80),
-            'total_return_pct': random.uniform(-10, 15),
-            'total_trades': random.randint(10, 500),
-            'sharpe_ratio': random.uniform(-1, 3),
-            'max_drawdown_pct': random.uniform(1, 20)
+        # Common field mappings
+        field_mappings = {
+            'total_return_pct': ['total_return', 'total_return_pct', 'return_pct', 'pnl_pct'],
+            'win_rate': ['win_rate', 'win_percentage', 'success_rate'],
+            'total_trades': ['total_trades', 'trade_count', 'num_trades'],
+            'sharpe_ratio': ['sharpe_ratio', 'sharpe'],
+            'max_drawdown_pct': ['max_drawdown', 'max_drawdown_pct', 'drawdown']
         }
+        
+        for metric, possible_fields in field_mappings.items():
+            for field in possible_fields:
+                if field in data:
+                    metrics[metric] = data[field]
+                    break
+        
+        return metrics if metrics else None
+    
+    def _extract_metrics_from_dataframe(self, df: pd.DataFrame) -> Dict:
+        """Extract metrics from results DataFrame"""
+        if len(df) == 0:
+            return None
+        
+        metrics = {}
+        
+        # Calculate metrics from trade-level data if available
+        if 'pnl' in df.columns:
+            total_return = df['pnl'].sum()
+            metrics['total_return_pct'] = total_return
+            
+            profitable_trades = (df['pnl'] > 0).sum()
+            total_trades = len(df)
+            metrics['win_rate'] = profitable_trades / total_trades * 100 if total_trades > 0 else 0
+            metrics['total_trades'] = total_trades
+            
+            # Calculate Sharpe ratio if we have enough trades
+            if total_trades > 10:
+                returns = df['pnl']
+                if returns.std() > 0:
+                    metrics['sharpe_ratio'] = returns.mean() / returns.std() * np.sqrt(252)  # Annualized
+        
+        return metrics if metrics else None
     
     def _params_to_key(self, params: Dict) -> str:
         """Convert parameters dictionary to string key"""
@@ -532,14 +761,58 @@ def optimize_risk_management(config_path: str, test_type: str = 'quick') -> Dict
 
 if __name__ == "__main__":
     import sys
+    import argparse
     
-    if len(sys.argv) < 2:
-        print("Usage: python risk_management_optimizer.py <config_file> [--quick-test]")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Risk Management Parameter Optimization')
+    parser.add_argument('config_file', help='Path to backtesting configuration file')
+    parser.add_argument('--test-type', choices=['quick', 'focused', 'comprehensive'], 
+                       default='quick', help='Type of optimization test to run')
+    parser.add_argument('--max-concurrent', type=int, default=1, 
+                       help='Maximum concurrent backtests (be careful with system resources)')
+    parser.add_argument('--dry-run', action='store_true', 
+                       help='Generate parameter combinations without running backtests')
     
-    config_file = sys.argv[1]
-    test_type = 'quick' if '--quick-test' in sys.argv else 'comprehensive'
+    args = parser.parse_args()
     
-    print(f"Starting risk management optimization with {test_type} testing...")
-    results = optimize_risk_management(config_file, test_type)
-    print(f"\n✅ Optimization completed! Report saved to: {results['report_path']}")
+    print(f"🚀 Starting Risk Management Optimization")
+    print(f"   Config: {args.config_file}")
+    print(f"   Test Type: {args.test_type}")
+    print(f"   Max Concurrent: {args.max_concurrent}")
+    print("=" * 60)
+    
+    if args.dry_run:
+        print("🔍 DRY RUN MODE - Generating parameters only")
+        optimizer = RiskManagementOptimizer(args.config_file)
+        combinations = optimizer.generate_test_parameter_grid(args.test_type)
+        
+        print(f"\n📊 Generated {len(combinations)} parameter combinations:")
+        for i, params in enumerate(combinations[:10]):  # Show first 10
+            print(f"  {i+1:3d}. {params}")
+        
+        if len(combinations) > 10:
+            print(f"  ... and {len(combinations) - 10} more combinations")
+        
+        print(f"\n💡 Remove --dry-run to execute actual optimization")
+    else:
+        print("🔥 LIVE MODE - Running actual backtests")
+        results = optimize_risk_management(args.config_file, args.test_type)
+        print(f"\n✅ Optimization completed!")
+        print(f"📊 Report saved to: {results['report_path']}")
+        
+        # Show quick summary
+        analysis = results['analysis']
+        if analysis.get('successful_count', 0) > 0:
+            print(f"\n🎯 Quick Results Summary:")
+            print(f"   Successful tests: {analysis['successful_count']}/{analysis['total_tested']}")
+            
+            if analysis.get('best_win_rate'):
+                best_wr = analysis['best_win_rate']
+                print(f"   Best win rate: {best_wr['value']:.1f}%")
+                print(f"   Best parameters: {best_wr['parameters']}")
+                
+            if analysis.get('parameter_sensitivity'):
+                sens = analysis['parameter_sensitivity']
+                most_sensitive = max(sens.items(), key=lambda x: x[1]['sensitivity'])
+                print(f"   Most sensitive parameter: {most_sensitive[0]} (impact: {most_sensitive[1]['sensitivity']:.2f})")
+        else:
+            print("⚠️  No successful results found. Check your configuration and system setup.")
