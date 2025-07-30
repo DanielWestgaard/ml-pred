@@ -1,0 +1,27 @@
+hypothesis:
+  name: spread_compression_patterns_v2
+
+# Model training with BINARY target (instead of directional)
+model_training:
+    type: random_forest
+    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-01-01_2025-03-01.csv
+    target_column: target_spread_compression_v2_binary  # Try binary target instead
+    exclude_basic_ohlc: true  # Focus on hybrid features only
+    parameters:
+        n_estimators: 300
+        max_depth: 12
+        min_samples_split: 4
+        min_samples_leaf: 2
+        class_weight: {0: 1, 1: 9}  # Custom weights: NO_SIGNAL=1, SIGNAL=9 (9:1 rebalancing)
+        bootstrap: true
+        oob_score: true
+        random_state: 42
+        n_jobs: -1
+        max_features: sqrt
+
+# Walk-forward validation configuration
+walk_forward:
+    initial_training_months: 4
+    validation_period_months: 1
+    step_forward_months: 1
+    min_training_samples: 50000
