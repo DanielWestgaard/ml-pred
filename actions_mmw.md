@@ -65,4 +65,19 @@ Based on the results in `Step 1`, since the V3 target is generating excellent ba
 3. **Market timing** - Verify your entry/exit execution logic
 
 ### Created dedicated testing file complete Risk Management Optimization system
+Check out `RISK_OPTIMIZATION_GUIDE.md` for what and how this works.
+
+🚀 Start Testing NOW:
+
+# 1. Verify it works (30 seconds) ✅
+python risk_management_optimizer.py hypothesis/spread_compression_patterns/config_backtest_v3_quick.yml
+--dry-run
+
+# 2. Run quick optimization (2-4 hours, 216 tests) - UNDERWAY
+python risk_management_optimizer.py hypothesis/spread_compression_patterns/config_backtest_v3_quick.yml
+--test-type quick
+
+# 3. If quick shows promise, run focused (4-6 hours, 300 tests) - TODO
+python risk_management_optimizer.py hypothesis/spread_compression_patterns/config_backtest_v3_quick.yml
+--test-type focused
 
