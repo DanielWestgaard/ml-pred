@@ -461,15 +461,15 @@ class TargetHypothesis(BaseProcessor):
             price_momentum = self.df['close'].pct_change(periods=3)  # Shorter period for more signals
             volume_momentum = self.df['volume_ratio'] - 1.0
             
-            # Lower thresholds for directional detection
+            # Balanced thresholds for directional detection
             bullish_bias = (
-                (price_momentum > -0.0001) &  # Almost any positive or flat momentum
-                (volume_momentum > -0.1)     # Volume not significantly below average
+                (price_momentum > 0.0001) &   # Clear positive momentum required
+                (volume_momentum > 0.0)      # Volume above average required
             )
             
             bearish_bias = (
-                (price_momentum < 0.0001) &   # Almost any negative or flat momentum  
-                (volume_momentum > -0.1)     # Volume not significantly below average
+                (price_momentum < -0.0001) &  # Clear negative momentum required
+                (volume_momentum > 0.0)      # Volume above average required
             )
             
             # STEP 4: BALANCED SIGNAL GENERATION
