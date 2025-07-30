@@ -12,7 +12,9 @@ Then, we figured out that the last (major) issue was major class imbalance: Eg.
 - **Class 1 (Basic signal)**: 78,392 samples (6.0%) 
 - **Class 2+ (Strong signals)**: 2,065 samples (0.15%)
 
-Which also led to model learning and only predicting HOLD ("no signal"). Which also led to very low confidence on positive predictions, 0% win rate and always negative returns (varying from -9% to -0,5%)
+This led to model learning and only predicting HOLD ("no signal"), and also very low confidence on positive predictions: 0% win rate and always negative returns (varying from -9% to -0,5%).
+
+I tried to change and specify `model_training.parameters.class_weight: {0: 1, 1: 40, 2: 40}` instead of using the `balanced` on that is standard, but his didn't help either.
 
 However, after we implemented SMOTE into the model training and "changed the distribution of classes", that changed a lot! Model still isn't profitable, yet, but we're finally seeing positive win rates! 
 
