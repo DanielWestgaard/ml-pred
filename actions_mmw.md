@@ -34,8 +34,7 @@ strong feature correlations
 - Risk management settings (stop losses too tight?)
 - Signal execution timing (entry/exit logic?)
 - Market regime mismatch (training vs testing periods?)
-3. The model ISN'T learning wrong patterns - The features correlate strongly with targets, proving the
-logic is sound
+3. **The model ISN'T learning wrong patterns** - The features correlate strongly with targets, proving the logic is sound
 
 
 ## 2. Feature quality assessment
