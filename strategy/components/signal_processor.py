@@ -423,7 +423,7 @@ class AdvancedSignalProcessor(SignalProcessor):
         signals['signal_direction'] = filtered_directions
         signals['confidence_scores'] = filtered_confidences
         
-        filter_summary = f"Advanced filtering: {len(predictions)} predictions → {len(filtered_signals)} signals"
+        filter_summary = f"Advanced filtering: {len(signals['raw_predictions'])} predictions → {len(filtered_signals)} signals"
         logger.info(filter_summary)
         
         return signals
