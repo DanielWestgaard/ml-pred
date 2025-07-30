@@ -20,3 +20,4 @@ nbformat
 torch
 tensorflow
 timeout
+imblearn
