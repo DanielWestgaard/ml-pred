@@ -45,4 +45,15 @@ backtesting:
 ```
 
 ### Key Insight
-**The signal processor works perfectly.** The core issue is the model needs retraining - it's overfitted and only outputs ~3 constant confidence values instead of a proper confidence distribution.
+**The signal processor works perfectly.** The core issue is the model needs retraining - it's overfitted and only outputs ~3 constant confidence values instead of a proper confidence distribution.<br>
+Both new models show:
+- Proper confidence distribution ✅
+- All 3 classes predicted ✅
+- Advanced signal filtering working ✅
+- But 0% win rate ❌
+
+**Possible causes**:
+1. Target/labels wrong - Model learning opposite of what it should
+2. Feature quality - Features don't predict spread compression well
+3. Market regime - March 2025 data doesn't match training period patterns
+4. Risk management - Stop losses too tight, take profits too wide
