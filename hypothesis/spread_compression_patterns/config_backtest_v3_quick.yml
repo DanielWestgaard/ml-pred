@@ -18,7 +18,7 @@ backtesting:
     loop_interval: 0
 
   signal_processing:
-    confidence_threshold: 0.495    # High enough to reduce frequency
+    confidence_threshold: 0.49    # High enough to reduce frequency
     signal_filters: []
     min_signal_strength: 0.48
     volume_confirmation_required: false
