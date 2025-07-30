@@ -188,11 +188,13 @@ class TargetHypothesis(BaseProcessor):
     
     def spread_compression_patterns(self):
         """
+        WARNING: OUTDATED, SEEMINGLY NOT GOOD, AND CONTAINS LOOKAHEAD BIAS
         Target for spread compression pattern hypothesis.
         
         This targets moments when spread compression leads to significant price movements,
         particularly during London session trading hours when market liquidity changes.
         """
+        logger.error("WARNING - YOU ARE TESTING AN OLD TARGET HYPOTHESES - THIS IS OUTDATED AND SEEMINGLY NOT GOOD")
         try:
             # Required features check - Updated to match enhanced feature set
             required_features = [
@@ -585,6 +587,7 @@ class TargetHypothesis(BaseProcessor):
 
     def spread_compression_patterns_v2(self):
         """
+        WARNING: OUTDATED AND SEEMINGLY NOT GOOD
         Enhanced target for spread compression pattern hypothesis - VERSION 2.
         
         FOCUS: Quality Tier 2+ signals only, eliminating noisy Tier 1 signals.
@@ -596,6 +599,7 @@ class TargetHypothesis(BaseProcessor):
         - Feature interaction logic using top predictors
         - Enhanced volume and institutional confirmation
         """
+        logger.error("WARNING - YOU ARE TESTING AN TARGET HYPOTHESES - THIS IS OUTDATED AND SEEMINGLY NOT GOOD")
         try:
             # Required features check - Enhanced set focusing on top predictors
             required_features = [
