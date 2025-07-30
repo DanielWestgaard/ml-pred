@@ -22,7 +22,7 @@ class RandomForestModel(BaseModel):
     - Feature importance analysis for market microstructure patterns
     """
     
-    def __init__(self, dataset: pd.DataFrame, X_train: pd.DataFrame, y_train: pd.DataFrame):
+    def __init__(self, dataset: pd.DataFrame, X_train: pd.DataFrame, y_train: pd.DataFrame, model_params: dict = None):
         """
         Initialize Random Forest Classifier optimized for spread compression patterns.
         
@@ -30,6 +30,7 @@ class RandomForestModel(BaseModel):
             dataset: The processed/engineered data for training and testing (pd.DataFrame)
             X_train: Training features (pd.DataFrame)
             y_train: Training targets - should be binary classification labels (pd.DataFrame/Series)
+            model_params: Optional model parameters from configuration (dict)
             
         Returns:
             Trained Random Forest model optimized for imbalanced financial data
@@ -39,6 +40,7 @@ class RandomForestModel(BaseModel):
         self.df = dataset
         self.X_train = X_train
         self.y_train = y_train
+        self.model_params = model_params or {}
         
         # Validate that target is binary classification
         unique_targets = np.unique(y_train)
@@ -59,8 +61,8 @@ class RandomForestModel(BaseModel):
         """
         logger.info(f"---------- Starting to train Random Forest Classifier Model! ----------")
         
-        # Optimized parameters for spread compression patterns
-        params = {
+        # Default parameters optimized for spread compression patterns
+        default_params = {
             # Core ensemble parameters
             'n_estimators': 300,              # More trees for rare signal detection
             'max_depth': 10,                  # Deeper trees for complex market patterns
@@ -82,6 +84,12 @@ class RandomForestModel(BaseModel):
             'max_samples': None,             # Use all samples for each tree
         }
         
+        # Merge default parameters with configuration parameters (config overrides defaults)
+        params = {**default_params, **self.model_params}
+        logger.info(f"Default parameters: {default_params}")
+        logger.info(f"Config parameters: {self.model_params}")
+        logger.info(f"Final merged parameters: {params}")
+        
         logger.debug(f"Random Forest parameters: {params}")
         
         # Log class distribution for monitoring
@@ -91,14 +99,51 @@ class RandomForestModel(BaseModel):
         if len(class_counts) == 2:
             imbalance_ratio = class_counts.min() / class_counts.max()
             logger.info(f"Imbalance ratio: {imbalance_ratio:.4f} ({imbalance_ratio*100:.2f}%)")
+        elif len(class_counts) == 3:
+            minority_class_pct = (class_counts[1] + class_counts[2]) / class_counts.sum() * 100
+            logger.info(f"Minority classes (BUY+SELL): {minority_class_pct:.1f}% of total data")
+        
+        # Check if SMOTE oversampling should be applied
+        X_train_final = self.X_train
+        y_train_final = self.y_train
+        
+        # Apply SMOTE if extreme imbalance detected (minority classes < 10%)
+        if len(class_counts) >= 2 and 'use_smote' in self.model_params and self.model_params['use_smote']:
+            try:
+                from imblearn.over_sampling import SMOTE
+                logger.info("Applying SMOTE oversampling for extreme class imbalance...")
+                
+                # Configure SMOTE
+                smote_strategy = self.model_params.get('smote_strategy', 'auto')  # Can be 'minority', 'not majority', 'all', or dict
+                smote_k_neighbors = min(5, class_counts.min() - 1) if class_counts.min() > 1 else 1
+                
+                smote = SMOTE(
+                    sampling_strategy=smote_strategy,
+                    k_neighbors=smote_k_neighbors,
+                    random_state=42
+                )
+                
+                X_train_final, y_train_final = smote.fit_resample(self.X_train, self.y_train)
+                
+                # Log new distribution
+                new_class_counts = pd.Series(y_train_final).value_counts()
+                logger.info(f"After SMOTE - Class distribution: {new_class_counts.to_dict()}")
+                logger.info(f"Training samples increased from {len(self.y_train)} to {len(y_train_final)}")
+                
+            except ImportError:
+                logger.warning("SMOTE oversampling requested but imblearn not available. Install with: pip install imbalanced-learn")
+            except Exception as e:
+                logger.warning(f"SMOTE oversampling failed: {e}. Continuing with original data.")
         
         # Create and train model
         try:
-            rf_classifier = RandomForestClassifier(**params)
+            # Filter out SMOTE-specific parameters before creating RandomForestClassifier
+            rf_params = {k: v for k, v in params.items() if k not in ['use_smote', 'smote_strategy']}
+            rf_classifier = RandomForestClassifier(**rf_params)
             
             # Fit the model
             logger.debug("Fitting Random Forest Classifier...")
-            model = rf_classifier.fit(self.X_train, self.y_train)
+            model = rf_classifier.fit(X_train_final, y_train_final)
             
             # Log training results
             logger.info(f"Successfully trained Random Forest Classifier!")

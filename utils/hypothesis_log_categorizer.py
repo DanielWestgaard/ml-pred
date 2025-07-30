@@ -48,7 +48,8 @@ def _determine_log_category(config: Dict[str, Any]) -> str:
         'data': ['data_pipeline'],
         'training': ['model_training'],
         'evaluation': ['evaluate_model'],
-        'strategy': ['strategy']
+        'strategy': ['strategy'],
+        'backtesting': ['backtesting']
     }
     
     # Count which categories are present

@@ -352,3 +352,20 @@ def get_data_file_path(symbol: str, timeframe: str, start_date: str, end_date: s
     return os.path.join(directory, filename)
 
 
+########## Utility used in data/features/target_hypothesis.py
+def generate_misssing_required_features_for_target(missing_features : list):
+    """
+    Helper method generating any missing features in the processed dataset.
+    
+    Args:
+        missing_features: List of features missing that's required for the generation of target hypothesis feature.
+    
+    Returns:
+        pandas.dataframe: with missing features. This way, the actual method don't need to add them in its own dataframe, and can use this returning one as just a "temporary df".
+    """
+    
+    # Try to generate the feature directly
+    
+        # Sometimes the feature has its own dependent features needed to be generated, so this could be a fallback or first/second test?
+    
+    # Returning resulting features

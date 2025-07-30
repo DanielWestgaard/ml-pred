@@ -48,6 +48,10 @@ class ModelTraining():
                 
                 # Extract target column configuration (proper fix)
                 self.configured_target = configurations.get("model_training_target_column")
+                # exclude basic OHLC features while keeping enhanced features
+                self.exclude_basic_ohlc = configurations.get("model_training_exclude_basic_ohlc")
+                # Extract model parameters for training
+                self.model_training_parameters = configurations.get("model_training_parameters", {})
                 
                 # Extract walk-forward validation configuration
                 self.walk_forward_config = configurations.get("walk_forward", {})
@@ -163,8 +167,10 @@ class ModelTraining():
                 # Split data into train and test
                 self.temporal_train_test_split()
                 
-                # Instantiate model
-                model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+                # Instantiate model with parameters
+                model_params = getattr(self, 'model_training_parameters', {})
+                logger.info(f"Using model parameters: {model_params}")
+                model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train, model_params=model_params)
                 # Actually train the model
                 self.training_start_time = time.time()  # not really accurate starting it here, but short term solution
                 self.model = model_instance.train()
@@ -312,7 +318,17 @@ class ModelTraining():
             # Features (Input variables) - Exclude ALL target columns and future-looking features to prevent data leakage
             target_columns = [col for col in self.df.columns if col.startswith('target_')]
             future_columns = [col for col in self.df.columns if col.startswith('future_')]
-            exclude_columns = target_columns + future_columns
+            
+            # NEW: Dynamic OHLC exclusion system - exclude basic OHLC features while keeping enhanced features
+            # Keep only close_og (original close) and exclude normalized OHLC that may dominate hybrid features
+            ohlc_columns = []
+            if self.exclude_basic_ohlc:
+                basic_ohlc = ['open', 'high', 'low', 'close', 'volume']  # Exclude basic OHLC
+                available_ohlc = [col for col in basic_ohlc if col in self.df.columns]
+                ohlc_columns = available_ohlc
+                logger.info(f"DYNAMIC EXCLUSION: Excluding basic OHLC features to focus on hybrid features: {available_ohlc}")
+            
+            exclude_columns = target_columns + future_columns + ohlc_columns
             
             logger.info(f"Excluding columns to prevent data leakage: {exclude_columns}")
             self.X = self.df.drop(exclude_columns, axis=1, errors='ignore')
@@ -530,7 +546,8 @@ class ModelTraining():
         if not periods:
             logger.warning("No walk-forward periods created, falling back to temporal split")
             self.temporal_train_test_split()
-            model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+            model_params = getattr(self, 'model_training_parameters', {})
+            model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train, model_params=model_params)
             self.training_start_time = time.time()
             model = model_instance.train()
             model.type = self.model_type
@@ -547,7 +564,8 @@ class ModelTraining():
         self.temporal_train_test_split()
         
         # Train the final model
-        model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train)
+        model_params = getattr(self, 'model_training_parameters', {})
+        model_instance = model_class(dataset=self.df, X_train=self.X_train, y_train=self.y_train, model_params=model_params)
         self.training_start_time = time.time()
         model = model_instance.train()
         model.type = self.model_type

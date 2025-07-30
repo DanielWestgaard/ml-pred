@@ -1,9 +1,5 @@
-import inspect
 import numpy as np
-
 import pandas as pd
-import matplotlib.pyplot as plt
-from scipy import stats
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
 from utils import shared_utils
@@ -53,6 +49,115 @@ class TargetHypothesis(BaseProcessor):
         
         return self.df
     
+    def _generate_features_with_dependencies(self, required_features, feature_dependency_map):
+        """
+        Reusable method to generate required features and their dependencies.
+        
+        Args:
+            required_features: List of feature names that are required
+            feature_dependency_map: Dict mapping feature_name -> (generator_method, [dependencies])
+                                   e.g., {'volume_ratio': ('volume_ratio_feature', ['volume_ma_20'])}
+        
+        Returns:
+            tuple: (successfully_generated_features, all_added_features, temp_generator_df)
+        """
+        from data.features.enhanced_generation import ModelAwareFeatureGenerator
+        
+        missing_features = [f for f in required_features if f not in self.df.columns]
+        if not missing_features:
+            return [], [], self.df
+            
+        logger.warning(f"Missing required features for enhanced target generation: {missing_features}")
+        logger.info("Generating missing features temporarily for target creation...")
+        
+        temp_generator = ModelAwareFeatureGenerator(self.df)
+        
+        # Track original columns to identify all added features
+        original_columns = set(temp_generator.df.columns)
+        
+        # Ensure datetime index for session features
+        if 'date' in temp_generator.df.columns:
+            temp_generator.df.set_index('date', inplace=True)
+            temp_generator.df.index = pd.to_datetime(temp_generator.df.index)
+        
+        # Build complete dependency graph including transitive dependencies
+        all_needed_features = set(missing_features)
+        
+        def add_dependencies_recursively(feature_name):
+            if feature_name in feature_dependency_map:
+                _, dependencies = feature_dependency_map[feature_name]
+                if dependencies:
+                    for dep in dependencies:
+                        if dep not in temp_generator.df.columns:
+                            all_needed_features.add(dep)
+                            add_dependencies_recursively(dep)
+        
+        for feature in missing_features:
+            add_dependencies_recursively(feature)
+        
+        # Topologically sort features based on dependencies
+        def topological_sort():
+            visited = set()
+            temp_visited = set()
+            result = []
+            
+            def visit(feature):
+                if feature in temp_visited:
+                    logger.warning(f"Circular dependency detected involving {feature}")
+                    return
+                if feature in visited:
+                    return
+                    
+                temp_visited.add(feature)
+                
+                if feature in feature_dependency_map:
+                    _, dependencies = feature_dependency_map[feature]
+                    if dependencies:
+                        for dep in dependencies:
+                            if dep in all_needed_features:
+                                visit(dep)
+                
+                temp_visited.remove(feature)
+                visited.add(feature)
+                result.append(feature)
+            
+            for feature in all_needed_features:
+                if feature not in visited:
+                    visit(feature)
+            
+            return result
+        
+        generation_order = topological_sort()
+        successfully_generated = []
+        
+        # Generate features in dependency order
+        for feature_name in generation_order:
+            if feature_name not in temp_generator.df.columns:
+                if feature_name in feature_dependency_map:
+                    generator_method, _ = feature_dependency_map[feature_name]
+                    if generator_method and hasattr(temp_generator, generator_method):
+                        try:
+                            logger.debug(f"Temporarily generating {feature_name} using {generator_method}")
+                            temp_generator.__getattribute__(generator_method)()
+                            if feature_name in temp_generator.df.columns:
+                                successfully_generated.append(feature_name)
+                                logger.debug(f"Successfully generated {feature_name}")
+                            else:
+                                logger.warning(f"Feature {feature_name} not found after generation")
+                        except Exception as e:
+                            logger.warning(f"Failed to generate {feature_name}: {e}")
+                    else:
+                        logger.warning(f"Cannot generate missing feature: {feature_name} (no method {generator_method})")
+        
+        # Identify all features that were added during the process
+        final_columns = set(temp_generator.df.columns)
+        all_added_features = list(final_columns - original_columns)
+        
+        logger.info(f"Successfully generated {len(successfully_generated)} features: {successfully_generated}")
+        logger.debug(f"Total features added during process: {len(all_added_features)} - {all_added_features}")
+        
+        return successfully_generated, all_added_features, temp_generator.df
+    
     def session_based_tod_anomalies(self):
         """
         This target captures when future volatility is abnormally high relative to that specific session's
@@ -83,11 +188,13 @@ class TargetHypothesis(BaseProcessor):
     
     def spread_compression_patterns(self):
         """
+        WARNING: OUTDATED, SEEMINGLY NOT GOOD, AND CONTAINS LOOKAHEAD BIAS
         Target for spread compression pattern hypothesis.
         
         This targets moments when spread compression leads to significant price movements,
         particularly during London session trading hours when market liquidity changes.
         """
+        logger.error("WARNING - YOU ARE TESTING AN OLD TARGET HYPOTHESES - THIS IS OUTDATED AND SEEMINGLY NOT GOOD")
         try:
             # Required features check - Updated to match enhanced feature set
             required_features = [
@@ -250,18 +357,18 @@ class TargetHypothesis(BaseProcessor):
             logger.error(f"Unable to calculate fixed target: {e}")
             return False
 
-    def spread_compression_patterns_v2(self):
+    def spread_compression_patterns_v3(self):
         """
-        Enhanced target for spread compression pattern hypothesis - VERSION 2.
+        Enhanced target for spread compression - VERSION 3 with BETTER CLASS BALANCE.
         
-        FOCUS: Quality Tier 2+ signals only, eliminating noisy Tier 1 signals.
-        GOAL: Better class balance (85/15 vs 93.9/6.1) with higher signal quality.
+        FOCUS: Achieve 15-20% signal rate (80-85% HOLD, 10-15% BUY/SELL) for better model training.
+        STRATEGY: More aggressive thresholds and feature interactions to generate more signals.
         
-        Key improvements:
-        - Skip Tier 1 noise signals entirely
-        - More sensitive thresholds for Tier 2+ detection 
-        - Feature interaction logic using top predictors
-        - Enhanced volume and institutional confirmation
+        Key improvements over V2:
+        - Ultra-aggressive thresholds for better balance
+        - Multiple signal generation pathways  
+        - Advanced feature combinations
+        - Balanced directional signals
         """
         try:
             # Required features check - Enhanced set focusing on top predictors
@@ -275,42 +382,264 @@ class TargetHypothesis(BaseProcessor):
                 'signal_conviction'       # Composite signal strength
             ]
             
-            missing_features = [f for f in required_features if f not in self.df.columns]
-            temp_generated_features = []
+            # Define feature dependency mapping for this hypothesis
+            feature_dependency_map = {
+                'volume_ma_20': ('volume_ma_20_feature', []),
+                'volume_ratio': ('volume_ratio_feature', ['volume_ma_20']),
+                'depth_stability': ('enhanced_market_depth_features', []),
+                'liquidity_stress': ('enhanced_market_depth_features', []),
+                'institutional_footprint': ('institutional_footprint_detection', ['volume_ratio']),
+                'microstructure_health': ('enhanced_microstructure_health', []),
+                'signal_conviction': ('enhanced_predictive_signals', []),
+                'london_session': ('fx_trading_sessions', [])
+            }
             
-            if missing_features:
-                logger.warning(f"Missing required features for enhanced target generation: {missing_features}")
-                logger.info("Generating missing features temporarily for target creation...")
+            # Use reusable dependency resolution method from V2
+            successfully_generated, all_added_features, updated_df = self._generate_features_with_dependencies(
+                required_features, feature_dependency_map
+            )
+            
+            # Update dataframe and track ALL features added for proper cleanup
+            self.df = updated_df
+            temp_generated_features = all_added_features
+            
+            logger.debug(f"V3: Successfully generated {len(successfully_generated)} features: {successfully_generated}")
+            logger.debug(f"V3: Total features added for cleanup: {len(all_added_features)}")
+            
+            # Check if we have the minimum required features for target generation
+            critical_features = ['depth_stability', 'institutional_footprint', 'volume_ratio', 'microstructure_health']
+            missing_critical = [f for f in critical_features if f not in self.df.columns]
+            
+            if missing_critical:
+                logger.error(f"Cannot proceed with target generation - missing critical features: {missing_critical}")
+                return False
+            
+            # STEP 1: ULTRA-AGGRESSIVE THRESHOLDS for 15-20% signal rate
+            logger.info("=== ENHANCED TARGET V3: BALANCED CLASS DISTRIBUTION ===")
+            
+            # Primary thresholds - VERY aggressive for more signals
+            depth_stability_threshold = self.df['depth_stability'].quantile(0.20)      # Top 80% (very inclusive)
+            institutional_threshold = self.df['institutional_footprint'].quantile(0.30)  # Top 70%
+            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.35)     # Top 65%
+            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.25)  # Top 75%
+            volume_threshold = max(1.01, self.df['volume_ratio'].quantile(0.35))        # Top 65%, minimum 1.01
+            signal_conviction_threshold = self.df['signal_conviction'].quantile(0.35)    # Top 65%
+            
+            logger.info(f"V3 ULTRA-AGGRESSIVE Thresholds:")
+            logger.info(f"  Depth stability: {depth_stability_threshold:.4f} (80th percentile)")
+            logger.info(f"  Institutional activity: {institutional_threshold:.4f} (70th percentile)")
+            logger.info(f"  Liquidity stress: {liquidity_stress_threshold:.4f} (65th percentile)")
+            logger.info(f"  Volume confirmation: {volume_threshold:.4f} (65th percentile)")
+            
+            # STEP 2: MULTIPLE SIGNAL PATHWAYS for better balance
+            
+            # Pathway 1: Core compression signal
+            core_signal = (
+                (self.df['depth_stability'] > depth_stability_threshold) |  # OR condition for more signals
+                (self.df['liquidity_stress'] > liquidity_stress_threshold)
+            )
+            
+            # Pathway 2: Volume-driven signal
+            volume_signal = (
+                (self.df['volume_ratio'] > volume_threshold) &
+                (self.df['institutional_footprint'] > institutional_threshold)
+            )
+            
+            # Pathway 3: Health-based signal
+            health_signal = (
+                (self.df['microstructure_health'] > microstructure_health_threshold) &
+                (self.df['signal_conviction'] > signal_conviction_threshold)
+            )
+            
+            # Pathway 4: Session timing bonus
+            london_boost = (self.df['london_session'] == 1)
+            
+            # Combined primary signal (OR logic for inclusivity)
+            primary_signal = core_signal | volume_signal | health_signal
+            
+            # STEP 3: DIRECTIONAL BIAS with more balanced approach
+            
+            # More sensitive directional detection
+            price_momentum = self.df['close'].pct_change(periods=3)  # Shorter period for more signals
+            volume_momentum = self.df['volume_ratio'] - 1.0
+            
+            # Balanced thresholds for directional detection
+            bullish_bias = (
+                (price_momentum > 0.0001) &   # Clear positive momentum required
+                (volume_momentum > 0.0)      # Volume above average required
+            )
+            
+            bearish_bias = (
+                (price_momentum < -0.0001) &  # Clear negative momentum required
+                (volume_momentum > 0.0)      # Volume above average required
+            )
+            
+            # STEP 4: BALANCED SIGNAL GENERATION
+            
+            # Quality Level 1: Basic signals with directional bias
+            basic_long_signal = primary_signal & bullish_bias
+            basic_short_signal = primary_signal & bearish_bias
+            
+            # Quality Level 2: Enhanced signals
+            enhanced_long_signal = (
+                (core_signal | volume_signal) & 
+                bullish_bias &
+                (self.df['depth_stability'] > depth_stability_threshold)
+            )
+            enhanced_short_signal = (
+                (core_signal | volume_signal) & 
+                bearish_bias &
+                (self.df['depth_stability'] > depth_stability_threshold)
+            )
+            
+            # Quality Level 3: Premium signals (with session bonus)
+            premium_long_signal = enhanced_long_signal & london_boost
+            premium_short_signal = enhanced_short_signal & london_boost
+            
+            # STEP 5: CREATE BALANCED THREE-CLASS TARGET
+            
+            # Long signal strength
+            long_score = np.where(
+                premium_long_signal, 3,      # Premium long signals
+                np.where(
+                    enhanced_long_signal, 2,  # Enhanced long signals
+                    np.where(
+                        basic_long_signal, 1,  # Basic long signals
+                        0  # No long signal
+                    )
+                )
+            )
+            
+            # Short signal strength
+            short_score = np.where(
+                premium_short_signal, 3,      # Premium short signals
+                np.where(
+                    enhanced_short_signal, 2,  # Enhanced short signals
+                    np.where(
+                        basic_short_signal, 1,  # Basic short signals
+                        0  # No short signal
+                    )
+                )
+            )
+            
+            # Create balanced three-class directional target
+            directional_target = np.where(
+                long_score > 0, 1,      # Any long signal → BUY (Class 1)
+                np.where(
+                    short_score > 0, 2,  # Any short signal → SELL (Class 2)
+                    0                    # No signals → HOLD (Class 0)
+                )
+            )
+            
+            # Multi-class targets for analysis
+            self.df['target_spread_compression_v3_long_score'] = long_score
+            self.df['target_spread_compression_v3_short_score'] = short_score
+            self.df['target_spread_compression_v3_directional'] = directional_target
+            self.df['target_spread_compression_v3_binary'] = (directional_target > 0).astype(int)
+            
+            # STEP 6: RESULTS ANALYSIS
+            directional_dist = pd.Series(directional_target).value_counts().sort_index()
+            
+            logger.info(f"=== V3 BALANCED TARGET RESULTS ===")
+            logger.info(f"Three-class distribution: {directional_dist.to_dict()}")
+            
+            total_samples = len(self.df)
+            hold_pct = directional_dist.get(0, 0) / total_samples * 100
+            buy_pct = directional_dist.get(1, 0) / total_samples * 100
+            sell_pct = directional_dist.get(2, 0) / total_samples * 100
+            
+            logger.info(f"  Class 0 (HOLD): {directional_dist.get(0, 0)} ({hold_pct:.1f}%)")
+            logger.info(f"  Class 1 (BUY):  {directional_dist.get(1, 0)} ({buy_pct:.1f}%)")
+            logger.info(f"  Class 2 (SELL): {directional_dist.get(2, 0)} ({sell_pct:.1f}%)")
+            
+            # Check if we achieved better balance
+            signal_pct = buy_pct + sell_pct
+            if signal_pct > 15:
+                logger.info(f"✅ SUCCESS: {signal_pct:.1f}% signal rate achieved (target: >15%)")
+            else:
+                logger.warning(f"⚠️  Signal rate {signal_pct:.1f}% still below 15% target")
+            
+            # Check directional balance
+            if buy_pct > 0 and sell_pct > 0:
+                balance_ratio = min(buy_pct, sell_pct) / max(buy_pct, sell_pct)
+                logger.info(f"Directional balance ratio: {balance_ratio:.3f} (1.0 = perfect)")
                 
-                # Import the ModelAwareFeatureGenerator for on-demand feature generation
-                from data.features.enhanced_generation import ModelAwareFeatureGenerator
-                temp_generator = ModelAwareFeatureGenerator(self.df)
-                
-                # Map features to their generator methods
-                feature_generator_map = {
-                    'depth_stability': 'enhanced_market_depth_features',
-                    'liquidity_stress': 'enhanced_market_depth_features', 
-                    'institutional_footprint': 'enhanced_institutional_analysis',
-                    'microstructure_health': 'enhanced_microstructure_health',
-                    'signal_conviction': 'enhanced_predictive_signals',
-                    'volume_ratio': 'volume_ratio_feature',
-                    'london_session': 'fx_trading_sessions'
-                }
-                
-                # Generate missing features temporarily
-                for feature in missing_features:
-                    generator_method = feature_generator_map.get(feature)
-                    if generator_method and hasattr(temp_generator, generator_method):
-                        logger.debug(f"Temporarily generating {feature} using {generator_method}")
-                        temp_generator.__getattribute__(generator_method)()
-                        temp_generated_features.append(feature)
-                        logger.debug(f"Successfully generated {feature}")
-                    else:
-                        logger.error(f"Cannot generate missing feature: {feature} (no method {generator_method})")
-                        return
-                
-                # Update our dataframe with temporarily generated features
-                self.df = temp_generator.df
+                if balance_ratio > 0.5:
+                    logger.info("✅ GOOD: Reasonable directional balance")
+                else:
+                    logger.warning(f"⚠️  IMBALANCED: {('Long' if buy_pct > sell_pct else 'Short')} signals dominate")
+            
+            # Clean up temporary features
+            cleanup_features = temp_generated_features
+            cleanup_features = [f for f in cleanup_features if f in self.df.columns]
+            
+            if cleanup_features:
+                logger.info(f"Cleaning up temporary features: {cleanup_features}")
+                self.df = self.df.drop(columns=cleanup_features)
+                logger.debug("Temporary features cleaned up")
+            
+            logger.info("✅ Enhanced target generation V3 completed successfully!")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to generate enhanced target V3: {e}")
+            return False
+
+    def spread_compression_patterns_v2(self):
+        """
+        WARNING: OUTDATED AND SEEMINGLY NOT GOOD
+        Enhanced target for spread compression pattern hypothesis - VERSION 2.
+        
+        FOCUS: Quality Tier 2+ signals only, eliminating noisy Tier 1 signals.
+        GOAL: Better class balance (85/15 vs 93.9/6.1) with higher signal quality.
+        
+        Key improvements:
+        - Skip Tier 1 noise signals entirely
+        - More sensitive thresholds for Tier 2+ detection 
+        - Feature interaction logic using top predictors
+        - Enhanced volume and institutional confirmation
+        """
+        logger.error("WARNING - YOU ARE TESTING AN TARGET HYPOTHESES - THIS IS OUTDATED AND SEEMINGLY NOT GOOD")
+        try:
+            # Required features check - Enhanced set focusing on top predictors
+            required_features = [
+                'depth_stability',        # TOP predictor (0.399 correlation)
+                'institutional_footprint', # Strong institutional signal
+                'liquidity_stress',       # Compression detection  
+                'microstructure_health',  # Signal quality filter
+                'volume_ratio',           # Volume confirmation
+                'london_session',         # Session timing
+                'signal_conviction'       # Composite signal strength
+            ]
+            
+            # Define feature dependency mapping for this hypothesis
+            feature_dependency_map = {
+                'volume_ma_20': ('volume_ma_20_feature', []),
+                'volume_ratio': ('volume_ratio_feature', ['volume_ma_20']),
+                'depth_stability': ('enhanced_market_depth_features', []),
+                'liquidity_stress': ('enhanced_market_depth_features', []),
+                'institutional_footprint': ('institutional_footprint_detection', ['volume_ratio']),
+                'microstructure_health': ('enhanced_microstructure_health', []),
+                'signal_conviction': ('enhanced_predictive_signals', []),
+                'london_session': ('fx_trading_sessions', [])
+            }
+            
+            # Use reusable dependency resolution method
+            _, all_added_features, updated_df = self._generate_features_with_dependencies(
+                required_features, feature_dependency_map
+            )
+            
+            # Update dataframe and track ALL features added (not just successfully generated)
+            self.df = updated_df
+            temp_generated_features = all_added_features  # Track ALL added features for cleanup
+            
+            # Check if we have the minimum required features for target generation
+            critical_features = ['depth_stability', 'institutional_footprint', 'volume_ratio', 'microstructure_health']
+            missing_critical = [f for f in critical_features if f not in self.df.columns]
+            
+            if missing_critical:
+                logger.error(f"Cannot proceed with target generation - missing critical features: {missing_critical}")
+                return False
             
             # REMOVED: Future price movement causes data leakage
             # Target generation should be based only on current market conditions
@@ -330,16 +659,16 @@ class TargetHypothesis(BaseProcessor):
                     f"75th percentile: {abs(price_returns).quantile(0.75):.6f}, "
                     f"90th percentile: {abs(price_returns).quantile(0.90):.6f}")
             
-            # STEP 2: ENHANCED THRESHOLDS - Much more sensitive for 10%+ target
-            # Primary filter: Top predictor (depth_stability) - lowered to 50th percentile for more signals
-            depth_stability_threshold = self.df['depth_stability'].quantile(0.50)  # Much more sensitive
+            # STEP 2: ULTRA-AGGRESSIVE THRESHOLDS - Target 15-20% signals for better balance
+            # Primary filter: Top predictor (depth_stability) - VERY sensitive
+            depth_stability_threshold = self.df['depth_stability'].quantile(0.30)  # Ultra-sensitive: top 70%
             
-            # Secondary filters - significantly more sensitive
-            institutional_threshold = self.df['institutional_footprint'].quantile(0.60)  # Lowered from 75th
-            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.65)     # Lowered from 75th
-            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.50)  # Lowered from 60th
-            volume_threshold = max(1.02, self.df['volume_ratio'].quantile(0.60))        # Lowered from 70th and 1.05
-            signal_conviction_threshold = self.df['signal_conviction'].quantile(0.60)    # Lowered from 70th
+            # Secondary filters - ULTRA sensitive  
+            institutional_threshold = self.df['institutional_footprint'].quantile(0.40)  # Top 60%
+            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.45)     # Top 55%
+            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.35)  # Top 65%
+            volume_threshold = max(1.01, self.df['volume_ratio'].quantile(0.45))        # Top 55%, minimum 1.01
+            signal_conviction_threshold = self.df['signal_conviction'].quantile(0.45)    # Top 55%
             
             # Movement threshold - use statistical thresholds instead of future data
             # Base movement threshold on historical price volatility
@@ -589,4 +918,3 @@ class TargetHypothesis(BaseProcessor):
 
     # IMPORTANT FOR FURTHER DEVELOPMENT: Remember to add the prefix 'target_*' for the target column to the hypothesis.
     # This is because the normalization step after generation and this step will not normalize columns that starts with 'target_'.
-
