@@ -4,7 +4,7 @@ hypothesis:
 # Backtesting configuration for V3 trained model
 backtesting:
   enabled: true
-  model_folder: storage/models/2025-07-30_15:45:40  # SMOTE-trained V3 model
+  model_folder: storage/models/2025-07-30_18:53:39  # SMOTE-trained V3 model
 
   data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
   start_date: "2025-03-12"
@@ -20,10 +20,14 @@ backtesting:
     loop_interval: 0
 
   signal_processing:
-    confidence_threshold: 0.02    # Low threshold for balanced model
+    use_advanced_filtering: true
+    confidence_threshold: 0.49    # Low threshold for balanced model
     signal_filters: []
     min_signal_strength: 0.02
     volume_confirmation_required: false
+    min_confidence_delta: 0.05      # Only trade on confidence jumps
+    cooldown_minutes: 30            # 30min between signals  
+    max_signals_per_hour: 2         # Hard limit
 
   risk_management:
     max_position_size: 0.08

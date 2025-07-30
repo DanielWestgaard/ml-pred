@@ -310,8 +310,14 @@ class BacktestOrchestrator:
             # Strategy components (reuse existing components!)
             signal_config = self.config.get('backtesting', {}).get('signal_processing', {})
             
+            # Debug: Log config structure to understand the issue
+            logger.debug(f"Full config keys: {list(self.config.keys())}")
+            logger.debug(f"Backtesting config: {self.config.get('backtesting', {})}")
+            logger.debug(f"Signal config found: {signal_config}")
+            
             # Use AdvancedSignalProcessor if advanced filtering is enabled, otherwise use basic SignalProcessor
             use_advanced_filtering = signal_config.get('use_advanced_filtering', False)
+            logger.info(f"Advanced filtering enabled: {use_advanced_filtering}")
             
             if use_advanced_filtering:
                 self.signal_processor = AdvancedSignalProcessor(

@@ -7,18 +7,23 @@ backtesting:
   model_folder: storage/models/2025-07-30_14:15:50  # Our working SMOTE model
   data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
   start_date: "2025-03-10"
-  end_date: "2025-03-11"  # Just 1 day
+  end_date: "2025-03-2+"  # 10 days
   buffer_size: 200
   initial_capital: 10000
   transaction_costs: 0.0005
   slippage: 0.0002
 
   execution:
-    max_loops: 500  # Force completion after 500 trades
+    max_loops: 2000  # Force completion 
     loop_interval: 0
 
   signal_processing:
-    confidence_threshold: 0.49    # High enough to reduce frequency
+    use_advanced_filtering: true   # ENABLE ADVANCED SIGNAL FILTERING!
+    confidence_threshold: 0.49     # Just below your model's flat 0.4948
+    min_confidence_delta: 0.03     # Only trade on confidence jumps >0.05
+    cooldown_minutes: 15           # 30min cooldown between same-direction signals
+    max_signals_per_hour: 3        # Hard limit: max 2 signals per hour
+    confidence_window_minutes: 10  # Track rolling 10-min confidence average
     signal_filters: []
     min_signal_strength: 0.48
     volume_confirmation_required: false

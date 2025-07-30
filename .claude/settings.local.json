@@ -10,7 +10,8 @@
       "Bash(rm:*)",
       "Bash(mv:*)",
       "Bash(true)",
-      "Bash(cut:*)"
+      "Bash(cut:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }
