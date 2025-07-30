@@ -1,9 +1,5 @@
-import inspect
 import numpy as np
-
 import pandas as pd
-import matplotlib.pyplot as plt
-from scipy import stats
 from data.processing.base_processor import BaseProcessor
 from utils import data_utils
 from utils import shared_utils
@@ -357,6 +353,234 @@ class TargetHypothesis(BaseProcessor):
             
         except Exception as e:
             logger.error(f"Unable to calculate fixed target: {e}")
+            return False
+
+    def spread_compression_patterns_v3(self):
+        """
+        Enhanced target for spread compression - VERSION 3 with BETTER CLASS BALANCE.
+        
+        FOCUS: Achieve 15-20% signal rate (80-85% HOLD, 10-15% BUY/SELL) for better model training.
+        STRATEGY: More aggressive thresholds and feature interactions to generate more signals.
+        
+        Key improvements over V2:
+        - Ultra-aggressive thresholds for better balance
+        - Multiple signal generation pathways  
+        - Advanced feature combinations
+        - Balanced directional signals
+        """
+        try:
+            # Required features check - Enhanced set focusing on top predictors
+            required_features = [
+                'depth_stability',        # TOP predictor (0.399 correlation)
+                'institutional_footprint', # Strong institutional signal
+                'liquidity_stress',       # Compression detection  
+                'microstructure_health',  # Signal quality filter
+                'volume_ratio',           # Volume confirmation
+                'london_session',         # Session timing
+                'signal_conviction'       # Composite signal strength
+            ]
+            
+            # Define feature dependency mapping for this hypothesis
+            feature_dependency_map = {
+                'volume_ma_20': ('volume_ma_20_feature', []),
+                'volume_ratio': ('volume_ratio_feature', ['volume_ma_20']),
+                'depth_stability': ('enhanced_market_depth_features', []),
+                'liquidity_stress': ('enhanced_market_depth_features', []),
+                'institutional_footprint': ('institutional_footprint_detection', ['volume_ratio']),
+                'microstructure_health': ('enhanced_microstructure_health', []),
+                'signal_conviction': ('enhanced_predictive_signals', []),
+                'london_session': ('fx_trading_sessions', [])
+            }
+            
+            # Use reusable dependency resolution method from V2
+            successfully_generated, all_added_features, updated_df = self._generate_features_with_dependencies(
+                required_features, feature_dependency_map
+            )
+            
+            # Update dataframe and track ALL features added for proper cleanup
+            self.df = updated_df
+            temp_generated_features = all_added_features
+            
+            logger.debug(f"V3: Successfully generated {len(successfully_generated)} features: {successfully_generated}")
+            logger.debug(f"V3: Total features added for cleanup: {len(all_added_features)}")
+            
+            # Check if we have the minimum required features for target generation
+            critical_features = ['depth_stability', 'institutional_footprint', 'volume_ratio', 'microstructure_health']
+            missing_critical = [f for f in critical_features if f not in self.df.columns]
+            
+            if missing_critical:
+                logger.error(f"Cannot proceed with target generation - missing critical features: {missing_critical}")
+                return False
+            
+            # STEP 1: ULTRA-AGGRESSIVE THRESHOLDS for 15-20% signal rate
+            logger.info("=== ENHANCED TARGET V3: BALANCED CLASS DISTRIBUTION ===")
+            
+            # Primary thresholds - VERY aggressive for more signals
+            depth_stability_threshold = self.df['depth_stability'].quantile(0.20)      # Top 80% (very inclusive)
+            institutional_threshold = self.df['institutional_footprint'].quantile(0.30)  # Top 70%
+            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.35)     # Top 65%
+            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.25)  # Top 75%
+            volume_threshold = max(1.01, self.df['volume_ratio'].quantile(0.35))        # Top 65%, minimum 1.01
+            signal_conviction_threshold = self.df['signal_conviction'].quantile(0.35)    # Top 65%
+            
+            logger.info(f"V3 ULTRA-AGGRESSIVE Thresholds:")
+            logger.info(f"  Depth stability: {depth_stability_threshold:.4f} (80th percentile)")
+            logger.info(f"  Institutional activity: {institutional_threshold:.4f} (70th percentile)")
+            logger.info(f"  Liquidity stress: {liquidity_stress_threshold:.4f} (65th percentile)")
+            logger.info(f"  Volume confirmation: {volume_threshold:.4f} (65th percentile)")
+            
+            # STEP 2: MULTIPLE SIGNAL PATHWAYS for better balance
+            
+            # Pathway 1: Core compression signal
+            core_signal = (
+                (self.df['depth_stability'] > depth_stability_threshold) |  # OR condition for more signals
+                (self.df['liquidity_stress'] > liquidity_stress_threshold)
+            )
+            
+            # Pathway 2: Volume-driven signal
+            volume_signal = (
+                (self.df['volume_ratio'] > volume_threshold) &
+                (self.df['institutional_footprint'] > institutional_threshold)
+            )
+            
+            # Pathway 3: Health-based signal
+            health_signal = (
+                (self.df['microstructure_health'] > microstructure_health_threshold) &
+                (self.df['signal_conviction'] > signal_conviction_threshold)
+            )
+            
+            # Pathway 4: Session timing bonus
+            london_boost = (self.df['london_session'] == 1)
+            
+            # Combined primary signal (OR logic for inclusivity)
+            primary_signal = core_signal | volume_signal | health_signal
+            
+            # STEP 3: DIRECTIONAL BIAS with more balanced approach
+            
+            # More sensitive directional detection
+            price_momentum = self.df['close'].pct_change(periods=3)  # Shorter period for more signals
+            volume_momentum = self.df['volume_ratio'] - 1.0
+            
+            # Lower thresholds for directional detection
+            bullish_bias = (
+                (price_momentum > -0.0001) &  # Almost any positive or flat momentum
+                (volume_momentum > -0.1)     # Volume not significantly below average
+            )
+            
+            bearish_bias = (
+                (price_momentum < 0.0001) &   # Almost any negative or flat momentum  
+                (volume_momentum > -0.1)     # Volume not significantly below average
+            )
+            
+            # STEP 4: BALANCED SIGNAL GENERATION
+            
+            # Quality Level 1: Basic signals with directional bias
+            basic_long_signal = primary_signal & bullish_bias
+            basic_short_signal = primary_signal & bearish_bias
+            
+            # Quality Level 2: Enhanced signals
+            enhanced_long_signal = (
+                (core_signal | volume_signal) & 
+                bullish_bias &
+                (self.df['depth_stability'] > depth_stability_threshold)
+            )
+            enhanced_short_signal = (
+                (core_signal | volume_signal) & 
+                bearish_bias &
+                (self.df['depth_stability'] > depth_stability_threshold)
+            )
+            
+            # Quality Level 3: Premium signals (with session bonus)
+            premium_long_signal = enhanced_long_signal & london_boost
+            premium_short_signal = enhanced_short_signal & london_boost
+            
+            # STEP 5: CREATE BALANCED THREE-CLASS TARGET
+            
+            # Long signal strength
+            long_score = np.where(
+                premium_long_signal, 3,      # Premium long signals
+                np.where(
+                    enhanced_long_signal, 2,  # Enhanced long signals
+                    np.where(
+                        basic_long_signal, 1,  # Basic long signals
+                        0  # No long signal
+                    )
+                )
+            )
+            
+            # Short signal strength
+            short_score = np.where(
+                premium_short_signal, 3,      # Premium short signals
+                np.where(
+                    enhanced_short_signal, 2,  # Enhanced short signals
+                    np.where(
+                        basic_short_signal, 1,  # Basic short signals
+                        0  # No short signal
+                    )
+                )
+            )
+            
+            # Create balanced three-class directional target
+            directional_target = np.where(
+                long_score > 0, 1,      # Any long signal → BUY (Class 1)
+                np.where(
+                    short_score > 0, 2,  # Any short signal → SELL (Class 2)
+                    0                    # No signals → HOLD (Class 0)
+                )
+            )
+            
+            # Multi-class targets for analysis
+            self.df['target_spread_compression_v3_long_score'] = long_score
+            self.df['target_spread_compression_v3_short_score'] = short_score
+            self.df['target_spread_compression_v3_directional'] = directional_target
+            self.df['target_spread_compression_v3_binary'] = (directional_target > 0).astype(int)
+            
+            # STEP 6: RESULTS ANALYSIS
+            directional_dist = pd.Series(directional_target).value_counts().sort_index()
+            
+            logger.info(f"=== V3 BALANCED TARGET RESULTS ===")
+            logger.info(f"Three-class distribution: {directional_dist.to_dict()}")
+            
+            total_samples = len(self.df)
+            hold_pct = directional_dist.get(0, 0) / total_samples * 100
+            buy_pct = directional_dist.get(1, 0) / total_samples * 100
+            sell_pct = directional_dist.get(2, 0) / total_samples * 100
+            
+            logger.info(f"  Class 0 (HOLD): {directional_dist.get(0, 0)} ({hold_pct:.1f}%)")
+            logger.info(f"  Class 1 (BUY):  {directional_dist.get(1, 0)} ({buy_pct:.1f}%)")
+            logger.info(f"  Class 2 (SELL): {directional_dist.get(2, 0)} ({sell_pct:.1f}%)")
+            
+            # Check if we achieved better balance
+            signal_pct = buy_pct + sell_pct
+            if signal_pct > 15:
+                logger.info(f"✅ SUCCESS: {signal_pct:.1f}% signal rate achieved (target: >15%)")
+            else:
+                logger.warning(f"⚠️  Signal rate {signal_pct:.1f}% still below 15% target")
+            
+            # Check directional balance
+            if buy_pct > 0 and sell_pct > 0:
+                balance_ratio = min(buy_pct, sell_pct) / max(buy_pct, sell_pct)
+                logger.info(f"Directional balance ratio: {balance_ratio:.3f} (1.0 = perfect)")
+                
+                if balance_ratio > 0.5:
+                    logger.info("✅ GOOD: Reasonable directional balance")
+                else:
+                    logger.warning(f"⚠️  IMBALANCED: {('Long' if buy_pct > sell_pct else 'Short')} signals dominate")
+            
+            # Clean up temporary features
+            cleanup_features = temp_generated_features
+            cleanup_features = [f for f in cleanup_features if f in self.df.columns]
+            
+            if cleanup_features:
+                logger.info(f"Cleaning up temporary features: {cleanup_features}")
+                self.df = self.df.drop(columns=cleanup_features)
+                logger.debug("Temporary features cleaned up")
+            
+            logger.info("✅ Enhanced target generation V3 completed successfully!")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to generate enhanced target V3: {e}")
             return False
 
     def spread_compression_patterns_v2(self):
