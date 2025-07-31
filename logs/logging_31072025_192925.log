@@ -1,0 +1,85 @@
+31-07-2025 19:29:25 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+31-07-2025 19:29:25 - __main__                                :195  - INFO     - 🚀 STARTING FEATURE MISMATCH DIAGNOSTIC
+31-07-2025 19:29:25 - __main__                                :196  - INFO     - ================================================================================
+31-07-2025 19:29:25 - __main__                                :197  - INFO     - Systematically comparing training vs backtesting features
+31-07-2025 19:29:25 - __main__                                :198  - INFO     - to identify why model returns 0.0000 confidence
+31-07-2025 19:29:25 - __main__                                :199  - INFO     - ================================================================================
+31-07-2025 19:29:25 - __main__                                :50   - INFO     - 📊 TRAINING DATA ANALYSIS:
+31-07-2025 19:29:25 - __main__                                :51   - INFO     - Loading: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
+31-07-2025 19:29:25 - __main__                                :54   - INFO     - Shape: (172980, 16)
+31-07-2025 19:29:25 - __main__                                :55   - INFO     - Columns: ['date', 'top_predictor_interaction', 'volume', 'depth_stability', 'microstructure_momentum_fusion', 'high', 'low', 'close', 'institutional_footprint', 'open', 'volume_ratio', 'target_spread_compression_v3_long_score', 'target_spread_compression_v3_short_score', 'target_spread_compression_v3_directional', 'target_spread_compression_v3_binary', 'close_og']
+31-07-2025 19:29:26 - __main__                                :40   - INFO     - ✅ Model loaded: 6 features
+31-07-2025 19:29:26 - __main__                                :41   - INFO     - Training features: ['top_predictor_interaction', 'depth_stability', 'microstructure_momentum_fusion', 'institutional_footprint', 'volume_ratio', 'close_og']
+31-07-2025 19:29:26 - __main__                                :60   - INFO     - 
+🔍 FEATURE AVAILABILITY IN TRAINING DATA:
+31-07-2025 19:29:26 - __main__                                :64   - INFO     -   ✅ top_predictor_interaction: Available, sample values: [0.89782192 0.89782192 0.89782192 0.89782192 0.89782192]
+31-07-2025 19:29:26 - __main__                                :64   - INFO     -   ✅ depth_stability: Available, sample values: [1000. 1000. 1000. 1000. 1000.]
+31-07-2025 19:29:26 - __main__                                :64   - INFO     -   ✅ microstructure_momentum_fusion: Available, sample values: [0.53869315 0.53869315 0.53869315 0.53869315 0.53869315]
+31-07-2025 19:29:26 - __main__                                :64   - INFO     -   ✅ institutional_footprint: Available, sample values: [0.10475405 0.10475405 0.10475405 0.10475405 0.10475405]
+31-07-2025 19:29:26 - __main__                                :64   - INFO     -   ✅ volume_ratio: Available, sample values: [-4.24852916 -4.24852916 -4.24852916 -4.24852916 -4.24852916]
+31-07-2025 19:29:26 - __main__                                :64   - INFO     -   ✅ close_og: Available, sample values: [1.25878 1.25855 1.25851 1.25852 1.25834]
+31-07-2025 19:29:26 - __main__                                :76   - INFO     - 
+📊 BACKTESTING DATA ANALYSIS:
+31-07-2025 19:29:26 - __main__                                :77   - INFO     - Loading: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
+31-07-2025 19:29:27 - __main__                                :88   - INFO     - Backtesting period shape: (14401, 16)
+31-07-2025 19:29:27 - __main__                                :89   - INFO     - Date range: 2025-03-10 00:00:00+00:00 to 2025-03-20 00:00:00+00:00
+31-07-2025 19:29:27 - __main__                                :96   - INFO     - 
+🤖 MODEL PREDICTION TEST:
+31-07-2025 19:29:27 - __main__                                :40   - INFO     - ✅ Model loaded: 6 features
+31-07-2025 19:29:27 - __main__                                :41   - INFO     - Training features: ['top_predictor_interaction', 'depth_stability', 'microstructure_momentum_fusion', 'institutional_footprint', 'volume_ratio', 'close_og']
+31-07-2025 19:29:27 - __main__                                :76   - INFO     - 
+📊 BACKTESTING DATA ANALYSIS:
+31-07-2025 19:29:27 - __main__                                :77   - INFO     - Loading: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
+31-07-2025 19:29:27 - __main__                                :88   - INFO     - Backtesting period shape: (14401, 16)
+31-07-2025 19:29:27 - __main__                                :89   - INFO     - Date range: 2025-03-10 00:00:00+00:00 to 2025-03-20 00:00:00+00:00
+31-07-2025 19:29:27 - __main__                                :103  - INFO     - 
+🔍 FEATURE AVAILABILITY IN BACKTESTING DATA:
+31-07-2025 19:29:27 - __main__                                :109  - INFO     -   ✅ top_predictor_interaction: Available, sample values: [0.83658062 0.41493194 0.6233107  0.6195871  0.62257759]
+31-07-2025 19:29:27 - __main__                                :109  - INFO     -   ✅ depth_stability: Available, sample values: [1000. 1000. 1000. 1000. 1000.]
+31-07-2025 19:29:27 - __main__                                :109  - INFO     -   ✅ microstructure_momentum_fusion: Available, sample values: [0.50194837 0.24895917 0.37398642 0.37175226 0.37354656]
+31-07-2025 19:29:27 - __main__                                :109  - INFO     -   ✅ institutional_footprint: Available, sample values: [0.03924148 0.00864604 0.02572004 0.0364678  0.036802  ]
+31-07-2025 19:29:27 - __main__                                :109  - INFO     -   ✅ volume_ratio: Available, sample values: [ 2.20890409  0.10981123  0.46237049 -0.67950919 -0.66264774]
+31-07-2025 19:29:27 - __main__                                :109  - INFO     -   ✅ close_og: Available, sample values: [1.29317 1.29322 1.29326 1.29347 1.29337]
+31-07-2025 19:29:27 - __main__                                :119  - INFO     - 
+🎯 TESTING MODEL PREDICTIONS:
+31-07-2025 19:29:27 - __main__                                :123  - INFO     - Test data shape: (100, 6)
+31-07-2025 19:29:27 - __main__                                :124  - INFO     - Null values: 0
+31-07-2025 19:29:27 - __main__                                :125  - INFO     - Infinite values: 0
+31-07-2025 19:29:27 - __main__                                :144  - INFO     - 
+📊 PREDICTION RESULTS:
+31-07-2025 19:29:27 - __main__                                :145  - INFO     - Prediction shape: (100,)
+31-07-2025 19:29:27 - __main__                                :146  - INFO     - Probability shape: (100, 3)
+31-07-2025 19:29:27 - __main__                                :147  - INFO     - Classes: [0 1 2]
+31-07-2025 19:29:27 - __main__                                :151  - INFO     - Prediction distribution: {0: 91, 1: 5, 2: 4}
+31-07-2025 19:29:27 - __main__                                :153  - INFO     - 
+📊 CONFIDENCE ANALYSIS:
+31-07-2025 19:29:27 - __main__                                :154  - INFO     - Min confidence: 0.341832
+31-07-2025 19:29:27 - __main__                                :155  - INFO     - Max confidence: 0.999464
+31-07-2025 19:29:27 - __main__                                :156  - INFO     - Mean confidence: 0.886804
+31-07-2025 19:29:27 - __main__                                :157  - INFO     - Median confidence: 0.984030
+31-07-2025 19:29:27 - __main__                                :164  - INFO     - 
+🚨 CONFIDENCE THRESHOLD ANALYSIS:
+31-07-2025 19:29:27 - __main__                                :165  - INFO     - Predictions with confidence > 0.01: 100/100 (100.0%)
+31-07-2025 19:29:27 - __main__                                :166  - INFO     - Predictions with confidence > 0.1:  100/100 (100.0%)
+31-07-2025 19:29:27 - __main__                                :167  - INFO     - Predictions with confidence > 0.3:  100/100 (100.0%)
+31-07-2025 19:29:27 - __main__                                :175  - INFO     - ✅ Model generating reasonable confidence values
+31-07-2025 19:29:27 - __main__                                :178  - INFO     - 
+📝 SAMPLE PREDICTIONS (first 10):
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 0: Pred=0, Conf=0.619252, Proba=[0.61925178 0.11177307 0.26897516]
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 1: Pred=0, Conf=0.991878, Proba=[0.99187807 0.00355764 0.00456429]
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 2: Pred=0, Conf=0.945954, Proba=[0.94595364 0.01914862 0.03489775]
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 3: Pred=0, Conf=0.994117, Proba=[0.99411727 0.00218055 0.00370218]
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 4: Pred=0, Conf=0.994117, Proba=[0.99411727 0.00218055 0.00370218]
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 5: Pred=0, Conf=0.997572, Proba=[9.97572428e-01 9.92246541e-04 1.43532570e-03]
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 6: Pred=0, Conf=0.998202, Proba=[9.98202413e-01 5.63522705e-04 1.23406479e-03]
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 7: Pred=2, Conf=0.436211, Proba=[0.13676609 0.42702252 0.43621138]
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 8: Pred=0, Conf=0.903528, Proba=[0.9035276  0.03923961 0.05723278]
+31-07-2025 19:29:27 - __main__                                :180  - INFO     -   Row 9: Pred=0, Conf=0.997932, Proba=[9.97932228e-01 5.34376630e-04 1.53339567e-03]
+31-07-2025 19:29:27 - __main__                                :183  - INFO     - 
+🔄 COMPARISON WITH MODEL DIAGNOSTIC:
+31-07-2025 19:29:27 - __main__                                :184  - INFO     - Earlier model diagnostic showed confidence range 0.345-0.999
+31-07-2025 19:29:27 - __main__                                :185  - INFO     - If this test shows much lower confidence, there's a data issue
+31-07-2025 19:29:27 - __main__                                :210  - INFO     - 
+================================================================================
+31-07-2025 19:29:27 - __main__                                :211  - INFO     - 🎯 DIAGNOSTIC COMPLETE
+31-07-2025 19:29:27 - __main__                                :212  - INFO     - ================================================================================
