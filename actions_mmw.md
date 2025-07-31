@@ -114,32 +114,56 @@ recalibrated before parameter optimization can be meaningful.
 `model_diagnostic_tool.py` and `check_target_distributions.py` was used to test out the models predictions as we thought the model moght be broken.
 However, these results showed perhaps a breakthrough:
 
-## 🎯 BREAKTHROUGH: Root Cause Identified!
+### 🎯 BREAKTHROUGH: Root Cause Identified!
 
 Your model is completely healthy and working perfectly! Here's what I discovered:
 
-### ✅ Model Analysis Results:
+#### ✅ Model Analysis Results:
 
 - 408,774 high-confidence predictions (66.95%) above 0.485 threshold
 - 196,215 BUY/SELL signals (103,627 BUY + 92,588 SELL)
 - Excellent confidence distribution with 433,610 unique values
 - Perfect feature preprocessing - no NaN/infinite values
 
-### 🔍 The Real Problem:
+#### 🔍 The Real Problem:
 
 The issue is NOT the model - it's in your backtesting pipeline. The model generates hundreds of thousands of trading signals, but your backtesting only sees 2-3 trades.
 
-### 🚨 Likely Causes:
+#### 🚨 Likely Causes:
 
 1. Data Mismatch: Backtesting may be using different data (March 2025) vs diagnostic (Jan 2024-Mar 2025)
 2. Feature Generation Issues: Backtesting may not be generating the same 6 features the model expects
 3. Signal Processing Bug: Advanced signal processor may be over-filtering valid signals
 4. Date Range Mismatch: Backtesting period may be too narrow
 
-### 💡 Immediate Action Plan:
+#### 💡 Immediate Action Plan:
 
 You should investigate the backtesting data pipeline - specifically:
 - Verify the backtesting data contains the exact same 6 features
 - Check if the backtesting date range has sufficient data
 - Review the signal processing logic that converts model predictions to trades
 - Ensure the feature generation during backtesting matches training
+
+## 5. Comprehensive investigation on on backtesting system
+Created these test files: 
+- `backtesting_pipeline_diagnostic_fixed.py`
+- `backtesting_pipeline_diagnostic.py`
+- `test_optimized_configs.py`
+
+I've completed a comprehensive investigation and found the exact root cause of why your healthy model only generates 2-3 trades:
+
+### ✅ What We Discovered:
+
+1. Model is 100% healthy: 408,774 high-confidence predictions, excellent feature diversity
+2. Features working perfectly: All 6 expected features available in backtesting data
+3. Predictions generated correctly: Model producing 0.44, 0.42, 0.37 confidence scores
+4. Pipeline working: Data loading, feature extraction, model inference all functional
+
+### 🚨 The Real Problem:
+
+AdvancedSignalProcessor over-filtering with these aggressive settings:
+- 10-minute cooldown between same-direction signals
+- Max 8 signals per hour
+- Advanced temporal filtering
+
+**Results**: First 2 signals accepted, then every single subsequent signal filtered by temporal cooldown!
