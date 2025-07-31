@@ -81,7 +81,8 @@ Here's what changed:
 
 ## Validation Ready:
 
-Created `validate_balanced_targets.py` to test the new approach.
+Created `validate_balanced_targets.py` to test the new approach.<br>
+Resulting logfile: "logs/logging_31072025_172959.log"
 
 ### Next Steps:
 
