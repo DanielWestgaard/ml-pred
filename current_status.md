@@ -117,3 +117,25 @@ when HOLD is strong."
     - Layer 2: Trading signal weakness < 30% confidence
     - Layer 3: HOLD override (HOLD > 95% AND trading signal < 40%)
     - Layer 4: Feature reversal (existing logic)
+
+#### Also found three bugs:
+
+I found and fixed 3 major bugs causing the immediate trade closures:
+
+🚨 Bug 1: Variable Scope Error (CRITICAL)
+
+Problem: 'hold_confidence' in locals() check was always FalseResult: Minimum position
+duration protection never workedFix: Removed incorrect scope check - positions now properly
+protected for 10 minutes
+
+🚨 Bug 2: Signal Decay Threshold Too Sensitive
+
+Problem: 40% decay threshold triggered too easily (0.62 → 0.37 = 40% decay)Result: Positions
+closed immediately on minor confidence dropsFix: Increased threshold to 70% decay for more
+realistic exits
+
+🚨 Bug 3: Missing Debug Visibility
+
+Problem: No visibility into confidence calculations and decay logicResult: Impossible to
+debug exit decisionsFix: Added detailed debug logging for all exit decisions
+
