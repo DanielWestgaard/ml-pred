@@ -36,7 +36,7 @@ backtesting:
     position_tracking: "detailed"
 
   exit_strategy:
-    confidence_exit_threshold: 0.85
+    confidence_exit_threshold: 0.99
     signal_strength_decay: 0.8
     volatility_exit_multiplier: 2.5
     minimum_signal_life: 8
