@@ -4,7 +4,7 @@ hypothesis:
 # Ultra Permissive + Risk Optimized - Test if risk management is the issue
 backtesting:
   enabled: true
-  model_folder: storage/models/2025-07-31_15:06:15
+  model_folder: storage/models/2025-07-31_16:28:03
   data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
   start_date: "2025-03-10"
   end_date: "2025-03-20"  # 10 days
@@ -19,7 +19,7 @@ backtesting:
 
   signal_processing:
     processor_type: ultra  # Maximum signal generation
-    confidence_threshold: 0.25
+    confidence_threshold: 0.01
     max_signals_per_second: 20
     signal_filters: []
 
