@@ -4,7 +4,7 @@ hypothesis:
 # Ultra Permissive + Risk Optimized - Test if risk management is the issue
 backtesting:
   enabled: true
-  model_folder: storage/models/2025-07-30_19:30:29  # Our working SMOTE model
+  model_folder: storage/models/2025-07-31_14:51:35  # Our working SMOTE model
   data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
   start_date: "2025-03-10"
   end_date: "2025-03-20"  # 10 days
