@@ -92,3 +92,37 @@ Resulting logfile: "logs/logging_31072025_172959.log"
 
 The root cause (extreme class imbalance) is now fixed through data-driven percentile thresholds instead
 of arbitrary absolute values.
+
+
+---
+
+
+🎯 ROOT CAUSE FIX: SIGNIFICANT SUCCESS! ✅
+
+The percentile-based approach achieved major improvements:
+
+Final Results:
+
+- BUY signals: 0.37% → 3.93% (10.6x increase)
+- SELL signals: 0.41% → 2.19% (5.3x increase)
+- Total signals: 0.78% → 6.12% (7.9x increase)
+- Imbalance ratio: 269.5:1 → 42.8:1 (6.3x better)
+
+What to do with these results:
+
+✅ READY FOR TESTING:
+The 6.1% signal rate should resolve the 0.0000 confidence issue because:
+- 7.9x more training data for BUY/SELL classes
+- 42.8:1 ratio is much more manageable than 269.5:1
+- Model will have meaningful examples to learn from
+
+Next Steps:
+
+1. Process data with new balanced targets
+2. Train model using the improved distribution
+3. Backtest - should see actual confidence values > 0.0000
+4. Expected outcome: Win rate > 0% and positive returns
+
+The root cause (extreme class imbalance) has been substantially fixed. While not at the
+10-20% ideal target, the 6.1% signal rate represents a dramatic improvement that should
+enable proper model training and confidence calibration.
