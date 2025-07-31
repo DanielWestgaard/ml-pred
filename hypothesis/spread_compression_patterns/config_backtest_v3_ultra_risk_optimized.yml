@@ -1,0 +1,51 @@
+hypothesis:
+  name: spread_compression_patterns_v3
+
+# Ultra Permissive + Risk Optimized - Test if risk management is the issue
+backtesting:
+  enabled: true
+  model_folder: storage/models/2025-07-31_19:16:38
+  data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
+  start_date: "2025-03-10"
+  end_date: "2025-03-20"  # 10 days
+  buffer_size: 200
+  initial_capital: 10000
+  transaction_costs: 0.0005
+  slippage: 0.0002
+
+  execution:
+    max_loops: 3000  # Force completion 
+    loop_interval: 0
+
+  signal_processing:
+    processor_type: ultra  # Maximum signal generation
+    confidence_threshold: 0.52
+    max_signals_per_second: 20
+    signal_filters: []
+
+  risk_management:
+    max_position_size: 0.08
+    stop_loss_pct: 0.030          # MUCH WIDER: 5% vs 1.2% - let predictions breathe
+    take_profit_pct: 0.015        # TIGHTER: 1.5% vs 3.5% - quick wins
+    max_drawdown: 0.5
+    max_concurrent_positions: 2
+    position_size_scaling: "volatility"
+
+  position_management:
+    max_concurrent_positions: 2
+    position_tracking: "detailed"
+
+  exit_strategy:
+    confidence_exit_threshold: 0.99  # Not used anymore - using signal decay logic
+    signal_strength_decay: 0.7       # Exit when signal decays by 70% from peak (was too sensitive at 40%)
+    volatility_exit_multiplier: 2.5
+    minimum_signal_life: 10           # Minimum 10 minutes position duration
+
+  signal_tracking:
+    signal_strength_features:
+      - compression_ratio_micro
+      - volume_ratio
+      - signal_strength_v2
+      - compression_consistency
+      - volatility_short
+      - spread_baseline

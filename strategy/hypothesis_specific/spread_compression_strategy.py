@@ -84,6 +84,12 @@ class SpreadCompressionSignalTracker:
             return 0.0
         
         decay = (peak_strength - current_strength) / peak_strength
+        
+        # Debug logging for signal decay calculation
+        from utils.logging_utils import get_logger
+        logger = get_logger()
+        logger.debug(f"Signal decay for {position_id}: peak={peak_strength:.4f}, current={current_strength:.4f}, decay={decay:.4f}")
+        
         return max(0.0, decay)
     
     def cleanup_position(self, position_id: str):

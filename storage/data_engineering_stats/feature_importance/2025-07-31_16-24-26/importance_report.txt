@@ -1,0 +1,41 @@
+================================================================================
+FEATURE IMPORTANCE ANALYSIS REPORT
+================================================================================
+Dataset: 610555 rows, 4 features
+Target: target_spread_compression_v3_long_score (classification)
+Analysis Date: 2025-07-31 16:24:57
+
+CONSENSUS TOP FEATURES:
+----------------------------------------
+ 1. top_predictor_interaction      0.9255
+ 2. microstructure_momentum_fusion 0.8834
+ 3. volume_ratio                   0.7319
+ 4. institutional_footprint        0.4991
+
+CORRELATION - TOP 5:
+------------------------------
+1. volume_ratio              0.0853
+2. top_predictor_interaction 0.0797
+3. microstructure_momentum_fusion 0.0797
+4. institutional_footprint   0.0723
+
+MUTUAL INFORMATION - TOP 5:
+------------------------------
+1. volume_ratio              0.0189
+2. top_predictor_interaction 0.0145
+3. microstructure_momentum_fusion 0.0144
+4. institutional_footprint   0.0033
+
+RANDOM FOREST - TOP 5:
+------------------------------
+1. top_predictor_interaction 0.2572
+2. microstructure_momentum_fusion 0.2551
+3. institutional_footprint   0.2506
+4. volume_ratio              0.2372
+
+PERMUTATION - TOP 5:
+------------------------------
+1. top_predictor_interaction 0.1160
+2. microstructure_momentum_fusion 0.0976
+3. volume_ratio              0.0006
+4. institutional_footprint   0.0002

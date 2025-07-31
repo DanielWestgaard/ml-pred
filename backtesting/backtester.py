@@ -15,7 +15,7 @@ from data.features.enhanced_generation import ModelAwareFeatureGenerator
 from strategy.hypothesis_specific.spread_compression_strategy import SpreadCompressionSignalTracker
 
 # Import existing strategy components (reuse!)
-from strategy.components.signal_processor import SignalProcessor, AdvancedSignalProcessor
+from strategy.components.signal_processor import SignalProcessor, AdvancedSignalProcessor, SmartHybridProcessor, UltraPermissiveProcessor
 from strategy.components.risk_manager import RiskManager
 from strategy.components.position_manager import PositionManager
 
@@ -315,11 +315,30 @@ class BacktestOrchestrator:
             logger.debug(f"Backtesting config: {self.config.get('backtesting', {})}")
             logger.debug(f"Signal config found: {signal_config}")
             
-            # Use AdvancedSignalProcessor if advanced filtering is enabled, otherwise use basic SignalProcessor
-            use_advanced_filtering = signal_config.get('use_advanced_filtering', False)
-            logger.info(f"Advanced filtering enabled: {use_advanced_filtering}")
+            # Choose signal processor type based on configuration
+            processor_type = signal_config.get('processor_type', 'basic')  # basic, advanced, smart, ultra
+            logger.info(f"Signal processor type: {processor_type}")
             
-            if use_advanced_filtering:
+            if processor_type == 'ultra':
+                self.signal_processor = UltraPermissiveProcessor(
+                    confidence_threshold=signal_config.get('confidence_threshold', 0.30),
+                    signal_filters=signal_config.get('signal_filters', []),
+                    model_type=self.model_type,
+                    max_signals_per_second=signal_config.get('max_signals_per_second', 10)
+                )
+                logger.info("Using UltraPermissiveProcessor for maximum signal generation")
+            elif processor_type == 'smart':
+                self.signal_processor = SmartHybridProcessor(
+                    confidence_threshold=signal_config.get('confidence_threshold', 0.35),
+                    signal_filters=signal_config.get('signal_filters', []),
+                    model_type=self.model_type,
+                    min_direction_change_seconds=signal_config.get('min_direction_change_seconds', 30),
+                    same_direction_cooldown_seconds=signal_config.get('same_direction_cooldown_seconds', 120),
+                    confidence_percentile_filter=signal_config.get('confidence_percentile_filter', 0.2),
+                    max_signals_per_minute=signal_config.get('max_signals_per_minute', 3)
+                )
+                logger.info("Using SmartHybridProcessor for balanced signal filtering")
+            elif processor_type == 'advanced' or signal_config.get('use_advanced_filtering', False):
                 self.signal_processor = AdvancedSignalProcessor(
                     confidence_threshold=signal_config.get('confidence_threshold', 0.49),
                     signal_filters=signal_config.get('signal_filters', []),
@@ -559,11 +578,17 @@ class BacktestOrchestrator:
                     progress_pct = (self.current_data_index / total_data_points) * 100
                     account_info = self.simulation_broker.get_account_info()
                     
-                    # Get filtering stats if using AdvancedSignalProcessor
+                    # Get filtering stats if using AdvancedSignalProcessor or SmartHybridProcessor
                     filter_stats_str = ""
                     if isinstance(self.signal_processor, AdvancedSignalProcessor):
                         stats = self.signal_processor.get_filter_stats()
                         filter_stats_str = f" | Filter: {stats['signals_last_hour']}/hr, Avg:{stats['avg_confidence']:.3f}"
+                    elif isinstance(self.signal_processor, SmartHybridProcessor):
+                        stats = self.signal_processor.get_smart_stats()
+                        filter_stats_str = f" | Smart: {stats['signals_last_minute']}/min, Avg:{stats['avg_confidence']:.3f}"
+                    elif isinstance(self.signal_processor, UltraPermissiveProcessor):
+                        stats = self.signal_processor.get_ultra_stats()
+                        filter_stats_str = f" | Ultra: {stats['signals_last_second']}/sec"
                     
                     logger.info(f"Progress: {progress_pct:.1f}% | "
                                f"Iteration: {iteration}/{max_loops} | "
@@ -702,49 +727,81 @@ class BacktestOrchestrator:
             return False, None
         
         position_id = position.get('id', 'unknown')
-        # Handle three-class model probabilities correctly
+        position_direction = position.get('direction', 'BUY')
+        
+        # Calculate confidence properly: Use TRADING SIGNAL confidence, not HOLD confidence
         if probability is not None:
             if hasattr(probability, '__len__') and len(probability) == 3:
                 # Three-class model: [prob_hold, prob_buy, prob_sell]
-                current_confidence = probability[prediction]
+                prob_hold, prob_buy, prob_sell = probability
+                
+                # For exit logic, use the confidence of the ORIGINAL trading direction
+                if position_direction == 'BUY':
+                    current_confidence = prob_buy  # BUY signal strength
+                elif position_direction == 'SELL':
+                    current_confidence = prob_sell  # SELL signal strength
+                else:
+                    current_confidence = max(prob_buy, prob_sell)  # Fallback
+                    
+                # Store HOLD confidence separately for different exit logic
+                hold_confidence = prob_hold
             elif prediction == 1:
                 # Binary model: prediction 1 uses direct probability
                 current_confidence = probability
+                hold_confidence = 1 - probability
             else:
                 # Binary model: prediction 0 uses inverse probability
                 current_confidence = 1 - probability if probability is not None else 0
+                hold_confidence = probability
         else:
             # No probability available - use default confidence
             current_confidence = 0.6 if prediction > 0 else 0.4
+            hold_confidence = 0.4
         
         # Update signal tracking
+        logger.debug(f"Exit check for {position_id}: prediction={prediction}, {position_direction} confidence={current_confidence:.4f}, HOLD confidence={hold_confidence:.4f}")
         self.signal_tracker.update_signal_strength(position_id, current_data, current_confidence)
         
-        # Check minimum signal life (not a hard constraint, just a filter)
+        # Check minimum signal life (ENFORCED - positions must stay open minimum time)
         entry_time = position.get('entry_time')
+        logger.debug(f"Position {position_id} entry_time check: {entry_time}")
         if entry_time:
             from datetime import datetime
             if isinstance(entry_time, str):
                 entry_time = pd.to_datetime(entry_time)
-            position_age_minutes = (pd.Timestamp.now(tz='UTC') - entry_time).total_seconds() / 60
+            # Use current backtesting time, not real-time
+            current_backtest_time = pd.to_datetime(current_data['timestamp'], utc=True)
+            position_age_minutes = (current_backtest_time - entry_time).total_seconds() / 60
+            logger.debug(f"Position {position_id} age: {position_age_minutes:.2f} minutes, minimum required: {self.minimum_signal_life}")
+            
+            # ENFORCE minimum position duration unless extreme conditions
             if position_age_minutes < self.minimum_signal_life:
-                # Only exit on very strong contrary signals during minimum life period
-                if prediction == 0 and current_confidence > 0.9:
-                    return True, "strong_contrary_signal"
+                # Only exit on EXTREMELY strong contrary signals during minimum life
+                # Must be opposite direction prediction with very high confidence
+                if ((position_direction == 'BUY' and prediction == 2 and current_confidence > 0.8) or 
+                    (position_direction == 'SELL' and prediction == 1 and current_confidence > 0.8)):
+                    logger.debug(f"Emergency contrary exit during minimum life: {position_direction} position, opposite prediction {prediction} with {current_confidence:.4f} confidence")
+                    return True, "emergency_contrary_signal"
+                
+                # Otherwise, position MUST stay open during minimum life period
+                logger.debug(f"Position {position_id} protected by minimum life: {position_age_minutes:.1f}min < {self.minimum_signal_life}min")
                 return False, None
         
-        # 1. Confidence-based exit: Exit when model predicts compression is over (class 0) with sufficient confidence
-        if prediction == 0 and current_confidence > self.confidence_exit_threshold:
-            logger.debug(f"Confidence exit triggered: {current_confidence:.4f} > {self.confidence_exit_threshold}")
-            return True, "confidence_drop"
+        # Exit Strategy: Only exit on strong contrary signals or time-based rules
+        # Don't exit just because HOLD is predicted - that's normal market behavior
         
-        # 2. Signal strength decay: Exit when signal deteriorates significantly
-        signal_decay = self.signal_tracker.calculate_signal_decay(position_id)
-        if signal_decay > self.signal_decay_threshold:
-            logger.debug(f"Signal decay exit triggered: {signal_decay:.4f} > {self.signal_decay_threshold}")
-            return True, "signal_decay"
+        # 1. Strong contrary signal: Exit when model predicts OPPOSITE direction with high confidence
+        if ((position_direction == 'BUY' and prediction == 2 and current_confidence > 0.6) or 
+            (position_direction == 'SELL' and prediction == 1 and current_confidence > 0.6)):
+            logger.debug(f"Contrary signal exit: {position_direction} position, model predicts opposite with {current_confidence:.4f} confidence")
+            return True, "contrary_signal"
         
-        # 3. Feature-based exit: Exit when core compression features reverse
+        # 2. Extremely strong HOLD with very weak original signal: Market conditions changed
+        if (prediction == 0 and hold_confidence > 0.98 and current_confidence < 0.1):
+            logger.debug(f"Market change exit: HOLD {hold_confidence:.4f} > 0.98, {position_direction} {current_confidence:.4f} < 0.10")
+            return True, "market_change"
+        
+        # 4. Feature-based exit: Exit when core compression features reverse
         if self._check_compression_reversal(position, current_data):
             return True, "compression_reversal"
         

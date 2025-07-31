@@ -1,0 +1,253 @@
+31-07-2025 21:04:15 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+31-07-2025 21:04:15 - __main__                                :390  - INFO     - 🔥 FULL OPTIMIZATION MODE
+31-07-2025 21:04:15 - __main__                                :391  - INFO     - Running quick optimization...
+31-07-2025 21:04:15 - risk_management_optimizer               :50   - INFO     - RiskManagementOptimizer initialized with config: hypothesis/spread_compression_patterns/config_backtest_v3_ultra_risk_optimized.yml
+31-07-2025 21:04:15 - __main__                                :81   - INFO     - Generated 30 breakthrough quick test combinations
+31-07-2025 21:04:15 - __main__                                :396  - INFO     - Will test 30 parameter combinations
+31-07-2025 21:04:15 - __main__                                :397  - INFO     - This may take several hours...
+31-07-2025 21:04:17 - risk_management_optimizer               :278  - INFO     - Starting optimization batch with 30 combinations
+31-07-2025 21:04:17 - risk_management_optimizer               :283  - INFO     - Testing combination 1/30: {'confidence_threshold': 0.52, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.015, 'minimum_signal_life': 8}
+31-07-2025 21:04:17 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.52
+31-07-2025 21:04:17 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:04:17 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:04:17 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:04:17 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpz0kplywi.yml
+31-07-2025 21:05:47 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.77, 'win_rate': 0.0, 'total_trades': 144, 'final_equity': 9979.59, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 86.8}
+31-07-2025 21:05:47 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.77% return, 144 trades, $0.00 equity
+31-07-2025 21:05:47 - risk_management_optimizer               :283  - INFO     - Testing combination 2/30: {'confidence_threshold': 0.52, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.025, 'minimum_signal_life': 10}
+31-07-2025 21:05:47 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.52
+31-07-2025 21:05:47 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:05:47 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:05:47 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:05:47 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmph79lt9dz.yml
+31-07-2025 21:07:18 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.77, 'win_rate': 0.0, 'total_trades': 144, 'final_equity': 9980.17, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 87.79}
+31-07-2025 21:07:18 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.77% return, 144 trades, $0.00 equity
+31-07-2025 21:07:18 - risk_management_optimizer               :283  - INFO     - Testing combination 3/30: {'confidence_threshold': 0.52, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.035, 'minimum_signal_life': 12}
+31-07-2025 21:07:18 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.52
+31-07-2025 21:07:18 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:07:18 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:07:18 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:07:18 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpr4x00opo.yml
+31-07-2025 21:08:46 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.78, 'win_rate': 0.1, 'total_trades': 144, 'final_equity': 9980.84, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 84.55}
+31-07-2025 21:08:46 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.78% return, 144 trades, $0.00 equity
+31-07-2025 21:08:46 - risk_management_optimizer               :283  - INFO     - Testing combination 4/30: {'confidence_threshold': 0.52, 'stop_loss_pct': 0.05, 'take_profit_pct': 0.025, 'minimum_signal_life': 8}
+31-07-2025 21:08:46 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.52
+31-07-2025 21:08:46 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.05
+31-07-2025 21:08:46 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:08:46 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:08:46 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmp1rvhprr3.yml
+31-07-2025 21:10:13 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.76, 'win_rate': 0.0, 'total_trades': 144, 'final_equity': 9980.26, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 84.65}
+31-07-2025 21:10:13 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.76% return, 144 trades, $0.00 equity
+31-07-2025 21:10:13 - risk_management_optimizer               :283  - INFO     - Testing combination 5/30: {'confidence_threshold': 0.52, 'stop_loss_pct': 0.05, 'take_profit_pct': 0.035, 'minimum_signal_life': 10}
+31-07-2025 21:10:13 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.52
+31-07-2025 21:10:13 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.05
+31-07-2025 21:10:13 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:10:13 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:10:13 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpsw3tjnjo.yml
+31-07-2025 21:11:41 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.77, 'win_rate': 0.1, 'total_trades': 144, 'final_equity': 9980.35, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 84.53}
+31-07-2025 21:11:41 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.77% return, 144 trades, $0.00 equity
+31-07-2025 21:11:41 - risk_management_optimizer               :283  - INFO     - Testing combination 6/30: {'confidence_threshold': 0.52, 'stop_loss_pct': 0.08, 'take_profit_pct': 0.015, 'minimum_signal_life': 12}
+31-07-2025 21:11:41 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.52
+31-07-2025 21:11:41 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.08
+31-07-2025 21:11:41 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:11:41 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:11:41 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpnc26mle3.yml
+31-07-2025 21:13:16 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.77, 'win_rate': 0.1, 'total_trades': 144, 'final_equity': 9981.4, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 91.77}
+31-07-2025 21:13:16 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.77% return, 144 trades, $0.00 equity
+31-07-2025 21:13:16 - risk_management_optimizer               :283  - INFO     - Testing combination 7/30: {'confidence_threshold': 0.52, 'stop_loss_pct': 0.08, 'take_profit_pct': 0.035, 'minimum_signal_life': 8}
+31-07-2025 21:13:16 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.52
+31-07-2025 21:13:16 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.08
+31-07-2025 21:13:16 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:13:16 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:13:16 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpjju1aom4.yml
+31-07-2025 21:14:48 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.76, 'win_rate': 0.0, 'total_trades': 144, 'final_equity': 9979.92, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 89.21}
+31-07-2025 21:14:48 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.76% return, 144 trades, $0.00 equity
+31-07-2025 21:14:48 - risk_management_optimizer               :283  - INFO     - Testing combination 8/30: {'confidence_threshold': 0.54, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.015, 'minimum_signal_life': 10}
+31-07-2025 21:14:48 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.54
+31-07-2025 21:14:48 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:14:48 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:14:48 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:14:48 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpppxnhl0d.yml
+31-07-2025 21:16:18 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.48, 'win_rate': 0.1, 'total_trades': 87, 'final_equity': 9988.52, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 87.22}
+31-07-2025 21:16:18 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.48% return, 87 trades, $0.00 equity
+31-07-2025 21:16:18 - risk_management_optimizer               :283  - INFO     - Testing combination 9/30: {'confidence_threshold': 0.54, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.025, 'minimum_signal_life': 12}
+31-07-2025 21:16:18 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.54
+31-07-2025 21:16:18 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:16:18 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:16:18 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:16:18 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmp9l8f9cpu.yml
+31-07-2025 21:17:52 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.48, 'win_rate': 0.1, 'total_trades': 87, 'final_equity': 9989.58, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 90.06}
+31-07-2025 21:17:52 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.48% return, 87 trades, $0.00 equity
+31-07-2025 21:17:52 - risk_management_optimizer               :283  - INFO     - Testing combination 10/30: {'confidence_threshold': 0.54, 'stop_loss_pct': 0.05, 'take_profit_pct': 0.015, 'minimum_signal_life': 8}
+31-07-2025 21:17:52 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.54
+31-07-2025 21:17:52 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.05
+31-07-2025 21:17:52 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:17:52 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:17:52 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmp5pe_et0j.yml
+31-07-2025 21:19:21 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.47, 'win_rate': 0.0, 'total_trades': 87, 'final_equity': 9988.5, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 86.63}
+31-07-2025 21:19:21 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.47% return, 87 trades, $0.00 equity
+31-07-2025 21:19:21 - risk_management_optimizer               :283  - INFO     - Testing combination 11/30: {'confidence_threshold': 0.54, 'stop_loss_pct': 0.05, 'take_profit_pct': 0.025, 'minimum_signal_life': 10}
+31-07-2025 21:19:21 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.54
+31-07-2025 21:19:21 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.05
+31-07-2025 21:19:21 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:19:21 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:19:21 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmp6czzl3zg.yml
+31-07-2025 21:20:57 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.48, 'win_rate': 0.1, 'total_trades': 87, 'final_equity': 9988.68, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 91.82}
+31-07-2025 21:20:57 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.48% return, 87 trades, $0.00 equity
+31-07-2025 21:20:57 - risk_management_optimizer               :283  - INFO     - Testing combination 12/30: {'confidence_threshold': 0.54, 'stop_loss_pct': 0.05, 'take_profit_pct': 0.035, 'minimum_signal_life': 12}
+31-07-2025 21:20:57 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.54
+31-07-2025 21:20:57 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.05
+31-07-2025 21:20:57 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:20:57 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:20:57 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpn9816amx.yml
+31-07-2025 21:22:28 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.48, 'win_rate': 0.1, 'total_trades': 87, 'final_equity': 9989.06, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 88.61}
+31-07-2025 21:22:28 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.48% return, 87 trades, $0.00 equity
+31-07-2025 21:22:28 - risk_management_optimizer               :283  - INFO     - Testing combination 13/30: {'confidence_threshold': 0.54, 'stop_loss_pct': 0.08, 'take_profit_pct': 0.025, 'minimum_signal_life': 8}
+31-07-2025 21:22:28 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.54
+31-07-2025 21:22:28 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.08
+31-07-2025 21:22:28 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:22:28 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:22:28 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmp0mukjmdt.yml
+31-07-2025 21:23:59 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.48, 'win_rate': 0.0, 'total_trades': 87, 'final_equity': 9988.44, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 87.76}
+31-07-2025 21:23:59 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.48% return, 87 trades, $0.00 equity
+31-07-2025 21:23:59 - risk_management_optimizer               :283  - INFO     - Testing combination 14/30: {'confidence_threshold': 0.54, 'stop_loss_pct': 0.08, 'take_profit_pct': 0.035, 'minimum_signal_life': 10}
+31-07-2025 21:23:59 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.54
+31-07-2025 21:23:59 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.08
+31-07-2025 21:23:59 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:23:59 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:23:59 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpj5vedk0o.yml
+31-07-2025 21:25:32 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.48, 'win_rate': 0.0, 'total_trades': 87, 'final_equity': 9988.84, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 88.96}
+31-07-2025 21:25:32 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.48% return, 87 trades, $0.00 equity
+31-07-2025 21:25:32 - risk_management_optimizer               :283  - INFO     - Testing combination 15/30: {'confidence_threshold': 0.56, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.015, 'minimum_signal_life': 12}
+31-07-2025 21:25:32 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.56
+31-07-2025 21:25:32 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:25:32 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:25:32 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:25:32 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpvkfvrlhm.yml
+31-07-2025 21:26:59 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.32, 'win_rate': 0.1, 'total_trades': 54, 'final_equity': 9994.16, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 84.64}
+31-07-2025 21:26:59 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.32% return, 54 trades, $0.00 equity
+31-07-2025 21:26:59 - risk_management_optimizer               :283  - INFO     - Testing combination 16/30: {'confidence_threshold': 0.56, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.035, 'minimum_signal_life': 8}
+31-07-2025 21:26:59 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.56
+31-07-2025 21:26:59 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:26:59 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:26:59 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:26:59 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpyi0bzcsz.yml
+31-07-2025 21:28:31 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.31, 'win_rate': 0.0, 'total_trades': 54, 'final_equity': 9993.93, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 88.45}
+31-07-2025 21:28:31 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.31% return, 54 trades, $0.00 equity
+31-07-2025 21:28:31 - risk_management_optimizer               :283  - INFO     - Testing combination 17/30: {'confidence_threshold': 0.56, 'stop_loss_pct': 0.05, 'take_profit_pct': 0.015, 'minimum_signal_life': 10}
+31-07-2025 21:28:31 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.56
+31-07-2025 21:28:31 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.05
+31-07-2025 21:28:31 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:28:31 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:28:31 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpuiyi6rvo.yml
+31-07-2025 21:29:58 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.31, 'win_rate': 0.0, 'total_trades': 54, 'final_equity': 9994.15, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 83.95}
+31-07-2025 21:29:58 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.31% return, 54 trades, $0.00 equity
+31-07-2025 21:29:58 - risk_management_optimizer               :283  - INFO     - Testing combination 18/30: {'confidence_threshold': 0.56, 'stop_loss_pct': 0.05, 'take_profit_pct': 0.025, 'minimum_signal_life': 12}
+31-07-2025 21:29:58 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.56
+31-07-2025 21:29:58 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.05
+31-07-2025 21:29:58 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:29:58 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:29:58 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpcbzc52nf.yml
+31-07-2025 21:31:34 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.32, 'win_rate': 0.1, 'total_trades': 54, 'final_equity': 9994.14, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 93.0}
+31-07-2025 21:31:34 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.32% return, 54 trades, $0.00 equity
+31-07-2025 21:31:34 - risk_management_optimizer               :283  - INFO     - Testing combination 19/30: {'confidence_threshold': 0.56, 'stop_loss_pct': 0.08, 'take_profit_pct': 0.015, 'minimum_signal_life': 8}
+31-07-2025 21:31:34 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.56
+31-07-2025 21:31:34 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.08
+31-07-2025 21:31:34 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:31:34 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:31:34 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmp90k704qb.yml
+31-07-2025 21:33:13 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.31, 'win_rate': 0.0, 'total_trades': 54, 'final_equity': 9993.91, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 96.17}
+31-07-2025 21:33:13 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.31% return, 54 trades, $0.00 equity
+31-07-2025 21:33:13 - risk_management_optimizer               :283  - INFO     - Testing combination 20/30: {'confidence_threshold': 0.56, 'stop_loss_pct': 0.08, 'take_profit_pct': 0.025, 'minimum_signal_life': 10}
+31-07-2025 21:33:13 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.56
+31-07-2025 21:33:13 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.08
+31-07-2025 21:33:13 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:33:13 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:33:13 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpnzq1oqgw.yml
+31-07-2025 21:34:52 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.31, 'win_rate': 0.0, 'total_trades': 54, 'final_equity': 9994.05, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.88}
+31-07-2025 21:34:52 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.31% return, 54 trades, $0.00 equity
+31-07-2025 21:34:52 - risk_management_optimizer               :283  - INFO     - Testing combination 21/30: {'confidence_threshold': 0.56, 'stop_loss_pct': 0.08, 'take_profit_pct': 0.035, 'minimum_signal_life': 12}
+31-07-2025 21:34:52 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.56
+31-07-2025 21:34:52 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.08
+31-07-2025 21:34:52 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:34:52 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:34:52 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmp6iqncioc.yml
+31-07-2025 21:36:32 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.32, 'win_rate': 0.1, 'total_trades': 54, 'final_equity': 9994.07, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 96.27}
+31-07-2025 21:36:32 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.32% return, 54 trades, $0.00 equity
+31-07-2025 21:36:32 - risk_management_optimizer               :283  - INFO     - Testing combination 22/30: {'confidence_threshold': 0.58, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.025, 'minimum_signal_life': 8}
+31-07-2025 21:36:32 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.58
+31-07-2025 21:36:32 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:36:32 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:36:32 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:36:32 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpdxyb43g7.yml
+31-07-2025 21:38:11 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.19, 'win_rate': 0.0, 'total_trades': 32, 'final_equity': 9996.24, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.71}
+31-07-2025 21:38:11 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.19% return, 32 trades, $0.00 equity
+31-07-2025 21:38:11 - risk_management_optimizer               :283  - INFO     - Testing combination 23/30: {'confidence_threshold': 0.58, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.035, 'minimum_signal_life': 10}
+31-07-2025 21:38:11 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.58
+31-07-2025 21:38:11 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:38:11 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:38:11 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:38:11 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpi9ll532o.yml
+31-07-2025 21:39:49 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.19, 'win_rate': 0.1, 'total_trades': 32, 'final_equity': 9996.5, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.51}
+31-07-2025 21:39:49 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.19% return, 32 trades, $0.00 equity
+31-07-2025 21:39:49 - risk_management_optimizer               :283  - INFO     - Testing combination 24/30: {'confidence_threshold': 0.58, 'stop_loss_pct': 0.05, 'take_profit_pct': 0.015, 'minimum_signal_life': 12}
+31-07-2025 21:39:49 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.58
+31-07-2025 21:39:49 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.05
+31-07-2025 21:39:49 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:39:49 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:39:49 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpx6rt26vb.yml
+31-07-2025 21:41:28 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.19, 'win_rate': 0.1, 'total_trades': 32, 'final_equity': 9996.46, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.89}
+31-07-2025 21:41:28 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.19% return, 32 trades, $0.00 equity
+31-07-2025 21:41:28 - risk_management_optimizer               :283  - INFO     - Testing combination 25/30: {'confidence_threshold': 0.58, 'stop_loss_pct': 0.05, 'take_profit_pct': 0.035, 'minimum_signal_life': 8}
+31-07-2025 21:41:28 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.58
+31-07-2025 21:41:28 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.05
+31-07-2025 21:41:28 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:41:28 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:41:28 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpnds3deuz.yml
+31-07-2025 21:43:07 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.19, 'win_rate': 0.0, 'total_trades': 32, 'final_equity': 9996.16, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.8}
+31-07-2025 21:43:07 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.19% return, 32 trades, $0.00 equity
+31-07-2025 21:43:07 - risk_management_optimizer               :283  - INFO     - Testing combination 26/30: {'confidence_threshold': 0.58, 'stop_loss_pct': 0.08, 'take_profit_pct': 0.015, 'minimum_signal_life': 10}
+31-07-2025 21:43:07 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.58
+31-07-2025 21:43:07 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.08
+31-07-2025 21:43:07 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:43:07 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:43:07 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmprnq6e1_d.yml
+31-07-2025 21:44:45 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.18, 'win_rate': 0.1, 'total_trades': 32, 'final_equity': 9996.76, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.49}
+31-07-2025 21:44:45 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.18% return, 32 trades, $0.00 equity
+31-07-2025 21:44:45 - risk_management_optimizer               :283  - INFO     - Testing combination 27/30: {'confidence_threshold': 0.58, 'stop_loss_pct': 0.08, 'take_profit_pct': 0.025, 'minimum_signal_life': 12}
+31-07-2025 21:44:45 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.58
+31-07-2025 21:44:45 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.08
+31-07-2025 21:44:45 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:44:45 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:44:45 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmp518mgzn6.yml
+31-07-2025 21:46:23 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.19, 'win_rate': 0.1, 'total_trades': 32, 'final_equity': 9996.58, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.4}
+31-07-2025 21:46:23 - risk_management_optimizer               :307  - INFO     -   Result: 0.1% win rate, -0.19% return, 32 trades, $0.00 equity
+31-07-2025 21:46:23 - risk_management_optimizer               :283  - INFO     - Testing combination 28/30: {'confidence_threshold': 0.6, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.015, 'minimum_signal_life': 8}
+31-07-2025 21:46:23 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.6
+31-07-2025 21:46:23 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:46:23 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.015
+31-07-2025 21:46:23 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 8
+31-07-2025 21:46:23 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmp67l07pix.yml
+31-07-2025 21:48:02 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.08, 'win_rate': 0.0, 'total_trades': 12, 'final_equity': 9998.26, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.51}
+31-07-2025 21:48:02 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.08% return, 12 trades, $0.00 equity
+31-07-2025 21:48:02 - risk_management_optimizer               :283  - INFO     - Testing combination 29/30: {'confidence_threshold': 0.6, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.025, 'minimum_signal_life': 10}
+31-07-2025 21:48:02 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.6
+31-07-2025 21:48:02 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:48:02 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.025
+31-07-2025 21:48:02 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 10
+31-07-2025 21:48:02 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpm8agl8q1.yml
+31-07-2025 21:49:40 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.08, 'win_rate': 0.0, 'total_trades': 12, 'final_equity': 9998.48, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.05}
+31-07-2025 21:49:40 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.08% return, 12 trades, $0.00 equity
+31-07-2025 21:49:40 - risk_management_optimizer               :283  - INFO     - Testing combination 30/30: {'confidence_threshold': 0.6, 'stop_loss_pct': 0.03, 'take_profit_pct': 0.035, 'minimum_signal_life': 12}
+31-07-2025 21:49:40 - __main__                                :180  - DEBUG    - Set backtesting.signal_processing.confidence_threshold = 0.6
+31-07-2025 21:49:40 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.stop_loss_pct = 0.03
+31-07-2025 21:49:40 - __main__                                :180  - DEBUG    - Set backtesting.risk_management.take_profit_pct = 0.035
+31-07-2025 21:49:40 - __main__                                :180  - DEBUG    - Set backtesting.exit_strategy.minimum_signal_life = 12
+31-07-2025 21:49:40 - risk_management_optimizer               :346  - DEBUG    - Running backtest command: python main.py --hyp /var/folders/z5/s70qz68n3ldb71dlnp8c0p2r0000gp/T/tmpvg27bm1w.yml
+31-07-2025 21:51:18 - __main__                                :228  - DEBUG    - Parsed results from output: {'total_return_pct': -0.07, 'win_rate': 0.0, 'total_trades': 12, 'final_equity': 9998.29, 'iterations_completed': 3000, 'iterations_total': 3000, 'execution_time': 95.96}
+31-07-2025 21:51:18 - risk_management_optimizer               :307  - INFO     -   Result: 0.0% win rate, -0.07% return, 12 trades, $0.00 equity
+31-07-2025 21:51:18 - risk_management_optimizer               :592  - INFO     - Analyzing optimization results...
+31-07-2025 21:51:18 - risk_management_optimizer               :592  - INFO     - Analyzing optimization results...
+31-07-2025 21:51:18 - risk_management_optimizer               :725  - INFO     - Report saved to: storage/optimization/enhancement_report_20250731_215118.txt
+31-07-2025 21:51:18 - __main__                                :410  - INFO     - 
+📊 Optimization complete! Report: storage/optimization/enhancement_report_20250731_215118.txt

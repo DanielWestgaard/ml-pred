@@ -144,9 +144,9 @@ class SignalProcessor:
                 direction = 'SELL'
                 strength = prob_sell
             else:  # HOLD signal (Class 0) - should NOT generate trading signals
-                confidence = 0.0  # Force low confidence to filter out HOLD predictions
+                confidence = 0.0  # Set to 0 to filter out HOLD signals from trading
                 direction = 'HOLD'  # Proper direction for HOLD
-                strength = 0.0  # No strength for HOLD signals
+                strength = 0.0  # No trading strength for HOLD signals
                 
         # Handle binary classification (legacy support)
         elif probability is not None:
@@ -301,6 +301,291 @@ class SignalProcessor:
             logger.info("Signals filtered out due to inactive trading session")
         
         return signals
+
+
+class SmartHybridProcessor(SignalProcessor):
+    """
+    Smart hybrid processor that balances signal quality with quantity.
+    Uses intelligent filtering without over-restricting valid trading opportunities.
+    """
+    
+    def __init__(self, confidence_threshold: float = 0.35,
+                 signal_filters: List[str] = None,
+                 model_type: Optional[ModelType] = None,
+                 min_direction_change_seconds: int = 30,
+                 same_direction_cooldown_seconds: int = 120,
+                 confidence_percentile_filter: float = 0.2,
+                 max_signals_per_minute: int = 3,
+                 **kwargs):
+        """
+        Initialize smart hybrid processor
+        
+        Args:
+            confidence_threshold: Base confidence threshold
+            min_direction_change_seconds: Minimum seconds between direction changes (30s)
+            same_direction_cooldown_seconds: Cooldown for same direction signals (2min)
+            confidence_percentile_filter: Filter bottom X% of predictions (0.2 = bottom 20%)
+            max_signals_per_minute: Maximum signals per minute to prevent spam
+        """
+        super().__init__(confidence_threshold, signal_filters, model_type, **kwargs)
+        
+        self.min_direction_change_seconds = min_direction_change_seconds
+        self.same_direction_cooldown_seconds = same_direction_cooldown_seconds
+        self.confidence_percentile_filter = confidence_percentile_filter
+        self.max_signals_per_minute = max_signals_per_minute
+        
+        # Smart state tracking
+        self.last_signal_time = {}
+        self.last_direction = None
+        self.confidence_buffer = deque(maxlen=100)  # Rolling confidence history
+        self.minute_signal_count = deque(maxlen=60)  # Track per-minute signals
+        
+        logger.info(f"SmartHybridProcessor initialized:")
+        logger.info(f"  - Direction change cooldown: {min_direction_change_seconds}s")
+        logger.info(f"  - Same direction cooldown: {same_direction_cooldown_seconds}s")
+        logger.info(f"  - Confidence percentile filter: {confidence_percentile_filter}")
+        logger.info(f"  - Max signals/minute: {max_signals_per_minute}")
+    
+    def process(self, predictions: np.ndarray, market_data: pd.DataFrame = None,
+                model=None, prediction_probabilities: np.ndarray = None) -> Dict[str, Any]:
+        """
+        Process predictions with smart hybrid filtering
+        """
+        # Get base signals first
+        signals = super().process(predictions, market_data, model, prediction_probabilities)
+        
+        # Apply smart filtering
+        signals = self._apply_smart_filters(signals, market_data)
+        
+        return signals
+    
+    def _apply_smart_filters(self, signals: Dict[str, Any], market_data: pd.DataFrame) -> Dict[str, Any]:
+        """
+        Apply smart filtering that prioritizes quality while maintaining reasonable volume
+        """
+        if not signals['processed_signals']:
+            return signals
+        
+        current_time = datetime.now()
+        filtered_signals = []
+        filtered_strengths = []
+        filtered_directions = []
+        filtered_confidences = []
+        
+        # Build confidence distribution for percentile filtering
+        all_confidences = [s['confidence'] for s in signals['processed_signals']]
+        if len(all_confidences) > 5:  # Need reasonable sample size
+            confidence_threshold_dynamic = np.percentile(all_confidences, 
+                                                       self.confidence_percentile_filter * 100)
+        else:
+            confidence_threshold_dynamic = self.confidence_threshold
+        
+        for i, signal in enumerate(signals['processed_signals']):
+            direction = signal['direction']
+            confidence = signal['confidence']
+            
+            # Update confidence buffer for analysis
+            self.confidence_buffer.append({
+                'timestamp': current_time,
+                'confidence': confidence,
+                'direction': direction
+            })
+            
+            # Smart Layer 1: Dynamic Confidence Filter
+            if confidence < max(confidence_threshold_dynamic, self.confidence_threshold):
+                logger.debug(f"Signal filtered by dynamic confidence: {confidence:.4f} < {confidence_threshold_dynamic:.4f}")
+                continue
+                
+            # Smart Layer 2: Intelligent Temporal Filter
+            if not self._passes_smart_temporal_filter(direction, current_time):
+                logger.debug(f"Signal filtered by smart temporal filter: {direction}")
+                continue
+            
+            # Smart Layer 3: Rate Limiting (per minute, not hour)
+            if not self._passes_rate_limit(current_time):
+                logger.debug(f"Signal filtered by rate limit")
+                continue
+            
+            # Signal accepted
+            filtered_signals.append(signal)
+            filtered_strengths.append(signals['signal_strength'][i])
+            filtered_directions.append(signals['signal_direction'][i])
+            filtered_confidences.append(signals['confidence_scores'][i])
+            
+            # Update state
+            self.last_signal_time[direction] = current_time
+            self.last_direction = direction
+            self._update_minute_counter(current_time)
+            
+            logger.info(f"Smart signal accepted: {direction} confidence={confidence:.4f}")
+        
+        # Update signals with filtered results
+        signals['processed_signals'] = filtered_signals
+        signals['signal_strength'] = filtered_strengths
+        signals['signal_direction'] = filtered_directions
+        signals['confidence_scores'] = filtered_confidences
+        
+        filter_summary = f"Smart filtering: {len(signals['raw_predictions'])} predictions → {len(filtered_signals)} signals"
+        logger.info(filter_summary)
+        
+        return signals
+    
+    def _passes_smart_temporal_filter(self, direction: str, current_time: datetime) -> bool:
+        """
+        Smart temporal filter: Short cooldown for direction changes, longer for same direction
+        """
+        if direction not in self.last_signal_time:
+            return True
+        
+        time_since_last = current_time - self.last_signal_time[direction]
+        seconds_since = time_since_last.total_seconds()
+        
+        # Direction change gets priority with shorter cooldown
+        if self.last_direction and direction != self.last_direction:
+            return seconds_since >= self.min_direction_change_seconds
+        else:
+            # Same direction needs longer cooldown
+            return seconds_since >= self.same_direction_cooldown_seconds
+    
+    def _passes_rate_limit(self, current_time: datetime) -> bool:
+        """
+        Rate limiting per minute instead of per hour
+        """
+        # Clean old entries
+        cutoff_time = current_time - timedelta(minutes=1)
+        while self.minute_signal_count and self.minute_signal_count[0] < cutoff_time:
+            self.minute_signal_count.popleft()
+        
+        return len(self.minute_signal_count) < self.max_signals_per_minute
+    
+    def _update_minute_counter(self, current_time: datetime):
+        """Update per-minute signal counter"""
+        self.minute_signal_count.append(current_time)
+    
+    def get_smart_stats(self) -> Dict[str, Any]:
+        """Get smart filtering statistics"""
+        current_time = datetime.now()
+        
+        # Recent confidence stats
+        recent_confidences = [h['confidence'] for h in self.confidence_buffer]
+        avg_confidence = np.mean(recent_confidences) if recent_confidences else 0.0
+        
+        return {
+            'signals_last_minute': len(self.minute_signal_count),
+            'avg_confidence': avg_confidence,
+            'confidence_buffer_size': len(self.confidence_buffer),
+            'last_signal_times': dict(self.last_signal_time),
+            'last_direction': self.last_direction
+        }
+
+
+class UltraPermissiveProcessor(SignalProcessor):
+    """
+    Ultra-permissive processor that maximizes signal generation with minimal filtering.
+    Only applies essential quality filters to unleash your model's full potential.
+    """
+    
+    def __init__(self, confidence_threshold: float = 0.30,
+                 signal_filters: List[str] = None,
+                 model_type: Optional[ModelType] = None,
+                 max_signals_per_second: int = 10,
+                 **kwargs):
+        """
+        Initialize ultra-permissive processor with minimal restrictions
+        
+        Args:
+            confidence_threshold: Very low confidence threshold
+            max_signals_per_second: Prevent system overload only
+        """
+        super().__init__(confidence_threshold, signal_filters, model_type, **kwargs)
+        
+        self.max_signals_per_second = max_signals_per_second
+        self.second_signal_count = deque(maxlen=10)  # Track per-second signals
+        
+        logger.info(f"UltraPermissiveProcessor initialized:")
+        logger.info(f"  - Confidence threshold: {confidence_threshold}")
+        logger.info(f"  - Max signals/second: {max_signals_per_second}")
+        logger.info(f"  - NO temporal cooldowns")
+        logger.info(f"  - NO confidence delta requirements")
+    
+    def process(self, predictions: np.ndarray, market_data: pd.DataFrame = None,
+                model=None, prediction_probabilities: np.ndarray = None) -> Dict[str, Any]:
+        """
+        Process predictions with ultra-permissive filtering
+        """
+        # Get base signals first
+        signals = super().process(predictions, market_data, model, prediction_probabilities)
+        
+        # Apply minimal filtering
+        signals = self._apply_minimal_filters(signals, market_data)
+        
+        return signals
+    
+    def _apply_minimal_filters(self, signals: Dict[str, Any], market_data: pd.DataFrame) -> Dict[str, Any]:
+        """
+        Apply only essential filters to prevent system overload
+        """
+        if not signals['processed_signals']:
+            return signals
+        
+        current_time = datetime.now()
+        filtered_signals = []
+        filtered_strengths = []
+        filtered_directions = []
+        filtered_confidences = []
+        
+        for i, signal in enumerate(signals['processed_signals']):
+            direction = signal['direction']
+            confidence = signal['confidence']
+            
+            # ONLY filter: System overload protection
+            if not self._passes_overload_protection(current_time):
+                logger.debug(f"Signal filtered by overload protection")
+                continue
+            
+            # Accept everything else!
+            filtered_signals.append(signal)
+            filtered_strengths.append(signals['signal_strength'][i])
+            filtered_directions.append(signals['signal_direction'][i])
+            filtered_confidences.append(signals['confidence_scores'][i])
+            
+            # Update overload tracking
+            self._update_second_counter(current_time)
+            
+            logger.debug(f"Ultra signal accepted: {direction} confidence={confidence:.4f}")
+        
+        # Update signals with filtered results
+        signals['processed_signals'] = filtered_signals
+        signals['signal_strength'] = filtered_strengths
+        signals['signal_direction'] = filtered_directions
+        signals['confidence_scores'] = filtered_confidences
+        
+        filter_summary = f"Ultra filtering: {len(signals['raw_predictions'])} predictions → {len(filtered_signals)} signals"
+        logger.info(filter_summary)
+        
+        return signals
+    
+    def _passes_overload_protection(self, current_time: datetime) -> bool:
+        """
+        Only prevent system overload - allow everything else
+        """
+        # Clean old entries
+        cutoff_time = current_time - timedelta(seconds=1)
+        while self.second_signal_count and self.second_signal_count[0] < cutoff_time:
+            self.second_signal_count.popleft()
+        
+        return len(self.second_signal_count) < self.max_signals_per_second
+    
+    def _update_second_counter(self, current_time: datetime):
+        """Update per-second signal counter"""
+        self.second_signal_count.append(current_time)
+    
+    def get_ultra_stats(self) -> Dict[str, Any]:
+        """Get ultra processor statistics"""
+        return {
+            'signals_last_second': len(self.second_signal_count),
+            'max_signals_per_second': self.max_signals_per_second
+        }
 
 
 class AdvancedSignalProcessor(SignalProcessor):
