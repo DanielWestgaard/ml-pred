@@ -769,7 +769,9 @@ class BacktestOrchestrator:
             from datetime import datetime
             if isinstance(entry_time, str):
                 entry_time = pd.to_datetime(entry_time)
-            position_age_minutes = (pd.Timestamp.now(tz='UTC') - entry_time).total_seconds() / 60
+            # Use current backtesting time, not real-time
+            current_backtest_time = pd.to_datetime(current_data['timestamp'], utc=True)
+            position_age_minutes = (current_backtest_time - entry_time).total_seconds() / 60
             logger.debug(f"Position {position_id} age: {position_age_minutes:.2f} minutes, minimum required: {self.minimum_signal_life}")
             
             # ENFORCE minimum position duration unless extreme conditions
@@ -793,8 +795,8 @@ class BacktestOrchestrator:
             return True, "contrary_signal"
         
         # 2. Extremely strong HOLD with very weak original signal: Market conditions changed
-        if (prediction == 0 and hold_confidence > 0.95 and current_confidence < 0.2):
-            logger.debug(f"Market change exit: HOLD {hold_confidence:.4f} > 0.95, {position_direction} {current_confidence:.4f} < 0.20")
+        if (prediction == 0 and hold_confidence > 0.98 and current_confidence < 0.1):
+            logger.debug(f"Market change exit: HOLD {hold_confidence:.4f} > 0.98, {position_direction} {current_confidence:.4f} < 0.10")
             return True, "market_change"
         
         # 4. Feature-based exit: Exit when core compression features reverse
