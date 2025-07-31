@@ -1,0 +1,27 @@
+31-07-2025 11:29:36 - logging_utils                           :149  - INFO     - Logging system initialized. Environment: development
+31-07-2025 11:29:37 - uncaught_exception                      :164  - CRITICAL - Uncaught exception
+Traceback (most recent call last):
+  File "/Users/dmartinsen/pers-prog/ml-pred/simple_model_diagnostic.py", line 220, in <module>
+    run_simple_diagnostic()
+  File "/Users/dmartinsen/pers-prog/ml-pred/simple_model_diagnostic.py", line 89, in run_simple_diagnostic
+    predictions = model.predict(clean_features)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dmartinsen/pers-prog/ml-pred/venv/lib/python3.11/site-packages/sklearn/ensemble/_forest.py", line 904, in predict
+    proba = self.predict_proba(X)
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dmartinsen/pers-prog/ml-pred/venv/lib/python3.11/site-packages/sklearn/ensemble/_forest.py", line 946, in predict_proba
+    X = self._validate_X_predict(X)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dmartinsen/pers-prog/ml-pred/venv/lib/python3.11/site-packages/sklearn/ensemble/_forest.py", line 638, in _validate_X_predict
+    X = validate_data(
+        ^^^^^^^^^^^^^^
+  File "/Users/dmartinsen/pers-prog/ml-pred/venv/lib/python3.11/site-packages/sklearn/utils/validation.py", line 2919, in validate_data
+    _check_feature_names(_estimator, X, reset=reset)
+  File "/Users/dmartinsen/pers-prog/ml-pred/venv/lib/python3.11/site-packages/sklearn/utils/validation.py", line 2777, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- volume
+Feature names seen at fit time, yet now missing:
+- close_og
+
