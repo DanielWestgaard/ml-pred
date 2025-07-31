@@ -19,13 +19,13 @@ backtesting:
 
   signal_processing:
     processor_type: ultra  # Maximum signal generation
-    confidence_threshold: 0.54
+    confidence_threshold: 0.52
     max_signals_per_second: 20
     signal_filters: []
 
   risk_management:
     max_position_size: 0.08
-    stop_loss_pct: 0.050          # MUCH WIDER: 5% vs 1.2% - let predictions breathe
+    stop_loss_pct: 0.030          # MUCH WIDER: 5% vs 1.2% - let predictions breathe
     take_profit_pct: 0.015        # TIGHTER: 1.5% vs 3.5% - quick wins
     max_drawdown: 0.5
     max_concurrent_positions: 2
