@@ -15,7 +15,7 @@ from data.features.enhanced_generation import ModelAwareFeatureGenerator
 from strategy.hypothesis_specific.spread_compression_strategy import SpreadCompressionSignalTracker
 
 # Import existing strategy components (reuse!)
-from strategy.components.signal_processor import SignalProcessor, AdvancedSignalProcessor, SmartHybridProcessor
+from strategy.components.signal_processor import SignalProcessor, AdvancedSignalProcessor, SmartHybridProcessor, UltraPermissiveProcessor
 from strategy.components.risk_manager import RiskManager
 from strategy.components.position_manager import PositionManager
 
@@ -316,10 +316,18 @@ class BacktestOrchestrator:
             logger.debug(f"Signal config found: {signal_config}")
             
             # Choose signal processor type based on configuration
-            processor_type = signal_config.get('processor_type', 'basic')  # basic, advanced, smart
+            processor_type = signal_config.get('processor_type', 'basic')  # basic, advanced, smart, ultra
             logger.info(f"Signal processor type: {processor_type}")
             
-            if processor_type == 'smart':
+            if processor_type == 'ultra':
+                self.signal_processor = UltraPermissiveProcessor(
+                    confidence_threshold=signal_config.get('confidence_threshold', 0.30),
+                    signal_filters=signal_config.get('signal_filters', []),
+                    model_type=self.model_type,
+                    max_signals_per_second=signal_config.get('max_signals_per_second', 10)
+                )
+                logger.info("Using UltraPermissiveProcessor for maximum signal generation")
+            elif processor_type == 'smart':
                 self.signal_processor = SmartHybridProcessor(
                     confidence_threshold=signal_config.get('confidence_threshold', 0.35),
                     signal_filters=signal_config.get('signal_filters', []),
@@ -578,6 +586,9 @@ class BacktestOrchestrator:
                     elif isinstance(self.signal_processor, SmartHybridProcessor):
                         stats = self.signal_processor.get_smart_stats()
                         filter_stats_str = f" | Smart: {stats['signals_last_minute']}/min, Avg:{stats['avg_confidence']:.3f}"
+                    elif isinstance(self.signal_processor, UltraPermissiveProcessor):
+                        stats = self.signal_processor.get_ultra_stats()
+                        filter_stats_str = f" | Ultra: {stats['signals_last_second']}/sec"
                     
                     logger.info(f"Progress: {progress_pct:.1f}% | "
                                f"Iteration: {iteration}/{max_loops} | "
