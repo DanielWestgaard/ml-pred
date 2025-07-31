@@ -4,9 +4,9 @@ I've really been struggling to make my model profitable (backtesting showed cons
 
 ## Previous "fixes" which helped results
 - "No" lookahead bias in features (`data/features/enhanced_generation.py`)
-- Features are "optimized" and picked out the best feature of both worlds ("hybrid")
+- Features are "optimized", has predictive powers and picked out the best feature of both worlds ("hybrid")
 - Not using OHLCV in training, only `close_og` (un-normalized original `close` prices) as this is needed for placing orders
-- Improved the hypothsesis target, now using v3 (`data/features/target_hypothesis.py`)
+- Improved the hypothsesis target, now using v3 (`data/features/target_hypothesis.py`) and proven to be working
 - "Fixed"/reduced chances of data leakage with Walk-Forward Validation in model training (Random Forest) (`model/model_training.py` and `model/walk_forward_validator.py`)
 - Tested a bunch of different feature combinations and parameters in both model training (`model/`) and backtesting (`backtesting/`)
 
