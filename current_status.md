@@ -96,3 +96,24 @@ confidence (0.90+).
 Your exit strategy should be: "Close when the original BUY/SELL signal weakens," not "Close
 when HOLD is strong."
 
+## ✅ Critical Exit Strategy Fixes Implemented
+
+### Key Changes Made:
+
+1. Fixed Confidence Calculation Logic
+    - Before: Used HOLD confidence (0.90-0.99) for exits
+    - After: Uses original BUY/SELL signal confidence for exit decisions
+
+2. Implemented Signal Decay-Based Exits
+    - Before: Closed when HOLD > 0.85 (immediate closure)
+    - After: Closes when original trading signal decays by 40% from peak
+
+3. Enforced Minimum Position Duration
+    - Before: Positions closed within seconds
+    - After: Positions must stay open minimum 10 minutes (except emergency HOLD > 95%)
+
+4. Multi-Layer Exit Strategy:
+    - Layer 1: Signal decay > 40% from peak
+    - Layer 2: Trading signal weakness < 30% confidence
+    - Layer 3: HOLD override (HOLD > 95% AND trading signal < 40%)
+    - Layer 4: Feature reversal (existing logic)

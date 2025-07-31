@@ -36,10 +36,10 @@ backtesting:
     position_tracking: "detailed"
 
   exit_strategy:
-    confidence_exit_threshold: 0.99
-    signal_strength_decay: 0.8
+    confidence_exit_threshold: 0.99  # Not used anymore - using signal decay logic
+    signal_strength_decay: 0.4       # Exit when signal decays by 40% from peak
     volatility_exit_multiplier: 2.5
-    minimum_signal_life: 8
+    minimum_signal_life: 10           # Minimum 10 minutes position duration
 
   signal_tracking:
     signal_strength_features:

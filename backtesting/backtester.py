@@ -727,49 +727,78 @@ class BacktestOrchestrator:
             return False, None
         
         position_id = position.get('id', 'unknown')
-        # Handle three-class model probabilities correctly
+        position_direction = position.get('direction', 'BUY')
+        
+        # Calculate confidence properly: Use TRADING SIGNAL confidence, not HOLD confidence
         if probability is not None:
             if hasattr(probability, '__len__') and len(probability) == 3:
                 # Three-class model: [prob_hold, prob_buy, prob_sell]
-                current_confidence = probability[prediction]
+                prob_hold, prob_buy, prob_sell = probability
+                
+                # For exit logic, use the confidence of the ORIGINAL trading direction
+                if position_direction == 'BUY':
+                    current_confidence = prob_buy  # BUY signal strength
+                elif position_direction == 'SELL':
+                    current_confidence = prob_sell  # SELL signal strength
+                else:
+                    current_confidence = max(prob_buy, prob_sell)  # Fallback
+                    
+                # Store HOLD confidence separately for different exit logic
+                hold_confidence = prob_hold
             elif prediction == 1:
                 # Binary model: prediction 1 uses direct probability
                 current_confidence = probability
+                hold_confidence = 1 - probability
             else:
                 # Binary model: prediction 0 uses inverse probability
                 current_confidence = 1 - probability if probability is not None else 0
+                hold_confidence = probability
         else:
             # No probability available - use default confidence
             current_confidence = 0.6 if prediction > 0 else 0.4
+            hold_confidence = 0.4
         
         # Update signal tracking
         self.signal_tracker.update_signal_strength(position_id, current_data, current_confidence)
         
-        # Check minimum signal life (not a hard constraint, just a filter)
+        # Check minimum signal life (ENFORCED - positions must stay open minimum time)
         entry_time = position.get('entry_time')
         if entry_time:
             from datetime import datetime
             if isinstance(entry_time, str):
                 entry_time = pd.to_datetime(entry_time)
             position_age_minutes = (pd.Timestamp.now(tz='UTC') - entry_time).total_seconds() / 60
+            
+            # ENFORCE minimum position duration unless extreme conditions
             if position_age_minutes < self.minimum_signal_life:
-                # Only exit on very strong contrary signals during minimum life period
-                if prediction == 0 and current_confidence > 0.9:
-                    return True, "strong_contrary_signal"
+                # Only exit on EXTREMELY strong contrary signals (HOLD > 95%) during minimum life
+                if prediction == 0 and 'hold_confidence' in locals() and hold_confidence > 0.95:
+                    logger.debug(f"Emergency exit during minimum life: HOLD confidence {hold_confidence:.4f} > 0.95")
+                    return True, "emergency_contrary_signal"
+                
+                # Otherwise, position MUST stay open during minimum life period
+                logger.debug(f"Position {position_id} protected by minimum life: {position_age_minutes:.1f}min < {self.minimum_signal_life}min")
                 return False, None
         
-        # 1. Confidence-based exit: Exit when model predicts compression is over (class 0) with sufficient confidence
-        if prediction == 0 and current_confidence > self.confidence_exit_threshold:
-            logger.debug(f"Confidence exit triggered: {current_confidence:.4f} > {self.confidence_exit_threshold}")
-            return True, "confidence_drop"
-        
-        # 2. Signal strength decay: Exit when signal deteriorates significantly
+        # 1. Signal strength decay exit: Exit when ORIGINAL TRADING SIGNAL weakens
+        # Use signal decay from tracker, not absolute confidence
         signal_decay = self.signal_tracker.calculate_signal_decay(position_id)
         if signal_decay > self.signal_decay_threshold:
             logger.debug(f"Signal decay exit triggered: {signal_decay:.4f} > {self.signal_decay_threshold}")
             return True, "signal_decay"
         
-        # 3. Feature-based exit: Exit when core compression features reverse
+        # 2. Trading signal confidence drop: Exit when original BUY/SELL signal drops below threshold
+        if current_confidence < 0.3:  # Fixed threshold for trading signal weakness
+            logger.debug(f"Trading signal weakness exit: {position_direction} confidence {current_confidence:.4f} < 0.30")
+            return True, "trading_signal_weak"
+        
+        # 3. HOLD signal override: Exit when HOLD is extremely confident AND trading signal is weak
+        if (prediction == 0 and 'hold_confidence' in locals() and 
+            hold_confidence > 0.95 and current_confidence < 0.4):
+            logger.debug(f"HOLD override exit: HOLD {hold_confidence:.4f} > 0.95, {position_direction} {current_confidence:.4f} < 0.40")
+            return True, "hold_override"
+        
+        # 4. Feature-based exit: Exit when core compression features reverse
         if self._check_compression_reversal(position, current_data):
             return True, "compression_reversal"
         
