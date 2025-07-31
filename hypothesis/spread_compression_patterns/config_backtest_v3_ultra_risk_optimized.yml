@@ -19,7 +19,7 @@ backtesting:
 
   signal_processing:
     processor_type: ultra  # Maximum signal generation
-    confidence_threshold: 0.01
+    confidence_threshold: 0.61
     max_signals_per_second: 20
     signal_filters: []
 
