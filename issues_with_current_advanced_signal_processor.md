@@ -59,6 +59,26 @@ Create a new processor that applies intelligent filtering without over-restricti
 - Volume-based limits: Scale signal limits based on market activity
 - Quality over quantity: Prioritize directional changes and confidence spikes
 
+### ✅ SmartHybridProcessor Features:
+
+1. Dynamic Confidence Thresholds: Uses percentile filtering instead of fixed thresholds
+2. Intelligent Temporal Filtering:
+- 30s cooldown for direction changes (prioritized)
+- 2min cooldown for same-direction signals
+3. Per-Minute Rate Limiting: 3 signals/minute (180/hour) vs old 8/hour
+4. Quality over Quantity: Filters bottom 20% of predictions dynamically
+
+### Test the New Processor:
+
+Run this command to test:
+`python main.py --hyp hypothesis/spread_compression_patterns config_backtest_v3_smart.yml`
+
+#### 📊 Expected Results:
+
+- Old AdvancedSignalProcessor: 2 trades (1,217 blocked by temporal cooldown)
+- New SmartHybridProcessor: 50-200 trades (balanced filtering)
+
+
 ## Option 3: Adaptive Signal Processor
 
 Implement learning-based filtering that adjusts parameters based on recent performance:
