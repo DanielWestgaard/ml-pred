@@ -120,3 +120,39 @@ self.df['depth_stability'] = np.clip(depth_stability_log, 0, max(upper_bound, 5)
 3. Backtesting trained model on testing dataset: `python main.py --hyp hypothesis/spread_compression_patterns/config_backtest_v3_ultra_risk_optimized.yml`
     - Logfile: "logs/backtesting/logging_31072025_150745.log"
 
+## 🎯 ROUND 2 ANALYSIS COMPLETE!
+
+### ✅ KEY FINDINGS
+
+PROGRESS MADE:
+- ✅ depth_stability restored: From 1 constant value → 581 unique values
+- ✅ Model inclusion: depth_stability now has 0.0063 importance (vs 0.0000)
+- ✅ Pipeline stability: Still no crashes or data corruption
+- ✅ Feature variation: Training std dev: 0.0000 → 8.0948
+
+PERSISTENT CHALLENGES:
+- ❌ Win rate unchanged: Still 0.0% (fundamental model issue)
+- ⚠️ Heavy capping: 95% of depth_stability values still hit 1000.0 limit
+- ⚠️ Low feature impact: depth_stability importance remains very low
+- ❌ Same performance: -5.63% vs -5.65% returns (virtually identical)
+
+### 🔍 ROOT CAUSE STATUS
+
+1. Original Issue: ✅ SOLVED - No more NaN/extreme returns
+2. Secondary Issue: 🔄 PARTIALLY FIXED - depth_stability has variation but still capped
+3. Tertiary Issue: ❌ UNCHANGED - 0% win rate indicates deeper model problems
+
+### 📋 NEXT STEPS RECOMMENDATIONS
+
+Immediate (High Priority):
+1. Investigate the 0% win rate - This is now the primary blocker
+    - Check if target labels align with actual price movements
+    - Analyze feature-target correlations
+    - Test with simpler baseline models
+2. Further optimize depth_stability calculation (if desired)
+    - Increase cap from 1000 to 5000+
+    - Or remove hard caps entirely
+
+The systematic diagnostic approach has been highly successful - you've eliminated the critical data corruption and
+restored feature functionality. The remaining 0% win rate is a model performance challenge that requires
+investigating the relationship between your features and targets, rather than data pipeline issues. 🚀
