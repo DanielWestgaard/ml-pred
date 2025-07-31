@@ -2045,8 +2045,11 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             self.df['depth_variability'] = spread_range / (spread_avg + 1e-8)
             
             # 2. Market depth stability (consensus: 0.9533) - #2 predictor!
-            depth_stability = 1 / (spread_range.rolling(window=20, min_periods=5).std() + 1e-8)
-            self.df['depth_stability'] = np.log1p(depth_stability)
+            # FIXED: Cap reciprocal to prevent extreme values
+            rolling_std = spread_range.rolling(window=20, min_periods=5).std()
+            max_stability_raw = 1000  # Reasonable cap for stability measure
+            depth_stability_raw = np.minimum(1 / (rolling_std + 1e-6), max_stability_raw)
+            self.df['depth_stability'] = np.clip(np.log1p(depth_stability_raw), 0, 10)
             
             # 3. Liquidity stress indicator (consensus: 0.7089)
             stress_threshold = spread_avg.rolling(window=60, min_periods=20).quantile(0.9)
@@ -2069,7 +2072,10 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             # Approximate using spread_close volatility
             spread_vol = spread_close.rolling(window=20, min_periods=5).std()
             self.df['depth_variability'] = spread_vol / (spread_close + 1e-8)
-            self.df['depth_stability'] = 1 / (spread_vol + 1e-8)
+            # FIXED: Cap reciprocal to prevent extreme values
+            max_stability_raw = 1000  # Reasonable cap for stability measure
+            depth_stability_raw = np.minimum(1 / (spread_vol + 1e-6), max_stability_raw)
+            self.df['depth_stability'] = np.clip(depth_stability_raw, 0, 10)
             
             stress_threshold = spread_close.rolling(window=60, min_periods=20).quantile(0.9)
             self.df['liquidity_stress'] = np.where(
