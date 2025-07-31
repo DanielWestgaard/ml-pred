@@ -19,10 +19,10 @@ backtesting:
 
   signal_processing:
     use_advanced_filtering: true   # ENABLE ADVANCED SIGNAL FILTERING!
-    confidence_threshold: 0.001    # Slightly lower to catch more 0.4948 signals
+    confidence_threshold: 0.40    # Slightly lower to catch more 0.4948 signals
     min_confidence_delta: 0.0      # Disable confidence delta - model too flat
-    cooldown_minutes: 10           # Focus on directional changes instead
-    max_signals_per_hour: 8        # Allow more signals for direction changes
+    cooldown_minutes: 2           # Focus on directional changes instead
+    max_signals_per_hour: 30        # Allow more signals for direction changes
     confidence_window_minutes: 15  # Longer window to track direction patterns
     signal_filters: []
     min_signal_strength: 0.48
