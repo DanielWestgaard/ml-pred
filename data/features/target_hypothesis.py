@@ -457,21 +457,24 @@ class TargetHypothesis(BaseProcessor):
             # Combined primary signal (OR logic for inclusivity)
             primary_signal = core_signal | volume_signal | health_signal
             
-            # STEP 3: DIRECTIONAL BIAS with more balanced approach
+            # STEP 3: IMPROVED DIRECTIONAL BIAS - Fix BUY signal accuracy
             
-            # More sensitive directional detection
-            price_momentum = self.df['close'].pct_change(periods=3)  # Shorter period for more signals
+            # IMPROVED: Use stronger thresholds and better momentum detection
+            price_momentum_short = self.df['close'].pct_change(periods=3)  # 3-period momentum
+            price_momentum_medium = self.df['close'].pct_change(periods=10)  # 10-period momentum
             volume_momentum = self.df['volume_ratio'] - 1.0
             
-            # Balanced thresholds for directional detection
+            # FIXED: Stronger thresholds to reduce noise and improve BUY signal accuracy
             bullish_bias = (
-                (price_momentum > 0.0001) &   # Clear positive momentum required
-                (volume_momentum > 0.0)      # Volume above average required
+                (price_momentum_short > 0.0005) &      # STRONGER: 0.05% vs 0.01% minimum move
+                (price_momentum_medium > 0.0002) &     # ADDED: Medium-term momentum confirmation
+                (volume_momentum > 0.1)                 # STRONGER: 10% vs 0% volume increase
             )
             
             bearish_bias = (
-                (price_momentum < -0.0001) &  # Clear negative momentum required
-                (volume_momentum > 0.0)      # Volume above average required
+                (price_momentum_short < -0.0005) &     # STRONGER: -0.05% vs -0.01% minimum move
+                (price_momentum_medium < -0.0002) &    # ADDED: Medium-term momentum confirmation  
+                (volume_momentum > 0.1)                 # STRONGER: 10% vs 0% volume increase
             )
             
             # STEP 4: BALANCED SIGNAL GENERATION
