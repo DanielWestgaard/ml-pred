@@ -764,11 +764,13 @@ class BacktestOrchestrator:
         
         # Check minimum signal life (ENFORCED - positions must stay open minimum time)
         entry_time = position.get('entry_time')
+        logger.debug(f"Position {position_id} entry_time check: {entry_time}")
         if entry_time:
             from datetime import datetime
             if isinstance(entry_time, str):
                 entry_time = pd.to_datetime(entry_time)
             position_age_minutes = (pd.Timestamp.now(tz='UTC') - entry_time).total_seconds() / 60
+            logger.debug(f"Position {position_id} age: {position_age_minutes:.2f} minutes, minimum required: {self.minimum_signal_life}")
             
             # ENFORCE minimum position duration unless extreme conditions
             if position_age_minutes < self.minimum_signal_life:
@@ -781,22 +783,19 @@ class BacktestOrchestrator:
                 logger.debug(f"Position {position_id} protected by minimum life: {position_age_minutes:.1f}min < {self.minimum_signal_life}min")
                 return False, None
         
-        # 1. Signal strength decay exit: Exit when ORIGINAL TRADING SIGNAL weakens
-        # Use signal decay from tracker, not absolute confidence
-        signal_decay = self.signal_tracker.calculate_signal_decay(position_id)
-        if signal_decay > self.signal_decay_threshold:
-            logger.debug(f"Signal decay exit triggered: {signal_decay:.4f} > {self.signal_decay_threshold}")
-            return True, "signal_decay"
+        # Exit Strategy: Only exit on strong contrary signals or time-based rules
+        # Don't exit just because HOLD is predicted - that's normal market behavior
         
-        # 2. Trading signal confidence drop: Exit when original BUY/SELL signal drops below threshold
-        if current_confidence < 0.3:  # Fixed threshold for trading signal weakness
-            logger.debug(f"Trading signal weakness exit: {position_direction} confidence {current_confidence:.4f} < 0.30")
-            return True, "trading_signal_weak"
+        # 1. Strong contrary signal: Exit when model predicts OPPOSITE direction with high confidence
+        if ((position_direction == 'BUY' and prediction == 2 and current_confidence > 0.6) or 
+            (position_direction == 'SELL' and prediction == 1 and current_confidence > 0.6)):
+            logger.debug(f"Contrary signal exit: {position_direction} position, model predicts opposite with {current_confidence:.4f} confidence")
+            return True, "contrary_signal"
         
-        # 3. HOLD signal override: Exit when HOLD is extremely confident AND trading signal is weak
-        if (prediction == 0 and hold_confidence > 0.95 and current_confidence < 0.4):
-            logger.debug(f"HOLD override exit: HOLD {hold_confidence:.4f} > 0.95, {position_direction} {current_confidence:.4f} < 0.40")
-            return True, "hold_override"
+        # 2. Extremely strong HOLD with very weak original signal: Market conditions changed
+        if (prediction == 0 and hold_confidence > 0.95 and current_confidence < 0.2):
+            logger.debug(f"Market change exit: HOLD {hold_confidence:.4f} > 0.95, {position_direction} {current_confidence:.4f} < 0.20")
+            return True, "market_change"
         
         # 4. Feature-based exit: Exit when core compression features reverse
         if self._check_compression_reversal(position, current_data):
