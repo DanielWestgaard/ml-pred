@@ -33,8 +33,8 @@ def run_backtest_config(config_name, config_path):
         return_pct = "Unknown"
         
         for line in output_lines:
-            if "Final Results:" in line:
-                # Extract from format like: "Final Results: Iterations: 3000/3000 | Return: -0.01%, Trades: 2, Win Rate: 0.0%"
+            if "📊 Final Results:" in line:
+                # Extract from format like: "📊 Final Results: Iterations: 3000/3000 | Return: -0.01%, Trades: 2, Win Rate: 0.0%"
                 parts = line.split("|")
                 for part in parts:
                     part = part.strip()
