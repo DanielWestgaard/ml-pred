@@ -469,30 +469,48 @@ class TargetHypothesis(BaseProcessor):
             # ROOT CAUSE SOLUTION: Use percentile-based thresholds for balanced class distribution
             # Target: 15% BUY + 15% SELL + 70% HOLD = balanced training data
             
-            # Calculate percentile thresholds dynamically from data distribution
-            price_short_bull_threshold = price_momentum_short.quantile(0.85)      # Top 15% for BUY
-            price_short_bear_threshold = price_momentum_short.quantile(0.15)      # Bottom 15% for SELL
-            price_medium_bull_threshold = price_momentum_medium.quantile(0.85)    # Top 15% for BUY
-            price_medium_bear_threshold = price_momentum_medium.quantile(0.15)    # Bottom 15% for SELL
-            volume_momentum_threshold = volume_momentum.quantile(0.80)            # Top 20% volume activity
+            # Calculate percentile thresholds dynamically - MORE AGGRESSIVE for 10-20% target
+            price_short_bull_threshold = price_momentum_short.quantile(0.75)      # Top 25% for BUY (more inclusive)
+            price_short_bear_threshold = price_momentum_short.quantile(0.25)      # Bottom 25% for SELL (more inclusive)
+            price_medium_bull_threshold = price_momentum_medium.quantile(0.75)    # Top 25% for BUY (more inclusive)  
+            price_medium_bear_threshold = price_momentum_medium.quantile(0.25)    # Bottom 25% for SELL (more inclusive)
+            volume_momentum_threshold = volume_momentum.quantile(0.70)            # Top 30% volume activity (more inclusive)
             
-            logger.info(f"PERCENTILE-BASED THRESHOLDS (ROOT CAUSE FIX):")
-            logger.info(f"  Price momentum short - BUY: {price_short_bull_threshold:.6f} (85th %), SELL: {price_short_bear_threshold:.6f} (15th %)")
-            logger.info(f"  Price momentum medium - BUY: {price_medium_bull_threshold:.6f} (85th %), SELL: {price_medium_bear_threshold:.6f} (15th %)")
-            logger.info(f"  Volume momentum threshold: {volume_momentum_threshold:.4f} (80th %)")
+            logger.info(f"PERCENTILE-BASED THRESHOLDS (ROOT CAUSE FIX - AGGRESSIVE):")
+            logger.info(f"  Price momentum short - BUY: {price_short_bull_threshold:.6f} (75th %), SELL: {price_short_bear_threshold:.6f} (25th %)")
+            logger.info(f"  Price momentum medium - BUY: {price_medium_bull_threshold:.6f} (75th %), SELL: {price_medium_bear_threshold:.6f} (25th %)")
+            logger.info(f"  Volume momentum threshold: {volume_momentum_threshold:.4f} (70th %)")
             
-            # BALANCED DIRECTIONAL BIAS using percentile thresholds
-            bullish_bias = (
-                (price_momentum_short > price_short_bull_threshold) &      # Top 15% short-term momentum
-                (price_momentum_medium > price_medium_bull_threshold) &    # Top 15% medium-term momentum 
-                (volume_momentum > volume_momentum_threshold)              # Top 20% volume activity
+            # INCLUSIVE DIRECTIONAL BIAS - Fix AND logic issue (ROOT CAUSE OF PERSISTENCE)
+            # The issue: 15% AND 15% AND 20% = very small overlap!
+            # Solution: Use OR logic to be more inclusive, matching percentile design intent
+            
+            # Primary momentum signals (inclusive OR logic)
+            strong_bullish_momentum = (
+                (price_momentum_short > price_short_bull_threshold) |      # Top 15% short-term OR
+                (price_momentum_medium > price_medium_bull_threshold)      # Top 15% medium-term
             )
             
-            bearish_bias = (
-                (price_momentum_short < price_short_bear_threshold) &      # Bottom 15% short-term momentum
-                (price_momentum_medium < price_medium_bear_threshold) &    # Bottom 15% medium-term momentum
-                (volume_momentum > volume_momentum_threshold)              # Top 20% volume activity
+            strong_bearish_momentum = (
+                (price_momentum_short < price_short_bear_threshold) |      # Bottom 15% short-term OR
+                (price_momentum_medium < price_medium_bear_threshold)      # Bottom 15% medium-term
             )
+            
+            # Volume confirmation (optional enhancement, not required)
+            volume_confirmation = (volume_momentum > volume_momentum_threshold)
+            
+            # BALANCED DIRECTIONAL BIAS (designed for ~15% each)
+            bullish_bias = strong_bullish_momentum & volume_confirmation  # Simple AND for quality
+            bearish_bias = strong_bearish_momentum & volume_confirmation  # Simple AND for quality
+            
+            # Fallback: If volume filter is too restrictive, use momentum only
+            if bullish_bias.sum() < len(bullish_bias) * 0.05:  # Less than 5%
+                logger.info("Volume filter too restrictive for BUY - using momentum only")
+                bullish_bias = strong_bullish_momentum
+                
+            if bearish_bias.sum() < len(bearish_bias) * 0.05:  # Less than 5%
+                logger.info("Volume filter too restrictive for SELL - using momentum only") 
+                bearish_bias = strong_bearish_momentum
             
             # STEP 4: BALANCED SIGNAL GENERATION
             
