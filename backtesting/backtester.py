@@ -759,6 +759,7 @@ class BacktestOrchestrator:
             hold_confidence = 0.4
         
         # Update signal tracking
+        logger.debug(f"Exit check for {position_id}: prediction={prediction}, {position_direction} confidence={current_confidence:.4f}, HOLD confidence={hold_confidence:.4f}")
         self.signal_tracker.update_signal_strength(position_id, current_data, current_confidence)
         
         # Check minimum signal life (ENFORCED - positions must stay open minimum time)
@@ -772,7 +773,7 @@ class BacktestOrchestrator:
             # ENFORCE minimum position duration unless extreme conditions
             if position_age_minutes < self.minimum_signal_life:
                 # Only exit on EXTREMELY strong contrary signals (HOLD > 95%) during minimum life
-                if prediction == 0 and 'hold_confidence' in locals() and hold_confidence > 0.95:
+                if prediction == 0 and hold_confidence > 0.95:
                     logger.debug(f"Emergency exit during minimum life: HOLD confidence {hold_confidence:.4f} > 0.95")
                     return True, "emergency_contrary_signal"
                 
@@ -793,8 +794,7 @@ class BacktestOrchestrator:
             return True, "trading_signal_weak"
         
         # 3. HOLD signal override: Exit when HOLD is extremely confident AND trading signal is weak
-        if (prediction == 0 and 'hold_confidence' in locals() and 
-            hold_confidence > 0.95 and current_confidence < 0.4):
+        if (prediction == 0 and hold_confidence > 0.95 and current_confidence < 0.4):
             logger.debug(f"HOLD override exit: HOLD {hold_confidence:.4f} > 0.95, {position_direction} {current_confidence:.4f} < 0.40")
             return True, "hold_override"
         
