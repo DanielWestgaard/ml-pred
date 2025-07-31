@@ -776,9 +776,11 @@ class BacktestOrchestrator:
             
             # ENFORCE minimum position duration unless extreme conditions
             if position_age_minutes < self.minimum_signal_life:
-                # Only exit on EXTREMELY strong contrary signals (HOLD > 95%) during minimum life
-                if prediction == 0 and hold_confidence > 0.95:
-                    logger.debug(f"Emergency exit during minimum life: HOLD confidence {hold_confidence:.4f} > 0.95")
+                # Only exit on EXTREMELY strong contrary signals during minimum life
+                # Must be opposite direction prediction with very high confidence
+                if ((position_direction == 'BUY' and prediction == 2 and current_confidence > 0.8) or 
+                    (position_direction == 'SELL' and prediction == 1 and current_confidence > 0.8)):
+                    logger.debug(f"Emergency contrary exit during minimum life: {position_direction} position, opposite prediction {prediction} with {current_confidence:.4f} confidence")
                     return True, "emergency_contrary_signal"
                 
                 # Otherwise, position MUST stay open during minimum life period
