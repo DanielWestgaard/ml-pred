@@ -112,10 +112,11 @@ self.df['depth_stability'] = np.clip(depth_stability_log, 0, max(upper_bound, 5)
 
 # New round after second feature fix - Round 2
 1. Processing datasets: Command `python main.py --hyp 'hypothesis/spread_compression_patterns/config_process_data_v3.yml'`
-    - Training dataset: "logs/data/logging_31072025_144539.log", results from feature imbalance: "storage/data_engineering_stats/feature_importance/2025-07-31_14-45-44"
-    - Backtest dataset: "logs/data/logging_31072025_144850.log", results from feature imbalance: "storage/data_engineering_stats/feature_importance/2025-07-31_14-48-54"
+    - Training dataset: "logs/data/logging_31072025_150414.log", results from feature imbalance: "storage/data_engineering_stats/feature_importance/2025-07-31_15-04-20"
+    - Backtest dataset: "logs/data/logging_31072025_150257.log", results from feature imbalance: "storage/data_engineering_stats/feature_importance/2025-07-31_15-03-01"
 2. Training new model on those features (without SMOTE): `python main.py --hyp 'hypothesis/spread_compression_patterns/config_model_training_v3_balanced.yml'`
-    - Logfile: "logs/training/logging_31072025_145108.log"
-    - Saved model path: "storage/models/2025-07-31_14:51:35"
+    - Logfile: "logs/training/logging_31072025_150547.log"
+    - Saved model path: "storage/models/2025-07-31_15:06:15"
 3. Backtesting trained model on testing dataset: `python main.py --hyp hypothesis/spread_compression_patterns/config_backtest_v3_ultra_risk_optimized.yml`
-    - Logfile: "logs/backtesting/logging_31072025_145316.log"
+    - Logfile: "logs/backtesting/logging_31072025_150745.log"
+
