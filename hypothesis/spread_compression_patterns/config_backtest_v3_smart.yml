@@ -1,0 +1,54 @@
+hypothesis:
+  name: spread_compression_patterns_v3
+
+# Smart Hybrid Processor test configuration
+backtesting:
+  enabled: true
+  model_folder: storage/models/2025-07-30_19:30:29  # Our working SMOTE model
+  data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
+  start_date: "2025-03-10"
+  end_date: "2025-03-20"  # 10 days
+  buffer_size: 200
+  initial_capital: 10000
+  transaction_costs: 0.0005
+  slippage: 0.0002
+
+  execution:
+    max_loops: 3000  # Force completion 
+    loop_interval: 0
+
+  signal_processing:
+    processor_type: smart  # NEW: Use SmartHybridProcessor
+    confidence_threshold: 0.35          # Lower threshold to catch more signals
+    min_direction_change_seconds: 30    # 30s cooldown for direction changes
+    same_direction_cooldown_seconds: 120 # 2min cooldown for same direction
+    confidence_percentile_filter: 0.2   # Filter bottom 20% of predictions
+    max_signals_per_minute: 3           # Allow 3 signals per minute (180/hour)
+    signal_filters: []
+
+  risk_management:
+    max_position_size: 0.08
+    stop_loss_pct: 0.012
+    take_profit_pct: 0.035
+    max_drawdown: 0.5
+    max_concurrent_positions: 2
+    position_size_scaling: "volatility"
+
+  position_management:
+    max_concurrent_positions: 2
+    position_tracking: "detailed"
+
+  exit_strategy:
+    confidence_exit_threshold: 0.85
+    signal_strength_decay: 0.8
+    volatility_exit_multiplier: 2.5
+    minimum_signal_life: 8
+
+  signal_tracking:
+    signal_strength_features:
+      - compression_ratio_micro
+      - volume_ratio
+      - signal_strength_v2
+      - compression_consistency
+      - volatility_short
+      - spread_baseline
