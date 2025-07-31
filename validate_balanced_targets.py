@@ -48,7 +48,7 @@ def validate_balanced_target_generation():
     try:
         target_generator = TargetHypothesis(dataset_path, 'spread_compression_patterns_v3')
         
-        logger.info("\n🎯 TESTING NEW PERCENTILE-BASED TARGET GENERATION...")
+        logger.info("🎯 TESTING NEW PERCENTILE-BASED TARGET GENERATION...")
         result_df = target_generator.run()
         
         if result_df is None or 'target_spread_compression_v3_directional' not in result_df.columns:
@@ -60,7 +60,7 @@ def validate_balanced_target_generation():
         target_dist = result_df[target_column].value_counts().sort_index()
         total_samples = len(result_df)
         
-        logger.info(f"\n📊 NEW BALANCED TARGET DISTRIBUTION RESULTS:")
+        logger.info(f"📊 NEW BALANCED TARGET DISTRIBUTION RESULTS:")
         logger.info(f"Total samples: {total_samples:,}")
         
         # Calculate percentages
@@ -77,7 +77,7 @@ def validate_balanced_target_generation():
         logger.info(f"  SELL (Class 2): {sell_count:,} samples ({sell_pct:.2f}%)")
         
         # ROOT CAUSE FIX SUCCESS VALIDATION
-        logger.info(f"\n🎯 ROOT CAUSE FIX VALIDATION:")
+        logger.info(f"🎯 ROOT CAUSE FIX VALIDATION:")
         signal_pct = buy_pct + sell_pct
         
         logger.info(f"Original extreme imbalance: HOLD: 99.22%, BUY: 0.37%, SELL: 0.41%")
@@ -92,7 +92,7 @@ def validate_balanced_target_generation():
         sell_improvement = sell_pct / original_sell_pct if original_sell_pct > 0 else float('inf')
         signal_improvement = signal_pct / original_signal_pct if original_signal_pct > 0 else float('inf')
         
-        logger.info(f"\n📈 IMPROVEMENT METRICS:")
+        logger.info(f"📈 IMPROVEMENT METRICS:")
         logger.info(f"  BUY signals:  {buy_improvement:.1f}x increase ({original_buy_pct:.2f}% → {buy_pct:.2f}%)")
         logger.info(f"  SELL signals: {sell_improvement:.1f}x increase ({original_sell_pct:.2f}% → {sell_pct:.2f}%)")
         logger.info(f"  Total signals: {signal_improvement:.1f}x increase ({original_signal_pct:.2f}% → {signal_pct:.2f}%)")
@@ -104,7 +104,7 @@ def validate_balanced_target_generation():
             new_imbalance_ratio = max_class / min_class
             original_imbalance_ratio = 269.5
             
-            logger.info(f"\n⚖️  CLASS BALANCE ANALYSIS:")
+            logger.info(f"⚖️  CLASS BALANCE ANALYSIS:")
             logger.info(f"  Original imbalance ratio: {original_imbalance_ratio:.1f}:1 (SEVERE)")
             logger.info(f"  New imbalance ratio: {new_imbalance_ratio:.1f}:1")
             
@@ -123,7 +123,7 @@ def validate_balanced_target_generation():
         # Directional balance check
         if buy_count > 0 and sell_count > 0:
             directional_balance = min(buy_count, sell_count) / max(buy_count, sell_count)
-            logger.info(f"\n📊 DIRECTIONAL BALANCE:")
+            logger.info(f"📊 DIRECTIONAL BALANCE:")
             logger.info(f"  BUY/SELL balance ratio: {directional_balance:.3f} (1.0 = perfect)")
             
             if directional_balance > 0.8:
@@ -134,7 +134,7 @@ def validate_balanced_target_generation():
                 logger.info(f"  ⚠️  IMBALANCED: {('BUY' if buy_count > sell_count else 'SELL')} signals dominate")
         
         # ML Training Suitability Assessment
-        logger.info(f"\n🤖 ML TRAINING SUITABILITY:")
+        logger.info(f"🤖 ML TRAINING SUITABILITY:")
         if signal_pct >= 20 and signal_pct <= 40:
             logger.info(f"  ✅ OPTIMAL: {signal_pct:.1f}% signal rate perfect for ML training")
         elif signal_pct >= 10 and signal_pct < 20:
@@ -151,7 +151,7 @@ def validate_balanced_target_generation():
         else:
             logger.info("  ⚠️  May still have confidence calibration issues")
         
-        logger.info(f"\n🎯 ROOT CAUSE FIX SUMMARY:")
+        logger.info(f"🎯 ROOT CAUSE FIX SUMMARY:")
         if signal_pct > 10 and new_imbalance_ratio < 20:
             logger.info("  ✅ SUCCESS: ROOT CAUSE FIXED!")
             logger.info("  ✅ Balanced class distribution achieved")
