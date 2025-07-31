@@ -55,7 +55,7 @@ class FeatureRegistry:
         # Index by category
         self._category_index[definition.category].add(definition.name)
         
-        logger.debug(f"Registered feature generator '{definition.name}' producing {definition.output_features}")
+        # logger.debug(f"Registered feature generator '{definition.name}' producing {definition.output_features}")  # Have commented this out as it clutters the logs a bit
     
     def get_available_features(self) -> List[str]:
         """Get all features that can be generated"""
