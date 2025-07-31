@@ -414,22 +414,23 @@ class TargetHypothesis(BaseProcessor):
                 logger.error(f"Cannot proceed with target generation - missing critical features: {missing_critical}")
                 return False
             
-            # STEP 1: ULTRA-AGGRESSIVE THRESHOLDS for 15-20% signal rate
-            logger.info("=== ENHANCED TARGET V3: BALANCED CLASS DISTRIBUTION ===")
+            # STEP 1: BALANCED FEATURE THRESHOLDS - ROOT CAUSE FIX
+            logger.info("=== ENHANCED TARGET V3: PERCENTILE-BASED BALANCED DISTRIBUTION ===")
             
-            # Primary thresholds - VERY aggressive for more signals
-            depth_stability_threshold = self.df['depth_stability'].quantile(0.20)      # Top 80% (very inclusive)
-            institutional_threshold = self.df['institutional_footprint'].quantile(0.30)  # Top 70%
-            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.35)     # Top 65%
-            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.25)  # Top 75%
-            volume_threshold = max(1.01, self.df['volume_ratio'].quantile(0.35))        # Top 65%, minimum 1.01
-            signal_conviction_threshold = self.df['signal_conviction'].quantile(0.35)    # Top 65%
+            # BALANCED thresholds - designed for quality signals with reasonable frequency
+            depth_stability_threshold = self.df['depth_stability'].quantile(0.70)      # Top 30% (quality focus)
+            institutional_threshold = self.df['institutional_footprint'].quantile(0.75)  # Top 25% (institutional activity)
+            liquidity_stress_threshold = self.df['liquidity_stress'].quantile(0.80)     # Top 20% (stress events)
+            microstructure_health_threshold = self.df['microstructure_health'].quantile(0.60)  # Top 40% (health filter)
+            volume_threshold = max(1.05, self.df['volume_ratio'].quantile(0.75))        # Top 25%, minimum 1.05
+            signal_conviction_threshold = self.df['signal_conviction'].quantile(0.70)    # Top 30% (conviction)
             
-            logger.info(f"V3 ULTRA-AGGRESSIVE Thresholds:")
-            logger.info(f"  Depth stability: {depth_stability_threshold:.4f} (80th percentile)")
-            logger.info(f"  Institutional activity: {institutional_threshold:.4f} (70th percentile)")
-            logger.info(f"  Liquidity stress: {liquidity_stress_threshold:.4f} (65th percentile)")
-            logger.info(f"  Volume confirmation: {volume_threshold:.4f} (65th percentile)")
+            logger.info(f"V3 BALANCED PERCENTILE Thresholds:")
+            logger.info(f"  Depth stability: {depth_stability_threshold:.4f} (70th percentile)")
+            logger.info(f"  Institutional activity: {institutional_threshold:.4f} (75th percentile)")
+            logger.info(f"  Liquidity stress: {liquidity_stress_threshold:.4f} (80th percentile)")
+            logger.info(f"  Volume confirmation: {volume_threshold:.4f} (75th percentile)")
+            logger.info(f"  Signal conviction: {signal_conviction_threshold:.4f} (70th percentile)")
             
             # STEP 2: MULTIPLE SIGNAL PATHWAYS for better balance
             
@@ -457,24 +458,40 @@ class TargetHypothesis(BaseProcessor):
             # Combined primary signal (OR logic for inclusivity)
             primary_signal = core_signal | volume_signal | health_signal
             
-            # STEP 3: IMPROVED DIRECTIONAL BIAS - Fix BUY signal accuracy
+            # STEP 3: PERCENTILE-BASED DIRECTIONAL BIAS - ROOT CAUSE FIX
+            # Replace absolute thresholds with data-driven percentiles for balanced targets
             
-            # IMPROVED: Use stronger thresholds and better momentum detection
+            # Calculate momentum features
             price_momentum_short = self.df['close'].pct_change(periods=3)  # 3-period momentum
             price_momentum_medium = self.df['close'].pct_change(periods=10)  # 10-period momentum
             volume_momentum = self.df['volume_ratio'] - 1.0
             
-            # FIXED: Stronger thresholds to reduce noise and improve BUY signal accuracy
+            # ROOT CAUSE SOLUTION: Use percentile-based thresholds for balanced class distribution
+            # Target: 15% BUY + 15% SELL + 70% HOLD = balanced training data
+            
+            # Calculate percentile thresholds dynamically from data distribution
+            price_short_bull_threshold = price_momentum_short.quantile(0.85)      # Top 15% for BUY
+            price_short_bear_threshold = price_momentum_short.quantile(0.15)      # Bottom 15% for SELL
+            price_medium_bull_threshold = price_momentum_medium.quantile(0.85)    # Top 15% for BUY
+            price_medium_bear_threshold = price_momentum_medium.quantile(0.15)    # Bottom 15% for SELL
+            volume_momentum_threshold = volume_momentum.quantile(0.80)            # Top 20% volume activity
+            
+            logger.info(f"PERCENTILE-BASED THRESHOLDS (ROOT CAUSE FIX):")
+            logger.info(f"  Price momentum short - BUY: {price_short_bull_threshold:.6f} (85th %), SELL: {price_short_bear_threshold:.6f} (15th %)")
+            logger.info(f"  Price momentum medium - BUY: {price_medium_bull_threshold:.6f} (85th %), SELL: {price_medium_bear_threshold:.6f} (15th %)")
+            logger.info(f"  Volume momentum threshold: {volume_momentum_threshold:.4f} (80th %)")
+            
+            # BALANCED DIRECTIONAL BIAS using percentile thresholds
             bullish_bias = (
-                (price_momentum_short > 0.0005) &      # STRONGER: 0.05% vs 0.01% minimum move
-                (price_momentum_medium > 0.0002) &     # ADDED: Medium-term momentum confirmation
-                (volume_momentum > 0.1)                 # STRONGER: 10% vs 0% volume increase
+                (price_momentum_short > price_short_bull_threshold) &      # Top 15% short-term momentum
+                (price_momentum_medium > price_medium_bull_threshold) &    # Top 15% medium-term momentum 
+                (volume_momentum > volume_momentum_threshold)              # Top 20% volume activity
             )
             
             bearish_bias = (
-                (price_momentum_short < -0.0005) &     # STRONGER: -0.05% vs -0.01% minimum move
-                (price_momentum_medium < -0.0002) &    # ADDED: Medium-term momentum confirmation  
-                (volume_momentum > 0.1)                 # STRONGER: 10% vs 0% volume increase
+                (price_momentum_short < price_short_bear_threshold) &      # Bottom 15% short-term momentum
+                (price_momentum_medium < price_medium_bear_threshold) &    # Bottom 15% medium-term momentum
+                (volume_momentum > volume_momentum_threshold)              # Top 20% volume activity
             )
             
             # STEP 4: BALANCED SIGNAL GENERATION
@@ -555,12 +572,14 @@ class TargetHypothesis(BaseProcessor):
             logger.info(f"  Class 1 (BUY):  {directional_dist.get(1, 0)} ({buy_pct:.1f}%)")
             logger.info(f"  Class 2 (SELL): {directional_dist.get(2, 0)} ({sell_pct:.1f}%)")
             
-            # Check if we achieved better balance
+            # Check if we achieved balanced distribution (ROOT CAUSE FIX SUCCESS)
             signal_pct = buy_pct + sell_pct
-            if signal_pct > 15:
-                logger.info(f"✅ SUCCESS: {signal_pct:.1f}% signal rate achieved (target: >15%)")
+            if signal_pct >= 20 and signal_pct <= 40:
+                logger.info(f"✅ ROOT CAUSE FIX SUCCESS: {signal_pct:.1f}% signal rate (target: 20-40%)")
+            elif signal_pct > 40:
+                logger.warning(f"⚠️  Signal rate {signal_pct:.1f}% too high - may need tighter thresholds")
             else:
-                logger.warning(f"⚠️  Signal rate {signal_pct:.1f}% still below 15% target")
+                logger.warning(f"⚠️  Signal rate {signal_pct:.1f}% still below 20% target")
             
             # Check directional balance
             if buy_pct > 0 and sell_pct > 0:

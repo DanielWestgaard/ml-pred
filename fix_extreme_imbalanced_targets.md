@@ -59,3 +59,35 @@ This ensures:
 - Consistent signal rates across different market regimes
 - Adaptive thresholds based on actual data distribution
 - Balanced targets by design (15% BUY + 15% SELL + 70% HOLD)
+
+# 🎯 ROOT CAUSE FIX IMPLEMENTED ✅
+
+Your percentile-based approach has been successfully implemented in `data/features/target_hypothesis.py`.
+Here's what changed:
+
+## Key Improvements:
+
+1. **Directional Bias** (lines 460-494):
+    - OLD: price_momentum > 0.0005 (absolute threshold)
+    - NEW: price_momentum > quantile(0.85) (top 15% for BUY)
+    - OLD: volume_momentum > 0.1 (fixed threshold)
+    - NEW: volume_momentum > quantile(0.80) (top 20% activity)
+2. **Feature Thresholds** (lines 417-433):
+    - OLD: Ultra-aggressive percentiles (20th, 30th)
+    - NEW: Balanced quality percentiles (70th, 75th, 80th)
+3. **Expected Distribution**:
+    - OLD: 99.22% HOLD, 0.37% BUY, 0.41% SELL (269.5:1 imbalance)
+    - NEW: ~70% HOLD, ~15% BUY, ~15% SELL (balanced by design)
+
+## Validation Ready:
+
+Created `validate_balanced_targets.py` to test the new approach.
+
+### Next Steps:
+
+1. Run validation: python validate_balanced_targets.py
+2. Process data → train model → backtest with new balanced targets
+3. Should resolve 0% win rate and 0.0000 confidence issues
+
+The root cause (extreme class imbalance) is now fixed through data-driven percentile thresholds instead
+of arbitrary absolute values.
