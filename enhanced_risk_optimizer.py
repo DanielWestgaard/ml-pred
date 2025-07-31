@@ -246,31 +246,31 @@ def test_enhanced_optimizer(config_path: str) -> bool:
     Returns:
         True if tests pass, False if issues found
     """
-    print("🧪 Testing Enhanced Risk Optimizer")
-    print("=" * 60)
+    logger.info("🧪 Testing Enhanced Risk Optimizer")
+    logger.info("=" * 60)
     
     try:
         # Test 1: Initialize optimizer
         optimizer = EnhancedRiskOptimizer(config_path)
-        print(f"✅ Test 1 PASS: Successfully loaded config: {config_path}")
+        logger.info(f"✅ Test 1 PASS: Successfully loaded config: {config_path}")
         
         # Test 2: Generate parameter combinations
         quick_params = optimizer.generate_breakthrough_grid('quick')
-        print(f"✅ Test 2 PASS: Generated {len(quick_params)} parameter combinations")
+        logger.info(f"✅ Test 2 PASS: Generated {len(quick_params)} parameter combinations")
         
         # Test 3: Create test configuration
         test_params = quick_params[0]
         test_config = optimizer.create_test_config(optimizer.base_config, test_params)
-        print(f"✅ Test 3 PASS: Created test config with params: {test_params}")
+        logger.info(f"✅ Test 3 PASS: Created test config with params: {test_params}")
         
         # Test 4: Verify config modifications
         original_conf = optimizer.base_config['backtesting']['signal_processing']['confidence_threshold']
         modified_conf = test_config['backtesting']['signal_processing']['confidence_threshold']
         
         if original_conf != modified_conf:
-            print(f"✅ Test 4 PASS: Config modification working (confidence: {original_conf} → {modified_conf})")
+            logger.info(f"✅ Test 4 PASS: Config modification working (confidence: {original_conf} → {modified_conf})")
         else:
-            print(f"⚠️  Test 4 WARNING: Config not modified (both: {original_conf})")
+            logger.info(f"⚠️  Test 4 WARNING: Config not modified (both: {original_conf})")
         
         # Test 5: Test result parsing
         sample_output = """
@@ -280,19 +280,19 @@ def test_enhanced_optimizer(config_path: str) -> bool:
         
         parsed = optimizer._parse_output_results(sample_output, "")
         if parsed and 'win_rate' in parsed:
-            print(f"✅ Test 5 PASS: Result parsing working: {parsed}")
+            logger.info(f"✅ Test 5 PASS: Result parsing working: {parsed}")
         else:
-            print(f"❌ Test 5 FAIL: Result parsing failed: {parsed}")
+            logger.info(f"❌ Test 5 FAIL: Result parsing failed: {parsed}")
             return False
         
-        print("\n🎯 All Tests PASSED!")
-        print("✅ Enhanced optimizer is ready for production use")
+        logger.info("\n🎯 All Tests PASSED!")
+        logger.info("✅ Enhanced optimizer is ready for production use")
         return True
         
     except Exception as e:
-        print(f"❌ Tests FAILED: {e}")
+        logger.info(f"❌ Tests FAILED: {e}")
         import traceback
-        traceback.print_exc()
+        traceback.logger.info_exc()
         return False
 
 
@@ -300,37 +300,37 @@ def run_quick_optimization(config_path: str) -> Dict:
     """
     Run a quick 30-combination optimization to verify everything works
     """
-    print("🚀 Running Quick Optimization (30 combinations)")
-    print("=" * 60)
+    logger.info("🚀 Running Quick Optimization (30 combinations)")
+    logger.info("=" * 60)
     
     optimizer = EnhancedRiskOptimizer(config_path)
     
     # Generate quick test parameters
     combinations = optimizer.generate_breakthrough_grid('quick')
-    print(f"Generated {len(combinations)} parameter combinations")
+    logger.info(f"Generated {len(combinations)} parameter combinations")
     
     # Show first few combinations
-    print("\nFirst 5 parameter combinations:")
+    logger.info("\nFirst 5 parameter combinations:")
     for i, params in enumerate(combinations[:5]):
-        print(f"  {i+1}. {params}")
+        logger.info(f"  {i+1}. {params}")
     
     # Run optimization
     start_time = time.time()
     results = optimizer.run_optimization_batch(combinations)
     end_time = time.time()
     
-    print(f"\n⏱️  Optimization completed in {end_time - start_time:.1f} seconds")
+    logger.info(f"\n⏱️  Optimization completed in {end_time - start_time:.1f} seconds")
     
     # Analyze results
     analysis = optimizer.analyze_results()
     
     if analysis.get('successful_count', 0) > 0:
-        print(f"✅ Success! {analysis['successful_count']}/{analysis['total_tested']} combinations worked")
+        logger.info(f"✅ Success! {analysis['successful_count']}/{analysis['total_tested']} combinations worked")
         
         if analysis.get('best_win_rate'):
             best = analysis['best_win_rate']
-            print(f"🏆 Best win rate: {best['value']:.1f}%")
-            print(f"🏆 Best parameters: {best['parameters']}")
+            logger.info(f"🏆 Best win rate: {best['value']:.1f}%")
+            logger.info(f"🏆 Best parameters: {best['parameters']}")
         
         # Generate report
         report = optimizer.generate_report()
@@ -347,10 +347,10 @@ def run_quick_optimization(config_path: str) -> Dict:
                 'report': report
             }, f, indent=2, default=str)
         
-        print(f"💾 Results saved to: {results_file}")
+        logger.info(f"💾 Results saved to: {results_file}")
         
     else:
-        print("❌ No successful combinations found - check your configuration")
+        logger.info("❌ No successful combinations found - check your configuration")
         
     return {
         'optimizer': optimizer,
@@ -373,28 +373,28 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     if args.test_only:
-        print("🧪 TESTING MODE")
+        logger.info("🧪 TESTING MODE")
         success = test_enhanced_optimizer(args.config_file)
         if success:
-            print("\n🎉 All tests passed! Ready for optimization.")
+            logger.info("\n🎉 All tests passed! Ready for optimization.")
         else:
-            print("\n❌ Tests failed! Fix issues before running optimization.")
+            logger.info("\n❌ Tests failed! Fix issues before running optimization.")
             sys.exit(1)
     
     elif args.quick:
-        print("⚡ QUICK OPTIMIZATION MODE")
+        logger.info("⚡ QUICK OPTIMIZATION MODE")
         results = run_quick_optimization(args.config_file)
-        print("\n✅ Quick optimization completed!")
+        logger.info("\n✅ Quick optimization completed!")
     
     else:
-        print("🔥 FULL OPTIMIZATION MODE")
-        print(f"Running {args.test_type} optimization...")
+        logger.info("🔥 FULL OPTIMIZATION MODE")
+        logger.info(f"Running {args.test_type} optimization...")
         
         optimizer = EnhancedRiskOptimizer(args.config_file)
         combinations = optimizer.generate_breakthrough_grid(args.test_type)
         
-        print(f"Will test {len(combinations)} parameter combinations")
-        print("This may take several hours...")
+        logger.info(f"Will test {len(combinations)} parameter combinations")
+        logger.info("This may take several hours...")
         
         confirm = input("Continue? (y/N): ")
         if confirm.lower() == 'y':
@@ -407,6 +407,6 @@ if __name__ == "__main__":
             Path(report_path).parent.mkdir(parents=True, exist_ok=True)
             
             report = optimizer.generate_report(report_path)
-            print(f"\n📊 Optimization complete! Report: {report_path}")
+            logger.info(f"\n📊 Optimization complete! Report: {report_path}")
         else:
-            print("Cancelled.")
+            logger.info("Cancelled.")
