@@ -4,7 +4,7 @@ hypothesis:
 # Model training with balanced V3 target (15-20% signal rate)
 model_training:
     type: random_forest
-    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2024-01-01_2025-03-01.csv
+    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
     target_column: target_spread_compression_v3_directional
     exclude_basic_ohlc: true  # Focus on hybrid features only, exclude basic OHLC
     parameters:
