@@ -1,6 +1,6 @@
 # Round 1
 First off, I ran `python validate_balanced_targets.py` to test the new approach.<br>
-Resulting logfile: "logs/logging_31072025_172959.log"
+Resulting logfile: "logs/logging_31072025_180400.log"
 
 1. Processing datasets: Command `python main.py --hyp 'hypothesis/spread_compression_patterns/config_process_data_v3.yml'`
     - Training dataset: logs "logs/data/logging_31072025_173426.log", results from feature imbalance: "storage/data_engineering_stats/feature_importance/2025-07-31_17-34-31"
