@@ -15,7 +15,7 @@ from data.features.enhanced_generation import ModelAwareFeatureGenerator
 from strategy.hypothesis_specific.spread_compression_strategy import SpreadCompressionSignalTracker
 
 # Import existing strategy components (reuse!)
-from strategy.components.signal_processor import SignalProcessor, AdvancedSignalProcessor
+from strategy.components.signal_processor import SignalProcessor, AdvancedSignalProcessor, SmartHybridProcessor
 from strategy.components.risk_manager import RiskManager
 from strategy.components.position_manager import PositionManager
 
@@ -315,11 +315,22 @@ class BacktestOrchestrator:
             logger.debug(f"Backtesting config: {self.config.get('backtesting', {})}")
             logger.debug(f"Signal config found: {signal_config}")
             
-            # Use AdvancedSignalProcessor if advanced filtering is enabled, otherwise use basic SignalProcessor
-            use_advanced_filtering = signal_config.get('use_advanced_filtering', False)
-            logger.info(f"Advanced filtering enabled: {use_advanced_filtering}")
+            # Choose signal processor type based on configuration
+            processor_type = signal_config.get('processor_type', 'basic')  # basic, advanced, smart
+            logger.info(f"Signal processor type: {processor_type}")
             
-            if use_advanced_filtering:
+            if processor_type == 'smart':
+                self.signal_processor = SmartHybridProcessor(
+                    confidence_threshold=signal_config.get('confidence_threshold', 0.35),
+                    signal_filters=signal_config.get('signal_filters', []),
+                    model_type=self.model_type,
+                    min_direction_change_seconds=signal_config.get('min_direction_change_seconds', 30),
+                    same_direction_cooldown_seconds=signal_config.get('same_direction_cooldown_seconds', 120),
+                    confidence_percentile_filter=signal_config.get('confidence_percentile_filter', 0.2),
+                    max_signals_per_minute=signal_config.get('max_signals_per_minute', 3)
+                )
+                logger.info("Using SmartHybridProcessor for balanced signal filtering")
+            elif processor_type == 'advanced' or signal_config.get('use_advanced_filtering', False):
                 self.signal_processor = AdvancedSignalProcessor(
                     confidence_threshold=signal_config.get('confidence_threshold', 0.49),
                     signal_filters=signal_config.get('signal_filters', []),
@@ -559,11 +570,14 @@ class BacktestOrchestrator:
                     progress_pct = (self.current_data_index / total_data_points) * 100
                     account_info = self.simulation_broker.get_account_info()
                     
-                    # Get filtering stats if using AdvancedSignalProcessor
+                    # Get filtering stats if using AdvancedSignalProcessor or SmartHybridProcessor
                     filter_stats_str = ""
                     if isinstance(self.signal_processor, AdvancedSignalProcessor):
                         stats = self.signal_processor.get_filter_stats()
                         filter_stats_str = f" | Filter: {stats['signals_last_hour']}/hr, Avg:{stats['avg_confidence']:.3f}"
+                    elif isinstance(self.signal_processor, SmartHybridProcessor):
+                        stats = self.signal_processor.get_smart_stats()
+                        filter_stats_str = f" | Smart: {stats['signals_last_minute']}/min, Avg:{stats['avg_confidence']:.3f}"
                     
                     logger.info(f"Progress: {progress_pct:.1f}% | "
                                f"Iteration: {iteration}/{max_loops} | "
