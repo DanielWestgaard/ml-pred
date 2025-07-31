@@ -53,7 +53,7 @@ confidence_window_minutes: 5        # Shorter window
 
 Create a new processor that applies intelligent filtering without over-restriction:
 
-Key improvements:
+### Key improvements:
 - Dynamic cooldown: 30 seconds for direction changes, 2 minutes for same direction
 - Confidence percentile filtering: Only filter bottom 20% of predictions
 - Volume-based limits: Scale signal limits based on market activity
@@ -66,12 +66,9 @@ Implement learning-based filtering that adjusts parameters based on recent perfo
 - Adjust thresholds automatically based on market conditions
 - Learn optimal cooldown periods from historical data
 
-Recommendation: Start with Option 1 (calibrated parameters) for immediate improvement, then
-consider Option 2 for optimal balance between signal quality and quantity.
-
 ---
 
-⏺ The main issue is your Advanced Signal Processor has compounding over-restrictive filters:
+The main issue is your **Advanced Signal Processor has compounding over-restrictive filters**:
 
 1. 30min cooldown between same-direction signals (blocks 99%+ of valid signals)
 2. Confidence delta requirement that rejects consistent model outputs
