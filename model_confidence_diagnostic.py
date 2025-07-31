@@ -35,8 +35,10 @@ def load_model_and_metadata(model_path):
     with open(metadata_path, 'r') as f:
         metadata = yaml.safe_load(f)
     
-    # Load the actual model
+    # Load the actual model (try both naming conventions)
     model_file = model_path / "model.pkl"
+    if not model_file.exists():
+        model_file = model_path / "random_forest.pkl"
     if not model_file.exists():
         print(f"❌ Model file not found: {model_file}")
         return None, metadata
@@ -266,8 +268,8 @@ def run_comprehensive_confidence_analysis():
     print("for all predictions during backtesting.")
     print("="*80)
     
-    # Use the latest trained model
-    model_path = "storage/models/2025-07-31_16:28:03"
+    # Use the latest trained model with improved class balance
+    model_path = "storage/models/2025-07-31_19:16:38"
     
     if not Path(model_path).exists():
         print(f"❌ Model path not found: {model_path}")
