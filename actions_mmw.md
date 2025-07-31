@@ -103,9 +103,11 @@ Before running more optimization, we need to fix the model:
 1. Check model confidence output directly:
 # Load your trained model and test on validation data
 model.predict_proba(validation_features)[:10]  # Should show [0.3, 0.5, 0.7] not [0.0, 0.0, 0.0]
-2. Test with `confidence_threshold = 0.001` or even `0.0` to see total signal generation
+2. ✅ Test with `confidence_threshold = 0.001` or even `0.0` to see total signal generation
+Did a quick test, `python main.py --hyp 'hypothesis/spread_compression_patterns config_backtest_v3_quick.yml'`, with `confidence_threshold: 0.001`, and this showed the same result: `Final Results: Iterations: 3000/3000 | Return: -0.01%, Trades: 2, Win Rate: 0.0%`
 3. Verify model wasn't corrupted during SMOTE training
-4. Check if feature preprocessing matches between training and inference
+4. ✅ Check if feature preprocessing matches between training and inference
+I checked to make sure dataset used for training was processed the same way the dataset used for backtesting was. Done in 'data_exploration.ipynb', and confirmed they have the same features.
 
 The optimizer is working perfectly - it's revealing that your model needs to be retrained or 
 recalibrated before parameter optimization can be meaningful.

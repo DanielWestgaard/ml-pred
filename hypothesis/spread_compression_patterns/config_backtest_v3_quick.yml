@@ -19,7 +19,7 @@ backtesting:
 
   signal_processing:
     use_advanced_filtering: true   # ENABLE ADVANCED SIGNAL FILTERING!
-    confidence_threshold: 0.485    # Slightly lower to catch more 0.4948 signals
+    confidence_threshold: 0.001    # Slightly lower to catch more 0.4948 signals
     min_confidence_delta: 0.0      # Disable confidence delta - model too flat
     cooldown_minutes: 10           # Focus on directional changes instead
     max_signals_per_hour: 8        # Allow more signals for direction changes

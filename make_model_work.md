@@ -53,7 +53,9 @@ Both new models show:
 - But 0% win rate ❌
 
 **Possible causes**:
-1. Target/labels wrong - Model learning opposite of what it should
+1. ✅ Target/labels wrong - Model learning opposite of what it should
+    Not this, as you can read in `actions_mmw.md`
 2. Feature quality - Features don't predict spread compression well
 3. Market regime - March 2025 data doesn't match training period patterns
-4. Risk management - Stop losses too tight, take profits too wide
+4. ✅ Risk management - Stop losses too tight, take profits too wide
+    Currently, not this, as you can read in `actions_mmw.md`
