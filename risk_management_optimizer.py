@@ -591,10 +591,10 @@ class RiskManagementOptimizer:
         
         logger.info("Analyzing optimization results...")
         
-        # Extract successful results
+        # Extract successful results (lowered threshold for low-confidence models)
         successful_results = {}
         for key, result_data in self.optimization_results.items():
-            if result_data.get('results') and result_data['results'].get('total_trades', 0) > 10:
+            if result_data.get('results') and result_data['results'].get('total_trades', 0) > 0:
                 successful_results[key] = result_data
         
         if not successful_results:
