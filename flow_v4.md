@@ -1,3 +1,8 @@
+## Quick Intro
+Read `README.md` for and overview of the project, and `hypothesis/spread_compression_patterns/README.md` for information about the hypothesis I'm trying to make work.
+
+I've really been struggling to make my model profitable (backtesting showed consistently "0% win rate and always negative returns, with extremly low confidence on BUY/SELL"). 
+
 # Round 1
 
 **Training data period**: `2020-01-01_2025-07-01`
@@ -10,6 +15,7 @@
 3. **Lookahead Prevention**: All features strictly use historical data only
 4. **Signal Processing**: Fixed filtering bugs that blocked 99% of predictions
 5. **Feature Quality**: Added 19+ new predictive features with market microstructure
+6. **Memory efficient feature generation and feature importance analysis**
 
 ## Actual testing flow and paths
 1. Processing datasets: Command `python main.py --hyp 'hypothesis/spread_compression_patterns/config_process_data_v4_enhanced.yml'`
@@ -18,9 +24,9 @@
 2. Training new model on those features (without SMOTE): `python main.py --hyp 'hypothesis/spread_compression_patterns/config_model_training_v4_enhanced.yml'`
     - Logfile: "logs/training/logging_01082025_134621.log"
     - Saved model path: "storage/models/2025-08-01_13:46:57"
-3. Backtesting trained model on testing dataset: `python main.py --hyp hypothesis/spread_compression_patterns/config_backtest_v3_ultra_risk_optimized.yml`
-    - Logfile: ""
-    - Last line: ""
+3. Backtesting trained model on testing dataset: `python main.py --hyp 'hypothesis/spread_compression_patterns/config_backtest_v4_enhanced.yml'`
+    - Logfile: "logs/backtesting/logging_01082025_134803.log"
+    - Last line: "Return: 0.00%, Trades: 0, Win Rate: 0.0%"
 
 
 ## Results

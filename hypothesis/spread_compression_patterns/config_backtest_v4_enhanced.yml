@@ -4,7 +4,7 @@ hypothesis:
 # ENHANCED BACKTESTING CONFIGURATION FOR FORWARD-LOOKING MODEL
 backtesting:
   enabled: true
-  model_folder: storage/models/2025-07-31_22:57:51  # Will be updated after new training
+  model_folder: storage/models/2025-08-01_13:46:57  # Will be updated after new training
   data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-07-02_2025-07-31.csv
   start_date: "2025-07-15"
   end_date: "2025-07-26"  # 10 days for comprehensive testing
