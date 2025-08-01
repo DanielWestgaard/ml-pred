@@ -1,0 +1,50 @@
+{
+  "closed_trades": [
+    {
+      "id": "trade_1",
+      "symbol": "GBPUSD",
+      "direction": "BUY",
+      "entry_price": 1.2877268082341502,
+      "position_size_usd": 437.41726464726247,
+      "position_units": 339.68172585230974,
+      "entry_timestamp": "2025-03-10 22:20:00+00:00",
+      "stop_loss_price": 1.27222784,
+      "take_profit_price": 1.3069951999999998,
+      "transaction_cost": 0.21870863232363125,
+      "signal_strength": 0.5467715808090781,
+      "unrealized_pnl": -0.08723306418926052,
+      "status": "closed",
+      "entry_features": {
+        "compression_ratio_micro": 0,
+        "volume_ratio": 0,
+        "signal_strength_v2": 0,
+        "compression_consistency": 0
+      },
+      "entry_time": "2025-03-10 22:20:00+00:00",
+      "exit_price": 1.2874440774269218,
+      "exit_timestamp": "2025-03-10 22:28:00+00:00",
+      "exit_reason": "market_change",
+      "exit_transaction_cost": 0.21870863232363125,
+      "gross_pnl": -0.09603848855096098,
+      "net_pnl": -0.3147471208745922,
+      "total_transaction_costs": 0.4374172646472625,
+      "holding_period_minutes": 8.0
+    }
+  ],
+  "final_account_info": {
+    "initial_capital": 10000,
+    "current_balance": 9999.466544246803,
+    "current_equity": 9999.466544246803,
+    "unrealized_pnl": 0,
+    "total_return": -5.33455753196904e-05,
+    "total_return_pct": -0.00533455753196904,
+    "open_positions_count": 0,
+    "total_trades": 1,
+    "winning_trades": 0,
+    "win_rate": 0.0,
+    "total_fees": 0.4374172646472625,
+    "peak_equity": 10000,
+    "max_drawdown": 5.33455753196904e-05,
+    "max_drawdown_pct": 0.00533455753196904
+  }
+}

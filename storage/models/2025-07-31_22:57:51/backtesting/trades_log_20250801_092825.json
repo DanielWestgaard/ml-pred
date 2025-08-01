@@ -1,0 +1,80 @@
+{
+  "closed_trades": [
+    {
+      "id": "trade_1",
+      "symbol": "GBPUSD",
+      "direction": "BUY",
+      "entry_price": 1.2932973419383473,
+      "position_size_usd": 338.10755193545606,
+      "position_units": 261.4306400944988,
+      "entry_timestamp": "2025-03-10 00:00:00+00:00",
+      "stop_loss_price": 1.2776519599999998,
+      "take_profit_price": 1.3125675499999998,
+      "transaction_cost": 0.16905377596772803,
+      "signal_strength": 0.4226344399193201,
+      "unrealized_pnl": 0.0006948987592395751,
+      "status": "closed",
+      "entry_features": {
+        "compression_ratio_micro": 0,
+        "volume_ratio": 0,
+        "signal_strength_v2": 0,
+        "compression_consistency": 0
+      },
+      "entry_time": "2025-03-10 00:00:00+00:00",
+      "exit_price": 1.293053031651861,
+      "exit_timestamp": "2025-03-10 00:05:00+00:00",
+      "exit_reason": "market_change",
+      "exit_transaction_cost": 0.16905377596772803,
+      "gross_pnl": -0.06387019457781398,
+      "net_pnl": -0.232923970545542,
+      "total_transaction_costs": 0.33810755193545605,
+      "holding_period_minutes": 5.0
+    },
+    {
+      "id": "trade_2",
+      "symbol": "GBPUSD",
+      "direction": "SELL",
+      "entry_price": 1.2934368530610372,
+      "position_size_usd": 370.8322579387016,
+      "position_units": 286.70302462860326,
+      "entry_timestamp": "2025-03-10 00:19:00+00:00",
+      "stop_loss_price": 1.3090523600000001,
+      "take_profit_price": 1.2741270500000001,
+      "transaction_cost": 0.1854161289693508,
+      "signal_strength": 0.46355895646184647,
+      "unrealized_pnl": -0.04104066036695488,
+      "status": "closed",
+      "entry_features": {
+        "compression_ratio_micro": 0,
+        "volume_ratio": 0,
+        "signal_strength_v2": 0,
+        "compression_consistency": 0
+      },
+      "entry_time": "2025-03-10 00:19:00+00:00",
+      "exit_price": 1.2937776886425207,
+      "exit_timestamp": "2025-03-10 00:22:00+00:00",
+      "exit_reason": "market_change",
+      "exit_transaction_cost": 0.1854161289693508,
+      "gross_pnl": -0.09771859211238751,
+      "net_pnl": -0.2831347210817383,
+      "total_transaction_costs": 0.3708322579387016,
+      "holding_period_minutes": 3.0
+    }
+  ],
+  "final_account_info": {
+    "initial_capital": 10000,
+    "current_balance": 9999.129471403436,
+    "current_equity": 9999.129471403436,
+    "unrealized_pnl": 0,
+    "total_return": -8.70528596564327e-05,
+    "total_return_pct": -0.00870528596564327,
+    "open_positions_count": 0,
+    "total_trades": 2,
+    "winning_trades": 0,
+    "win_rate": 0.0,
+    "total_fees": 0.7089398098741576,
+    "peak_equity": 10000,
+    "max_drawdown": 8.70528596564327e-05,
+    "max_drawdown_pct": 0.00870528596564327
+  }
+}

@@ -5,9 +5,9 @@ hypothesis:
 backtesting:
   enabled: true
   model_folder: storage/models/2025-07-31_22:57:51  # Our working SMOTE model
-  data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
-  start_date: "2025-03-10"
-  end_date: "2025-03-20"  # 10 days
+  data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-07-02_2025-07-31.csv
+  start_date: "2025-07-15"
+  end_date: "2025-07-26"  # 10 days
   buffer_size: 200
   initial_capital: 10000
   transaction_costs: 0.0005
@@ -33,18 +33,18 @@ backtesting:
     stop_loss_pct: 0.012
     take_profit_pct: 0.015
     max_drawdown: 0.5
-    max_concurrent_positions: 2
+    max_concurrent_positions: 3
     position_size_scaling: "volatility"
 
   position_management:
-    max_concurrent_positions: 2
+    max_concurrent_positions: 3
     position_tracking: "detailed"
 
   exit_strategy:
-    confidence_exit_threshold: 0.85
+    confidence_exit_threshold: 0.9
     signal_strength_decay: 0.8
     volatility_exit_multiplier: 2.5
-    minimum_signal_life: 12
+    minimum_signal_life: 1
 
   signal_tracking:
     signal_strength_features:

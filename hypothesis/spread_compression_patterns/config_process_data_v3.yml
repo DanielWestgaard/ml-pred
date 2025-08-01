@@ -3,7 +3,7 @@ hypothesis:
 
 # Complete pipeline with balanced V3 target and optimized parameters
 data_pipeline:
-  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2020-01-01_2025-07-01.csv
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2025-07-02_2025-07-31.csv
   spread_focused: true
   selected_features:  # Enhanced hybrid features
     [
