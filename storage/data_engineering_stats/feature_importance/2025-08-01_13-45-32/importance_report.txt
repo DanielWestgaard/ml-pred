@@ -1,0 +1,32 @@
+================================================================================
+FEATURE IMPORTANCE ANALYSIS REPORT
+================================================================================
+Dataset: 41821 rows, 27 features
+Target: target_spread_compression_v4_directional (classification)
+Analysis Date: 2025-08-01 13:45:44
+
+CONSENSUS TOP FEATURES:
+----------------------------------------
+ 1. volatility_momentum_sequence   1.0000
+ 2. volume_momentum_sequence       0.8657
+ 3. volume_ratio                   0.3519
+ 4. microstructure_momentum_fusion 0.2546
+ 5. top_predictor_interaction      0.2500
+ 6. tick_momentum                  0.2176
+ 7. spread_compression_rate        0.0093
+ 8. book_imbalance_proxy           0.0093
+ 9. volatility_trend               0.0046
+10. liquidity_flow                 0.0046
+11. trend_strength                 0.0000
+12. price_acceleration             0.0000
+13. volume_price_sync              0.0000
+14. momentum_persistence           0.0000
+15. reversal_signals               0.0000
+
+MUTUAL INFORMATION - TOP 5:
+------------------------------
+1. volatility_momentum_sequence 0.0026
+2. volume_momentum_sequence  0.0022
+3. volume_ratio              0.0009
+4. microstructure_momentum_fusion 0.0007
+5. top_predictor_interaction 0.0006

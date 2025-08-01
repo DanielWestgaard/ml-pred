@@ -13,8 +13,8 @@
 
 ## Actual testing flow and paths
 1. Processing datasets: Command `python main.py --hyp 'hypothesis/spread_compression_patterns/config_process_data_v4_enhanced.yml'`
-    - Training dataset: logfile "logs/data/logging_01082025_120043.log", results from feature imbalance: ""
-    - Backtest dataset: logfile "", results from feature imbalance: ""
+    - Training dataset: logfile "logs/data/logging_01082025_133755.log", results from feature imbalance: "storage/data_engineering_stats/feature_importance/2025-08-01_13-44-03"
+    - Backtest dataset: logfile "logs/data/logging_01082025_134518.log", results from feature imbalance: "storage/data_engineering_stats/feature_importance/2025-08-01_13-45-32"
 2. Training new model on those features (without SMOTE): `python main.py --hyp 'hypothesis/spread_compression_patterns/config_model_training_v3_balanced.yml'`
     - Logfile: ""
     - Saved model path: ""
