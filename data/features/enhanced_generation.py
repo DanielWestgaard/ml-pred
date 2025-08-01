@@ -2785,7 +2785,9 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             volume_down = np.where(price_change < 0, self.df['volume'], 0)
             
             net_volume = volume_up - volume_down
-            self.df['market_pressure'] = net_volume.rolling(10).sum()
+            # Convert to pandas Series for rolling operations
+            net_volume_series = pd.Series(net_volume, index=self.df.index)
+            self.df['market_pressure'] = net_volume_series.rolling(10).sum()
             
             # SECTION 5: FEATURE VALIDATION AND NORMALIZATION
             logger.debug("Validating microstructure features...")
