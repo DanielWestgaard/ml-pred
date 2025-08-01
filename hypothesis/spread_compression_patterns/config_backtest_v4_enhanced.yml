@@ -4,7 +4,7 @@ hypothesis:
 # ENHANCED BACKTESTING CONFIGURATION FOR FORWARD-LOOKING MODEL
 backtesting:
   enabled: true
-  model_folder: storage/models/2025-08-01_14:59:28  # FIXED MODEL - Properly trained with balanced data
+  model_folder: storage/models/2025-08-01_15:16:41  # FIXED MODEL - Properly trained with balanced data
   data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-07-02_2025-07-31.csv
   start_date: "2025-07-15"
   end_date: "2025-07-26"  # 10 days for comprehensive testing
@@ -18,7 +18,7 @@ backtesting:
     loop_interval: 0
 
   signal_processing:
-    use_advanced_filtering: false          # Keep simple initially 
+    use_advanced_filtering: true          # Keep simple initially 
     confidence_threshold: 0.15             # Conservative threshold for quality signals
     min_confidence_delta: 0.02             # Require meaningful confidence differences
     cooldown_minutes: 1                    # Minimum cooldown for signal quality

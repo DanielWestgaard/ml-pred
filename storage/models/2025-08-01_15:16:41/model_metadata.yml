@@ -1,0 +1,78 @@
+hypothesis:
+  name: spread_compression_patterns_v4_enhanced
+model_info:
+  model_type: random_forest
+  model_class: RandomForestClassifier
+  storage_path: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-08-01_15:16:41
+  created_at: '2025-08-01T15:16:41.123445'
+
+training:
+  duration_seconds: 12.15
+  duration_formatted: 0:00:12
+  completed_at: '2025-08-01T15:16:41.123459'
+  train_samples: 980352
+  test_samples: 245089
+  validation_method: walk_forward
+  walk_forward_periods: 12
+  final_training_period:
+    start: '2023-01-02T00:42:00+00:00'
+    end: '2025-05-02T00:42:00+00:00'
+    samples: 1225441
+
+dataset:
+  dataset_path: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
+  target_column: target_spread_compression_v4_directional
+  feature_count: 13
+  features:
+  - institutional_footprint
+  - spread_compression_rate
+  - depth_stability
+  - microstructure_momentum_fusion
+  - volume_ratio
+  - price_momentum_1min
+  - price_momentum_3min
+  - price_momentum_5min
+  - price_acceleration
+  - volume_momentum
+  - volume_acceleration
+  - volatility_trend
+  - close_og
+  total_samples: 1225441
+  date_range:
+    start: '2023-01-02 00:42:00+00:00'
+    end: '2025-05-02 00:42:00+00:00'
+  missing_values: 0
+
+model_parameters:
+  bootstrap: true
+  ccp_alpha: 0.01
+  class_weight: balanced
+  criterion: gini
+  max_depth: 6
+  max_features: 0.3
+  max_leaf_nodes: 500
+  max_samples: 0.8
+  min_impurity_decrease: 0.001
+  min_samples_leaf: 5
+  min_samples_split: 10
+  min_weight_fraction_leaf: 0.0
+  monotonic_cst: null
+  n_estimators: 100
+  n_jobs: -1
+  oob_score: true
+  random_state: 42
+  verbose: 0
+  warm_start: false
+
+system_info:
+  cpu: arm
+  cpu_cores: 10
+  cpu_threads: 10
+  memory_gb: 16.0
+  python_version: 3.11.13
+  os: Darwin 24.5.0
+
+data_split:
+  train_size: 980352
+  test_size: 245089
+  split_ratio: 980352/245089
