@@ -1,0 +1,59 @@
+backtesting:
+  buffer_size: 200
+  data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-07-02_2025-07-31.csv
+  enabled: true
+  end_date: '2025-07-26'
+  execution:
+    loop_interval: 0
+    max_loops: 3000
+  exit_strategy:
+    confidence_exit_threshold: 0.9
+    minimum_signal_life: 5
+    signal_strength_decay: 0.7
+    volatility_exit_multiplier: 2.0
+  initial_capital: 10000
+  model_folder: storage/models/2025-08-01_15:16:41
+  position_management:
+    max_concurrent_positions: 2
+    position_tracking: detailed
+  risk_management:
+    max_concurrent_positions: 2
+    max_drawdown: 0.25
+    max_position_size: 0.06
+    position_size_scaling: confidence
+    stop_loss_pct: 0.01
+    take_profit_pct: 0.025
+  signal_processing:
+    confidence_threshold: 0.12
+    confidence_window_minutes: 10
+    cooldown_minutes: 1.0
+    max_signals_per_hour: 120
+    min_confidence_delta: 0.01
+    min_signal_strength: 0.12
+    signal_filters: []
+    use_advanced_filtering: true
+    volume_confirmation_required: false
+  signal_tracking:
+    signal_strength_features:
+    - price_momentum_sequence
+    - volume_momentum_sequence
+    - trend_strength
+    - momentum_persistence
+    - spread_compression_rate
+    - tick_momentum
+  slippage: 0.0002
+  start_date: '2025-07-15'
+  transaction_costs: 0.0005
+dynamic_metadata:
+  adjustments_applied:
+    confidence_threshold: "0.120 \u2192 0.120"
+    cooldown_minutes: "1.00 \u2192 1.00"
+    position_size: "0.060 \u2192 0.060"
+    stop_loss_pct: "0.010 \u2192 0.010"
+  base_strategy: Conservative
+  generation_timestamp: '2025-08-01T17:52:16.439898'
+  market_volatility: 0.015
+  volatility_multiplier: 1.0
+  volatility_regime: NORMAL
+hypothesis:
+  name: spread_compression_patterns_v4_enhanced
