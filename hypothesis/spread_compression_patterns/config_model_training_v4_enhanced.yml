@@ -4,7 +4,7 @@ hypothesis:
 # ENHANCED MODEL TRAINING WITH FORWARD-LOOKING TARGETS
 model_training:
     type: random_forest
-    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2020-01-01_2025-07-01.csv
+    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
     target_column: target_spread_compression_v4_directional  # NEW V4 forward-looking target
     exclude_basic_ohlc: true  # Focus on enhanced features only
     parameters:
