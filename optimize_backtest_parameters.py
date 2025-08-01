@@ -95,17 +95,23 @@ class BacktestOptimizer:
             output_lines = result.stdout.split('\n')
             for line in reversed(output_lines):  # Search from end
                 if "Final Results:" in line:
-                    # Extract return, trades, win rate
-                    parts = line.split('|')
-                    return_str = [p.strip() for p in parts if 'Return:' in p][0]
-                    trades_str = [p.strip() for p in parts if 'Trades:' in p][0]
-                    winrate_str = [p.strip() for p in parts if 'Win Rate:' in p][0]
+                    # Extract return, trades, win rate using more robust parsing
+                    import re
                     
-                    return {
-                        'return_pct': float(return_str.split('Return: ')[1].replace('%', '').replace(',', '')),
-                        'total_trades': int(trades_str.split('Trades: ')[1].replace(',', '')),
-                        'win_rate': float(winrate_str.split('Win Rate: ')[1].replace('%', ''))
-                    }
+                    # Extract return percentage
+                    return_match = re.search(r'Return:\s*([-+]?\d*\.?\d+)%', line)
+                    trades_match = re.search(r'Trades:\s*(\d+)', line)
+                    winrate_match = re.search(r'Win Rate:\s*([-+]?\d*\.?\d+)%', line)
+                    
+                    if return_match and trades_match and winrate_match:
+                        return {
+                            'return_pct': float(return_match.group(1)),
+                            'total_trades': int(trades_match.group(1)),
+                            'win_rate': float(winrate_match.group(1))
+                        }
+                    else:
+                        logger.warning(f"Could not parse line: {line}")
+                        continue
             
             logger.warning("Could not parse backtest results")
             return None
