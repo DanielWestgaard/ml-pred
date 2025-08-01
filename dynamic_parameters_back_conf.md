@@ -85,7 +85,7 @@ of manual testing!
 Would you like me to:
 - A) Implement the Conservative config with dynamic volatility adjustments?
 - B) Run a focused optimization around the Conservative parameters?
-- C) Update your flow_v4.md with these Round 3 results?
+- C) Update your `flow_v4.md` with these Round 3 results?
 
 You've achieved another breakthrough - data-driven parameter optimization that shows clear
 winners! 🎉
