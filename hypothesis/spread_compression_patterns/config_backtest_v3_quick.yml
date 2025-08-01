@@ -18,14 +18,14 @@ backtesting:
     loop_interval: 0
 
   signal_processing:
-    use_advanced_filtering: true   # ENABLE ADVANCED SIGNAL FILTERING!
-    confidence_threshold: 0.01    # Optimized for model's 0.49-0.53 confidence range
-    min_confidence_delta: 0.0      # Disable confidence delta - model too flat
-    cooldown_minutes: 2           # Focus on directional changes instead
-    max_signals_per_hour: 30        # Allow more signals for direction changes
-    confidence_window_minutes: 15  # Longer window to track direction patterns
+    use_advanced_filtering: false  # DISABLE - advanced filtering is blocking signals
+    confidence_threshold: 0.01     # Very low to capture all quality signals
+    min_confidence_delta: 0.0      # Disabled
+    cooldown_minutes: 0             # No cooldown - allow all signals
+    max_signals_per_hour: 1000      # No limit
+    confidence_window_minutes: 15   # Keep for analysis
     signal_filters: []
-    min_signal_strength: 0.48
+    min_signal_strength: 0.01       # Very low threshold
     volume_confirmation_required: false
 
   risk_management:
