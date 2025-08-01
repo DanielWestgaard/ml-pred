@@ -419,15 +419,29 @@ class TargetHypothesis(BaseProcessor):
             future_return_10min = self.df['close'].shift(-10) / self.df['close'] - 1 # 10 minutes ahead
             future_return_15min = self.df['close'].shift(-15) / self.df['close'] - 1 # 15 minutes ahead
             
-            # Calculate volatility-adjusted thresholds (adaptive to market conditions)
+            # Calculate realistic thresholds for GBPUSD trading
+            # GBPUSD typical price around 1.37, need minimum 3-5 pips movement for signals
+            base_price = self.df['close'].median()  # Current price level
+            min_pips = 4.0  # Minimum 4 pips for signal generation
+            pip_value = 0.0001  # 1 pip for GBPUSD
+            
+            # Base threshold: 4 pips converted to percentage
+            base_threshold = (min_pips * pip_value) / base_price
+            
+            # Adaptive component: use volatility but with much smaller multiplier
             price_volatility = self.df['close'].pct_change().rolling(100).std()
+            volatility_factor = 0.5  # Reduced from 2.0 to 0.5
+            adaptive_component = price_volatility * volatility_factor
             
-            # Dynamic thresholds based on recent volatility (prevents overfitting to specific periods)
-            vol_multiplier = 2.0  # 2 standard deviations
-            dynamic_threshold_up = price_volatility * vol_multiplier
-            dynamic_threshold_down = -price_volatility * vol_multiplier
+            # Final thresholds: base + adaptive (ensures minimum pip movement)
+            dynamic_threshold_up = base_threshold + adaptive_component
+            dynamic_threshold_down = -(base_threshold + adaptive_component)
             
-            logger.info(f"Dynamic threshold stats - Mean up: {dynamic_threshold_up.mean():.6f}, Mean down: {dynamic_threshold_down.mean():.6f}")
+            # Calculate equivalent pip values for logging
+            mean_threshold_pips = (dynamic_threshold_up.mean() * base_price) / pip_value
+            
+            logger.info(f"FIXED Dynamic thresholds - Mean up: {dynamic_threshold_up.mean():.6f} ({mean_threshold_pips:.1f} pips), Mean down: {dynamic_threshold_down.mean():.6f}")
+            logger.info(f"Base price: {base_price:.5f}, Base threshold: {base_threshold:.6f} ({min_pips} pips), Volatility factor: {volatility_factor}")
             
             # STEP 2: TEMPORAL MOMENTUM FEATURES (NO LOOKAHEAD)
             # These capture market direction and acceleration
@@ -486,20 +500,12 @@ class TargetHypothesis(BaseProcessor):
                 )
             )
             
-            # Quality filter: only generate signals when conditions are favorable
-            high_quality_signals = structure_quality & (
-                (momentum_bullish & (primary_target == 1)) |
-                (momentum_bearish & (primary_target == 2))
-            )
+            # SIMPLIFIED: Remove overly restrictive quality filter for now
+            # TODO: Add back incremental quality filters after basic model works
             
-            # Final target: combine forward-looking prediction with quality filter
-            quality_filtered_target = np.where(
-                high_quality_signals & (primary_target == 1), 1,  # High-quality BUY
-                np.where(
-                    high_quality_signals & (primary_target == 2), 2,  # High-quality SELL
-                    0  # HOLD (includes low-quality signals)
-                )
-            )
+            # For now, use primary target directly (price movement based only)
+            logger.info("🔧 SIMPLIFIED: Using basic price movement signals only (no quality filter)")
+            quality_filtered_target = primary_target
             
             # STEP 5: MULTI-HORIZON TARGETS FOR ENSEMBLE
             
@@ -561,12 +567,25 @@ class TargetHypothesis(BaseProcessor):
             future_samples_available = (~future_return_10min.isna()).sum()
             logger.info(f"Future return samples available: {future_samples_available}/{total_samples}")
             
-            if signal_rate > 5 and signal_rate < 25:
-                logger.info(f"✅ GOOD: Signal rate {signal_rate:.1f}% in optimal range (5-25%)")
+            # ENHANCED VALIDATION WITH EARLY STOPPING
+            if signal_rate < 0.1:
+                logger.error(f"🚨 CRITICAL: Signal rate {signal_rate:.1f}% too low - model will fail!")
+                logger.error("💡 SOLUTION: Reduce threshold multipliers or increase pip thresholds")
+                raise ValueError(f"Target generation failed: signal rate {signal_rate:.1f}% < 0.1% minimum")
             elif signal_rate < 5:
-                logger.warning(f"⚠️ Low signal rate {signal_rate:.1f}% - consider loosening thresholds")
+                logger.warning(f"⚠️  LOW: Signal rate {signal_rate:.1f}% below optimal (5-25%)")
+                logger.warning("💡 Consider reducing thresholds for better signal generation")
+            elif signal_rate > 25:
+                logger.warning(f"⚠️  HIGH: Signal rate {signal_rate:.1f}% above optimal (5-25%)")
+                logger.warning("💡 Consider increasing thresholds to reduce noise")
             else:
-                logger.warning(f"⚠️ High signal rate {signal_rate:.1f}% - consider tightening thresholds")
+                logger.info(f"✅ OPTIMAL: Signal rate {signal_rate:.1f}% in target range (5-25%)")
+            
+            # Additional validation checks
+            min_class_samples = min(target_dist.get(1, 0), target_dist.get(2, 0))
+            if min_class_samples < 1000:
+                logger.warning(f"⚠️  LOW SAMPLES: Minimum class has only {min_class_samples} samples")
+                logger.warning("💡 Consider longer time periods or looser thresholds for robust training")
             
             # Balance check
             if buy_pct > 0 and sell_pct > 0:

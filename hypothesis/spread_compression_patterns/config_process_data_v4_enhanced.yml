@@ -3,44 +3,22 @@ hypothesis:
 
 # ENHANCED DATA PIPELINE WITH FORWARD-LOOKING TARGETS AND TEMPORAL FEATURES
 data_pipeline:
-  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2025-07-02_2025-07-31.csv # storage/data/capital_com/GBPUSD/raw/1m/2023-01-01_2025-07-01.csv # 
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2023-01-01_2025-07-01.csv  # FULL training dataset restored 
   spread_focused: true
-  selected_features:  # Enhanced feature set with temporal and microstructure features
+  selected_features:  # SIMPLIFIED: Core proven features only (avoid overfitting)
     [
-      # Core market structure features (proven predictive power)
+      # TOP 5 CORE FEATURES (proven predictive power from previous iterations)
       'microstructure_momentum_fusion',
       'depth_stability', 
       'volume_ratio',
       'institutional_footprint',
-      'top_predictor_interaction',
-      
-      # NEW: Temporal and sequential features (CRITICAL for prediction)
-      'price_momentum_sequence',
-      'volume_momentum_sequence', 
-      'volatility_momentum_sequence',
-      'price_acceleration',
-      'volume_acceleration',
-      'momentum_divergence',
-      'volume_price_sync',
-      'trend_strength',
-      'momentum_persistence',
-      'reversal_signals',
-      
-      # NEW: Market microstructure features (HIGH PRIORITY)
       'spread_compression_rate',
-      'book_imbalance_proxy',
-      'tick_momentum',
-      'microstructure_efficiency',
-      'liquidity_flow',
-      'price_impact',
-      'order_flow_imbalance',
-      'market_pressure',
       
-      # Temporal features from target generation (NO LOOKAHEAD)
-      'price_momentum_1min',
-      'price_momentum_3min', 
+      # ESSENTIAL TEMPORAL FEATURES (3 most important)
       'price_momentum_5min',
       'volume_momentum',
-      'volume_acceleration',
       'volatility_trend'
+      
+      # NOTE: Removed 19+ experimental features that caused overfitting
+      # Will add back incrementally after validating core model works
     ]

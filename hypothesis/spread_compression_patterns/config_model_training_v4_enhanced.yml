@@ -8,26 +8,26 @@ model_training:
     target_column: target_spread_compression_v4_directional  # NEW V4 forward-looking target
     exclude_basic_ohlc: true  # Focus on enhanced features only
     parameters:
-        n_estimators: 500                  # Increased for better ensemble learning
-        max_depth: 12                      # Slightly deeper for complex patterns
-        min_samples_split: 2               # Lower for capturing minority patterns
-        min_samples_leaf: 1                # Minimum for maximum pattern detection
+        n_estimators: 100                  # REDUCED from 500 to prevent overfitting
+        max_depth: 6                       # REDUCED from 12 to limit complexity
+        min_samples_split: 10              # INCREASED from 2 to prevent overfitting
+        min_samples_leaf: 5                # INCREASED from 1 to ensure robust splits
         class_weight: balanced             # Handle class imbalance
         bootstrap: true
         oob_score: true
         random_state: 42
         n_jobs: -1
-        max_features: sqrt                 # Good for many features
+        max_features: 0.3                  # REDUCED from sqrt to limit feature interaction
         
-        # Enhanced parameters for temporal pattern learning
-        criterion: gini                    # Good for classification
-        min_impurity_decrease: 0.0001      # Small threshold for pattern detection
-        max_leaf_nodes: null               # No limit for complex patterns
+        # Simplified parameters to prevent overfitting
+        criterion: gini                    # Keep gini for classification
+        min_impurity_decrease: 0.001       # INCREASED from 0.0001 to require stronger splits
+        max_leaf_nodes: 500                # LIMIT leaf nodes to prevent memorization
         
-        # Advanced RF parameters for temporal data
+        # Conservative RF parameters
         warm_start: false
-        ccp_alpha: 0.0                     # No cost complexity pruning
-        max_samples: null                  # Use all samples
+        ccp_alpha: 0.01                    # ADDED cost complexity pruning
+        max_samples: 0.8                   # LIMIT to 80% of samples per tree
 
 # Enhanced validation for temporal data
 walk_forward:
