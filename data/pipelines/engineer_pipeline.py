@@ -1,11 +1,5 @@
-import inspect
 import os
-import sys
-import pandas as pd
-
 from utils import data_utils
-from utils import shared_utils
-import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
@@ -70,7 +64,7 @@ class EngineeringPipeline():
         logger.info("---------- Running Data Pipeline ----------")
         
         # Monitor initial memory state
-        initial_memory = memory_monitor.check_and_warn("at pipeline start")
+        memory_monitor.check_and_warn("at pipeline start")
         
         # Clean the data
         with PerformanceContext("Data Cleaning"):
@@ -114,15 +108,20 @@ class EngineeringPipeline():
                     with PerformanceContext("Feature Importance Analysis"):
                         self._run_feature_importance_analysis()
                         memory_monitor.safe_cleanup()  # Cleanup after importance analysis
-        else:
-            logger.debug("User did not provide any specific features to be generated - generating all features.")
-            self.skip_selection = True
-            logger.debug(f"Also, Skip Selection is (currently set to ${self.skip_selection})")
-            self.df = self.feature_generator.generate_all()
-            
-            # Feature importance analysis (after feature generation but before transformation)
-            if self.analyze_feature_importance:
-                self._run_feature_importance_analysis()
+            else:
+                logger.debug("User did not provide any specific features to be generated - generating all features.")
+                self.skip_selection = True
+                logger.debug(f"Also, Skip Selection is (currently set to ${self.skip_selection})")
+                self.df = self.feature_generator.generate_all()
+                
+                # Clean up after feature generation
+                memory_monitor.safe_cleanup()
+                
+                # Feature importance analysis (after feature generation but before transformation)
+                if self.analyze_feature_importance:
+                    with PerformanceContext("Feature Importance Analysis"):
+                        self._run_feature_importance_analysis()
+                        memory_monitor.safe_cleanup()  # Cleanup after importance analysis
         
         # Transformation, scaling, handle missing values, etc. of newly generated features
         self.transformation = FeatureTransformer(self.df)
