@@ -1,0 +1,24 @@
+hypothesis:
+  name: spread_compression_patterns_v4
+
+# ENHANCED DATA PIPELINE WITH FORWARD-LOOKING TARGETS AND TEMPORAL FEATURES
+data_pipeline:
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2025-07-02_2025-07-31.csv # storage/data/capital_com/GBPUSD/raw/1m/2023-01-01_2025-07-01.csv  # FULL training dataset restored 
+  spread_focused: true
+  selected_features:  # SIMPLIFIED: Core proven features only (avoid overfitting)
+    [
+      # TOP 5 CORE FEATURES (proven predictive power from previous iterations)
+      'microstructure_momentum_fusion',
+      'depth_stability', 
+      'volume_ratio',
+      'institutional_footprint',
+      'spread_compression_rate',
+      
+      # ESSENTIAL TEMPORAL FEATURES (3 most important)
+      'price_momentum_5min',
+      'volume_momentum',
+      'volatility_trend'
+      
+      # NOTE: Removed 19+ experimental features that caused overfitting
+      # Will add back incrementally after validating core model works
+    ]

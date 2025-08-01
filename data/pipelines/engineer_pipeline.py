@@ -1,11 +1,5 @@
-import inspect
 import os
-import sys
-import pandas as pd
-
 from utils import data_utils
-from utils import shared_utils
-import config.config as config
 from data.processing.cleaning import DataCleaner
 from data.processing.validation import DataValidator
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
@@ -14,6 +8,7 @@ from data.features.selection import FeatureSelector
 from data.features.target_hypothesis import TargetHypothesis
 import utils.hypothesis.config_loader as config_loader
 from utils.logging_utils import get_logger
+from utils.performance_utils import memory_monitor, PerformanceContext
 
 logger = get_logger()
 
@@ -68,47 +63,65 @@ class EngineeringPipeline():
         """
         logger.info("---------- Running Data Pipeline ----------")
         
+        # Monitor initial memory state
+        memory_monitor.check_and_warn("at pipeline start")
+        
         # Clean the data
-        self.df = self.cleaner.run()
+        with PerformanceContext("Data Cleaning"):
+            self.df = self.cleaner.run()
+            memory_monitor.safe_cleanup()  # Cleanup after cleaning
         
         # Validate
-        self.validator = DataValidator(self.df)
-        self.validator_results = self.validator.run()
-        self.df = self.validator_results["validated_data"]
-        # logger results
-        data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
+        with PerformanceContext("Data Validation"):
+            self.validator = DataValidator(self.df)
+            self.validator_results = self.validator.run()
+            self.df = self.validator_results["validated_data"]
+            # logger results
+            data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
+            memory_monitor.safe_cleanup()  # Cleanup after validation
         
         # Feature Generation
-        self.feature_generator = ModelAwareFeatureGenerator(self.df)
-        
-        if self.selected_features is not None:
-            logger.debug(f"User provided specific features to be generated: {self.selected_features}")
-            self.skip_selection = True
+        with PerformanceContext("Feature Generation"):
+            self.feature_generator = ModelAwareFeatureGenerator(self.df)
             
-            # Generate specific features using list format
-            if isinstance(self.selected_features, list):
-                logger.info(f"Generating specific features: {self.selected_features}")
-                self.df = self.feature_generator.generate_selected(self.selected_features)
+            if self.selected_features is not None:
+                logger.debug(f"User provided specific features to be generated: {self.selected_features}")
+                self.skip_selection = True
+                
+                # Generate specific features using list format
+                if isinstance(self.selected_features, list):
+                    logger.info(f"Generating specific features: {self.selected_features}")
+                    self.df = self.feature_generator.generate_selected(self.selected_features)
+                else:
+                    logger.warning("selected_features must be a list of feature names, generating all features")
+                    self.df = self.feature_generator.generate_all()
+                
+                # Clean up after feature generation (most memory-intensive step)
+                memory_monitor.safe_cleanup()
+                
+                # Also change target to the hypothesis
+                self.hypo = TargetHypothesis(self.df, self.hypothesis_name or "session_based_tod_anomalies_X")
+                self.df = self.hypo.run()
+                
+                # Feature importance analysis (after feature generation but before transformation)
+                if self.analyze_feature_importance:
+                    with PerformanceContext("Feature Importance Analysis"):
+                        self._run_feature_importance_analysis()
+                        memory_monitor.safe_cleanup()  # Cleanup after importance analysis
             else:
-                logger.warning("selected_features must be a list of feature names, generating all features")
+                logger.debug("User did not provide any specific features to be generated - generating all features.")
+                self.skip_selection = True
+                logger.debug(f"Also, Skip Selection is (currently set to ${self.skip_selection})")
                 self.df = self.feature_generator.generate_all()
-            
-            # Also change target to the hypothesis
-            self.hypo = TargetHypothesis(self.df, self.hypothesis_name or "session_based_tod_anomalies_X")
-            self.df = self.hypo.run()
-            
-            # Feature importance analysis (after feature generation but before transformation)
-            if self.analyze_feature_importance:
-                self._run_feature_importance_analysis()
-        else:
-            logger.debug("User did not provide any specific features to be generated - generating all features.")
-            self.skip_selection = True
-            logger.debug(f"Also, Skip Selection is (currently set to ${self.skip_selection})")
-            self.df = self.feature_generator.generate_all()
-            
-            # Feature importance analysis (after feature generation but before transformation)
-            if self.analyze_feature_importance:
-                self._run_feature_importance_analysis()
+                
+                # Clean up after feature generation
+                memory_monitor.safe_cleanup()
+                
+                # Feature importance analysis (after feature generation but before transformation)
+                if self.analyze_feature_importance:
+                    with PerformanceContext("Feature Importance Analysis"):
+                        self._run_feature_importance_analysis()
+                        memory_monitor.safe_cleanup()  # Cleanup after importance analysis
         
         # Transformation, scaling, handle missing values, etc. of newly generated features
         self.transformation = FeatureTransformer(self.df)

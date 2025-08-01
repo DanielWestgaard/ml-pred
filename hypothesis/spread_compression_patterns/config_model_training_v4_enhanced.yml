@@ -1,0 +1,37 @@
+hypothesis:
+  name: spread_compression_patterns_v4_enhanced
+
+# ENHANCED MODEL TRAINING WITH FORWARD-LOOKING TARGETS
+model_training:
+    type: random_forest
+    processed_data: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
+    target_column: target_spread_compression_v4_directional  # NEW V4 forward-looking target
+    exclude_basic_ohlc: true  # Focus on enhanced features only
+    parameters:
+        n_estimators: 100                  # REDUCED from 500 to prevent overfitting
+        max_depth: 6                       # REDUCED from 12 to limit complexity
+        min_samples_split: 10              # INCREASED from 2 to prevent overfitting
+        min_samples_leaf: 5                # INCREASED from 1 to ensure robust splits
+        class_weight: balanced             # Handle class imbalance
+        bootstrap: true
+        oob_score: true
+        random_state: 42
+        n_jobs: -1
+        max_features: 0.3                  # REDUCED from sqrt to limit feature interaction
+        
+        # Simplified parameters to prevent overfitting
+        criterion: gini                    # Keep gini for classification
+        min_impurity_decrease: 0.001       # INCREASED from 0.0001 to require stronger splits
+        max_leaf_nodes: 500                # LIMIT leaf nodes to prevent memorization
+        
+        # Conservative RF parameters
+        warm_start: false
+        ccp_alpha: 0.01                    # ADDED cost complexity pruning
+        max_samples: 0.8                   # LIMIT to 80% of samples per tree
+
+# Enhanced validation for temporal data
+walk_forward:
+    initial_training_months: 6             # Longer initial training for stability
+    validation_period_months: 1
+    step_forward_months: 1
+    min_training_samples: 100000           # More samples for complex patterns

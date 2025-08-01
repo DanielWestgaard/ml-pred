@@ -18,6 +18,7 @@ from pathlib import Path
 from .feature_registry import FeatureRegistry, FeatureDefinition, feature_generator, AutoRegisterMeta
 from utils import data_utils
 from utils.logging_utils import get_logger
+from utils.performance_utils import memory_monitor, PerformanceContext, fast_linear_trend, fast_momentum_consistency
 
 logger = get_logger()
 
@@ -115,6 +116,10 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             DataFrame with generated features
         """
         logger.info(f"Generating {len(feature_names)} selected features...")
+        
+        # Monitor memory usage for large datasets
+        dataset_size = len(self.df)
+        memory_monitor.check_and_warn(f"before generating {len(feature_names)} features on {dataset_size:,} rows")
         
         # **FEATURE EXPANSION**: Handle logical feature groups in config
         # Some config entries like "bid_ask_spread_features" refer to logical groups, not individual features
@@ -718,23 +723,37 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         self.df['session_atr_std'] = self.df['session_atr_std'].fillna(global_atr_std)
     
     @feature_generator(
-        output_features=['future_atr'],
+        output_features=['expected_atr'],
         dependencies=['average_true_range'],
-        description="Forward-looking ATR values",
+        description="Expected ATR based on historical patterns (NO LOOKAHEAD)",
         category="volatility"
     )
-    def future_atr_features(self):
-        """Calculate forward-looking ATR features"""
-        # Calculate future ATR by shifting current ATR forward
-        # This represents the ATR that will be realized in the future
-        lookforward_periods = 5  # Look 5 periods ahead
+    def expected_atr_features(self):
+        """
+        FIXED: Calculate expected ATR without lookahead bias
         
-        # Shift ATR backward to get "future" values from current perspective
-        self.df['future_atr'] = self.df['atr'].shift(-lookforward_periods)
+        Instead of looking into the future, predict future volatility based on:
+        - Historical ATR trends
+        - Recent volatility patterns
+        - Mean reversion patterns
+        """
+        # Historical ATR trend (slope of recent ATR values) - OPTIMIZED
+        # Using fast_linear_trend which is mathematically equivalent to np.polyfit but much faster
+        atr_trend = fast_linear_trend(self.df['atr'], window=10)
         
-        # For the last few rows where we don't have future data,
-        # fill with the current ATR as a reasonable approximation
-        self.df['future_atr'] = self.df['future_atr'].fillna(self.df['atr'])
+        # Mean reversion component (ATR tends to revert to long-term mean)
+        long_term_atr = self.df['atr'].rolling(50).mean()
+        atr_deviation = self.df['atr'] - long_term_atr
+        
+        # Expected ATR: current ATR + trend - mean reversion effect
+        mean_reversion_factor = 0.3  # 30% reversion toward mean
+        trend_continuation_factor = 0.7  # 70% trend continuation
+        
+        self.df['expected_atr'] = (
+            self.df['atr'] + 
+            atr_trend * trend_continuation_factor -
+            atr_deviation * mean_reversion_factor
+        ).clip(lower=self.df['atr'].min())  # ATR cannot be negative
     
     # ==========================================================================
     # MIGRATED FEATURES FROM LEGACY GENERATION.PY
@@ -2484,6 +2503,331 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         self.df['microstructure_momentum_fusion'] = np.clip(self.df['microstructure_momentum_fusion'], -2, 2)
         
         logger.debug("Enhanced feature interactions generated successfully")
+        
+    @feature_generator(
+        output_features=[
+            'price_momentum_sequence', 'volume_momentum_sequence', 'volatility_momentum_sequence',
+            'price_acceleration', 'volume_acceleration', 'volatility_acceleration',
+            'momentum_divergence', 'volume_price_sync', 'trend_strength',
+            'momentum_persistence', 'reversal_signals'
+        ],
+        dependencies=['close', 'volume', 'high', 'low'],
+        description="Advanced temporal and sequential features for predictive modeling",
+        category="temporal_sequences"
+    )
+    def enhanced_temporal_sequential_features(self):
+        """
+        CRITICAL ADDITION: Temporal and sequential features for predictive power
+        
+        Features that capture market DIRECTION and MOMENTUM:
+        - Sequential momentum across multiple timeframes
+        - Acceleration and deceleration patterns
+        - Momentum divergences and confirmations
+        - Trend strength and persistence
+        - Early reversal signals
+        
+        NO LOOKAHEAD BIAS - All features use only past/current data
+        """
+        try:
+            logger.info("Generating advanced temporal and sequential features...")
+            
+            # Ensure we have required OHLCV data
+            required_cols = ['close', 'volume', 'high', 'low']
+            missing_cols = [col for col in required_cols if col not in self.df.columns]
+            if missing_cols:
+                logger.error(f"Missing required OHLCV columns: {missing_cols}")
+                return
+            
+            # SECTION 1: MULTI-TIMEFRAME MOMENTUM SEQUENCES
+            logger.debug("Creating momentum sequences...")
+            
+            # Price momentum across different periods (NO LOOKAHEAD)
+            momentum_1min = self.df['close'].pct_change(1)
+            momentum_3min = self.df['close'].pct_change(3)
+            momentum_5min = self.df['close'].pct_change(5)
+            momentum_10min = self.df['close'].pct_change(10)
+            
+            # Composite momentum sequence (weighted by recency)
+            self.df['price_momentum_sequence'] = (
+                momentum_1min * 0.4 +      # Most recent (40% weight)
+                momentum_3min * 0.3 +      # Short-term (30% weight)
+                momentum_5min * 0.2 +      # Medium-term (20% weight)
+                momentum_10min * 0.1       # Longer-term (10% weight)
+            )
+            
+            # Volume momentum sequence
+            volume_momentum_1 = self.df['volume'].pct_change(1)
+            volume_momentum_3 = self.df['volume'].pct_change(3)
+            volume_momentum_5 = self.df['volume'].pct_change(5)
+            
+            self.df['volume_momentum_sequence'] = (
+                volume_momentum_1 * 0.5 +
+                volume_momentum_3 * 0.3 +
+                volume_momentum_5 * 0.2
+            )
+            
+            # Volatility momentum (range expansion/contraction)
+            current_range = self.df['high'] - self.df['low']
+            volatility_momentum = current_range.pct_change(3)
+            # OPTIMIZED: Using fast_linear_trend (mathematically equivalent to np.polyfit)
+            volatility_trend = fast_linear_trend(current_range, window=5)
+            
+            self.df['volatility_momentum_sequence'] = (
+                volatility_momentum * 0.6 + volatility_trend * 0.4
+            )
+            
+            # SECTION 2: ACCELERATION PATTERNS
+            logger.debug("Creating acceleration features...")
+            
+            # Price acceleration (change in momentum - second derivative)
+            self.df['price_acceleration'] = momentum_1min.diff()
+            
+            # Volume acceleration  
+            self.df['volume_acceleration'] = volume_momentum_1.diff()
+            
+            # Volatility acceleration
+            self.df['volatility_acceleration'] = volatility_momentum.diff()
+            
+            # SECTION 3: MOMENTUM DIVERGENCES AND CONFIRMATIONS
+            logger.debug("Creating momentum divergence signals...")
+            
+            # Price-Volume divergence detection
+            price_direction = np.sign(momentum_3min)
+            volume_direction = np.sign(volume_momentum_3)
+            
+            # Momentum divergence: price and volume moving in opposite directions
+            self.df['momentum_divergence'] = np.where(
+                (price_direction != volume_direction) & (abs(momentum_3min) > 0.0001),
+                abs(momentum_3min) * 2,  # Amplify divergence signal
+                0
+            )
+            
+            # Volume-Price synchronization (confirmation)
+            self.df['volume_price_sync'] = np.where(
+                (price_direction == volume_direction) & (abs(momentum_3min) > 0.0001),
+                abs(momentum_3min) * abs(volume_momentum_3),  # Multiply confirmations
+                0
+            )
+            
+            # SECTION 4: TREND STRENGTH AND PERSISTENCE
+            logger.debug("Creating trend strength features...")
+            
+            # Trend strength using multiple timeframe alignment
+            short_trend = np.sign(momentum_3min)
+            medium_trend = np.sign(momentum_5min)  
+            long_trend = np.sign(momentum_10min)
+            
+            # Trend alignment score
+            trend_alignment = (short_trend == medium_trend) & (medium_trend == long_trend)
+            trend_strength_raw = abs(momentum_3min) + abs(momentum_5min) + abs(momentum_10min)
+            
+            self.df['trend_strength'] = np.where(
+                trend_alignment,
+                trend_strength_raw * 2,  # Amplify aligned trends
+                trend_strength_raw * 0.5  # Reduce conflicting trends
+            )
+            
+            # Momentum persistence (consistency over time) - OPTIMIZED
+            # Using fast_momentum_consistency (equivalent calculation but faster)
+            momentum_consistency = fast_momentum_consistency(momentum_3min, window=5)
+            
+            self.df['momentum_persistence'] = momentum_consistency * abs(momentum_3min)
+            
+            # SECTION 5: EARLY REVERSAL SIGNALS
+            logger.debug("Creating reversal signal features...")
+            
+            # Price exhaustion patterns
+            price_extreme = abs(momentum_1min) > abs(momentum_1min).rolling(20).quantile(0.9)
+            volume_confirmation = self.df['volume'] > self.df['volume'].rolling(10).mean()
+            
+            # Potential reversal: extreme price move without volume confirmation
+            potential_reversal = price_extreme & ~volume_confirmation
+            
+            # Momentum deceleration
+            momentum_weakening = (
+                (abs(momentum_1min) < abs(momentum_3min)) &  # Short-term weakening
+                (abs(momentum_3min) < abs(momentum_5min))     # Confirmed by medium-term
+            )
+            
+            self.df['reversal_signals'] = np.where(
+                potential_reversal | momentum_weakening,
+                abs(momentum_1min),  # Strength of potential reversal
+                0
+            )
+            
+            # SECTION 6: FEATURE VALIDATION AND CLIPPING
+            logger.debug("Validating and clipping temporal features...")
+            
+            # Clip extreme values to prevent outliers
+            temporal_features = [
+                'price_momentum_sequence', 'volume_momentum_sequence', 'volatility_momentum_sequence',
+                'price_acceleration', 'volume_acceleration', 'volatility_acceleration',
+                'momentum_divergence', 'volume_price_sync', 'trend_strength',
+                'momentum_persistence', 'reversal_signals'
+            ]
+            
+            for feature in temporal_features:
+                if feature in self.df.columns:
+                    # Clip to reasonable ranges based on feature type
+                    if 'momentum' in feature or 'acceleration' in feature:
+                        self.df[feature] = np.clip(self.df[feature], -0.1, 0.1)  # +/-10%
+                    elif 'strength' in feature or 'sync' in feature:
+                        self.df[feature] = np.clip(self.df[feature], 0, 0.05)    # 0-5%
+                    elif 'divergence' in feature or 'reversal' in feature:
+                        self.df[feature] = np.clip(self.df[feature], 0, 0.02)    # 0-2%
+                    else:
+                        self.df[feature] = np.clip(self.df[feature], -1, 1)      # Generic range
+            
+            # Handle NaN values
+            for feature in temporal_features:
+                if feature in self.df.columns:
+                    self.df[feature] = self.df[feature].fillna(0)
+            
+            logger.info("✅ Advanced temporal and sequential features generated successfully!")
+            logger.info(f"✅ Added {len(temporal_features)} new predictive features")
+            logger.info("🎯 Model now has directional momentum and trend information!")
+            
+        except Exception as e:
+            logger.error(f"Failed to generate temporal sequential features: {e}")
+            import traceback
+            traceback.print_exc()
+
+    @feature_generator(
+        output_features=[
+            'spread_compression_rate', 'book_imbalance_proxy', 'tick_momentum',
+            'microstructure_efficiency', 'liquidity_flow', 'price_impact',
+            'order_flow_imbalance', 'market_pressure'
+        ],
+        dependencies=['close', 'volume', 'high', 'low', 'open'],
+        description="Market microstructure features for high-frequency predictive signals",
+        category="microstructure"
+    )
+    def enhanced_market_microstructure_features(self):
+        """
+        HIGH PRIORITY: Market microstructure features for fine-grained prediction
+        
+        Features that capture:
+        - Bid-ask spread dynamics (simulated from OHLC)
+        - Order book pressure (proxied from volume/price patterns)
+        - Tick-level momentum
+        - Market efficiency and liquidity conditions
+        - Price impact and order flow
+        
+        NO LOOKAHEAD BIAS - Uses only historical data
+        """
+        try:
+            logger.info("Generating advanced market microstructure features...")
+            
+            # Ensure required OHLCV data
+            required_cols = ['close', 'volume', 'high', 'low', 'open']
+            missing_cols = [col for col in required_cols if col not in self.df.columns]
+            if missing_cols:
+                logger.warning(f"Missing columns for microstructure: {missing_cols}")
+                # Fill missing columns with reasonable defaults
+                if 'open' not in self.df.columns:
+                    self.df['open'] = self.df['close'].shift(1).fillna(self.df['close'])
+            
+            # SECTION 1: SPREAD AND LIQUIDITY DYNAMICS
+            logger.debug("Creating spread and liquidity features...")
+            
+            # Simulated spread (high-low as proxy for bid-ask spread)
+            current_spread = self.df['high'] - self.df['low']
+            avg_spread = current_spread.rolling(20).mean()
+            
+            # Spread compression rate (key predictor)
+            self.df['spread_compression_rate'] = (current_spread - avg_spread) / avg_spread
+            
+            # Liquidity flow (volume normalized by spread)
+            self.df['liquidity_flow'] = np.where(
+                current_spread > 0,
+                self.df['volume'] / current_spread,
+                self.df['volume']  # Fallback if spread is zero
+            )
+            
+            # SECTION 2: ORDER BOOK IMBALANCE (PROXIED)
+            logger.debug("Creating order book imbalance proxies...")
+            
+            # Price position within the bar (proxy for bid-ask pressure)
+            bar_position = (self.df['close'] - self.df['low']) / (self.df['high'] - self.df['low'])
+            bar_position = bar_position.fillna(0.5)  # Neutral if no range
+            
+            # Book imbalance proxy: deviation from mid-point
+            self.df['book_imbalance_proxy'] = (bar_position - 0.5) * self.df['volume']
+            
+            # Order flow imbalance (cumulative volume-weighted price position)
+            volume_weighted_position = bar_position * self.df['volume']
+            self.df['order_flow_imbalance'] = volume_weighted_position.rolling(10).sum()
+            
+            # SECTION 3: TICK-LEVEL MOMENTUM
+            logger.debug("Creating tick momentum features...")
+            
+            # Tick direction (up/down/unchanged)
+            price_change = self.df['close'].diff()
+            tick_direction = np.sign(price_change)
+            
+            # Tick momentum (sequential tick direction) - convert to Series first
+            tick_direction_series = pd.Series(tick_direction, index=self.df.index)
+            self.df['tick_momentum'] = tick_direction_series.rolling(5).sum()
+            
+            # Price impact per unit volume
+            volume_nonzero = np.where(self.df['volume'] > 0, self.df['volume'], 1)
+            self.df['price_impact'] = abs(price_change) / volume_nonzero
+            
+            # SECTION 4: MARKET EFFICIENCY MEASURES
+            logger.debug("Creating market efficiency features...")
+            
+            # Price efficiency: how close is close to VWAP
+            typical_price = (self.df['high'] + self.df['low'] + self.df['close']) / 3
+            volume_weighted_avg = (typical_price * self.df['volume']).rolling(10).sum() / self.df['volume'].rolling(10).sum()
+            
+            self.df['microstructure_efficiency'] = abs(self.df['close'] - volume_weighted_avg) / self.df['close']
+            
+            # Market pressure (net volume-weighted direction)
+            volume_up = np.where(price_change > 0, self.df['volume'], 0)
+            volume_down = np.where(price_change < 0, self.df['volume'], 0)
+            
+            net_volume = volume_up - volume_down
+            # Convert to pandas Series for rolling operations
+            net_volume_series = pd.Series(net_volume, index=self.df.index)
+            self.df['market_pressure'] = net_volume_series.rolling(10).sum()
+            
+            # SECTION 5: FEATURE VALIDATION AND NORMALIZATION
+            logger.debug("Validating microstructure features...")
+            
+            microstructure_features = [
+                'spread_compression_rate', 'book_imbalance_proxy', 'tick_momentum',
+                'microstructure_efficiency', 'liquidity_flow', 'price_impact',
+                'order_flow_imbalance', 'market_pressure'
+            ]
+            
+            # Normalize and clip features
+            for feature in microstructure_features:
+                if feature in self.df.columns:
+                    # Handle infinities and extreme values
+                    self.df[feature] = self.df[feature].replace([np.inf, -np.inf], np.nan)
+                    self.df[feature] = self.df[feature].fillna(0)
+                    
+                    # Clip to reasonable ranges
+                    if 'rate' in feature or 'efficiency' in feature:
+                        self.df[feature] = np.clip(self.df[feature], -2, 2)
+                    elif 'momentum' in feature or 'pressure' in feature:
+                        self.df[feature] = np.clip(self.df[feature], -1000, 1000)
+                    elif 'imbalance' in feature or 'flow' in feature:
+                        percentile_99 = self.df[feature].quantile(0.99)
+                        percentile_1 = self.df[feature].quantile(0.01)
+                        self.df[feature] = np.clip(self.df[feature], percentile_1, percentile_99)
+                    else:
+                        self.df[feature] = np.clip(self.df[feature], -5, 5)
+            
+            logger.info("✅ Advanced market microstructure features generated successfully!")
+            logger.info(f"✅ Added {len(microstructure_features)} microstructure features")
+            logger.info("🎯 Model now has fine-grained market structure information!")
+            
+        except Exception as e:
+            logger.error(f"Failed to generate microstructure features: {e}")
+            import traceback
+            traceback.print_exc()
+            
         if 'volume' not in self.df.columns:
             logger.error("Volume column missing from OHLCV data")
             self.df['volume'] = 0  # Fallback

@@ -1,0 +1,282 @@
+01-08-2025 15:15:06 - mixed                                   :149  - INFO     - Logging system initialized. Environment: development, Log category: data (Data pipeline and feature engineering)
+01-08-2025 15:15:08 - __main__                                :142  - INFO     - User using pure hypothesis flow!
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/spread_compression_patterns/config_process_data_v4_enhanced.yml
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :189  - INFO     - Loaded hypothesis: spread_compression_patterns_v4
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.raw_source: storage/data/capital_com/GBPUSD/raw/1m/2025-07-02_2025-07-31.csv
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.spread_focused: True
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.selected_features: ['microstructure_momentum_fusion', 'depth_stability', 'volume_ratio', 'institutional_footprint', 'spread_compression_rate', 'price_momentum_5min', 'volume_momentum', 'volatility_trend']
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'model_training' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'evaluate_model' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'strategy' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'backtesting' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'walk_forward' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :208  - DEBUG    - Extracted selected_features as 'features': ['microstructure_momentum_fusion', 'depth_stability', 'volume_ratio', 'institutional_footprint', 'spread_compression_rate', 'price_momentum_5min', 'volume_momentum', 'volatility_trend']
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :213  - DEBUG    - Extracted spread_focused setting: True
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :221  - INFO     - Successfully loaded config sections: ['data_pipeline']
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from hypothesis/spread_compression_patterns/config_process_data_v4_enhanced.yml
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :189  - INFO     - Loaded hypothesis: spread_compression_patterns_v4
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.raw_source: storage/data/capital_com/GBPUSD/raw/1m/2025-07-02_2025-07-31.csv
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.spread_focused: True
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.selected_features: ['microstructure_momentum_fusion', 'depth_stability', 'volume_ratio', 'institutional_footprint', 'spread_compression_rate', 'price_momentum_5min', 'volume_momentum', 'volatility_trend']
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'model_training' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'evaluate_model' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'strategy' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'backtesting' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'walk_forward' not found in configuration
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :208  - DEBUG    - Extracted selected_features as 'features': ['microstructure_momentum_fusion', 'depth_stability', 'volume_ratio', 'institutional_footprint', 'spread_compression_rate', 'price_momentum_5min', 'volume_momentum', 'volatility_trend']
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :213  - DEBUG    - Extracted spread_focused setting: True
+01-08-2025 15:15:08 - utils.hypothesis.config_loader          :221  - INFO     - Successfully loaded config sections: ['data_pipeline']
+01-08-2025 15:15:08 - utils.data_utils                        :250  - DEBUG    - Loading storage/data/capital_com/GBPUSD/raw/1m/2025-07-02_2025-07-31.csv
+01-08-2025 15:15:08 - data.pipelines.engineer_pipeline        :49   - DEBUG    - Engineering Pipeline - Successfully loaded data!
+01-08-2025 15:15:08 - utils.data_utils                        :250  - DEBUG    - Loading                       Date     Open     High      Low  ...  spread_close  spread_tight  spread_wide  spread_avg
+0      2025-07-02T00:00:00  1.37460  1.37474  1.37447  ...       0.00013      -0.00015      0.00041     0.00013
+1      2025-07-02T00:01:00  1.37468  1.37470  1.37443  ...       0.00013      -0.00014      0.00040     0.00013
+2      2025-07-02T00:02:00  1.37450  1.37462  1.37437  ...       0.00013      -0.00013      0.00039     0.00013
+3      2025-07-02T00:03:00  1.37438  1.37451  1.37438  ...       0.00013       0.00001      0.00025     0.00013
+4      2025-07-02T00:04:00  1.37440  1.37451  1.37438  ...       0.00013       0.00001      0.00025     0.00013
+...                    ...      ...      ...      ...  ...           ...           ...          ...         ...
+30101  2025-07-31T00:56:00  1.32503  1.32509  1.32500  ...       0.00013       0.00004      0.00022     0.00013
+30102  2025-07-31T00:57:00  1.32510  1.32516  1.32509  ...       0.00013       0.00005      0.00021     0.00013
+30103  2025-07-31T00:58:00  1.32517  1.32519  1.32502  ...       0.00013      -0.00005      0.00031     0.00013
+30104  2025-07-31T00:59:00  1.32509  1.32519  1.32509  ...       0.00013       0.00003      0.00023     0.00013
+30105  2025-07-31T01:00:00  1.32515  1.32519  1.32493  ...       0.00013      -0.00012      0.00038     0.00013
+
+[30106 rows x 21 columns]
+01-08-2025 15:15:08 - data.pipelines.engineer_pipeline        :64   - INFO     - ---------- Running Data Pipeline ----------
+01-08-2025 15:15:08 - utils.performance_utils                 :195  - DEBUG    - Starting Data Cleaning (Memory: 269.2MB)
+01-08-2025 15:15:08 - data.processing.cleaning                :39   - INFO     - ---------- Running Data Cleaner ----------
+01-08-2025 15:15:08 - data.processing.cleaning                :145  - INFO     - Removed 29 duplicate records
+01-08-2025 15:15:08 - utils.data_utils                        :96   - DEBUG    - Parsing timestamp series with 30077 values
+01-08-2025 15:15:08 - utils.data_utils                        :125  - DEBUG    - Attempting pandas mixed format parsing
+01-08-2025 15:15:08 - data.processing.cleaning                :196  - DEBUG    - Localized timestamps to UTC
+01-08-2025 15:15:08 - data.processing.cleaning                :214  - DEBUG    - Most common time interval: 0 days 00:01:00
+01-08-2025 15:15:08 - data.processing.cleaning                :219  - WARNING  - Found 80 gaps in time series - filling them
+01-08-2025 15:15:08 - data.processing.cleaning                :241  - INFO     - Filled time series gaps. New length: 41821
+01-08-2025 15:15:08 - data.processing.cleaning                :306  - DEBUG    - Capping 350 extreme volume values
+01-08-2025 15:15:08 - data.processing.cleaning                :321  - DEBUG    - Checking for infinite values in dataset...
+01-08-2025 15:15:08 - data.processing.cleaning                :376  - DEBUG    - No infinite values found in dataset
+01-08-2025 15:15:08 - data.processing.cleaning                :488  - INFO     - No OHLC relationship issues found!
+01-08-2025 15:15:08 - utils.performance_utils                 :203  - INFO     - Completed Data Cleaning in 0.1s (Memory: 289.4MB, Δ+20.2MB)
+01-08-2025 15:15:08 - utils.performance_utils                 :195  - DEBUG    - Starting Data Validation (Memory: 289.4MB)
+01-08-2025 15:15:08 - utils.data_utils                        :250  - DEBUG    - Loading                               open     high      low  ...  spread_tight  spread_wide  spread_avg
+2025-07-02 00:00:00+00:00  1.37460  1.37474  1.37447  ...      -0.00015      0.00041     0.00013
+2025-07-02 00:01:00+00:00  1.37468  1.37470  1.37443  ...      -0.00014      0.00040     0.00013
+2025-07-02 00:02:00+00:00  1.37450  1.37462  1.37437  ...      -0.00013      0.00039     0.00013
+2025-07-02 00:03:00+00:00  1.37438  1.37451  1.37438  ...       0.00001      0.00025     0.00013
+2025-07-02 00:04:00+00:00  1.37440  1.37451  1.37438  ...       0.00001      0.00025     0.00013
+...                            ...      ...      ...  ...           ...          ...         ...
+2025-07-31 00:56:00+00:00  1.32503  1.32509  1.32500  ...       0.00004      0.00022     0.00013
+2025-07-31 00:57:00+00:00  1.32510  1.32516  1.32509  ...       0.00005      0.00021     0.00013
+2025-07-31 00:58:00+00:00  1.32517  1.32519  1.32502  ...      -0.00005      0.00031     0.00013
+2025-07-31 00:59:00+00:00  1.32509  1.32519  1.32509  ...       0.00003      0.00023     0.00013
+2025-07-31 01:00:00+00:00  1.32515  1.32519  1.32493  ...      -0.00012      0.00038     0.00013
+
+[41821 rows x 20 columns]
+01-08-2025 15:15:08 - data.processing.validation              :24   - INFO     - ---------- Running Data Validator ----------
+01-08-2025 15:15:08 - data.processing.validation              :255  - DEBUG    - No infinite values found in dataset
+01-08-2025 15:15:08 - utils.data_utils                        :277  - INFO     - Validation of cleaned data was valid!
+01-08-2025 15:15:08 - utils.performance_utils                 :203  - INFO     - Completed Data Validation in 0.0s (Memory: 299.8MB, Δ+10.4MB)
+01-08-2025 15:15:08 - utils.performance_utils                 :195  - DEBUG    - Starting Feature Generation (Memory: 299.8MB)
+01-08-2025 15:15:09 - utils.data_utils                        :250  - DEBUG    - Loading                               open     high      low  ...  spread_tight  spread_wide  spread_avg
+2025-07-02 00:00:00+00:00  1.37460  1.37474  1.37447  ...      -0.00015      0.00041     0.00013
+2025-07-02 00:01:00+00:00  1.37468  1.37470  1.37443  ...      -0.00014      0.00040     0.00013
+2025-07-02 00:02:00+00:00  1.37450  1.37462  1.37437  ...      -0.00013      0.00039     0.00013
+2025-07-02 00:03:00+00:00  1.37438  1.37451  1.37438  ...       0.00001      0.00025     0.00013
+2025-07-02 00:04:00+00:00  1.37440  1.37451  1.37438  ...       0.00001      0.00025     0.00013
+...                            ...      ...      ...  ...           ...          ...         ...
+2025-07-31 00:56:00+00:00  1.32503  1.32509  1.32500  ...       0.00004      0.00022     0.00013
+2025-07-31 00:57:00+00:00  1.32510  1.32516  1.32509  ...       0.00005      0.00021     0.00013
+2025-07-31 00:58:00+00:00  1.32517  1.32519  1.32502  ...      -0.00005      0.00031     0.00013
+2025-07-31 00:59:00+00:00  1.32509  1.32519  1.32509  ...       0.00003      0.00023     0.00013
+2025-07-31 01:00:00+00:00  1.32515  1.32519  1.32493  ...      -0.00012      0.00038     0.00013
+
+[41821 rows x 20 columns]
+01-08-2025 15:15:09 - data.features.enhanced_generation       :63   - INFO     - Enhanced FeatureGenerator initialized with 41821 rows
+01-08-2025 15:15:09 - data.pipelines.engineer_pipeline        :88   - DEBUG    - User provided specific features to be generated: ['microstructure_momentum_fusion', 'depth_stability', 'volume_ratio', 'institutional_footprint', 'spread_compression_rate', 'price_momentum_5min', 'volume_momentum', 'volatility_trend']
+01-08-2025 15:15:09 - data.pipelines.engineer_pipeline        :93   - INFO     - Generating specific features: ['microstructure_momentum_fusion', 'depth_stability', 'volume_ratio', 'institutional_footprint', 'spread_compression_rate', 'price_momentum_5min', 'volume_momentum', 'volatility_trend']
+01-08-2025 15:15:09 - data.features.enhanced_generation       :118  - INFO     - Generating 8 selected features...
+01-08-2025 15:15:09 - data.features.enhanced_generation       :151  - DEBUG    - Final expanded feature list: ['depth_stability', 'volume_momentum', 'microstructure_momentum_fusion', 'volatility_trend', 'spread_compression_rate', 'price_momentum_5min', 'volume_ratio', 'institutional_footprint']
+01-08-2025 15:15:09 - data.features.enhanced_generation       :184  - DEBUG    - Features scheduled for later generation in transformation step: ['volume_momentum', 'volatility_trend', 'price_momentum_5min']
+01-08-2025 15:15:09 - data.features.enhanced_generation       :185  - INFO     - Note: Some features (like transformation-based features) are generated during transformation phase, not feature generation
+01-08-2025 15:15:09 - data.features.enhanced_generation       :200  - DEBUG    - Execution order: ['volume_passthrough', 'volume_ma_20_feature', 'enhanced_market_depth_features', 'enhanced_market_microstructure_features', 'volume_ratio_feature', 'institutional_footprint_detection', 'enhanced_feature_interactions']
+01-08-2025 15:15:09 - data.features.enhanced_generation       :212  - DEBUG    - Executing generator: volume_passthrough
+01-08-2025 15:15:09 - data.features.enhanced_generation       :212  - DEBUG    - Executing generator: volume_ma_20_feature
+01-08-2025 15:15:09 - data.features.enhanced_generation       :212  - DEBUG    - Executing generator: enhanced_market_depth_features
+01-08-2025 15:15:09 - data.features.enhanced_generation       :212  - DEBUG    - Executing generator: enhanced_market_microstructure_features
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2719 - INFO     - Generating advanced market microstructure features...
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2731 - DEBUG    - Creating spread and liquidity features...
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2748 - DEBUG    - Creating order book imbalance proxies...
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2762 - DEBUG    - Creating tick momentum features...
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2777 - DEBUG    - Creating market efficiency features...
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2795 - DEBUG    - Validating microstructure features...
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2822 - INFO     - ✅ Advanced market microstructure features generated successfully!
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2823 - INFO     - ✅ Added 8 microstructure features
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2824 - INFO     - 🎯 Model now has fine-grained market structure information!
+01-08-2025 15:15:09 - data.features.enhanced_generation       :212  - DEBUG    - Executing generator: volume_ratio_feature
+01-08-2025 15:15:09 - data.features.enhanced_generation       :212  - DEBUG    - Executing generator: institutional_footprint_detection
+01-08-2025 15:15:09 - data.features.enhanced_generation       :212  - DEBUG    - Executing generator: enhanced_feature_interactions
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2505 - DEBUG    - Enhanced feature interactions generated successfully
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: bid_open
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: ask_open
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: bid_high
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: ask_high
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: bid_low
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: ask_low
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: bid_close
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: ask_close
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: spread_open
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: spread_high
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: spread_low
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: spread_close
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: spread_tight
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: spread_wide
+01-08-2025 15:15:09 - data.features.enhanced_generation       :266  - DEBUG    - Filtering out unrequested spread column: spread_avg
+01-08-2025 15:15:09 - data.features.enhanced_generation       :273  - INFO     - Filtering out 28 unrequested features: ['ask_close', 'ask_high', 'ask_low', 'ask_open', 'bid_close', 'bid_high', 'bid_low', 'bid_open', 'book_imbalance_proxy', 'depth_variability', 'flow_direction_strength', 'liquidity_flow', 'liquidity_stress', 'market_pressure', 'microstructure_efficiency', 'momentum_volume_sync', 'order_flow_imbalance', 'price_impact', 'spread_avg', 'spread_close', 'spread_high', 'spread_low', 'spread_open', 'spread_tight', 'spread_wide', 'tick_momentum', 'top_predictor_interaction', 'volume_ma_20']
+01-08-2025 15:15:09 - data.features.enhanced_generation       :278  - INFO     - Successfully generated 5 requested features
+01-08-2025 15:15:09 - data.features.enhanced_generation       :301  - INFO     - All expected features successfully generated
+01-08-2025 15:15:09 - utils.data_utils                        :250  - DEBUG    - Loading                            depth_stability    close  volume  ...     open  institutional_footprint     high
+2025-07-02 00:00:00+00:00              NaN  1.37468      86  ...  1.37460                      NaN  1.37474
+2025-07-02 00:01:00+00:00              NaN  1.37448      75  ...  1.37468                      NaN  1.37470
+2025-07-02 00:02:00+00:00              NaN  1.37440      58  ...  1.37450                      NaN  1.37462
+2025-07-02 00:03:00+00:00              NaN  1.37438      34  ...  1.37438                      NaN  1.37451
+2025-07-02 00:04:00+00:00         6.908755  1.37451      54  ...  1.37440                      NaN  1.37451
+...                                    ...      ...     ...  ...      ...                      ...      ...
+2025-07-31 00:56:00+00:00         6.908755  1.32509      34  ...  1.32503                 0.017125  1.32509
+2025-07-31 00:57:00+00:00         6.908755  1.32512      38  ...  1.32510                 0.007843  1.32516
+2025-07-31 00:58:00+00:00         6.908755  1.32509      53  ...  1.32517                 0.011144  1.32519
+2025-07-31 00:59:00+00:00         6.908755  1.32510      52  ...  1.32509                 0.024924  1.32519
+2025-07-31 01:00:00+00:00         6.908755  1.32495      52  ...  1.32515                 0.005975  1.32519
+
+[41821 rows x 10 columns]
+01-08-2025 15:15:09 - data.features.target_hypothesis         :35   - INFO     - ---------- Running Hypothesis Targeting ----------
+01-08-2025 15:15:09 - utils.shared_utils                      :124  - DEBUG    - Starting shared utility method list_of_functions_in_class().
+01-08-2025 15:15:09 - utils.shared_utils                      :141  - DEBUG    - Successfully populated list with functions in provided class! ['_generate_features_with_dependencies', 'session_based_tod_anomalies', 'spread_compression_patterns', 'spread_compression_patterns_v2', 'spread_compression_patterns_v3', 'spread_compression_patterns_v4']
+01-08-2025 15:15:09 - utils.shared_utils                      :98   - DEBUG    - Starting shared utility method safely_execute().
+01-08-2025 15:15:09 - data.features.target_hypothesis         :70   - WARNING  - Missing required features for enhanced target generation: ['liquidity_stress', 'microstructure_health', 'london_session']
+01-08-2025 15:15:09 - data.features.target_hypothesis         :71   - INFO     - Generating missing features temporarily for target creation...
+01-08-2025 15:15:09 - utils.data_utils                        :250  - DEBUG    - Loading                            depth_stability    close  volume  ...     open  institutional_footprint     high
+2025-07-02 00:00:00+00:00              NaN  1.37468      86  ...  1.37460                      NaN  1.37474
+2025-07-02 00:01:00+00:00              NaN  1.37448      75  ...  1.37468                      NaN  1.37470
+2025-07-02 00:02:00+00:00              NaN  1.37440      58  ...  1.37450                      NaN  1.37462
+2025-07-02 00:03:00+00:00              NaN  1.37438      34  ...  1.37438                      NaN  1.37451
+2025-07-02 00:04:00+00:00         6.908755  1.37451      54  ...  1.37440                      NaN  1.37451
+...                                    ...      ...     ...  ...      ...                      ...      ...
+2025-07-31 00:56:00+00:00         6.908755  1.32509      34  ...  1.32503                 0.017125  1.32509
+2025-07-31 00:57:00+00:00         6.908755  1.32512      38  ...  1.32510                 0.007843  1.32516
+2025-07-31 00:58:00+00:00         6.908755  1.32509      53  ...  1.32517                 0.011144  1.32519
+2025-07-31 00:59:00+00:00         6.908755  1.32510      52  ...  1.32509                 0.024924  1.32519
+2025-07-31 01:00:00+00:00         6.908755  1.32495      52  ...  1.32515                 0.005975  1.32519
+
+[41821 rows x 10 columns]
+01-08-2025 15:15:09 - data.features.enhanced_generation       :63   - INFO     - Enhanced FeatureGenerator initialized with 41821 rows
+01-08-2025 15:15:09 - data.features.target_hypothesis         :140  - DEBUG    - Temporarily generating microstructure_health using enhanced_microstructure_health
+01-08-2025 15:15:09 - data.features.target_hypothesis         :144  - DEBUG    - Successfully generated microstructure_health
+01-08-2025 15:15:09 - data.features.target_hypothesis         :140  - DEBUG    - Temporarily generating london_session using fx_trading_sessions
+01-08-2025 15:15:09 - data.features.target_hypothesis         :144  - DEBUG    - Successfully generated london_session
+01-08-2025 15:15:09 - data.features.target_hypothesis         :140  - DEBUG    - Temporarily generating liquidity_stress using enhanced_market_depth_features
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2086 - WARNING  - Spread tight/wide data not available - using spread_close approximation
+01-08-2025 15:15:09 - data.features.enhanced_generation       :2090 - INFO     - Creating spread_close approximation from high-low spread
+01-08-2025 15:15:09 - data.features.target_hypothesis         :144  - DEBUG    - Successfully generated liquidity_stress
+01-08-2025 15:15:09 - data.features.target_hypothesis         :156  - INFO     - Successfully generated 3 features: ['microstructure_health', 'london_session', 'liquidity_stress']
+01-08-2025 15:15:09 - data.features.target_hypothesis         :157  - DEBUG    - Total features added during process: 11 - ['london_ny_overlap', 'asian_london_overlap', 'liquidity_stress', 'microstructure_health', 'primary_session', 'london_session', 'ny_session', 'asian_session', 'depth_variability', 'spread_close', 'session_intensity']
+01-08-2025 15:15:09 - data.features.target_hypothesis         :410  - INFO     - === ENHANCED TARGET V4: FORWARD-LOOKING PREDICTION ===
+01-08-2025 15:15:09 - data.features.target_hypothesis         :415  - INFO     - Calculating forward-looking targets...
+01-08-2025 15:15:09 - data.features.target_hypothesis         :443  - INFO     - FIXED Dynamic thresholds - Mean up: 0.000333 (4.5 pips), Mean down: -0.000333
+01-08-2025 15:15:09 - data.features.target_hypothesis         :444  - INFO     - Base price: 1.34905, Base threshold: 0.000297 (4.0 pips), Volatility factor: 0.5
+01-08-2025 15:15:09 - data.features.target_hypothesis         :449  - INFO     - Generating temporal momentum features...
+01-08-2025 15:15:10 - data.features.target_hypothesis         :467  - INFO     - Temporal features generated successfully
+01-08-2025 15:15:10 - data.features.target_hypothesis         :492  - INFO     - Creating multi-horizon targets...
+01-08-2025 15:15:10 - data.features.target_hypothesis         :507  - INFO     - 🔧 SIMPLIFIED: Using basic price movement signals only (no quality filter)
+01-08-2025 15:15:10 - data.features.target_hypothesis         :559  - INFO     - === V4 FORWARD-LOOKING TARGET RESULTS ===
+01-08-2025 15:15:10 - data.features.target_hypothesis         :560  - INFO     - Target distribution: {0: 35195, 1: 3130, 2: 3496}
+01-08-2025 15:15:10 - data.features.target_hypothesis         :561  - INFO     -   Class 0 (HOLD): 35195 (84.2%)
+01-08-2025 15:15:10 - data.features.target_hypothesis         :562  - INFO     -   Class 1 (BUY):  3130 (7.5%)
+01-08-2025 15:15:10 - data.features.target_hypothesis         :563  - INFO     -   Class 2 (SELL): 3496 (8.4%)
+01-08-2025 15:15:10 - data.features.target_hypothesis         :564  - INFO     - Signal rate: 15.8%
+01-08-2025 15:15:10 - data.features.target_hypothesis         :568  - INFO     - Future return samples available: 41811/41821
+01-08-2025 15:15:10 - data.features.target_hypothesis         :582  - INFO     - ✅ OPTIMAL: Signal rate 15.8% in target range (5-25%)
+01-08-2025 15:15:10 - data.features.target_hypothesis         :593  - INFO     - Directional balance: 0.895 (1.0 = perfect)
+01-08-2025 15:15:10 - data.features.target_hypothesis         :596  - INFO     - ✅ GOOD: Reasonable directional balance
+01-08-2025 15:15:10 - data.features.target_hypothesis         :605  - INFO     - Cleaning up temporary features: ['london_ny_overlap', 'asian_london_overlap', 'liquidity_stress', 'microstructure_health', 'primary_session', 'london_session', 'ny_session', 'asian_session', 'depth_variability', 'spread_close', 'session_intensity']
+01-08-2025 15:15:10 - data.features.target_hypothesis         :608  - INFO     - ✅ FORWARD-LOOKING TARGET V4 generation completed successfully!
+01-08-2025 15:15:10 - data.features.target_hypothesis         :609  - INFO     - 🎯 Model will now predict FUTURE price movements, not past patterns!
+01-08-2025 15:15:10 - utils.shared_utils                      :105  - DEBUG    - Successfully ran function spread_compression_patterns_v4().
+01-08-2025 15:15:10 - utils.performance_utils                 :195  - DEBUG    - Starting Feature Importance Analysis (Memory: 337.2MB)
+01-08-2025 15:15:10 - data.pipelines.engineer_pipeline        :155  - INFO     - Running feature importance analysis...
+01-08-2025 15:15:10 - utils.data_utils                        :250  - DEBUG    - Loading                            depth_stability    close  ...  volume_acceleration  volatility_trend
+2025-07-02 00:00:00+00:00              NaN  1.37468  ...                  NaN               NaN
+2025-07-02 00:01:00+00:00              NaN  1.37448  ...                  NaN               NaN
+2025-07-02 00:02:00+00:00              NaN  1.37440  ...                  NaN               NaN
+2025-07-02 00:03:00+00:00              NaN  1.37438  ...                  NaN               NaN
+2025-07-02 00:04:00+00:00           1000.0  1.37451  ...             0.000000     -4.200000e-05
+...                                    ...      ...  ...                  ...               ...
+2025-07-31 00:56:00+00:00           1000.0  1.32509  ...            -0.969432     -1.000000e-06
+2025-07-31 00:57:00+00:00           1000.0  1.32512  ...            -0.298145     -1.000000e-05
+2025-07-31 00:58:00+00:00           1000.0  1.32509  ...             0.119219     -1.600000e-05
+2025-07-31 00:59:00+00:00           1000.0  1.32510  ...             0.719575     -1.800000e-05
+2025-07-31 01:00:00+00:00           1000.0  1.32495  ...            -0.172027      3.700000e-05
+
+[41821 rows x 21 columns]
+01-08-2025 15:15:10 - data.features.feature_importance        :147  - INFO     - Removing 1 constant features
+01-08-2025 15:15:10 - data.features.feature_importance        :73   - INFO     - FeatureImportanceAnalyzer initialized: 11 features, task: classification, target: target_spread_compression_v4_directional
+01-08-2025 15:15:10 - data.features.feature_importance        :326  - INFO     - Starting comprehensive feature importance analysis...
+01-08-2025 15:15:10 - data.features.feature_importance        :181  - INFO     - Correlation analysis completed. Top feature: institutional_footprint (0.2054)
+01-08-2025 15:15:10 - utils.performance_utils                 :195  - DEBUG    - Starting Mutual Information Analysis (Memory: 360.1MB)
+01-08-2025 15:15:11 - utils.performance_utils                 :203  - INFO     - Completed Mutual Information Analysis in 1.0s (Memory: 370.7MB, Δ+10.6MB)
+01-08-2025 15:15:11 - data.features.feature_importance        :212  - INFO     - Mutual information analysis completed. Top feature: price_momentum_5min (0.0672)
+01-08-2025 15:15:11 - utils.performance_utils                 :195  - DEBUG    - Starting Random Forest Training (Memory: 370.7MB)
+01-08-2025 15:15:13 - utils.performance_utils                 :203  - INFO     - Completed Random Forest Training in 1.4s (Memory: 472.8MB, Δ+102.1MB)
+01-08-2025 15:15:13 - data.features.feature_importance        :253  - INFO     - Random Forest analysis completed. Top feature: institutional_footprint (0.1061)
+01-08-2025 15:15:13 - data.features.feature_importance        :264  - INFO     - Lasso importance skipped (classification task)
+01-08-2025 15:15:21 - data.features.feature_importance        :316  - INFO     - Permutation importance analysis completed. Top feature: price_momentum_1min (0.0022)
+01-08-2025 15:15:21 - data.features.feature_importance        :361  - INFO     - Consensus ranking completed. Top feature: institutional_footprint (0.7609)
+01-08-2025 15:15:21 - data.features.feature_importance        :361  - INFO     - Consensus ranking completed. Top feature: institutional_footprint (0.7609)
+01-08-2025 15:15:22 - data.features.feature_importance        :406  - INFO     - Feature importance plot saved to storage/data_engineering_stats/feature_importance/2025-08-01_15-15-10/feature_importance_analysis.png
+01-08-2025 15:15:24 - data.features.feature_importance        :361  - INFO     - Consensus ranking completed. Top feature: institutional_footprint (0.7609)
+01-08-2025 15:15:24 - data.features.feature_importance        :475  - INFO     - Feature importance analysis completed and saved to storage/data_engineering_stats/feature_importance/2025-08-01_15-15-10
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :173  - INFO     - Feature Importance Analysis Results:
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :174  - INFO     - Top 10 features by consensus ranking:
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -    1. institutional_footprint   0.7609
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -    2. price_momentum_1min       0.7002
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -    3. price_momentum_5min       0.6869
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -    4. price_momentum_3min       0.6784
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -    5. spread_compression_rate   0.6209
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -    6. price_acceleration        0.6130
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -    7. volatility_trend          0.5447
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -    8. volume_ratio              0.5256
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -    9. microstructure_momentum_fusion 0.4930
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :176  - INFO     -   10. volume_momentum           0.4558
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :178  - INFO     - Full results saved to: storage/data_engineering_stats/feature_importance/2025-08-01_15-15-10
+01-08-2025 15:15:24 - utils.performance_utils                 :203  - INFO     - Completed Feature Importance Analysis in 13.5s (Memory: 1028.7MB, Δ+691.4MB)
+01-08-2025 15:15:24 - utils.performance_utils                 :203  - INFO     - Completed Feature Generation in 15.1s (Memory: 1028.7MB, Δ+728.8MB)
+01-08-2025 15:15:24 - utils.data_utils                        :250  - DEBUG    - Loading                            depth_stability    close  ...  volume_acceleration  volatility_trend
+2025-07-02 00:00:00+00:00              NaN  1.37468  ...                  NaN               NaN
+2025-07-02 00:01:00+00:00              NaN  1.37448  ...                  NaN               NaN
+2025-07-02 00:02:00+00:00              NaN  1.37440  ...                  NaN               NaN
+2025-07-02 00:03:00+00:00              NaN  1.37438  ...                  NaN               NaN
+2025-07-02 00:04:00+00:00           1000.0  1.37451  ...             0.000000     -4.200000e-05
+...                                    ...      ...  ...                  ...               ...
+2025-07-31 00:56:00+00:00           1000.0  1.32509  ...            -0.969432     -1.000000e-06
+2025-07-31 00:57:00+00:00           1000.0  1.32512  ...            -0.298145     -1.000000e-05
+2025-07-31 00:58:00+00:00           1000.0  1.32509  ...             0.119219     -1.600000e-05
+2025-07-31 00:59:00+00:00           1000.0  1.32510  ...             0.719575     -1.800000e-05
+2025-07-31 01:00:00+00:00           1000.0  1.32495  ...            -0.172027      3.700000e-05
+
+[41821 rows x 21 columns]
+01-08-2025 15:15:24 - data.features.transformation            :38   - INFO     - ---------- Running Feature Transformer ----------
+01-08-2025 15:15:24 - data.features.transformation            :63   - WARNING  - Dataset has features containing empty values. Will drop relevant features.
+01-08-2025 15:15:24 - data.features.transformation            :79   - DEBUG    - Starting to filter features based on missing values...
+01-08-2025 15:15:24 - data.features.transformation            :103  - DEBUG    - No columns exceeded NaN threshold
+01-08-2025 15:15:24 - data.features.transformation            :126  - INFO     - Data Transformation - _filter_features - Successfully dropped first None rows. Size of df is now 41821
+01-08-2025 15:15:24 - data.features.transformation            :139  - INFO     - Applying forward fill to 10 columns with scattered NaNs
+01-08-2025 15:15:24 - data.features.transformation            :151  - INFO     - Forward fill imputed 11897 values
+01-08-2025 15:15:24 - data.features.transformation            :155  - WARNING  - After forward fill, 50 NaN values remain
+01-08-2025 15:15:24 - data.features.transformation            :156  - WARNING  - These are likely at the beginning of the series - consider additional treatment
+01-08-2025 15:15:24 - data.features.transformation            :161  - DEBUG    - Columns still containing NaNs: ['depth_stability', 'microstructure_momentum_fusion', 'institutional_footprint', 'price_momentum_1min', 'price_momentum_3min', 'price_momentum_5min', 'price_acceleration', 'volume_momentum', 'volume_acceleration', 'volatility_trend']
+01-08-2025 15:15:24 - data.features.transformation            :173  - INFO     - Filled beginning NaNs with first valid values
+01-08-2025 15:15:24 - data.features.transformation            :200  - DEBUG    - No categorical columns found to encode
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :132  - INFO     - As selected features were provided, pipeline will skip Feature Selection.
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :137  - INFO     - ---------- Data Pipeline finished all 'data steps'! ----------
+01-08-2025 15:15:24 - utils.data_utils                        :301  - INFO     - Saving processed file ...
+01-08-2025 15:15:24 - utils.data_utils                        :316  - INFO     - Successfully saved file! storage/data/capital_com/GBPUSD/processed/1m/2025-07-02_2025-07-31.csv
+01-08-2025 15:15:24 - data.pipelines.engineer_pipeline        :146  - INFO     - ---------- Data Pipeline Finished ----------

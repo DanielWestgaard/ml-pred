@@ -72,13 +72,18 @@ class SignalProcessor:
             # Debug logger for confidence filtering
             logger.debug(f"Prediction {i}: value={prediction}, confidence={signal_info['confidence']:.4f}, threshold={self.confidence_threshold}")
             
-            if signal_info['confidence'] >= self.confidence_threshold:
-                signals['processed_signals'].append(signal_info)
-                signals['signal_strength'].append(signal_info['strength'])
-                signals['signal_direction'].append(signal_info['direction'])
-                signals['confidence_scores'].append(signal_info['confidence'])
+            # Only process BUY/SELL signals for trading entries, but track HOLD for exit decisions
+            if signal_info['direction'] in ['BUY', 'SELL']:
+                if signal_info['confidence'] >= self.confidence_threshold:
+                    signals['processed_signals'].append(signal_info)
+                    signals['signal_strength'].append(signal_info['strength'])
+                    signals['signal_direction'].append(signal_info['direction'])
+                    signals['confidence_scores'].append(signal_info['confidence'])
+                else:
+                    logger.debug(f"Trading signal rejected: {signal_info['direction']} confidence {signal_info['confidence']:.4f} < threshold {self.confidence_threshold}")
             else:
-                logger.debug(f"Signal rejected: confidence {signal_info['confidence']:.4f} < threshold {self.confidence_threshold}")
+                # HOLD signals are tracked but not added to processed_signals (used only for exits)
+                logger.debug(f"HOLD signal tracked: confidence={signal_info['confidence']:.4f} (not used for entries)")
         
         # Apply filters
         signals = self._apply_filters(signals, market_data)
@@ -143,10 +148,10 @@ class SignalProcessor:
                 confidence = prob_sell  
                 direction = 'SELL'
                 strength = prob_sell
-            else:  # HOLD signal (Class 0) - should NOT generate trading signals
-                confidence = 0.0  # Set to 0 to filter out HOLD signals from trading
+            else:  # HOLD signal (Class 0) - use actual probability for exit strategy
+                confidence = prob_hold  # Use actual HOLD probability for exit decisions
                 direction = 'HOLD'  # Proper direction for HOLD
-                strength = 0.0  # No trading strength for HOLD signals
+                strength = prob_hold  # HOLD strength for exit strategy evaluation
                 
         # Handle binary classification (legacy support)
         elif probability is not None:

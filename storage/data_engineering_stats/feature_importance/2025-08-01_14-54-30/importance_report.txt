@@ -1,0 +1,52 @@
+================================================================================
+FEATURE IMPORTANCE ANALYSIS REPORT
+================================================================================
+Dataset: 1311859 rows, 11 features
+Target: target_spread_compression_v4_directional (classification)
+Analysis Date: 2025-08-01 14:58:20
+
+CONSENSUS TOP FEATURES:
+----------------------------------------
+ 1. price_momentum_1min            0.6881
+ 2. institutional_footprint        0.6804
+ 3. price_momentum_3min            0.6320
+ 4. price_momentum_5min            0.6165
+ 5. spread_compression_rate        0.5789
+ 6. price_acceleration             0.5677
+ 7. volume_ratio                   0.4427
+ 8. volatility_trend               0.4207
+ 9. microstructure_momentum_fusion 0.4111
+10. volume_momentum                0.3824
+11. volume_acceleration            0.3661
+
+CORRELATION - TOP 5:
+------------------------------
+1. institutional_footprint   0.2129
+2. microstructure_momentum_fusion 0.0184
+3. volume_ratio              0.0181
+4. spread_compression_rate   0.0115
+5. volume_momentum           0.0042
+
+MUTUAL INFORMATION - TOP 5:
+------------------------------
+1. spread_compression_rate   0.0755
+2. price_acceleration        0.0720
+3. volume_ratio              0.0678
+4. price_momentum_5min       0.0669
+5. price_momentum_3min       0.0655
+
+RANDOM FOREST - TOP 5:
+------------------------------
+1. institutional_footprint   0.1047
+2. price_momentum_5min       0.1042
+3. price_momentum_3min       0.1029
+4. price_acceleration        0.1015
+5. price_momentum_1min       0.0966
+
+PERMUTATION - TOP 5:
+------------------------------
+1. price_momentum_1min       0.0032
+2. price_momentum_3min       0.0021
+3. price_momentum_5min       0.0018
+4. spread_compression_rate   0.0013
+5. price_acceleration        0.0011

@@ -24,3 +24,4 @@ storage/data/capital_com/GBPUSD/processed/1m/2024-01-01_2025-03-01.csv
 storage/data/capital_com/GBPUSD/processed/1m/2025-03-02_2025-07-01.csv
 storage/models/2025-07-30_19:26:44/random_forest.pkl
 storage/data/capital_com/GBPUSD/raw/1m/2020-01-01_2025-07-01.csv
+storage/data/capital_com/GBPUSD/processed/1m/2020-01-01_2025-07-01.csv

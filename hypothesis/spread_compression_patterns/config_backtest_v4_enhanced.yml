@@ -1,0 +1,56 @@
+hypothesis:
+  name: spread_compression_patterns_v4_enhanced
+
+# ENHANCED BACKTESTING CONFIGURATION FOR FORWARD-LOOKING MODEL
+backtesting:
+  enabled: true
+  model_folder: storage/models/2025-08-01_15:16:41  # FIXED MODEL - Properly trained with balanced data
+  data_source: storage/data/capital_com/GBPUSD/processed/1m/2025-07-02_2025-07-31.csv
+  start_date: "2025-07-15"
+  end_date: "2025-07-26"  # 10 days for comprehensive testing
+  buffer_size: 200
+  initial_capital: 10000
+  transaction_costs: 0.0005
+  slippage: 0.0002
+
+  execution:
+    max_loops: 3000  # Full test
+    loop_interval: 0
+
+  signal_processing:
+    use_advanced_filtering: true          # OPTION B: Hybrid approach with better tuning
+    confidence_threshold: 0.08             # LOWERED: More permissive for signal generation
+    min_confidence_delta: 0.01             # REDUCED: Allow smaller confidence differences
+    cooldown_minutes: 0.25                 # REDUCED: Faster signal generation
+    max_signals_per_hour: 240              # INCREASED: Allow more frequent signals
+    confidence_window_minutes: 10          # REDUCED: Shorter analysis window
+    signal_filters: []
+    min_signal_strength: 0.08              # LOWERED: Match confidence threshold
+    volume_confirmation_required: false
+
+  risk_management:
+    max_position_size: 0.08                # INCREASED: Allow larger positions for good signals
+    stop_loss_pct: 0.012                   # TIGHTER: Reduce risk per trade
+    take_profit_pct: 0.02                  # REDUCED: Take profits faster (1.67:1 R/R)
+    max_drawdown: 0.25                     # TIGHTER: Reduce overall portfolio risk
+    max_concurrent_positions: 3            # INCREASED: Allow more simultaneous positions
+    position_size_scaling: confidence      # CHANGED: Scale by signal confidence
+
+  position_management:
+    max_concurrent_positions: 3            # ALIGNED: Match risk_management setting
+    position_tracking: "detailed"
+
+  exit_strategy:
+    confidence_exit_threshold: 0.9         # High confidence needed for early exit
+    signal_strength_decay: 0.7             # Allow some signal decay
+    volatility_exit_multiplier: 2.0        # Moderate volatility sensitivity
+    minimum_signal_life: 5                 # 5-minute minimum hold
+
+  signal_tracking:
+    signal_strength_features:              # Enhanced feature tracking
+      - price_momentum_sequence
+      - volume_momentum_sequence
+      - trend_strength
+      - momentum_persistence
+      - spread_compression_rate
+      - tick_momentum

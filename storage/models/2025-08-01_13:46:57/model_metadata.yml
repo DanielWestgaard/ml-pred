@@ -1,0 +1,94 @@
+hypothesis:
+  name: spread_compression_patterns_v4_enhanced
+model_info:
+  model_type: random_forest
+  model_class: RandomForestClassifier
+  storage_path: /Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-08-01_13:46:57
+  created_at: '2025-08-01T13:46:57.365020'
+
+training:
+  duration_seconds: 24.77
+  duration_formatted: 0:00:24
+  completed_at: '2025-08-01T13:46:57.365030'
+  train_samples: 980352
+  test_samples: 245089
+  validation_method: walk_forward
+  walk_forward_periods: 12
+  final_training_period:
+    start: '2023-01-02T00:42:00+00:00'
+    end: '2025-05-02T00:42:00+00:00'
+    samples: 1225441
+
+dataset:
+  dataset_path: storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv
+  target_column: target_spread_compression_v4_directional
+  feature_count: 29
+  features:
+  - microstructure_momentum_fusion
+  - top_predictor_interaction
+  - microstructure_efficiency
+  - volatility_momentum_sequence
+  - momentum_divergence
+  - reversal_signals
+  - volume_price_sync
+  - market_pressure
+  - book_imbalance_proxy
+  - depth_stability
+  - liquidity_flow
+  - spread_compression_rate
+  - tick_momentum
+  - order_flow_imbalance
+  - volume_momentum_sequence
+  - momentum_persistence
+  - price_acceleration
+  - price_impact
+  - volume_acceleration
+  - institutional_footprint
+  - trend_strength
+  - volume_ratio
+  - price_momentum_sequence
+  - price_momentum_1min
+  - price_momentum_3min
+  - price_momentum_5min
+  - volume_momentum
+  - volatility_trend
+  - close_og
+  total_samples: 1225441
+  date_range:
+    start: '2023-01-02 00:42:00+00:00'
+    end: '2025-05-02 00:42:00+00:00'
+  missing_values: 0
+
+model_parameters:
+  bootstrap: true
+  ccp_alpha: 0.0
+  class_weight: balanced
+  criterion: gini
+  max_depth: 12
+  max_features: sqrt
+  max_leaf_nodes: null
+  max_samples: null
+  min_impurity_decrease: 0.0001
+  min_samples_leaf: 1
+  min_samples_split: 2
+  min_weight_fraction_leaf: 0.0
+  monotonic_cst: null
+  n_estimators: 500
+  n_jobs: -1
+  oob_score: true
+  random_state: 42
+  verbose: 0
+  warm_start: false
+
+system_info:
+  cpu: arm
+  cpu_cores: 10
+  cpu_threads: 10
+  memory_gb: 16.0
+  python_version: 3.11.13
+  os: Darwin 24.5.0
+
+data_split:
+  train_size: 980352
+  test_size: 245089
+  split_ratio: 980352/245089
