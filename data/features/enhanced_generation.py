@@ -2763,8 +2763,9 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             price_change = self.df['close'].diff()
             tick_direction = np.sign(price_change)
             
-            # Tick momentum (sequential tick direction)
-            self.df['tick_momentum'] = tick_direction.rolling(5).sum()
+            # Tick momentum (sequential tick direction) - convert to Series first
+            tick_direction_series = pd.Series(tick_direction, index=self.df.index)
+            self.df['tick_momentum'] = tick_direction_series.rolling(5).sum()
             
             # Price impact per unit volume
             volume_nonzero = np.where(self.df['volume'] > 0, self.df['volume'], 1)
