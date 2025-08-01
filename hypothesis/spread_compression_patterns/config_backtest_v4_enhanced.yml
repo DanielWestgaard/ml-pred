@@ -19,10 +19,10 @@ backtesting:
 
   signal_processing:
     use_advanced_filtering: true          # Keep simple initially 
-    confidence_threshold: 0.15             # Conservative threshold for quality signals
+    confidence_threshold: 0.12             # Conservative threshold for quality signals
     min_confidence_delta: 0.02             # Require meaningful confidence differences
-    cooldown_minutes: 1                    # Minimum cooldown for signal quality
-    max_signals_per_hour: 60               # Allow reasonable signal frequency
+    cooldown_minutes: 0.5                    # Minimum cooldown for signal quality
+    max_signals_per_hour: 120               # Allow reasonable signal frequency
     confidence_window_minutes: 15          # Confidence analysis window
     signal_filters: []
     min_signal_strength: 0.15              # Match confidence threshold
