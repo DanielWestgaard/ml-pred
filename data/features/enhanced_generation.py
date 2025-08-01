@@ -18,6 +18,7 @@ from pathlib import Path
 from .feature_registry import FeatureRegistry, FeatureDefinition, feature_generator, AutoRegisterMeta
 from utils import data_utils
 from utils.logging_utils import get_logger
+from utils.performance_utils import memory_monitor, PerformanceContext, fast_linear_trend, fast_momentum_consistency
 
 logger = get_logger()
 
@@ -115,6 +116,10 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             DataFrame with generated features
         """
         logger.info(f"Generating {len(feature_names)} selected features...")
+        
+        # Monitor memory usage for large datasets
+        dataset_size = len(self.df)
+        memory_monitor.check_and_warn(f"before generating {len(feature_names)} features on {dataset_size:,} rows")
         
         # **FEATURE EXPANSION**: Handle logical feature groups in config
         # Some config entries like "bid_ask_spread_features" refer to logical groups, not individual features
@@ -732,10 +737,9 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
         - Recent volatility patterns
         - Mean reversion patterns
         """
-        # Historical ATR trend (slope of recent ATR values)
-        atr_trend = self.df['atr'].rolling(10).apply(
-            lambda x: np.polyfit(range(len(x)), x, 1)[0] if len(x) >= 2 else 0
-        )
+        # Historical ATR trend (slope of recent ATR values) - OPTIMIZED
+        # Using fast_linear_trend which is mathematically equivalent to np.polyfit but much faster
+        atr_trend = fast_linear_trend(self.df['atr'], window=10)
         
         # Mean reversion component (ATR tends to revert to long-term mean)
         long_term_atr = self.df['atr'].rolling(50).mean()
@@ -2565,9 +2569,8 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
             # Volatility momentum (range expansion/contraction)
             current_range = self.df['high'] - self.df['low']
             volatility_momentum = current_range.pct_change(3)
-            volatility_trend = current_range.rolling(5).apply(
-                lambda x: np.polyfit(range(len(x)), x, 1)[0] if len(x) >= 2 else 0
-            )
+            # OPTIMIZED: Using fast_linear_trend (mathematically equivalent to np.polyfit)
+            volatility_trend = fast_linear_trend(current_range, window=5)
             
             self.df['volatility_momentum_sequence'] = (
                 volatility_momentum * 0.6 + volatility_trend * 0.4
@@ -2624,10 +2627,9 @@ class ModelAwareFeatureGenerator(metaclass=AutoRegisterMeta):
                 trend_strength_raw * 0.5  # Reduce conflicting trends
             )
             
-            # Momentum persistence (consistency over time)
-            momentum_consistency = momentum_3min.rolling(5).apply(
-                lambda x: (np.sign(x) == np.sign(x.iloc[-1])).sum() / len(x)
-            )
+            # Momentum persistence (consistency over time) - OPTIMIZED
+            # Using fast_momentum_consistency (equivalent calculation but faster)
+            momentum_consistency = fast_momentum_consistency(momentum_3min, window=5)
             
             self.df['momentum_persistence'] = momentum_consistency * abs(momentum_3min)
             

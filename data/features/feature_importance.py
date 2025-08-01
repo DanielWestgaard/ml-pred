@@ -28,6 +28,7 @@ from scipy.stats import spearmanr, pearsonr
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Set
 import warnings
+from utils.performance_utils import safe_sample_for_analysis, memory_monitor, PerformanceContext
 warnings.filterwarnings('ignore')
 
 from utils import data_utils
@@ -181,13 +182,29 @@ class FeatureImportanceAnalyzer:
         return result
     
     def mutual_information_importance(self) -> pd.Series:
-        """Feature importance based on mutual information"""
+        """Feature importance based on mutual information - OPTIMIZED for large datasets"""
         
         try:
-            if self.task_type == 'classification':
-                mi_scores = mutual_info_classif(self.features, self.target, random_state=42)
-            else:
-                mi_scores = mutual_info_regression(self.features, self.target, random_state=42)
+            # Use sampling for large datasets to prevent system strain while preserving functionality
+            features_sample = self.features
+            target_sample = self.target
+            
+            if len(self.features) > 200000:
+                logger.info(f"Large dataset detected ({len(self.features):,} rows). Using stratified sampling for MI analysis.")
+                # Create combined dataframe for consistent sampling
+                combined_df = pd.concat([self.features, self.target], axis=1)
+                sampled_df = safe_sample_for_analysis(combined_df, max_rows=200000, preserve_distribution=True)
+                
+                features_sample = sampled_df.iloc[:, :-1]  # All columns except last
+                target_sample = sampled_df.iloc[:, -1]     # Last column (target)
+                
+                logger.info(f"Using {len(features_sample):,} sampled rows for mutual information analysis")
+            
+            with PerformanceContext("Mutual Information Analysis"):
+                if self.task_type == 'classification':
+                    mi_scores = mutual_info_classif(features_sample, target_sample, random_state=42)
+                else:
+                    mi_scores = mutual_info_regression(features_sample, target_sample, random_state=42)
             
             result = pd.Series(mi_scores, index=self.features.columns).sort_values(ascending=False)
             self.importance_results['mutual_information'] = result
@@ -200,17 +217,33 @@ class FeatureImportanceAnalyzer:
             return pd.Series(0, index=self.features.columns)
     
     def random_forest_importance(self) -> pd.Series:
-        """Feature importance using Random Forest"""
+        """Feature importance using Random Forest - OPTIMIZED for large datasets"""
         
         try:
-            # Choose appropriate model
-            if self.task_type == 'classification':
-                model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
-            else:
-                model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+            # Use sampling for large datasets to prevent memory issues
+            features_sample = self.features
+            target_sample = self.target
             
-            # Fit model
-            model.fit(self.features, self.target)
+            if len(self.features) > 300000:
+                logger.info(f"Large dataset detected ({len(self.features):,} rows). Using sampling for Random Forest analysis.")
+                combined_df = pd.concat([self.features, self.target], axis=1)
+                sampled_df = safe_sample_for_analysis(combined_df, max_rows=300000, preserve_distribution=True)
+                
+                features_sample = sampled_df.iloc[:, :-1]
+                target_sample = sampled_df.iloc[:, -1]
+                logger.info(f"Using {len(features_sample):,} sampled rows for Random Forest analysis")
+            
+            # Choose appropriate model with reduced complexity for very large datasets
+            n_estimators = 50 if len(features_sample) > 100000 else 100
+            
+            if self.task_type == 'classification':
+                model = RandomForestClassifier(n_estimators=n_estimators, random_state=42, n_jobs=-1)
+            else:
+                model = RandomForestRegressor(n_estimators=n_estimators, random_state=42, n_jobs=-1)
+            
+            # Fit model with performance monitoring
+            with PerformanceContext("Random Forest Training"):
+                model.fit(features_sample, target_sample)
             
             # Get feature importances
             importances = model.feature_importances_

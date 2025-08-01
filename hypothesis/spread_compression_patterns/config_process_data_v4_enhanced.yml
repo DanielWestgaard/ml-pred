@@ -1,9 +1,9 @@
 hypothesis:
-  name: spread_compression_patterns_v4_enhanced
+  name: spread_compression_patterns_v4
 
 # ENHANCED DATA PIPELINE WITH FORWARD-LOOKING TARGETS AND TEMPORAL FEATURES
 data_pipeline:
-  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2020-01-01_2025-07-01.csv # storage/data/capital_com/GBPUSD/raw/1m/2025-07-02_2025-07-31.csv
+  raw_source: storage/data/capital_com/GBPUSD/raw/1m/2023-01-01_2025-07-01.csv # storage/data/capital_com/GBPUSD/raw/1m/2025-07-02_2025-07-31.csv
   spread_focused: true
   selected_features:  # Enhanced feature set with temporal and microstructure features
     [
