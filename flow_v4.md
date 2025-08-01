@@ -63,8 +63,9 @@ likely much better than this, even if they had low profitability.
 2. Training new model on those features (without SMOTE): `python main.py --hyp 'hypothesis/spread_compression_patterns/config_model_training_v4_enhanced.yml'`
     - Logfile: "logs/training/logging_01082025_151620.log"
     - Saved model path: "storage/models/2025-08-01_15:16:41"
-3. Backtesting trained model on testing dataset: `python main.py --hyp 'hypothesis/spread_compression_patterns/config_backtest_v4_enhanced.yml'`
-    - Logfile: "logs/backtesting/logging_01082025_151716.log"
+3. Backtesting trained model on testing dataset: `python main.py --hyp 'hypothesis/spread_compression_patterns/config_backtest_v4_enhanced.yml'` (changed to `use_advanced_filtering: true`)
+    - Logfile: "logs/backtesting/logging_01082025_152708.log" - Is advanced filtering broken?
+    - I also tested out with false advanced filtering, but then it kept on going because of so many trades, and many different logfiles (as they kept getting bigger).
     - Last line: ""
 
 ## Results
