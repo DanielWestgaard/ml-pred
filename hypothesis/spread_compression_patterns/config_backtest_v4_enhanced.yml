@@ -18,26 +18,26 @@ backtesting:
     loop_interval: 0
 
   signal_processing:
-    use_advanced_filtering: true          # Keep simple initially 
-    confidence_threshold: 0.12             # Conservative threshold for quality signals
-    min_confidence_delta: 0.02             # Require meaningful confidence differences
-    cooldown_minutes: 0.5                    # Minimum cooldown for signal quality
-    max_signals_per_hour: 120               # Allow reasonable signal frequency
-    confidence_window_minutes: 15          # Confidence analysis window
+    use_advanced_filtering: true          # OPTION B: Hybrid approach with better tuning
+    confidence_threshold: 0.08             # LOWERED: More permissive for signal generation
+    min_confidence_delta: 0.01             # REDUCED: Allow smaller confidence differences
+    cooldown_minutes: 0.25                 # REDUCED: Faster signal generation
+    max_signals_per_hour: 240              # INCREASED: Allow more frequent signals
+    confidence_window_minutes: 10          # REDUCED: Shorter analysis window
     signal_filters: []
-    min_signal_strength: 0.15              # Match confidence threshold
+    min_signal_strength: 0.08              # LOWERED: Match confidence threshold
     volume_confirmation_required: false
 
   risk_management:
-    max_position_size: 0.05                # Slightly smaller positions for testing
-    stop_loss_pct: 0.015                   # 1.5% stop loss
-    take_profit_pct: 0.025                 # 2.5% take profit (1.67:1 R/R)
-    max_drawdown: 0.3                      # 30% max drawdown
-    max_concurrent_positions: 2            # Conservative position limit
-    position_size_scaling: volatility
+    max_position_size: 0.08                # INCREASED: Allow larger positions for good signals
+    stop_loss_pct: 0.012                   # TIGHTER: Reduce risk per trade
+    take_profit_pct: 0.02                  # REDUCED: Take profits faster (1.67:1 R/R)
+    max_drawdown: 0.25                     # TIGHTER: Reduce overall portfolio risk
+    max_concurrent_positions: 3            # INCREASED: Allow more simultaneous positions
+    position_size_scaling: confidence      # CHANGED: Scale by signal confidence
 
   position_management:
-    max_concurrent_positions: 2
+    max_concurrent_positions: 3            # ALIGNED: Match risk_management setting
     position_tracking: "detailed"
 
   exit_strategy:
