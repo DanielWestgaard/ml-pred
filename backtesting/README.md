@@ -1,33 +1,32 @@
 # Backtesting System 📊
 
 ## Overview 🎯
-The backtesting system provides **rapid, accurate simulation** of trading strategies using historical data. It leverages **90% of existing strategy components** to ensure identical behavior between backtesting and live trading while optimizing for speed and comprehensive analysis.
+The backtesting system provides **rapid, accurate simulation** of trading strategies using historical data. It leverages a lot of existing strategy components to ensure similar behavior between backtesting and live trading (`strategy/`) while optimizing for speed and comprehensive analysis.
 
 ## Key Features 🚀
 - **✨ Multi-Model Support**: Automatic detection and handling of both regression and classification models
-- **🔄 Component Reuse**: Leverages existing `strategy/components` (RiskManager, SignalProcessor, PositionManager)
-- **⚡ High Performance**: Complete backtests in ~30 seconds vs hours of live testing
+- **🔄 Component Reuse**: Leverages existing `strategy/components` (`RiskManager`, `SignalProcessor`, `PositionManager`)
+- **⚡ High Performance**: Complete backtests much faster than "real time waiting" with live testing
 - **📈 Realistic Simulation**: Accurate transaction costs, slippage, and market impact modeling
 - **🎯 Intelligent Signal Processing**: Binary classification optimized for spread compression strategies
-- **🧠 Model-Driven Exits**: Positions close when model predicts compression period is over
+- **🧠 Model-Driven Exits**: Positions close when model predicts compression period is over - TODO: MORE UNIFIED APPROACH FOR OTHER MODELS AND STRATEGIES
 - **🎯 Perfect Feature Alignment**: Uses exact `model.feature_names_in_` for prediction consistency
-- **📊 Comprehensive Analytics**: Advanced performance metrics, risk analysis, and visualizations
+- **📊 Comprehensive Analytics**: Performance metrics and risk analysis
 - **🎛️ Easy Configuration**: Simple YAML configuration for rapid hypothesis testing
 - **🔍 Detailed Logging**: Full trade-by-trade analysis and position tracking
-- **✅ Production-Ready**: Extensively tested and debugged for reliable operation
 
 ## How It Works 🔄
 
-The backtesting system simulates live trading by processing historical data step-by-step, using the same components as your live strategy:
+The backtesting system simulates live trading by processing historical data step-by-step, using the same components as the live strategy:
 
 ### Data Flow Process
-1. **Historical Data** → BacktestDataManager loads and iterates through time-series data
-2. **Feature Generation** → Uses same ModelAwareFeatureGenerator as live trading
+1. **Historical Data** → `BacktestDataManager` loads and iterates through time-series data
+2. **Uses processed data** → For easier and faster use with focus on testing the actual model, the system will use processed (back-) testing data
 3. **Model Prediction** → Trained ML model generates predictions on features
-4. **Signal Processing** → SignalProcessor converts predictions to BUY/SELL signals
-5. **Risk Management** → RiskManager validates position sizing and risk limits
-6. **Trade Execution** → SimulationBroker executes trades with realistic costs
-7. **Position Management** → PositionManager tracks open/closed positions
+4. **Signal Processing** → `SignalProcessor` converts predictions to BUY/SELL signals
+5. **Risk Management** → `RiskManager` validates position sizing and risk limits
+6. **Trade Execution** → `SimulationBroker` executes trades with realistic costs
+7. **Position Management** → `PositionManager` tracks open/closed positions
 8. **Performance Analysis** → Comprehensive metrics and reporting
 
 ## Architecture 🏗️
