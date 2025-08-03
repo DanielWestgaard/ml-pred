@@ -1,19 +1,22 @@
-# About model/ 🤖
-This folder focuses on training ML Models with **automatic GPU acceleration**. <br>
+# ML Model Training System 🤖
 
-## Structure
+## Overview 📊
+This folder provides **GPU-accelerated machine learning model training** with support for multiple frameworks and intelligent hardware detection. The system automatically optimizes training for your available hardware (CUDA, Metal, or CPU) while maintaining consistent interfaces across different model types.
+
+## Structure 📁
 ```
-├── model_training.py           # Main file to train different models
-├── evaluation.py               # TODO: Evaluate trained model
+model/
+├── model_training.py                   # Main orchestrator for model training
+├── walk_forward_validator.py           # Walk-forward validation system
+├── README.md                           # This documentation
 │
-├── model_factory/              # Different ML Models with GPU support
-│   ├── base_model.py           # Interface for all model type implementations
-│   ├── xgboost.py              # XGBoost Regressor (GPU accelerated)
-│   ├── pytorch.py              # PyTorch Neural Networks (CUDA/Metal)
-│   ├── tensorflow.py           # TensorFlow Models (CUDA/Metal)
-│   └── ...
-│
-└── ...
+└── model_factory/                      # GPU-accelerated model implementations
+    ├── base_model.py                   # Abstract base interface for all models
+    ├── xgboost.py                      # XGBoost Regressor (GPU accelerated)
+    ├── random_forest.py                # Random Forest Classifier (optimized for finance)
+    ├── pytorch.py                      # PyTorch Neural Networks (CUDA/Metal)
+    ├── tensorflow.py                   # TensorFlow Models (CUDA/Metal)
+    └── ...
 ```
 
 ## 🚀 GPU Acceleration Support
@@ -68,8 +71,10 @@ Using the configuration structure outlined in the `hypothesis/README.md`, the Mo
 > Because of this "Hypothesis approach/flow", I've made the arguments `dataset` and `model_type` "optional". However, they must be provided/set for the Model Trainer to work. So, if `hypothesis_source` is not provided and either `dataset` or `model_type` (or both) is not provided, an error will be raised and the execution will be stopped (`sys.exit()`).
 
 
-### How to use 🤓
-To train a Machine Learning Model, you can choose how you want to use it:
+## Usage Examples 🚀
+
+#### 1. Hypothesis-Driven Training (Recommended)
+You can train ML models through several approaches:
 1. Configure **hypothesis** `config.yml`, following the structure outlined in `hypothesis/README.md`, and either 
     - Run `main.py` with:
         ```bash
@@ -235,10 +240,15 @@ Based on successful training with spread compression patterns:
 - **Feature Count**: 8 optimized features (redundancy eliminated)
 - **Class Balance**: Handled automatically with `class_weight='balanced'`
 
-## Evaluation
-Simple class having different evaluation implementations. One 'main' `run()` to orcestrate and run all implementations, but also possible to run each individual implementation.
-- `evaluate_regression_model()`: Evaluate a regression model.
-- `plot_model_prediction()`: Plot (test) data with model predictions for _manual inspection_.
+## Model Evaluation 📊
+
+The evaluation system provides comprehensive model assessment with multiple validation approaches:
+
+### Evaluation Features
+- **Regression Models**: Complete performance analysis with R², RMSE, MAE metrics
+- **Classification Models**: Precision, recall, F1-score, confusion matrix, ROC curves
+- **Visual Analysis**: Prediction plots, residual analysis, feature importance
+- **Walk-Forward Validation**: Time-series aware validation for financial data
 
 ### How to use
 #### Evaluate an _old_/**pre-trained**/**'stored' model**:
@@ -270,3 +280,32 @@ evaluate_model:
     model_folder: <path-to-processed-data>            # Only provide if you are evaluating a 'stored' model. Path to model folder
 ```
 When ready, run `python main.py -hyp 'hypothesis/1_session_based_tod_anomalies/config.yml'`
+
+## Best Practices 💡
+
+### Model Selection Guidelines
+- **XGBoost**: Best for regression tasks, tabular data, feature importance analysis
+- **Random Forest**: Ideal for imbalanced classification, robust to outliers, financial signals
+- **PyTorch**: Deep learning, complex patterns, large datasets
+- **TensorFlow**: Production ML pipelines, scalable deployments
+
+### Development Workflow
+1. **🔍 Start with EDA**: Analyze your data and target distribution
+2. **🎯 Choose Model Type**: Based on problem type (regression/classification) and data size
+3. **⚙️ Configure Parameters**: Use hypothesis config for reproducible experiments
+4. **🚀 Enable GPU**: Automatic acceleration for faster training
+5. **📊 Evaluate Thoroughly**: Use appropriate metrics for your use case
+6. **🔄 Iterate**: Adjust parameters based on evaluation results
+
+### Hardware Optimization
+- **GPU Training**: Automatically enabled when available (CUDA/Metal)
+- **Memory Management**: Models handle large datasets efficiently
+- **Multi-core CPU**: Fallback with optimal thread utilization
+- **Batch Processing**: Efficient handling of time-series data
+
+## Integration Points 🔗
+- **Data Pipeline**: Uses processed features from `data/` component
+- **Hypothesis System**: Configured through `hypothesis/` YAML files  
+- **Backtesting**: Models used by `backtesting/` for historical simulation
+- **Live Trading**: Models loaded by `strategy/` for real-time predictions
+- **Evaluation**: Results analyzed by `evaluation/` component

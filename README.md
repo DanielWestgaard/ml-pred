@@ -1,44 +1,39 @@
-# ml-pred 🚀
-The goal of this repository is to **explore possible ways to profit off the financial market**. In this current status of the repo, I'm **focusing on exploring different hypotheses** to find possible inefficiencies or micro-opportunities. Things that the "bigger institutions" might not prioritize because it is "so small" and not worth their time and resources.<br>
-In previous tries, I've explored the challenge of "**beating the market**". However, after many months, being a beginner and much reading on the topic, this is **not feasible** for a lone (beginner) developer. There are far too many institutions, competition and manipulation in the market for _me_ to be able to pull that off. Hence, I've **narrowed down my goal** to not fight or beat _them_, but **understand them and use _my_ strengths**: Under the radar (physically, and in the market), agile (big corps can't change as quick as lone me), "fail fast"-mindset, and most importantly: "**Big firms have to deploy large amounts of capital efficiently. They ignore things that can’t scale to billions in value. This gives me space.**"
-![Curent approach](images/current_approach_2025-05-27.png)
-> [!NOTE]
-> It's important know that this will probably not be the very best system, as I will also use this as a place to learn and take the time I need to really create and understand the different concepts of such a system myself.
+# ML-Driven Trading System 🚀
 
-## The hypothesis approach 🧑‍🚀
-The approach of using different hypotheses to test and find possible inefficiencies is as follows:
-1. **Data Processing**: Cleaning and Validating
-2. **Data Engineering**: Creates features relevant for the hypothesis using the unified ModelAwareFeatureGenerator (200+ features: volatility, returns, time of day, technical indicators, etc.). This will naturally not use Feature Selection.
-3. **Data Labeling**: Create labels based on the inefficiency hypothesis. Eg:
-    ```python
-    # Label: Binary momentum success after 5 green candles?
-    df['momentum_success'] = ((df['close'].shift(-5) - df['close']) > 0.0005)
-    ```
-4. **Machine Learning Model Training**: Train and evaluate ML models.
+A **complete hypothesis-driven trading platform** that discovers and exploits market inefficiencies through machine learning. The system focuses on finding micro-opportunities that large institutions ignore due to scalability constraints.
 
-## Project Structure 🏗️
-```
-├── main.py                 # Main orchestrator for running complete trading pipeline
-├── data/                   # Data engineering (historical & live data streaming)
-├── model/                  # Model training and management
-├── hypothesis/             # Hypothesis configurations and documentation
-├── backtesting/            # CURRENTLY UNDER WORK
-├── evaluation/             # Model evaluation and performance analysis
-├── strategy/               # Complete trading strategy execution system ✨
-├── broker/                 # Broker integrations for live trading
-├── storage/                # Data, models, results, and performance storage
-├── tests/                  # Comprehensive testing suite
-├── config/                 # System configuration files
-├── utils/                  # Shared utilities and helper functions
-├── secrets/                # Sensitive credentials (not in repo)
-├── images/                 # Documentation assets
-├── trash/                  # Deprecated code
-├── README.md               # Project overview
-└── pytest.ini             # Testing configuration
-```
+## Key Philosophy 💡
+Rather than competing directly with institutional players, this system leverages individual trader advantages:
+- **Agility**: Quick adaptation to market changes
+- **Small-scale focus**: Opportunities too small for institutional capital
+- **Hypothesis-driven**: Systematic testing of market inefficiencies
+- **End-to-end automation**: From data processing to live trading
 
-> [!NOTE]
-> The system is now a **complete end-to-end trading platform** capable of running strategies in both simulation and live trading modes. The strategy/ component ties together all other components to provide a fully functional trading system.
+![Current approach](images/current_approach_2025-05-27.png)
+
+## System Capabilities ⚡
+
+**🔄 Complete Trading Pipeline**: Data → Features → ML Models → Backtesting → Live Trading  
+**🧠 Hypothesis Testing**: Systematic exploration of market inefficiencies  
+**🚀 GPU-Accelerated ML**: XGBoost, Random Forest, PyTorch, TensorFlow support  
+**📊 Advanced Backtesting**: Historical simulation with realistic costs and slippage  
+**📡 Live Trading**: Real-time execution via Capital.com API with safety controls  
+**🎯 Risk Management**: Multi-layer position sizing, stop-losses, drawdown protection
+
+## System Components 📁
+
+| Component | Purpose | Key Features |
+|-----------|---------|--------------|
+| **[`hypothesis/`](hypothesis/README.md)** | Market hypothesis testing | Configurable trading strategies, pattern definitions |
+| **[`data/`](data/README.md)** | Data pipeline | Live streaming, feature generation (200+ features) |
+| **[`model/`](model/README.md)** | ML training system | GPU acceleration, multiple frameworks, walk-forward validation |
+| **[`backtesting/`](backtesting/README.md)** | Historical simulation | Realistic costs, component reuse, comprehensive metrics |
+| **[`strategy/`](strategy/README.md)** | Live trading system | Real-time execution, risk management, WebSocket integration |
+| **[`evaluation/`](evaluation/README.md)** | Performance analysis | Model evaluation, trading metrics, visualization |
+| **[`broker/`](broker/README.md)** | Market connectivity | Capital.com API, order management, account switching |
+
+> [!TIP]
+> Each component has detailed documentation in its respective README.md file. Start with `hypothesis/README.md` to understand the system's approach.
 
 ## Setup repo 🛠️
 If this is the first time using the repo, follow these instructions:
@@ -68,55 +63,58 @@ If this is the first time using the repo, follow these instructions:
     - [Material Icon Theme](https://marketplace.visualstudio.com/items/?itemName=PKief.material-icon-theme): Helps massively when you have many folders (icon some names).
 - `gitstats` cmd-line tool (already in `requirements.txt`): Simple and easy tool to get statistics about your repository. Eg: `gitstats /Users/dmartinsen/pers-prog/ml-pred /Users/dmartinsen/pers-prog/ml-pred`
 
-## Running ```main.py``` 👨‍✈️
-```main.py``` is the main orchestrator of this whole project. If you want to run entire componentes, or test out smaller stuff, this is where you do it from.<br>
-Make sure you've activated your venv, before running ```python main.py```.<br>
-All other components will have an argument you can run ```main``` with. Eg. ```python main.py --fetch-data-capcom```.
-### Current Functionality ⚡
-> [!NOTE] 
-> For a more thorough explanation of each component, see the README files in their respective folders.
+## Quick Start 🚀
 
-**Complete Trading System:**
-The provided path to hypothesis file is just an example.
-- **Strategy Execution**: Full live trading and simulation capabilities
-  ```bash
-  python main.py -strat "hypothesis/1_session_based_tod_anomalies/config.yml"
-  ```
-  or 
-  ```bash
-  python main.py -hyp 'hypothesis/1_session_based_tod_anomalies/config_fixed.yml'
-  ```
+### 1. Complete Hypothesis Workflow
+Run the entire pipeline from data processing to live trading:
+```bash
+python main.py -hyp 'hypothesis/spread_compression_patterns/config.yml'
+```
 
-**Data & Model Pipeline:**
-- **Hypothesis-Driven Data Pipeline**: Process data with specific market hypotheses
-  ```bash
-  python main.py -hyp "hypothesis/1_session_based_tod_anomalies/config.yml"
-  ```
-- **Historical Data Fetching**: Capital.com integration for market data
-- **Live Data Streaming**: Real-time market data via WebSocket and REST APIs
-- **Model Training & Evaluation**: Complete ML model lifecycle management
+### 2. Individual Components
+Execute specific components with targeted flags:
+```bash
+# Data processing only
+python main.py -eg --hypothesis 'hypothesis/config.yml'
 
-**Integration & Testing:**
-- **Broker Integration**: Capital.com API integration with order management
-- **Risk Management**: Multi-layer risk controls and position management
-- **Performance Tracking**: Strategy results and trade performance monitoring
+# Model training only  
+python main.py -train --hypothesis 'hypothesis/config.yml'
 
-## Recent System Improvements 🚀
+# Backtesting only
+python main.py -backtest --hypothesis 'hypothesis/config.yml'
 
-### Unified Feature Generation System (July 2025)
-The feature generation system has been completely unified and modernized:
-- **200+ Features**: Comprehensive technical indicators, market regime analysis, temporal features
-- **Model-Aware**: Automatically generates exactly what trained models need
-- **Consistent Results**: Both training pipeline and live trading use identical feature generation
-- **Automatic Dependencies**: Features are generated in optimal order with dependency resolution
-- **Easy Extensibility**: Add new features with simple decorators - no complex configuration needed
+# Live trading only
+python main.py -strat 'hypothesis/config.yml'
+```
 
-This provides a robust foundation ensuring perfect consistency between model training and live strategy execution.
+### 3. Production-Ready Example
+The spread compression strategy is tested and working-ish:
+```bash
+# Backtest with trained model
+python main.py -hyp 'hypothesis/spread_compression_patterns/config_backtest.yml'
 
-## Nice to know 💡
-Trying to follow best practice for python, I have...
-- Added readme's to each (important) folder to more granular descriptions and information about the different systems, and also trying to update them with a ```Structure``` paragraph for easier overview short descriptions.
-- Using methods with prefix ```_``` before the method name to indicate a "private" method (/helper function). Eg. ```_plot_fs_analysis_cfs()```.
-- I've chosen not to use ```__init.py__``` (in each directory), as modern Python (3.3+) no longer strictly required it for a directory to be recognized as a package. This might change in the future, depending on what libraries/packages I need (and if they require it).
+# Live trading (simulation mode)
+python main.py -strat 'hypothesis/spread_compression_patterns/config_complete.yml'
+```
 
-# Descriptions for AI Assistants
+> [!NOTE]  
+> See component-specific README files for detailed configuration options and advanced usage.
+
+## System Highlights 🌟
+
+### Latest Improvements (2025)
+- **🏗️ Unified Architecture**: Complete integration between backtesting and live trading systems
+- **🚀 GPU Acceleration**: Automatic hardware optimization for ML training (CUDA/Metal/CPU)
+- **📊 Advanced Backtesting**: 90% component reuse ensures identical behavior with live trading
+- **🧠 Production Models**: Random Forest classifier with perfect OOB accuracy for spread compression
+- **📡 Real-time Integration**: WebSocket streaming with Capital.com API for live market data
+
+### Key Achievements
+- **🎯 Hypothesis-Driven**: Systematic exploration of market inefficiencies
+- **⚡ End-to-End Pipeline**: Seamless data → model → backtest → live trading workflow  
+- **🛡️ Risk Management**: Multi-layer safety controls for live trading
+- **📈 Proven Strategy**: Spread compression pattern detection with validated results
+
+---
+
+**For detailed component documentation, see individual README files in each directory.**

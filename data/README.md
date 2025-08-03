@@ -28,7 +28,8 @@ data/
 │   ├── feature_registry.py             # Feature registration and dependency management
 │   ├── transformation.py               # Feature transformation and normalization
 │   ├── selection.py                    # Feature selection (CFS, XGB, RFE)
-│   └── target_hypothesis.py            # Hypothesis-specific target generation
+│   ├── target_hypothesis.py            # Hypothesis-specific target generation
+│   └── feature_importance.py           # 🆕 Standalone feature importance analysis system
 │
 ├── pipelines/                          # Data pipeline orchestration
 │   └── engineer_pipeline.py            # Main historical data processing pipeline
@@ -68,7 +69,8 @@ There are 2 ways of running the Data Pipeline on your raw data:
         from data.pipelines.engineer_pipeline import EngineeringPipeline
 
         data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv",
-                                            save_cleaned_data = True)
+                                            save_cleaned_data = True,
+                                            analyze_feature_importance = True)  # 🆕 Enable feature importance analysis
         
         data_pipeline.run()
         ```
@@ -93,7 +95,8 @@ When this is done, you can:
 
         data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv",  # Using hypothesis config-file, this will be dynamically fetched - so no need to provide if so
                                             save_cleaned_data = True,
-                                            hypothesis_source = "hypothesis/1_session_based_tod_anomalies/config.yml")
+                                            hypothesis_source = "hypothesis/1_session_based_tod_anomalies/config.yml",
+                                            analyze_feature_importance = True)  # 🆕 Enable feature importance analysis
         data_pipeline.run()
         ```
 
@@ -292,6 +295,29 @@ If the pipeline is being ran with ```hypothesis``` argument (path to `config.yml
 It's basically calculating and setting target column to the hypothesis: In this ```taget_hypothesis.py```-file, based on the `name` of the hypothesis in the ```config.yml```-file.<br>
 The approach is to use `shared_utils.list_of_functions_in_class` to dynamically list all method names in the class. Then, we run the **method name that matches with the hypothesis name** - meaning it's **important** they match!<br>
 For some more background and format, see the ```README.md``` documentation under the ```hypothesis/``` folder.
+
+### 🆕 Enhanced Target Generation Features
+- **🆕 Dependency Resolution**: Some of the methods have automatic generation of missing features required for target calculation (eg. `spread_compression_patterns_v4()`), but this should be a unified approach for all targets
+- **🆕 Spread Compression V4**: Forward-looking targets with proper temporal logic (no lookahead bias)
+- **🆕 Quality Validation**: Automatic signal rate validation and balance checking
+- **🆕 Feature Cleanup**: Automatic removal of temporary features after target generation
+
+### 🆕 Current Target Hypothesis Methods
+1. **session_based_tod_anomalies**: Session-specific volatility anomaly detection
+2. **spread_compression_patterns_v4**: ✅ **LATEST** - Forward-looking price movement prediction
+3. **spread_compression_patterns_v3**: Enhanced balanced class distribution (15-20% signals) ABOUT TO BE REMOVED
+4. **spread_compression_patterns_v2**: Quality-focused directional signals (outdated) ABOUT TO BE REMOVED
+5. **spread_compression_patterns**: Original version (outdated, contains lookahead bias) ABOUT TO BE REMOVED
+
+### 🆕 Spread Compression V4 Highlights - `spread_compression_patterns_v4()`
+- **Forward-Looking Predictions**: Predicts future price movements 5-15 minutes ahead
+- **No Lookahead Bias**: Uses only current market conditions for signal generation
+- **Dynamic Thresholds**: Pip-based thresholds adapted to current market volatility
+- **Temporal Features**: Price momentum, acceleration, and volume trends
+- **Multi-Horizon**: Short-term (5min), medium-term (10min), long-term (15min) targets
+- **Signal Validation**: Automatic validation of signal rates and class balance
+- **Directional Targets**: Three-class system (BUY/SELL/HOLD) for trading signal generation
+
 > [!IMPORTANT]
 > When adding functionality for new hypotheses: Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
 
@@ -302,6 +328,77 @@ The Selector file performs _very simple_ Feature Selection, by using different t
 3. **Recursive Feature Elimination**: Fits  a model (XGB Regressor) and removes the weakest feature (or features) until the specified number of features is reached.
 > [!NOTE]
 > Before the Selector returns the Features it found most predictive, I have added a manual step for preserving the `close_og` column, meaning the close price value without normalization. This is important to have in the processed file, as the model/strategy will later use this to place and execute trades.
+
+## 🆕 Feature Importance Analysis - feature_importance.py
+**Comprehensive Feature Importance Analysis System** - A modular, standalone system for analyzing feature predictive power using multiple statistical methods:
+
+### Key Features
+- **Multiple Analysis Methods**: Correlation, Mutual Information, Random Forest, Lasso Regularization, Permutation Importance
+- **🆕 Consensus Ranking**: Combines all methods to identify the most consistently predictive features
+- **🆕 Auto-Target Detection**: Automatically finds target columns (target_* patterns or 'close' fallback)
+- **🆕 Large Dataset Optimization**: Smart sampling and memory management for datasets >200k rows
+- **🆕 Comprehensive Reporting**: Automated visualization, detailed reports, and CSV exports
+- **🆕 Standalone Operation**: Can be run independently on any processed dataset
+- **🆕 Pipeline Integration**: Seamlessly integrates with EngineeringPipeline for automated analysis
+
+### Usage Examples
+
+#### Standalone Analysis
+```python
+from data.features.feature_importance import FeatureImportanceAnalyzer
+
+# Analyze any processed dataset
+analyzer = FeatureImportanceAnalyzer('storage/data/processed_data.csv')
+results = analyzer.analyze_and_save()
+
+# Get top features
+consensus_ranking = results['consensus']
+print("Top 10 features:", consensus_ranking.head(10))
+```
+
+#### Command Line Usage
+```bash
+# Analyze processed data directly
+python data/features/feature_importance.py storage/data/processed_data.csv target_spread_compression_v4_directional
+```
+
+#### Integrated Pipeline Analysis
+```python
+# Enable in pipeline for automatic analysis after feature generation
+data_pipeline = EngineeringPipeline(
+    raw_dataset="path/to/data.csv",
+    analyze_feature_importance=True  # 🆕 Automatic analysis
+)
+```
+
+### 🆕 Analysis Methods
+1. **Correlation Analysis**: Spearman correlation with target (robust to outliers)
+2. **Mutual Information**: Non-linear relationships and feature interactions  
+3. **Random Forest Importance**: Tree-based feature importance with cross-validation
+4. **Lasso Regularization**: L1 penalty feature selection (regression tasks)
+5. **Permutation Importance**: Model-agnostic importance via feature shuffling
+6. **Consensus Ranking**: Normalized combination of all methods for robust feature selection
+
+### 🆕 Output Structure
+```
+storage/data_engineering_stats/feature_importance/YYYY-MM-DD_HH-MM-SS/
+├── feature_importance_analysis.png     # Comprehensive visualization
+├── importance_results.csv              # Detailed method-specific results  
+├── consensus_ranking.csv               # Final consensus feature ranking
+└── importance_report.txt               # Human-readable summary report
+```
+
+### 🆕 Performance Optimization
+- **Smart Sampling**: Automatic dataset reduction for large datasets while preserving statistical properties
+- **Memory Management**: Efficient cleanup and memory monitoring
+- **Parallel Processing**: Multi-core execution for Random Forest and Permutation Importance
+- **Early Stopping**: Performance validation with actionable warnings
+
+### Integration Points
+- **Engineer Pipeline**: Automatic execution after feature generation (`analyze_feature_importance=True`)
+- **Hypothesis Testing**: Identifies most predictive features for specific targets
+- **Model Development**: Informs feature selection for training pipelines
+- **Research & Analysis**: Standalone tool for feature investigation
 
 
 

@@ -1,19 +1,28 @@
-# About hypothesis/
-This folder is meant to document testing of different hypotheses. Meaning trying to find patterns, anomalies, **inefficiencies**, available/repeatable liquidy, etc. in the market.<br>
-The purpose of this is that beating the market is _near_ impossible (considering all factors, challenges, and actors), but maybe there are higher changes of success by finding smaller oppurtunities in inefficiencies.
+# Hypothesis Testing System 🧪
+
+## Overview 📊
+This folder documents testing of different **market hypotheses** - systematic approaches to finding patterns, anomalies, **inefficiencies**, and repeatable opportunities in financial markets.
+
+The fundamental premise: while beating the market consistently is extremely challenging, there may be higher chances of success by identifying and exploiting smaller, specific market inefficiencies through **hypothesis-driven trading strategies**.
 
 
-## Structure
+## Structure 📁
 ```
-├── 1_session_based_tod_anomalies           # Name of the hypothesis
-│   ├── config.yml                          # Spesific configuration in terms of needed features, needed ML models (potentially their parameters/configurations again), etc.
-│   └── README.md                           # More through description of the hypothesis
-└── README.md                               # You are here - description about this folder
+hypothesis/
+├── 1_session_based_tod_anomalies/          # Session-based time-of-day anomalies
+│   ├── config.yml                          # Hypothesis configuration
+│   └── README.md                           # Detailed hypothesis description
+├── spread_compression_patterns/            # Spread compression trading (PRODUCTION-READY)
+│   ├── config_complete.yml                 # Complete pipeline configuration
+│   ├── config_backtest.yml                 # Backtesting configuration
+│   └── README.md                           # Strategy documentation
+└── README.md                               # This documentation
 ```
 
+## Hypothesis Development Process 🔬
 
-# Adding a new hypothesis 
-Each new (and all existing) hypotheses should follow _this_ structure.<br>
+### Creating a New Hypothesis
+Each hypothesis follows a **standardized structure** for consistency and integration:
 1. Create a new folder named after your hypothesis.
 2. Create a `config.yml` file for configuring the hypothesis and other potential parameters, following the given format.
 3. Optionally, though recommended, a `README.md` describing the hypothesis in more detail and with better formulations.
@@ -170,9 +179,9 @@ strategy:
 > - Support market microstructure hypotheses
 > - Use with spread-related features like `'compression_ratio'`, `'bid_ask_spread_features'`
 
-## How to use
+## Usage Examples 🚀
 
-The hypothesis system now supports a **complete end-to-end workflow** from data processing to live trading strategy execution. You can configure and run the entire pipeline through the hypothesis configuration file.
+The hypothesis system supports a **complete end-to-end workflow** from data processing to live trading strategy execution. Configure and run the entire pipeline through the hypothesis configuration file.
 
 ### Complete Workflow Options
 
@@ -284,13 +293,28 @@ strategy = StrategyFactory.create_strategy(
 results = strategy.run()
 ```
 
-### Configuration Best Practices
+## Best Practices 💡
 
-1. **Start with Simulation**: Always set `dry_run: true` when testing strategies
-2. **Incremental Testing**: Test components individually before full workflow
-3. **Risk Management**: Configure appropriate position sizing and stop losses
-4. **Model Validation**: Ensure model evaluation passes before strategy execution
-5. **Monitoring**: Enable performance tracking and alerts
+### Development Guidelines
+1. **🔍 Start with Exploration**: Analyze market data to identify potential patterns
+2. **📊 Validate Hypotheses**: Use statistical tests to confirm patterns exist
+3. **🤖 Model Development**: Train ML models on validated patterns
+4. **📈 Backtesting**: Thorough historical testing before live deployment
+5. **🎯 Live Testing**: Start with simulation mode, then small live positions
+
+### Configuration Best Practices
+1. **🔐 Start with Simulation**: Always set `dry_run: true` when testing strategies
+2. **🧪 Incremental Testing**: Test components individually before full workflow
+3. **🛡️ Risk Management**: Configure appropriate position sizing and stop losses
+4. **✅ Model Validation**: Ensure model evaluation passes before strategy execution
+5. **📊 Monitoring**: Enable performance tracking and alerts
+
+### Integration Points 🔗
+- **Data Pipeline**: Processes raw market data into ML-ready features
+- **Model Training**: Trains ML models on hypothesis-specific targets
+- **Backtesting**: Historical simulation using `backtesting/` component
+- **Live Trading**: Real-time execution using `strategy/` component
+- **Evaluation**: Performance analysis using `evaluation/` component
 
 > [!NOTE]
 > The centralized configuration approach eliminates the need to remember multiple command flags and ensures consistent component integration across the entire hypothesis workflow.
