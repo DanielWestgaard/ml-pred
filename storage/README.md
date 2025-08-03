@@ -33,18 +33,22 @@ This folder is used for storage of different purposes.
 ├── data_engineering_stats/     # Statistics and plots during data engineering pipeline
 │   ├── cleaned_data/           # Plots of dataset after cleaning
 │   ├── fe_generation/
-│   └── fe_selection/
+│   ├── fe_selection/
+│   └── feature_importance/     # Feature importance results
+
 │
 ├── models/                     # Trained models and metadata
 │   ├── <datetimenow>/          # Name of directory for model will be of now: Eg. '2025-06-09_20:19:29/'
 │   │   ├── trained_model.pkl   # Actual trained model. Eg. 'xgboost.pkl'
 │   │   ├── metadata.yml        # Information (metadata) about model training, location, parameters, etc.
-│   │   └── evaluation/         # Evaluation of model and plots of its predictions. Created in evaluation.py (plot method).
-│   │       ├── plot.pdf        # eg.
-│   │       └── evaluation.pdf  # eg.
+│   │   ├── evaluation/         # Evaluation of model and plots of its predictions. Created in evaluation.py (plot method).
+│   │   │   ├── plot.pdf        # eg.
+│   │   │   └── evaluation.pdf  # eg.
+│   │   └── backtesting/        # Backtesting results done on that selected model
+│   │       ├── backtest_results_<datetime>
+│   │       └── trades_log_<datetime>
+│   │
 │   └── ...
-│
-├── backtesting_results/        # Results from backtesting
 │
 └── README.md                   # Documentation related to storage/
 ```
