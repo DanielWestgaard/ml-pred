@@ -133,15 +133,25 @@ backtesting:
     
     # Signal processing (optimized for spread compression)
     signal_processing:
-        use_advanced_filtering: true           # ?
-        confidence_threshold: 0.50             # ?
-        min_confidence_delta: 0.01             # ?
-        cooldown_minutes: 0.25                 # ?
-        max_signals_per_hour: 240              # ?
-        confidence_window_minutes: 10          # ?
-        signal_filters: []                     # ? Examples of what you can use?['session_filter']
-        min_signal_strength: 0.08              # ?
-        volume_confirmation_required: false    # ?
+        # Basic vs Advanced filtering
+        use_advanced_filtering: true           # Enable AdvancedSignalProcessor with intelligent filtering
+        processor_type: advanced               # Options: 'basic', 'advanced', 'smart', 'ultra'
+        
+        # Core signal thresholds
+        confidence_threshold: 0.50             # Minimum model confidence (0.0-1.0) to generate signals
+        min_confidence_delta: 0.01             # Minimum confidence change to override cooldowns
+        min_signal_strength: 0.08              # Minimum signal strength after processing
+        
+        # Time-based filtering (prevents over-trading)
+        cooldown_minutes: 0.25                 # Wait time between signals (15 seconds)
+        max_signals_per_hour: 240              # Maximum signals per hour limit
+        confidence_window_minutes: 10          # Time window for confidence analysis
+        
+        # Advanced filters (list of filter names to apply)
+        signal_filters: ['session_filter']     # Options: ['session_filter', 'volatility_filter', 'volume_filter']
+        
+        # Additional confirmations
+        volume_confirmation_required: false    # Require volume confirmation for signals
     
     # Risk management (optimized for microstructure trading)
     risk_management:
@@ -150,13 +160,87 @@ backtesting:
         take_profit_pct: 0.04                         # 4% take profit (2:1 risk/reward)
         max_drawdown: 0.05                            # 5% maximum drawdown limit
         max_concurrent_positions: 3                   # Maximum 3 simultaneous positions
-        position_size_scaling: confidence             # ?Scale by signal confidence? Examples of others?
+        
+        # Position sizing methods
+        position_size_scaling: confidence             # Options: 'fixed', 'confidence', 'volatility', 'kelly'
 
     
     # Position management
     position_management:
         max_concurrent_positions: 3                   # Consistent with risk management
         position_tracking: detailed                   # Detailed position tracking for analysis
+```
+
+### Configuration Details 📋
+
+#### Signal Processing Options
+
+**Processor Types:**
+- `basic`: Simple confidence-based filtering with basic thresholds
+- `advanced`: Intelligent filtering with cooldowns and rate limiting
+- `smart`: Hybrid approach with directional change detection
+- `ultra`: Maximum permissiveness for high-frequency strategies
+
+**Signal Filters Available:**
+- `session_filter`: Only trade during preferred market sessions (London/NY overlap)
+- `volatility_filter`: Filter signals based on market volatility conditions
+- `volume_filter`: Require volume confirmation for signal validation
+
+**Example Configurations:**
+
+```yaml
+# Conservative trading (few high-quality signals)
+signal_processing:
+    processor_type: advanced
+    confidence_threshold: 0.70
+    cooldown_minutes: 5
+    max_signals_per_hour: 12
+    signal_filters: ['session_filter', 'volatility_filter']
+
+# Aggressive trading (more frequent signals)
+signal_processing:
+    processor_type: ultra
+    confidence_threshold: 0.30
+    cooldown_minutes: 0.1
+    max_signals_per_hour: 300
+    signal_filters: []
+
+# Balanced approach (recommended for most strategies)
+signal_processing:
+    processor_type: smart
+    confidence_threshold: 0.50
+    cooldown_minutes: 1.0
+    max_signals_per_hour: 60
+    signal_filters: ['session_filter']
+```
+
+#### Position Sizing Methods
+
+**Available Options:**
+- `fixed`: Fixed percentage of capital per trade (uses `max_position_size`)
+- `confidence`: Scale position size by signal confidence (higher confidence = larger position)
+- `volatility`: Adjust position size based on market volatility (more volatile = smaller position)
+- `kelly`: Kelly Criterion-based position sizing (requires win rate history)
+
+**Examples:**
+
+```yaml
+# Fixed sizing (2% per trade regardless of signal strength)
+risk_management:
+    position_size_scaling: fixed
+    max_position_size: 0.02
+
+# Confidence-based scaling (0.5-4% based on signal confidence)
+risk_management:
+    position_size_scaling: confidence
+    max_position_size: 0.04  # Maximum for highest confidence signals
+    min_position_size: 0.005 # Minimum for lowest confidence signals
+
+# Volatility-adjusted sizing (smaller positions in volatile markets)
+risk_management:
+    position_size_scaling: volatility
+    max_position_size: 0.03
+    volatility_lookback: 20  # Rolling window for volatility calculation
 ```
 
 ## Usage Examples 🚀
