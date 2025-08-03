@@ -16,39 +16,81 @@ The backtesting system provides **rapid, accurate simulation** of trading strate
 - **🔍 Detailed Logging**: Full trade-by-trade analysis and position tracking
 - **✅ Production-Ready**: Extensively tested and debugged for reliable operation
 
+## How It Works 🔄
+
+The backtesting system simulates live trading by processing historical data step-by-step, using the same components as your live strategy:
+
+### Data Flow Process
+1. **Historical Data** → BacktestDataManager loads and iterates through time-series data
+2. **Feature Generation** → Uses same ModelAwareFeatureGenerator as live trading
+3. **Model Prediction** → Trained ML model generates predictions on features
+4. **Signal Processing** → SignalProcessor converts predictions to BUY/SELL signals
+5. **Risk Management** → RiskManager validates position sizing and risk limits
+6. **Trade Execution** → SimulationBroker executes trades with realistic costs
+7. **Position Management** → PositionManager tracks open/closed positions
+8. **Performance Analysis** → Comprehensive metrics and reporting
+
 ## Architecture 🏗️
 
-The backtesting system follows a **simulation-first approach** that replaces live market components with historical data playback:
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           BACKTESTING SYSTEM                            │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│ ┌─────────────────┐  ┌──────────────────┐  ┌─────────────────────────┐ │
+│ │ BacktestOrches- │  │ BacktestDataMgr  │  │   Trained ML Model      │ │
+│ │    trator       │◄─┤  (Historical     │  │ • Random Forest         │ │
+│ │ (Main Controller│  │   Data Stream)   │  │ • Model Metadata        │ │
+│ │  & Orchestration│  └──────────────────┘  │ • Feature Names         │ │
+│ │     Loop)       │                        └─────────────────────────┘ │
+│ └─────────────────┘                                                    │
+│          │                                                             │
+│          ▼                                                             │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │                     REUSED STRATEGY COMPONENTS                      │ │
+│ │  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────────────┐│ │
+│ │  │ SignalProcessor │ │   RiskManager   │ │   PositionManager       ││ │
+│ │  │ • Confidence    │ │ • Position Size │ │ • Open Positions        ││ │
+│ │  │   Thresholds    │ │ • Stop Loss %   │ │ • Closed Positions      ││ │
+│ │  │ • Signal        │ │ • Take Profit % │ │ • Portfolio Tracking    ││ │
+│ │  │   Filtering     │ │ • Max Drawdown  │ │ • Position History      ││ │
+│ │  └─────────────────┘ └─────────────────┘ └─────────────────────────┘│ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│          │                                                             │
+│          ▼                                                             │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │                    BACKTESTING-SPECIFIC LAYER                       │ │
+│ │  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────────────┐│ │
+│ │  │ SimulationBroker│ │ Feature Generator│ │ Performance Analyzer    ││ │
+│ │  │ • Instant Fills │ │ • Model-Aware   │ │ • Sharpe Ratio          ││ │
+│ │  │ • Realistic     │ │ • Exact Feature │ │ • Max Drawdown          ││ │
+│ │  │   Costs (1.3pip)│ │   Alignment     │ │ • Win Rate              ││ │
+│ │  │ • Slippage      │ │ • Buffer Mgmt   │ │ • Trade Analysis        ││ │
+│ │  │   Modeling      │ │ • Time-Series   │ │ • Equity Curves         ││ │
+│ │  └─────────────────┘ └─────────────────┘ └─────────────────────────┘│ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                   │
+│                                    ▼                                   │
+│                       ┌─────────────────────────┐                     │
+│                       │     JSON Results        │                     │
+│                       │ • Detailed Metrics      │                     │
+│                       │ • Trade-by-Trade Log    │                     │
+│                       │ • Performance Report    │                     │
+│                       │ • Risk Analysis         │                     │
+│                       └─────────────────────────┘                     │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    BACKTESTING ARCHITECTURE                 │
-├─────────────────────────────────────────────────────────────┤
-│                                                            │
-│  ┌─────────────────┐    ┌──────────────────────────────┐   │
-│  │ BacktestOrches- │    │     Historical Data Flow     │   │
-│  │     trator      │────▶  BacktestDataManager        │   │
-│  │   (Main Loop)   │    │   (Replaces LiveDataMgr)    │   │
-│  └─────────────────┘    └──────────────────────────────┘   │
-│           │                                                │
-│           ▼                                                │
-│  ┌─────────────────┐    ┌──────────────────────────────┐   │
-│  │ Feature Genera- │    │     Strategy Components      │   │
-│  │     tion        │────▶    (90% Code Reuse!)        │   │
-│  │ (Unified System)│    │  • SignalProcessor           │   │
-│  └─────────────────┘    │  • RiskManager               │   │
-│           │              │  • PositionManager           │   │
-│           ▼              └──────────────────────────────┘   │
-│  ┌─────────────────┐                                       │
-│  │ Simulation      │    ┌──────────────────────────────┐   │
-│  │    Broker       │────▶   Performance Analytics     │   │
-│  │ (Instant Fills) │    │ • Comprehensive Metrics     │   │
-│  └─────────────────┘    │ • Risk Analysis              │   │
-│                         │ • Equity Curves              │   │
-│                         │ • Trade Analysis             │   │
-│                         └──────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
+### Component Relationships
+
+- **BacktestOrchestrator**: Central coordinator that manages the simulation loop
+- **BacktestDataManager**: Streams historical data, maintains buffer for feature generation
+- **Strategy Components**: **90% code reuse** from `strategy/components/`
+  - `SignalProcessor`: Converts model predictions → actionable signals
+  - `RiskManager`: Validates position sizing, stop-loss, take-profit
+  - `PositionManager`: Tracks portfolio state and position lifecycle
+- **SimulationBroker**: Replaces live broker API with instant execution + realistic costs
+- **Performance Analyzer**: Generates comprehensive trading performance metrics
 
 ## Structure 📁
 
