@@ -1,26 +1,103 @@
-# About strategy/ 🎯
+# Live Trading Strategy System 🎯
 
 ## Overview 📈
-The strategy component is a **complete trading system orchestrator** that transforms ML model predictions into actionable trading decisions through a **hypothesis-driven approach**. This system provides both **simulation and live trading capabilities**, seamlessly integrating all project components including data management, model predictions, risk management, and broker execution.
+The strategy component is a **complete live trading system** that transforms ML model predictions into actionable trading decisions through a **hypothesis-driven approach**. This system provides both **simulation and live trading capabilities**, seamlessly integrating all project components including real-time data management, model predictions, risk management, and broker execution.
 
 ## Key Features 🚀
-- **Full Trading System**: Complete end-to-end trading system from data ingestion to trade execution
-- **✨ Multi-Model Support**: Automatic detection and handling of both regression and classification models
-- **Live & Simulation Modes**: Support for both paper trading (simulation) and live market execution
-- **Real-time Data Integration**: Live market data streaming via WebSocket and REST APIs
-- **Hypothesis-Driven Architecture**: Each market hypothesis gets its own specialized strategy implementation. This must be manually implemented for the hypothesis.
-- **Enhanced Signal Processing**: Probability-based confidence for classification, magnitude-based for regression
-- **Comprehensive Risk Management**: Multi-layer risk controls with position sizing, stop-losses, and drawdown protection
-- **Automated Account Management**: Centralized account switching with configurable target accounts
-- **Live Trading Safety**: Automatic position closure during system shutdown for live trading protection
-- **Component Integration**: Seamlessly ties together `data/`, `broker/`, `model/`, and `evaluation/` components
+- **🎯 Full Trading System**: Complete end-to-end from data ingestion to trade execution
+- **🤖 Multi-Model Support**: Automatic detection and handling of both regression and classification models
+- **📡 Live & Simulation Modes**: Support for both paper trading (simulation) and live market execution
+- **⚡ Real-time Data Integration**: Live market data streaming via WebSocket and REST APIs (currently only through Capital.com's websocket API)
+- **🧠 Hypothesis-Driven Architecture**: Each market hypothesis gets its own specialized strategy implementation
+- **📊 Enhanced Signal Processing**: Probability-based confidence for classification, magnitude-based for regression
+- **🛡️ Comprehensive Risk Management**: Multi-layer risk controls with position sizing, stop-losses, and drawdown protection
+- **🔧 Automated Account Management**: Centralized account switching with configurable target accounts
+- **🚨 Live Trading Safety**: Automatic position closure during system shutdown for live trading protection
+- **🔗 Component Integration**: Seamlessly ties together `data/`, `broker/`, `model/`, and `evaluation/` components
+
+## How It Works 🔄
+
+The strategy system processes live market data in real-time, using trained ML models to generate trading signals:
+
+### Live Trading Flow
+1. **Real-time Data** → Live market data streams via WebSocket/REST APIs
+2. **Feature Generation** → Processes live data into features for ML model
+3. **Model Prediction** → Trained ML model generates predictions on live features
+4. **Signal Processing** → Converts predictions into BUY/SELL/HOLD signals
+5. **Risk Management** → Validates signals against risk parameters
+6. **Trade Execution** → Executes trades through broker API (Capital.com)
+7. **Position Management** → Tracks and monitors live positions
+8. **Performance Tracking** → Records all trading activity and performance
 
 ## Architecture Overview 🏗️
 The strategy system follows a **3-tier architecture**:
 
-1. **Orchestration Layer**: `StrategyOrchestrator` - Main entry point that determines and runs the appropriate strategy
-2. **Strategy Layer**: Hypothesis-specific implementations (`SessionAnomalyStrategy`, `PricePredictionStrategy`) 
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                       LIVE TRADING STRATEGY SYSTEM                      │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│ ┌─────────────────┐  ┌──────────────────┐  ┌─────────────────────────┐  │
+│ │ StrategyOrches- │  │ StrategyFactory  │  │   Hypothesis Config     │  │
+│ │    trator       │◄─┤ (Determines      │  │ • Session Anomalies     │  │
+│ │ (Main Entry     │  │  Strategy Type)  │  │ • Price Prediction      │  │
+│ │  Point & Life-  │  └──────────────────┘  │ • Spread Compression    │  │
+│ │  cycle Mgmt)    │                        └─────────────────────────┘  │
+│ └─────────────────┘                                                     │
+│          │                                                              │
+│          ▼                                                              │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │                    HYPOTHESIS-SPECIFIC STRATEGIES                   │ │
+│ │  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────────────┐│ │
+│ │  │  BaseStrategy   │ │SessionAnomaly   │ │SpreadCompression        ││ │
+│ │  │ (Abstract Base) │ │   Strategy      │ │   Strategy              ││ │
+│ │  │ • Model Loading │ │ • TOD Anomalies │ │ • PRODUCTION-READY      ││ │
+│ │  │ • Component     │ │ • Session Logic │ │ • 100% OOB Accuracy     ││ │
+│ │  │   Initialization│ │ • Volume Filters│ │ • Perfect RF Model      ││ │
+│ │  └─────────────────┘ └─────────────────┘ └─────────────────────────┘│ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│          │                                                              │
+│          ▼                                                              │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │                        STRATEGY COMPONENTS                          │ │
+│ │  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────────────┐│ │
+│ │  │ SignalProcessor │ │   RiskManager   │ │   PositionManager       ││ │
+│ │  │ • Model Type    │ │ • Position Size │ │ • Portfolio State       ││ │
+│ │  │   Auto-Detection│ │ • Stop Loss %   │ │ • Position Tracking     ││ │
+│ │  │ • Confidence    │ │ • Take Profit % │ │ • Performance Metrics   ││ │
+│ │  │   Thresholds    │ │ • Drawdown Ctrl │ │ • Real-time Updates     ││ │
+│ │  └─────────────────┘ └─────────────────┘ └─────────────────────────┘│ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│          │                                                              │
+│          ▼                                                              │
+│ ┌─────────────────────────────────────────────────────────────────────┐ │
+│ │                     LIVE TRADING LAYER                              │ │
+│ │  ┌─────────────────┐ ┌──────────────────┐ ┌────────────────────────┐│ │
+│ │  │  OrderManager   │ │  LiveDataManager │ │  PositionMonitor       ││ │
+│ │  │ • Broker API    │ │ • WebSocket      │ │ • Real-time P&L        ││ │
+│ │  │ • Capital.com   │ │ • Live Streaming │ │ • Risk Monitoring      ││ │
+│ │  │ • Auto-Sizing   │ │ • Buffer Mgmt    │ │ • Performance Tracking ││ │
+│ │  │ • Safety Stops  │ │ • Error Handling │ │ • Alert System         ││ │
+│ │  └─────────────────┘ └──────────────────┘ └────────────────────────┘│ │
+│ └─────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                    │
+│                                    ▼                                    │
+│                       ┌─────────────────────────┐                       │
+│                       │     Live Results        │                       │
+│                       │ • Real-time Trading     │                       │
+│                       │ • Position Tracking     │                       │
+│                       │ • Performance Metrics   │                       │
+│                       │ • Safety & Monitoring   │                       │
+│                       └─────────────────────────┘                       │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Architecture Layers
+
+1. **Orchestration Layer**: `StrategyOrchestrator` (strategy.py:11) - Main entry point that determines and runs the appropriate strategy
+2. **Strategy Layer**: Hypothesis-specific implementations (`SessionAnomalyStrategy`, `PricePredictionStrategy`, `SpreadCompressionStrategy`) 
 3. **Component Layer**: Modular components for signal processing, risk management, position tracking, and order execution
+4. **Live Trading Layer**: Real-time data streams, broker integration, and live position monitoring
 
 ## Structure
 ```
@@ -78,47 +155,103 @@ while trading_active:
     position_manager.update(orders, market_data)
 ```
 
-### 3. Configuration-First Approach
+## Configuration ⚙️
+
 Strategy configuration is embedded in hypothesis config files:
-```yml
+
+```yaml
 strategy:
     hypothesis_name: session_based_tod_anomalies
     model_folder: storage/models/2025-07-03_12:45:35
 
+    # Data stream configuration
     data:
-        symbol: GBPUSD
-        timeframe: MINUTE
-        buffer_size: 500
-        dry_run: true  # Simulation mode
-        use_websocket: true  # Subscribe to live market data from capital.com
-        jumpstart: true  # Preload historical data - a "must-have"
+        symbol: GBPUSD                    # Trading pair
+        timeframe: MINUTE                 # Data timeframe (MINUTE, HOUR, DAY)
+        buffer_size: 500                  # Historical data buffer for feature generation
+        dry_run: true                     # true = simulation, false = live trading
+        use_websocket: true               # Enable live WebSocket data streaming
+        jumpstart: true                   # Preload historical data buffer (essential)
 
+    # Execution settings
     execution:
-        max_loops: 100
-        loop_interval: 5
+        max_loops: 100                    # Maximum trading iterations
+        loop_interval: 5                  # Seconds between trading cycles
 
+    # Signal processing (converts ML predictions to trading signals)
     signal_processing:
-        confidence_threshold: 0.3  # Lower for classification, higher for regression
-        signal_filters: ['session_filter', 'volatility_filter']
-        model_type: 'auto'  # Auto-detect or specify: 'regression'/'binary_classification'
+        confidence_threshold: 0.3         # Minimum model confidence for signal generation
+        signal_filters: ['session_filter', 'volatility_filter']  # Available filters
+        model_type: 'auto'                # 'auto', 'regression', 'binary_classification'
 
+    # Risk management (position sizing and risk controls)
     risk_management:
-        max_position_size: 0.02  # 2% of capital
-        stop_loss_pct: 0.01      # 1% stop loss
-        max_drawdown: 0.05       # 5% max drawdown
+        max_position_size: 0.02           # 2% of capital per position
+        stop_loss_pct: 0.01               # 1% stop loss
+        take_profit_pct: 0.02             # 2% take profit (optional)
+        max_drawdown: 0.05                # 5% maximum portfolio drawdown
+        max_concurrent_positions: 3        # Maximum simultaneous positions
 
+    # Position tracking and management
     position_management:
-        max_concurrent_positions: 3
-        position_tracking: detailed
+        max_concurrent_positions: 3        # Must match risk_management setting
+        position_tracking: detailed        # 'basic' or 'detailed'
 
+    # Order execution (broker integration)
     order_management:
-        broker: capital_com
-        order_type: market
-        dry_run: false  # false = live trading, true = simulation mode
-        execution_delay: 0.1
+        broker: capital_com               # Broker API to use
+        order_type: market                # 'market' or 'limit'
+        dry_run: false                    # false = live trading, true = simulation
+        execution_delay: 0.1              # Delay between order placement (seconds)
 
+    # Real-time monitoring
     monitoring:
-        update_interval: 1.0
+        update_interval: 1.0              # Position update frequency (seconds)
+```
+
+### Configuration Details 📋
+
+#### Trading Modes
+- **Live Trading**: `dry_run: false` + `use_websocket: true` - Real trades with live data
+- **Paper Trading**: `dry_run: true` + `use_websocket: true` - Simulated trades with live data
+- **Backtest Mode**: Use `backtesting/` component for historical simulation
+
+#### Signal Processing Options
+- **Model Types**: `auto` (recommended), `regression`, `binary_classification`, `multiclass_classification`
+- **Available Filters**: `session_filter`, `volatility_filter`, `volume_filter`
+- **Confidence Thresholds**: 0.3-0.7 for classification, 0.1-0.5 for regression
+
+#### Risk Management Modes
+- **Conservative**: Small position sizes (1-2%), tight stops, multiple filters
+- **Moderate**: Medium position sizes (2-3%), balanced risk/reward
+- **Aggressive**: Larger positions (3-5%), wider stops, fewer filters
+
+**Example Configurations:**
+
+```yaml
+# Conservative live trading
+strategy:
+    data:
+        dry_run: false
+        use_websocket: true
+    signal_processing:
+        confidence_threshold: 0.7
+        signal_filters: ['session_filter', 'volatility_filter']
+    risk_management:
+        max_position_size: 0.01
+        stop_loss_pct: 0.008
+
+# Aggressive simulation
+strategy:
+    data:
+        dry_run: true
+        use_websocket: true
+    signal_processing:
+        confidence_threshold: 0.3
+        signal_filters: []
+    risk_management:
+        max_position_size: 0.05
+        stop_loss_pct: 0.02
 ```
 
 ## Component Details 🧩
