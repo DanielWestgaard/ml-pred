@@ -36,15 +36,15 @@ The backtesting system simulates live trading by processing historical data step
 │                           BACKTESTING SYSTEM                            │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
-│ ┌─────────────────┐  ┌──────────────────┐  ┌─────────────────────────┐ │
-│ │ BacktestOrches- │  │ BacktestDataMgr  │  │   Trained ML Model      │ │
-│ │    trator       │◄─┤  (Historical     │  │ • Random Forest         │ │
-│ │ (Main Controller│  │   Data Stream)   │  │ • Model Metadata        │ │
-│ │  & Orchestration│  └──────────────────┘  │ • Feature Names         │ │
-│ │     Loop)       │                        └─────────────────────────┘ │
-│ └─────────────────┘                                                    │
-│          │                                                             │
-│          ▼                                                             │
+│ ┌─────────────────┐  ┌──────────────────┐  ┌─────────────────────────┐  │
+│ │ BacktestOrches- │  │ BacktestDataMgr  │  │   Trained ML Model      │  │
+│ │    trator       │◄─┤  (Historical     │  │ • Random Forest         │  │
+│ │ (Main Controller│  │   Data Stream)   │  │ • Model Metadata        │  │
+│ │  & Orchestration│  └──────────────────┘  │ • Feature Names         │  │
+│ │     Loop)       │                        └─────────────────────────┘  │
+│ └─────────────────┘                                                     │
+│          │                                                              │
+│          ▼                                                              │
 │ ┌─────────────────────────────────────────────────────────────────────┐ │
 │ │                     REUSED STRATEGY COMPONENTS                      │ │
 │ │  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────────────┐│ │
@@ -55,28 +55,28 @@ The backtesting system simulates live trading by processing historical data step
 │ │  │   Filtering     │ │ • Max Drawdown  │ │ • Position History      ││ │
 │ │  └─────────────────┘ └─────────────────┘ └─────────────────────────┘│ │
 │ └─────────────────────────────────────────────────────────────────────┘ │
-│          │                                                             │
-│          ▼                                                             │
+│          │                                                              │
+│          ▼                                                              │
 │ ┌─────────────────────────────────────────────────────────────────────┐ │
 │ │                    BACKTESTING-SPECIFIC LAYER                       │ │
-│ │  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────────────┐│ │
-│ │  │ SimulationBroker│ │ Feature Generator│ │ Performance Analyzer    ││ │
-│ │  │ • Instant Fills │ │ • Model-Aware   │ │ • Sharpe Ratio          ││ │
-│ │  │ • Realistic     │ │ • Exact Feature │ │ • Max Drawdown          ││ │
-│ │  │   Costs (1.3pip)│ │   Alignment     │ │ • Win Rate              ││ │
-│ │  │ • Slippage      │ │ • Buffer Mgmt   │ │ • Trade Analysis        ││ │
-│ │  │   Modeling      │ │ • Time-Series   │ │ • Equity Curves         ││ │
-│ │  └─────────────────┘ └─────────────────┘ └─────────────────────────┘│ │
+│ │  ┌─────────────────┐ ┌──────────────────┐ ┌────────────────────────┐│ │
+│ │  │ SimulationBroker│ │ Feature Generator│ │ Performance Analyzer   ││ │
+│ │  │ • Instant Fills │ │ • Model-Aware    │ │ • Sharpe Ratio         ││ │
+│ │  │ • Realistic     │ │ • Exact Feature  │ │ • Max Drawdown         ││ │
+│ │  │   Costs (1.3pip)│ │   Alignment      │ │ • Win Rate             ││ │
+│ │  │ • Slippage      │ │ • Buffer Mgmt    │ │ • Trade Analysis       ││ │
+│ │  │   Modeling      │ │ • Time-Series    │ │ • Equity Curves        ││ │
+│ │  └─────────────────┘ └──────────────────┘ └────────────────────────┘│ │
 │ └─────────────────────────────────────────────────────────────────────┘ │
-│                                    │                                   │
-│                                    ▼                                   │
-│                       ┌─────────────────────────┐                     │
-│                       │     JSON Results        │                     │
-│                       │ • Detailed Metrics      │                     │
-│                       │ • Trade-by-Trade Log    │                     │
-│                       │ • Performance Report    │                     │
-│                       │ • Risk Analysis         │                     │
-│                       └─────────────────────────┘                     │
+│                                    │                                    │
+│                                    ▼                                    │
+│                       ┌─────────────────────────┐                       │
+│                       │     JSON Results        │                       │
+│                       │ • Detailed Metrics      │                       │
+│                       │ • Trade-by-Trade Log    │                       │
+│                       │ • Performance Report    │                       │
+│                       │ • Risk Analysis         │                       │
+│                       └─────────────────────────┘                       │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
