@@ -33,8 +33,8 @@ class SpreadCompressionAnalyzer:
         # Mid price for directional analysis
         self.df['mid_price'] = (self.df['bid_close'] + self.df['ask_close']) / 2
         
-        # Price changes for forward returns
-        for minutes in [5, 10, 15]:
+        # Price changes for forward returns - including longer timeframes
+        for minutes in [5, 10, 15, 30, 45, 60]:
             self.df[f'price_change_{minutes}m'] = self.df['mid_price'].shift(-minutes) - self.df['mid_price']
             self.df[f'return_{minutes}m'] = self.df[f'price_change_{minutes}m'] / self.df['mid_price']
             
@@ -107,76 +107,97 @@ class SpreadCompressionAnalyzer:
         return pd.DataFrame(frequency_data)
     
     def test_predictive_power(self, percentile_thresholds=[5, 10, 15, 20], 
-                            windows=[240], volume_windows=[240]):
-        """Test if spread compression predicts future price movements"""
-        print("\n=== PREDICTIVE POWER ANALYSIS ===")
+                            windows=[240], volume_windows=[240], test_expansion=False):
+        """Test if spread compression/expansion predicts future price movements"""
+        pattern_type = "EXPANSION" if test_expansion else "COMPRESSION"
+        print(f"\n=== PREDICTIVE POWER ANALYSIS - {pattern_type} PATTERNS ===")
         
         results = []
         
         for window in windows:
             for vol_window in volume_windows:
                 for threshold in percentile_thresholds:
-                    # Define compression condition
-                    compression_col = f'spread_close_below_pct{threshold}_{window}m'
+                    if test_expansion:
+                        # Test spread expansion (95th, 90th, etc. percentiles)
+                        expansion_threshold = 100 - threshold
+                        expansion_col = f'spread_close_pct{expansion_threshold}_{window}m'
+                        
+                        # Calculate expansion percentiles if not exists
+                        if expansion_col not in self.df.columns:
+                            self.df[expansion_col] = self.df['spread_close'].rolling(window=window, min_periods=10).quantile(expansion_threshold/100)
+                        
+                        # Flag when current spread is above this percentile (expansion)
+                        condition_col = f'spread_close_above_pct{expansion_threshold}_{window}m'
+                        if condition_col not in self.df.columns:
+                            self.df[condition_col] = self.df['spread_close'] >= self.df[expansion_col]
+                        
+                        pattern_col = condition_col
+                    else:
+                        # Original compression logic
+                        pattern_col = f'spread_close_below_pct{threshold}_{window}m'
+                    
                     volume_col = f'volume_above_avg_{vol_window}m'
                     
-                    if compression_col not in self.df.columns:
+                    if pattern_col not in self.df.columns:
                         continue
                     
-                    # Combined condition: spread compression + above average volume
-                    condition = self.df[compression_col] & self.df[volume_col] & (~self.df['is_weekend'])
-                    compression_events = self.df[condition]
+                    # Combined condition: spread pattern + above average volume
+                    condition = self.df[pattern_col] & self.df[volume_col] & (~self.df['is_weekend'])
+                    pattern_events = self.df[condition]
                     
-                    if len(compression_events) < 10:  # Need minimum events for analysis
+                    if len(pattern_events) < 10:  # Need minimum events for analysis
                         continue
                     
-                    print(f"\nTesting {threshold}th percentile, {window}m window, {vol_window}m volume:")
-                    print(f"  Found {len(compression_events)} compression events")
+                    threshold_desc = f"{100-threshold}th percentile (expansion)" if test_expansion else f"{threshold}th percentile (compression)"
+                    print(f"\nTesting {threshold_desc}, {window}m window, {vol_window}m volume:")
+                    print(f"  Found {len(pattern_events)} {pattern_type.lower()} events")
                     
-                    # Analyze forward returns
-                    for minutes in [5, 10, 15]:
+                    # Analyze forward returns - test longer timeframes too
+                    timeframes = [5, 10, 15] if not test_expansion else [5, 10, 15, 30, 45, 60]
+                    for minutes in timeframes:
                         return_col = f'return_{minutes}m'
                         
-                        if return_col not in compression_events.columns:
+                        if return_col not in pattern_events.columns:
                             continue
                         
-                        # Get returns for compression events vs all periods
-                        compression_returns = compression_events[return_col].dropna()
+                        # Get returns for pattern events vs all periods
+                        pattern_returns = pattern_events[return_col].dropna()
                         all_returns = self.df[return_col].dropna()
                         
-                        if len(compression_returns) < 5:
+                        if len(pattern_returns) < 5:
                             continue
                         
                         # Statistical tests
-                        mean_compression = compression_returns.mean()
+                        mean_pattern = pattern_returns.mean()
                         mean_all = all_returns.mean()
-                        std_compression = compression_returns.std()
+                        std_pattern = pattern_returns.std()
                         
                         # T-test for difference in means
                         try:
-                            t_stat, p_value = stats.ttest_ind(compression_returns, all_returns)
+                            t_stat, p_value = stats.ttest_ind(pattern_returns, all_returns)
                         except:
                             t_stat, p_value = np.nan, np.nan
                         
                         # Direction bias
-                        positive_pct = (compression_returns > 0).mean() * 100
-                        negative_pct = (compression_returns < 0).mean() * 100
+                        positive_pct = (pattern_returns > 0).mean() * 100
+                        negative_pct = (pattern_returns < 0).mean() * 100
                         
                         print(f"    {minutes}min forward returns:")
-                        print(f"      Mean: {mean_compression:.6f} vs {mean_all:.6f} (all periods)")
-                        print(f"      Std:  {std_compression:.6f}")
+                        print(f"      Mean: {mean_pattern:.6f} vs {mean_all:.6f} (all periods)")
+                        print(f"      Std:  {std_pattern:.6f}")
                         print(f"      Direction: {positive_pct:.1f}% positive, {negative_pct:.1f}% negative")
                         print(f"      T-test p-value: {p_value:.4f}")
                         
                         results.append({
+                            'pattern_type': pattern_type.lower(),
                             'percentile_threshold': threshold,
                             'window_minutes': window,
                             'volume_window': vol_window,
                             'forward_minutes': minutes,
-                            'compression_events': len(compression_events),
-                            'mean_return_compression': mean_compression,
+                            'pattern_events': len(pattern_events),
+                            'mean_return_pattern': mean_pattern,
                             'mean_return_all': mean_all,
-                            'std_return_compression': std_compression,
+                            'std_return_pattern': std_pattern,
                             'positive_direction_pct': positive_pct,
                             'negative_direction_pct': negative_pct,
                             't_statistic': t_stat,
@@ -345,8 +366,19 @@ class SpreadCompressionAnalyzer:
         # 2. Analyze compression frequency
         frequency_df = self.analyze_compression_frequency(percentile_results)
         
-        # 3. Test predictive power
-        predictive_results = self.test_predictive_power()
+        # 3. Test predictive power - both compression and expansion
+        print("\n" + "="*60)
+        print("TESTING SPREAD EXPANSION PATTERNS (HIGH PERCENTILES)")
+        print("="*60)
+        expansion_results = self.test_predictive_power(test_expansion=True)
+        
+        print("\n" + "="*60)  
+        print("TESTING ORIGINAL COMPRESSION PATTERNS (FOR COMPARISON)")
+        print("="*60)
+        compression_results = self.test_predictive_power(test_expansion=False)
+        
+        # Combine results
+        predictive_results = pd.concat([expansion_results, compression_results], ignore_index=True)
         
         # 4. Market regime analysis
         regime_stats = self.analyze_market_regime_impact()
