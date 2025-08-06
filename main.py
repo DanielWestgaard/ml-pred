@@ -326,27 +326,27 @@ def main():
         #validator.run()
         
         # Example 2: Quick hypothesis testing
-        results = validator.quick_test_volume_hypothesis(volume_threshold_pct=90)
+        # results = validator.quick_test_volume_hypothesis(volume_threshold_pct=90)
         
         # Example 3: Advanced validation
         # from hyp_val_framework.examples.spread_expansion_validator import SpreadExpansionValidator
         
-        # validator = HypothesisValidator("path/to/data.csv")
+        # validator = HypothesisValidator(args.validate_hypothesis)
         # advanced_results = validator.run_comprehensive_validation(SpreadExpansionValidator)
         
-        # # Example 4: Custom hypothesis
-        # def my_signal_logic(data, params):
-        #     return data['Volume'] > params['threshold']
+        # Example 4: Custom hypothesis
+        def my_signal_logic(data, params):
+            return data['volume'] > params['threshold']
         
-        # def my_parameter_logic(estimation_data):
-        #     return {'threshold': estimation_data['Volume'].quantile(0.9)}
+        def my_parameter_logic(estimation_data):
+            return {'threshold': estimation_data['volume'].quantile(0.9)}
         
-        # custom_results = validator.quick_test_custom_hypothesis(
-        #     "My Volume Hypothesis",
-        #     "Test if high volume predicts returns",
-        #     my_signal_logic,
-        #     my_parameter_logic
-        # )        
+        custom_results = validator.quick_test_custom_hypothesis(
+            "My Volume Hypothesis",
+            "Test if high volume predicts returns",
+            my_signal_logic,
+            my_parameter_logic
+        )
 
 def _strategy_flow(hypothesis_config: str):
     """

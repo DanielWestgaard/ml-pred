@@ -194,10 +194,10 @@ if __name__ == "__main__":
     
     # Example 4: Custom hypothesis
     def my_signal_logic(data, params):
-        return data['Volume'] > params['threshold']
+        return data['volume'] > params['threshold']
     
     def my_parameter_logic(estimation_data):
-        return {'threshold': estimation_data['Volume'].quantile(0.9)}
+        return {'threshold': estimation_data['volume'].quantile(0.9)}
     
     custom_results = validator.quick_test_custom_hypothesis(
         "My Volume Hypothesis",
