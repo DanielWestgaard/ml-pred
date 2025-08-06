@@ -73,9 +73,7 @@ class BacktestOrchestrator:
             # Run the backtest
             self.backtest_results = self.engine.run_backtest()
             
-            execution_time = time.time() - start_time
-            logger.info(f"✅ Backtest completed in {execution_time:.2f} seconds")
-            
+            # Note: BacktestEngine already logs completion timing
             return self.backtest_results
             
         except Exception as e:

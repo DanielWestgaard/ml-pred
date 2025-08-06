@@ -426,22 +426,10 @@ def _backtesting_flow(hypothesis_config: str):
         # Run the backtest
         results = backtester.run_backtest()
         
-        # Display results summary
+        # The BacktestEngine already logs comprehensive results, 
+        # so we just log a simple completion message here
         summary = backtester.get_results_summary()
-        
-        logger.info("📊 Backtesting Results Summary:")
-        logger.info(f"  - Hypothesis: {summary.get('hypothesis', 'Unknown')}")
-        logger.info(f"  - Total Return: {summary.get('total_return_pct', 0):.2f}%")
-        logger.info(f"  - Total Trades: {summary.get('total_trades', 0)}")
-        logger.info(f"  - Win Rate: {summary.get('win_rate', 0):.1f}%")
-        logger.info(f"  - Max Drawdown: {summary.get('max_drawdown_pct', 0):.2f}%")
-        logger.info(f"  - Execution Time: {summary.get('execution_time', 0):.2f}s")
-        
-        if summary.get('sharpe_ratio') != 'N/A':
-            logger.info(f"  - Sharpe Ratio: {summary.get('sharpe_ratio', 'N/A')}")
-            logger.info(f"  - Profit Factor: {summary.get('profit_factor', 'N/A')}")
-        
-        logger.info("✅ Backtesting flow completed successfully")
+        logger.info(f"✅ Backtesting completed: {summary.get('hypothesis', 'Unknown')} - Return: {summary.get('total_return_pct', 0):.2f}% ({summary.get('total_trades', 0)} trades)")
         return results
         
     except Exception as e:
