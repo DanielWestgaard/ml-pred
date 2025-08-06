@@ -1,19 +1,18 @@
 """
-Modernized Backtesting Orchestrator
+Modern Backtesting System
 
-This is the new, plugin-based backtesting orchestrator that leverages:
-- Hypothesis plugin system for modularity
-- Focused core components for maintainability  
-- Existing feature generation system for consistency
-- Comprehensive configuration validation
+Plugin-based, modular backtesting system that provides:
+- Hypothesis-specific plugins for different trading strategies
+- Focused, maintainable components
+- Comprehensive configuration validation  
+- Integration with existing feature generation system
+- Advanced signal processing and exit strategies
 
 Usage:
-    # Modern approach with plugins
-    orchestrator = ModernizedBacktester(hypothesis_config_path="path/to/config.yml")
-    results = orchestrator.run_backtest()
+    from backtesting.backtester import BacktestOrchestrator
     
-    # Legacy compatibility maintained
-    from backtesting.backtester import BacktestOrchestrator  # Still works
+    orchestrator = BacktestOrchestrator(hypothesis_config_path="path/to/config.yml")
+    results = orchestrator.run_backtest()
 """
 
 import time
@@ -25,17 +24,17 @@ from backtesting.core import BacktestEngine
 
 logger = get_logger()
 
-class ModernizedBacktester:
+class BacktestOrchestrator:
     """
     Modern backtesting orchestrator using the plugin system.
     
-    This class provides a clean interface to the new modular backtesting
-    architecture while maintaining compatibility with existing code.
+    Provides a clean, easy-to-use interface for running comprehensive
+    backtesting simulations with hypothesis-specific customizations.
     """
     
     def __init__(self, hypothesis_config_path: str = None, model_folder: str = None, **kwargs):
         """
-        Initialize modernized backtester
+        Initialize backtesting orchestrator
         
         Args:
             hypothesis_config_path: Path to hypothesis configuration file
@@ -51,7 +50,7 @@ class ModernizedBacktester:
         # Results storage
         self.backtest_results = None
         
-        logger.info("ModernizedBacktester initialized")
+        logger.info("BacktestOrchestrator initialized")
     
     def run_backtest(self) -> Dict[str, Any]:
         """
@@ -61,7 +60,7 @@ class ModernizedBacktester:
             Comprehensive backtest results
         """
         try:
-            logger.info("🚀 Starting modernized backtesting...")
+            logger.info("🚀 Starting backtesting simulation...")
             start_time = time.time()
             
             # Initialize the core engine
@@ -75,12 +74,12 @@ class ModernizedBacktester:
             self.backtest_results = self.engine.run_backtest()
             
             execution_time = time.time() - start_time
-            logger.info(f"✅ Modernized backtest completed in {execution_time:.2f} seconds")
+            logger.info(f"✅ Backtest completed in {execution_time:.2f} seconds")
             
             return self.backtest_results
             
         except Exception as e:
-            logger.error(f"Error in modernized backtesting: {e}")
+            logger.error(f"Error in backtesting: {e}")
             raise
     
     def get_progress(self) -> Dict[str, Any]:
@@ -188,7 +187,7 @@ def run_quick_backtest(hypothesis_config_path: str, model_folder: str = None) ->
     Returns:
         Backtest results
     """
-    backtester = ModernizedBacktester(
+    backtester = BacktestOrchestrator(
         hypothesis_config_path=hypothesis_config_path,
         model_folder=model_folder
     )
@@ -196,23 +195,8 @@ def run_quick_backtest(hypothesis_config_path: str, model_folder: str = None) ->
     return backtester.run_backtest()
 
 
-# Compatibility alias - maintain backward compatibility
-def create_legacy_compatible_orchestrator(hypothesis_config_path: str = None, 
-                                        model_folder: str = None, **kwargs):
-    """
-    Create a modernized backtester with legacy-compatible interface
-    
-    This function allows existing code to use the new architecture with minimal changes:
-    
-    Before:
-        from backtesting.backtester import BacktestOrchestrator
-        orchestrator = BacktestOrchestrator(hypothesis_config_path="config.yml")
-        
-    After:
-        from backtesting.modernized_backtester import create_legacy_compatible_orchestrator as BacktestOrchestrator
-        orchestrator = BacktestOrchestrator(hypothesis_config_path="config.yml")
-    """
-    return ModernizedBacktester(hypothesis_config_path, model_folder, **kwargs)
+# Alias for backward compatibility with existing scripts
+ModernizedBacktester = BacktestOrchestrator  # For any existing references
 
 
 if __name__ == "__main__":
@@ -223,7 +207,7 @@ if __name__ == "__main__":
         config_path = sys.argv[1]
         model_folder = sys.argv[2] if len(sys.argv) > 2 else None
         
-        logger.info(f"Running modernized backtest with config: {config_path}")
+        logger.info(f"Running backtest with config: {config_path}")
         
         try:
             results = run_quick_backtest(config_path, model_folder)
@@ -246,5 +230,5 @@ if __name__ == "__main__":
             logger.error(f"Backtest failed: {e}")
             sys.exit(1)
     else:
-        print("Usage: python modernized_backtester.py <config_path> [model_folder]")
+        print("Usage: python backtester.py <config_path> [model_folder]")
         sys.exit(1)
