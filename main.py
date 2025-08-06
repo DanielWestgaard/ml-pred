@@ -65,7 +65,7 @@ from utils.model.model_metadata_loader import get_latest_model
 import utils.hypothesis.config_loader as config_loader
 import utils.logging_utils as log_utils
 from utils.logging_utils import get_logger
-from hyp_val_framework.validate import HypothesisValidator
+from hyp_val_framework.validate_hypothesis import HypothesisValidator
 
 def parse_arguments():
     """Parse command line arguments."""
