@@ -521,17 +521,81 @@ class BacktestEngine:
                 'final_account_info': account_info
             }
             
-            # Add advanced metrics
-            risk_metrics = analyzer._calculate_risk_metrics(closed_trades, account_info)
-            trade_analysis = analyzer._analyze_trades(closed_trades)
-            
+            # Calculate basic risk metrics manually
+            risk_metrics = self._calculate_basic_risk_metrics(closed_trades, account_info)
             basic_results['risk_metrics'] = risk_metrics
-            basic_results['trade_analysis'] = trade_analysis
+            
+            # Get key insights from analyzer
+            insights = analyzer.get_key_insights()
+            basic_results['key_insights'] = insights
             
         except Exception as e:
             logger.warning(f"Could not calculate advanced metrics: {e}")
         
         return basic_results
+    
+    def _calculate_basic_risk_metrics(self, closed_trades: list, account_info: dict) -> dict:
+        """Calculate basic risk metrics for backtesting results"""
+        try:
+            if not closed_trades:
+                return {
+                    'sharpe_ratio': 'N/A',
+                    'profit_factor': 'N/A',
+                    'max_consecutive_losses': 0,
+                    'max_consecutive_wins': 0
+                }
+            
+            # Extract trade results
+            trade_pnls = [trade.get('pnl', 0) for trade in closed_trades]
+            winning_trades = [pnl for pnl in trade_pnls if pnl > 0]
+            losing_trades = [pnl for pnl in trade_pnls if pnl <= 0]
+            
+            # Calculate profit factor
+            total_wins = sum(winning_trades) if winning_trades else 0
+            total_losses = abs(sum(losing_trades)) if losing_trades else 0
+            profit_factor = total_wins / total_losses if total_losses > 0 else float('inf')
+            
+            # Calculate basic Sharpe ratio (simplified)
+            if len(trade_pnls) > 1:
+                returns_std = np.std(trade_pnls)
+                avg_return = np.mean(trade_pnls)
+                sharpe_ratio = avg_return / returns_std if returns_std > 0 else 0
+            else:
+                sharpe_ratio = 0
+            
+            # Calculate consecutive wins/losses
+            consecutive_wins = consecutive_losses = 0
+            max_consecutive_wins = max_consecutive_losses = 0
+            
+            for pnl in trade_pnls:
+                if pnl > 0:
+                    consecutive_wins += 1
+                    consecutive_losses = 0
+                    max_consecutive_wins = max(max_consecutive_wins, consecutive_wins)
+                else:
+                    consecutive_losses += 1
+                    consecutive_wins = 0
+                    max_consecutive_losses = max(max_consecutive_losses, consecutive_losses)
+            
+            return {
+                'sharpe_ratio': round(sharpe_ratio, 3) if isinstance(sharpe_ratio, (int, float)) else sharpe_ratio,
+                'profit_factor': round(profit_factor, 3) if profit_factor != float('inf') else 'inf',
+                'max_consecutive_losses': max_consecutive_losses,
+                'max_consecutive_wins': max_consecutive_wins,
+                'total_winning_trades': len(winning_trades),
+                'total_losing_trades': len(losing_trades),
+                'avg_winning_trade': round(np.mean(winning_trades), 2) if winning_trades else 0,
+                'avg_losing_trade': round(np.mean(losing_trades), 2) if losing_trades else 0
+            }
+            
+        except Exception as e:
+            logger.error(f"Error calculating risk metrics: {e}")
+            return {
+                'sharpe_ratio': 'Error',
+                'profit_factor': 'Error',
+                'max_consecutive_losses': 0,
+                'max_consecutive_wins': 0
+            }
     
     def _save_results(self):
         """Save backtest results to storage"""
