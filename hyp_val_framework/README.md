@@ -11,3 +11,6 @@ A "general hypothesis validation framework" would be the very first step of a hy
 - **Simple**: Don't overcomplicate it with many features. A hypothesis should be "lightweight"
 - **Testable**: Should be able to test and verify it
 - **Concrete** "hypothesis statement"
+
+### Suggestions
+- Even though we don't engineer the data, we could still reuse some of the components from `data/`. Eg. [Cleaning](data/processing/cleaning.py) and [Validation](data/processing/validation.py)
