@@ -175,33 +175,3 @@ def validate_spread_expansion_hypothesis(dataset, config=None):
     results = validator.run()
     validator.print_validation_summary()
     return results
-
-
-# Example usage patterns
-if __name__ == "__main__":
-    # Example 1: Basic usage (backward compatible)
-    validator = HypothesisValidator("path/to/data.csv")
-    validator.run()
-    
-    # Example 2: Quick hypothesis testing
-    results = validator.quick_test_volume_hypothesis(volume_threshold_pct=90)
-    
-    # Example 3: Advanced validation
-    from examples.spread_expansion_validator import SpreadExpansionValidator
-    
-    validator = HypothesisValidator("path/to/data.csv")
-    advanced_results = validator.run_comprehensive_validation(SpreadExpansionValidator)
-    
-    # Example 4: Custom hypothesis
-    def my_signal_logic(data, params):
-        return data['volume'] > params['threshold']
-    
-    def my_parameter_logic(estimation_data):
-        return {'threshold': estimation_data['volume'].quantile(0.9)}
-    
-    custom_results = validator.quick_test_custom_hypothesis(
-        "My Volume Hypothesis",
-        "Test if high volume predicts returns",
-        my_signal_logic,
-        my_parameter_logic
-    )
