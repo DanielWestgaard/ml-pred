@@ -133,3 +133,16 @@ class DefaultHypothesisPlugin(HypothesisPlugin):
 
 # Auto-register the default plugin
 HypothesisPluginRegistry.register_plugin('default', DefaultHypothesisPlugin)
+
+# Auto-register hypothesis-specific plugins
+def _auto_register_plugins():
+    """Auto-register plugins from the types directory"""
+    try:
+        from .types import SpreadCompressionPlugin
+        HypothesisPluginRegistry.register_plugin('spread_compression', SpreadCompressionPlugin)
+        logger.info("Auto-registered hypothesis-specific plugins")
+    except ImportError as e:
+        logger.warning(f"Could not auto-register some hypothesis plugins: {e}")
+
+# Perform auto-registration
+_auto_register_plugins()
