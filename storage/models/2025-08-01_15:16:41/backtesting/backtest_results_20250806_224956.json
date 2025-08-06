@@ -1,0 +1,174 @@
+{
+  "backtest_summary": {
+    "hypothesis_name": "spread_compression_patterns_v4_enhanced",
+    "model_type": "random_forest",
+    "initial_capital": 10000,
+    "final_equity": 9864.093647358055,
+    "total_return": -0.013590635264194498,
+    "total_return_pct": -1.3590635264194497,
+    "execution_time_seconds": 41.933554887771606
+  },
+  "trading_performance": {
+    "total_trades": 3,
+    "winning_trades": 1,
+    "losing_trades": 2,
+    "win_rate": 0.3333333333333333,
+    "total_fees": 0.9163474678526904,
+    "max_drawdown": 0.01613926966960553,
+    "max_drawdown_pct": 1.613926966960553
+  },
+  "data_period": {
+    "start": "2025-07-15 00:00:00+00:00",
+    "end": "2025-07-26 00:00:00+00:00"
+  },
+  "component_info": {
+    "model_info": {
+      "model_path": "storage/models/2025-08-01_15:16:41",
+      "model_class": "RandomForestClassifier",
+      "model_type": "multiclass_classification",
+      "hypothesis_name": "spread_compression_patterns_v4_enhanced",
+      "training_date": null,
+      "feature_count": 13,
+      "has_probabilities": true,
+      "model_metadata": {
+        "hypothesis": {
+          "name": "spread_compression_patterns_v4_enhanced"
+        },
+        "model_info": {
+          "model_type": "random_forest",
+          "model_class": "RandomForestClassifier",
+          "storage_path": "/Users/dmartinsen/pers-prog/ml-pred/storage/models/2025-08-01_15:16:41",
+          "created_at": "2025-08-01T15:16:41.123445"
+        },
+        "training": {
+          "duration_seconds": 12.15,
+          "duration_formatted": "0:00:12",
+          "completed_at": "2025-08-01T15:16:41.123459",
+          "train_samples": 980352,
+          "test_samples": 245089,
+          "validation_method": "walk_forward",
+          "walk_forward_periods": 12,
+          "final_training_period": {
+            "start": "2023-01-02T00:42:00+00:00",
+            "end": "2025-05-02T00:42:00+00:00",
+            "samples": 1225441
+          }
+        },
+        "dataset": {
+          "dataset_path": "storage/data/capital_com/GBPUSD/processed/1m/2023-01-01_2025-07-01.csv",
+          "target_column": "target_spread_compression_v4_directional",
+          "feature_count": 13,
+          "features": [
+            "institutional_footprint",
+            "spread_compression_rate",
+            "depth_stability",
+            "microstructure_momentum_fusion",
+            "volume_ratio",
+            "price_momentum_1min",
+            "price_momentum_3min",
+            "price_momentum_5min",
+            "price_acceleration",
+            "volume_momentum",
+            "volume_acceleration",
+            "volatility_trend",
+            "close_og"
+          ],
+          "total_samples": 1225441,
+          "date_range": {
+            "start": "2023-01-02 00:42:00+00:00",
+            "end": "2025-05-02 00:42:00+00:00"
+          },
+          "missing_values": 0
+        },
+        "model_parameters": {
+          "bootstrap": true,
+          "ccp_alpha": 0.01,
+          "class_weight": "balanced",
+          "criterion": "gini",
+          "max_depth": 6,
+          "max_features": 0.3,
+          "max_leaf_nodes": 500,
+          "max_samples": 0.8,
+          "min_impurity_decrease": 0.001,
+          "min_samples_leaf": 5,
+          "min_samples_split": 10,
+          "min_weight_fraction_leaf": 0.0,
+          "monotonic_cst": null,
+          "n_estimators": 100,
+          "n_jobs": -1,
+          "oob_score": true,
+          "random_state": 42,
+          "verbose": 0,
+          "warm_start": false
+        },
+        "system_info": {
+          "cpu": "arm",
+          "cpu_cores": 10,
+          "cpu_threads": 10,
+          "memory_gb": 16.0,
+          "python_version": "3.11.13",
+          "os": "Darwin 24.5.0"
+        },
+        "data_split": {
+          "train_size": 980352,
+          "test_size": 245089,
+          "split_ratio": "980352/245089"
+        }
+      }
+    },
+    "signal_processor_stats": {
+      "processor_type": "AdvancedSignalProcessor",
+      "signals_generated": 1477,
+      "signals_processed": 3,
+      "processing_rate": 0.2031144211238998,
+      "signals_last_hour": 3,
+      "avg_confidence": 0.37276532178205946,
+      "confidence_history_size": 100,
+      "last_signal_times": {
+        "SELL": "2025-08-06 22:49:14.782784",
+        "BUY": "2025-08-06 22:49:41.926977"
+      },
+      "last_direction": "BUY"
+    },
+    "exit_strategy_info": {
+      "exit_strategy_class": "SpreadCompressionExitStrategy",
+      "confidence_exit_threshold": 0.9,
+      "minimum_signal_life_minutes": 5,
+      "hypothesis_specific": true
+    },
+    "signal_tracker_info": {
+      "signal_tracker_class": "SpreadCompressionSignalTracker",
+      "track_compression_features": true,
+      "track_volume_patterns": true,
+      "tracked_positions_count": 0,
+      "hypothesis_specific": true
+    },
+    "hypothesis_plugin": {
+      "plugin_class": "SpreadCompressionPlugin",
+      "hypothesis_name": "spread_compression_patterns_v4_enhanced",
+      "supports_exit_strategy": true,
+      "supports_signal_tracking": true,
+      "supports_feature_customization": true,
+      "specialization": "spread_compression_patterns",
+      "required_features": [
+        "compression_ratio_micro",
+        "volume_ratio",
+        "signal_strength_v2",
+        "compression_consistency"
+      ],
+      "exit_strategy_type": "SpreadCompressionExitStrategy",
+      "signal_tracker_type": "SpreadCompressionSignalTracker",
+      "supports_feature_enhancement": true,
+      "optimal_timeframes": [
+        "1m",
+        "5m"
+      ],
+      "market_sessions": [
+        "London",
+        "NY",
+        "Overlap"
+      ],
+      "risk_profile": "medium_high_frequency"
+    }
+  }
+}
