@@ -394,14 +394,61 @@ def _strategy_flow(hypothesis_config: str):
         raise
 
 def _backtesting_flow(hypothesis_config: str):
+    """
+    Run backtesting flow with the modernized plugin-based system
+    
+    Args:
+        hypothesis_config: Path to the hypothesis configuration file
+    """
     from backtesting.backtester import BacktestOrchestrator
-
-    # Test the trained model
-    backtester = BacktestOrchestrator(
-        hypothesis_config_path = hypothesis_config  # "hypothesis/spread_compression_patterns/config_complete.yml"
-    )
-
-    results = backtester.run_backtest()
+    
+    try:
+        logger.info("🚀 Starting backtesting flow with modernized system...")
+        logger.info(f"Using hypothesis config: {hypothesis_config}")
+        
+        # Initialize the modern backtesting orchestrator
+        backtester = BacktestOrchestrator(
+            hypothesis_config_path=hypothesis_config
+        )
+        
+        # Validate configuration before running
+        validation = backtester.validate_configuration()
+        if not validation.get('is_valid', False):
+            logger.error(f"❌ Backtesting configuration validation failed: {validation.get('error')}")
+            return None
+        
+        # Log component information
+        component_info = backtester.get_component_info()
+        logger.info(f"Using model: {component_info.get('model_info', {}).get('model_class', 'Unknown')}")
+        logger.info(f"Hypothesis plugin: {component_info.get('hypothesis_plugin', {}).get('plugin_class', 'Unknown')}")
+        logger.info(f"Exit strategy: {component_info.get('exit_strategy_info', {}).get('exit_strategy_class', 'Unknown')}")
+        
+        # Run the backtest
+        results = backtester.run_backtest()
+        
+        # Display results summary
+        summary = backtester.get_results_summary()
+        
+        logger.info("📊 Backtesting Results Summary:")
+        logger.info(f"  - Hypothesis: {summary.get('hypothesis', 'Unknown')}")
+        logger.info(f"  - Total Return: {summary.get('total_return_pct', 0):.2f}%")
+        logger.info(f"  - Total Trades: {summary.get('total_trades', 0)}")
+        logger.info(f"  - Win Rate: {summary.get('win_rate', 0):.1f}%")
+        logger.info(f"  - Max Drawdown: {summary.get('max_drawdown_pct', 0):.2f}%")
+        logger.info(f"  - Execution Time: {summary.get('execution_time', 0):.2f}s")
+        
+        if summary.get('sharpe_ratio') != 'N/A':
+            logger.info(f"  - Sharpe Ratio: {summary.get('sharpe_ratio', 'N/A')}")
+            logger.info(f"  - Profit Factor: {summary.get('profit_factor', 'N/A')}")
+        
+        logger.info("✅ Backtesting flow completed successfully")
+        return results
+        
+    except Exception as e:
+        logger.error(f"❌ Backtesting flow failed: {e}")
+        import traceback
+        logger.error(f"Stack trace: {traceback.format_exc()}")
+        return None
 
 if __name__=="__main__":
     main()
