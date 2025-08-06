@@ -321,9 +321,7 @@ def main():
     if args.validate_hypothesis:
         logger.info("Validate hypothesis is wanted.")
         
-        # Example 1: Basic usage (backward compatible)
         validator = HypothesisValidator(args.validate_hypothesis)
-        #validator.run()
         
         # Example 2: Quick hypothesis testing
         # results = validator.quick_test_volume_hypothesis(volume_threshold_pct=90)

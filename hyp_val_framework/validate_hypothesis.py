@@ -50,46 +50,6 @@ class HypothesisValidator:
         self.validation_df = None
         self.validator_results = None
     
-    def run(self, validation_size: float = 0.3):
-        """
-        Run basic hypothesis validation (backward compatibility).
-        
-        Args:
-            validation_size: Fraction of data for validation period
-        """
-        # Clean
-        with PerformanceContext("Data Cleaning"):
-            self.df = self.cleaner.run()
-            memory_monitor.safe_cleanup()
-        
-        # Validate
-        with PerformanceContext("Data Validation"):
-            self.validator = DataValidator(self.df)
-            self.validator_results = self.validator.run()
-            self.df = self.validator_results["validated_data"]
-            data_utils.check_validation(
-                self.validator_results["is_valid"], 
-                self.validator_results["issues"]
-            )
-            memory_monitor.safe_cleanup()
-        
-        # Chronological splits
-        self._estimation_validation_periods(validation_size)
-        
-        logger.info("Basic validation setup complete. Use advanced methods for hypothesis testing.")
-    
-    def _estimation_validation_periods(self, validation_size: float = 0.3):
-        """
-        Create parameter estimation and validation periods.
-        """
-        split_idx = int(len(self.df) * (1 - validation_size))
-        
-        self.estimation_df = self.df.iloc[:split_idx].copy()
-        self.validation_df = self.df.iloc[split_idx:].copy()
-        
-        logger.info(f"Estimation period: {self.estimation_df.index.min()} to {self.estimation_df.index.max()}")
-        logger.info(f"Validation period: {self.validation_df.index.min()} to {self.validation_df.index.max()}")
-    
     # Quick validation methods
     def quick_test_volume_hypothesis(self, volume_threshold_pct: int = 95):
         """Quick test of volume spike hypothesis."""
