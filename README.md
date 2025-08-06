@@ -31,6 +31,7 @@ Rather than competing directly with institutional players, this system leverages
 | **[`strategy/`](strategy/README.md)** | Live trading system | Real-time execution, risk management, WebSocket integration |
 | **[`evaluation/`](evaluation/README.md)** | Performance analysis | Model evaluation, trading metrics, visualization |
 | **[`broker/`](broker/README.md)** | Market connectivity | Capital.com API, order management, account switching |
+| **[`hyp_val_framework/`](hyp_val_framework/README.md)** | Validate new hypotheses | Statistical, systematic, validation |
 
 > [!TIP]
 > Each component has detailed documentation in its respective README.md file. Start with `hypothesis/README.md` to understand the system's approach.
