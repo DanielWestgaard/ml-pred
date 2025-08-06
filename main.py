@@ -110,7 +110,7 @@ def parse_arguments():
     parser.add_argument('--wf-step-months', type=int, default=1, help='Step size between validation periods in months.')
 
     parser.add_argument('--validate-hypothesis', '-vh', default=False, help='Run validation on your new hypothesis.')
-    parser.add_argument('--validate-hypothesis', '-vh', default=False, help='')
+    # parser.add_argument('--validate-hypothesis-specific', '-vhs', default=False, help='')
 
     return parser.parse_args()
 
