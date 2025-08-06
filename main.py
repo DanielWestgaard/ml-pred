@@ -65,6 +65,7 @@ from utils.model.model_metadata_loader import get_latest_model
 import utils.hypothesis.config_loader as config_loader
 import utils.logging_utils as log_utils
 from utils.logging_utils import get_logger
+from hyp_val_framework.validate_hypothesis import HypothesisValidator
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -102,11 +103,14 @@ def parse_arguments():
     parser.add_argument('--fi-target', default=None, help='Target column for feature importance analysis (auto-detected if not provided).')
     parser.add_argument('--fi-in-pipeline', action='store_true', default=False, help='Enable feature importance analysis within data pipeline.')
     
-    # Walk-forward validation
+    # Walk-forward validation - TODO: Not used? Remove?
     parser.add_argument('--walk-forward', '-wf', default=False, help='Run walk-forward validation with hypothesis config file.')
     parser.add_argument('--wf-training-months', type=int, default=6, help='Initial training period in months for walk-forward validation.')
     parser.add_argument('--wf-validation-months', type=int, default=1, help='Validation period length in months.')
     parser.add_argument('--wf-step-months', type=int, default=1, help='Step size between validation periods in months.')
+
+    parser.add_argument('--validate-hypothesis', '-vh', default=False, help='Run validation on your new hypothesis.')
+    # parser.add_argument('--validate-hypothesis-specific', '-vhs', default=False, help='')
 
     return parser.parse_args()
 
@@ -284,7 +288,7 @@ def main():
             print(f"{i:2d}. {feature:<30} {score:.4f}")
         print("="*60)
     
-    # Walk-forward validation
+    # Walk-forward validation - TODO: Remove?
     if args.walk_forward:
         logger.info(f"Starting walk-forward validation with config: {args.walk_forward}")
         from model.walk_forward_validator import WalkForwardValidator, create_walk_forward_config
@@ -314,6 +318,33 @@ def main():
         print(f"Results saved to: {validator.validation_directory}")
         print("="*80)
 
+    if args.validate_hypothesis:
+        logger.info("Validate hypothesis is wanted.")
+        
+        validator = HypothesisValidator(args.validate_hypothesis)
+        
+        # Example 2: Quick hypothesis testing
+        # results = validator.quick_test_volume_hypothesis(volume_threshold_pct=90)
+        
+        # Example 3: Advanced validation
+        # from hyp_val_framework.examples.spread_expansion_validator import SpreadExpansionValidator
+        
+        # validator = HypothesisValidator(args.validate_hypothesis)
+        # advanced_results = validator.run_comprehensive_validation(SpreadExpansionValidator)
+        
+        # Example 4: Custom hypothesis
+        def my_signal_logic(data, params):
+            return data['volume'] > params['threshold']
+        
+        def my_parameter_logic(estimation_data):
+            return {'threshold': estimation_data['volume'].quantile(0.9)}
+        
+        custom_results = validator.quick_test_custom_hypothesis(
+            "My Volume Hypothesis",
+            "Test if high volume predicts returns",
+            my_signal_logic,
+            my_parameter_logic
+        )
 
 def _strategy_flow(hypothesis_config: str):
     """
