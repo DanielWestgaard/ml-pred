@@ -320,8 +320,33 @@ def main():
 
     if args.validate_hypothesis:
         logger.info("Validate hypothesis is wanted.")
-        hyp_val = HypothesisValidator(dataset = args.validate_hypothesis)
-        hyp_val.run()
+        
+        # Example 1: Basic usage (backward compatible)
+        validator = HypothesisValidator(args.validate_hypothesis)
+        #validator.run()
+        
+        # Example 2: Quick hypothesis testing
+        results = validator.quick_test_volume_hypothesis(volume_threshold_pct=90)
+        
+        # Example 3: Advanced validation
+        # from hyp_val_framework.examples.spread_expansion_validator import SpreadExpansionValidator
+        
+        # validator = HypothesisValidator("path/to/data.csv")
+        # advanced_results = validator.run_comprehensive_validation(SpreadExpansionValidator)
+        
+        # # Example 4: Custom hypothesis
+        # def my_signal_logic(data, params):
+        #     return data['Volume'] > params['threshold']
+        
+        # def my_parameter_logic(estimation_data):
+        #     return {'threshold': estimation_data['Volume'].quantile(0.9)}
+        
+        # custom_results = validator.quick_test_custom_hypothesis(
+        #     "My Volume Hypothesis",
+        #     "Test if high volume predicts returns",
+        #     my_signal_logic,
+        #     my_parameter_logic
+        # )        
 
 def _strategy_flow(hypothesis_config: str):
     """

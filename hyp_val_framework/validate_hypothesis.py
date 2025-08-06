@@ -13,8 +13,8 @@ from utils.data_utils import check_and_return_df
 from utils.performance_utils import memory_monitor, PerformanceContext
 from utils.logging_utils import get_logger
 
-from base_hypothesis_validator import BaseHypothesisValidator, SimpleHypothesisValidator
-from quick_validator import quick_validate_hypothesis, HypothesisTemplates
+from hyp_val_framework.base_hypothesis_validator import BaseHypothesisValidator, SimpleHypothesisValidator
+from hyp_val_framework.quick_validator import quick_validate_hypothesis, HypothesisTemplates
 
 logger = get_logger()
 
