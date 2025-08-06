@@ -19,10 +19,6 @@ class HypothesisValidator:
         self.df, self.og_df = check_and_return_df(dataset)
         # Clean & validate data
         self.cleaner = DataCleaner(raw_dataset=self.df, save_cleaned_data=False)
-        
-        # Split into train/test
-        # ...
-        # 
     
     def run(self):
         """Run the hypothesis validator on you hypothesis."""
@@ -40,3 +36,22 @@ class HypothesisValidator:
             data_utils.check_validation(self.validator_results["is_valid"], self.validator_results["issues"])
             memory_monitor.safe_cleanup()  # Cleanup after validation
         
+        # Cronological splits
+        self._estimation_validation_periods()
+        
+    def _estimation_validation_periods(self, validation_size:int = 0.3):
+        """
+        In ML this is called train/test splits, but to avoid confusion, I'm calling 
+        it Parameter Estimation Period and Validation Period, since that's what we're
+        using them for. 
+        """
+        split_idx = int( len(self.df) * (1 - validation_size) )
+        
+        # Train/Estimation periods
+        self.estimation_df = self.df.iloc[:split_idx].copy()
+        # Test/Validation periods
+        self.validation_df = self.df.iloc[split_idx:].copy()
+        
+        # Ensure no data leakage - have to use index as 'date' is sat to that
+        logger.info(f"Training: {self.estimation_df.index.min()} to {self.estimation_df.index.max()}")
+        logger.info(f"Testing:  {self.validation_df.index.min()} to {self.validation_df.index.max()}")
