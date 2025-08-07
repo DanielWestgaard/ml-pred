@@ -9,11 +9,9 @@ This module provides a robust, model-aware feature generation system that:
 - Provides clear error handling and validation
 """
 
-import inspect
 from dataclasses import dataclass, field
-from typing import Dict, List, Set, Callable, Optional, Any, Tuple
+from typing import Dict, List, Set, Callable, Optional, Tuple
 from collections import defaultdict, deque
-import pandas as pd
 from utils.logging_utils import get_logger
 
 logger = get_logger()
@@ -293,7 +291,7 @@ def feature_generator(output_features: List[str],
 
 class AutoRegisterMeta(type):
     """Metaclass that automatically registers decorated methods"""
-    def __new__(cls, name, bases, namespace, **kwargs):
+    def __new__(cls, name, bases, namespace, **_kwargs):
         new_class = super().__new__(cls, name, bases, namespace)
         
         # Auto-register methods with feature definitions

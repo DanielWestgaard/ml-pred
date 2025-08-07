@@ -5,7 +5,7 @@ from data.processing.validation import DataValidator
 from data.features.enhanced_generation import ModelAwareFeatureGenerator
 from data.features.transformation import FeatureTransformer
 from data.features.selection import FeatureSelector
-from data.features.target_hypothesis import TargetHypothesis
+from data.hypothesis import TargetHypothesis
 import utils.hypothesis.config_loader as config_loader
 from utils.logging_utils import get_logger
 from utils.performance_utils import memory_monitor, PerformanceContext
