@@ -23,13 +23,17 @@ data/
 │   ├── cleaning.py                     # Data cleaning (missing values, duplicates, outliers)
 │   └── validation.py                   # Data validation and integrity checks
 │
-├── features/                           # Unified feature engineering system
+├── features/                           # General feature engineering system
 │   ├── enhanced_generation.py          # ModelAwareFeatureGenerator - unified feature system (200+ features)
 │   ├── feature_registry.py             # Feature registration and dependency management
 │   ├── transformation.py               # Feature transformation and normalization
 │   ├── selection.py                    # Feature selection (CFS, XGB, RFE)
-│   ├── target_hypothesis.py            # Hypothesis-specific target generation
 │   └── feature_importance.py           # 🆕 Standalone feature importance analysis system
+│
+├── hypothesis/                         # 🆕 Hypothesis-specific target generation
+│   ├── __init__.py                     # Clean imports
+│   ├── base_target_generator.py        # Universal base class for all target generators
+│   └── target_generators.py            # Clean, modular hypothesis implementations
 │
 ├── pipelines/                          # Data pipeline orchestration
 │   └── engineer_pipeline.py            # Main historical data processing pipeline
@@ -81,13 +85,13 @@ There are 2 ways of running the Data Pipeline on your raw data:
 2. **Focusing on a Hypothesis**: The pipeline will have a somewhat different flow: `Cleaning` -> `Validation` -> `Generation` (only generating specified features from config-file) -> `Target Hypothesis` (generating _target column_ representing the Hypothesis) -> `Transformation` -> `Save`.<br>
 This really is at **the heart of this project**. Check out the documentation under `hypothesis/` and `Target Hypothesis` (chapter _in this readme file_) to see what this is, and how to create one to focus on (`config.yml`, `README.md`, new method in `target_hypothesis.py`).<br>
 When this is done, you can:
-    - **Recommended**: Use `main.py`and run the Pipeline, with hypothesis config, like this (eg.):
+    - **Recommended**: Use `main.py` and run the Pipeline with hypothesis config, like this (eg.):
         ```bash
-        python main.py -hyp "hypothesis/1_session_based_tod_anomalies/config.yml"
+        python main.py -hyp "hypothesis/spread_compression_patterns/config_process_data_v4_enhanced.yml"
         ```
-    - **Older version of using hypothesis flow**: Use `main.py`and run the Pipeline like this (eg.):
+    - **Legacy method**: Use `main.py` and run the Pipeline like this (eg.):
         ```bash
-        python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
+        python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/spread_compression_patterns/config_process_data_v4_enhanced.yml"
         ```
     - Or, implement it yourself:
         ```python
@@ -95,7 +99,7 @@ When this is done, you can:
 
         data_pipeline = EngineeringPipeline(raw_dataset = "storage/data/capital_com/GBPUSD/raw/1m/2025-05-01_2025-05-01.csv",  # Using hypothesis config-file, this will be dynamically fetched - so no need to provide if so
                                             save_cleaned_data = True,
-                                            hypothesis_source = "hypothesis/1_session_based_tod_anomalies/config.yml",
+                                            hypothesis_source = "hypothesis/spread_compression_patterns/config_process_data_v4_enhanced.yml",
                                             analyze_feature_importance = True)  # 🆕 Enable feature importance analysis
         data_pipeline.run()
         ```
@@ -104,9 +108,11 @@ When this is done, you can:
 > The pipeline uses the modern list-format for feature specification from hypothesis configs. The unified system automatically resolves dependencies and generates features in the optimal order.
 
 > [!NOTE]
-> Before using Hypothesis on the Pipeline, make sure you have created the Hypothesis properly. See the documentation under `hypothesis/` and under `Features`/`Target Hypothesis` in this document. Also, use the existing functionality as examples. This is currently a quick run-down:
-> 1. `config.yml`-file for the hypothesis in the given format. Also recommended to have a `README.md` under the directory of your hypothesis for a more detailed description, but not needed for this functionality to work.
-> 2. Create a method in the (`data/features/`)`target_hypothesis.py` to calculate your `target` (the hypothesis). Eg. like Hypothesis 1 ("session_based_tod_anomalies").<br>
+> 🆕 **New Clean Architecture**: The hypothesis system has been completely modernized! Before using hypotheses:
+> 1. `config.yml` file for the hypothesis in the given format. Also recommended to have a `README.md` under the directory of your hypothesis for a more detailed description.
+> 2. 🆕 Create a method in the new (`data/hypothesis/`)`target_generators.py` to calculate your `target` (the hypothesis).
+> 3. 🆕 The old `data/features/target_hypothesis.py` has been moved to `trash/deprecated_features/` - use the new clean system instead!
+> 4. 🆕 See the existing clean implementations like `spread_compression_patterns_v4` as examples.
 
 
 # About processing/
@@ -290,26 +296,75 @@ The ```run()``` has some functionality that excludes some features from normaliz
 > [!NOTE]
 > There are several steps in the normalization process that exludes some features with particular prefixes (eg. like starting with ```target_```) from normalization.
 
-## Creating Target Column (for the Hypothesis) - target_hypothesis.py
-If the pipeline is being ran with ```hypothesis``` argument (path to `config.yml`), the `Feature Selection` process is skipped and this (file) is ran after `Feature Generation`.<br>
-It's basically calculating and setting target column to the hypothesis: In this ```taget_hypothesis.py```-file, based on the `name` of the hypothesis in the ```config.yml```-file.<br>
-The approach is to use `shared_utils.list_of_functions_in_class` to dynamically list all method names in the class. Then, we run the **method name that matches with the hypothesis name** - meaning it's **important** they match!<br>
-For some more background and format, see the ```README.md``` documentation under the ```hypothesis/``` folder.
+# About hypothesis/ 🎯
 
-### 🆕 Enhanced Target Generation Features
-- **🆕 Dependency Resolution**: Some of the methods have automatic generation of missing features required for target calculation (eg. `spread_compression_patterns_v4()`), but this should be a unified approach for all targets
-- **🆕 Spread Compression V4**: Forward-looking targets with proper temporal logic (no lookahead bias)
-- **🆕 Quality Validation**: Automatic signal rate validation and balance checking
-- **🆕 Feature Cleanup**: Automatic removal of temporary features after target generation
+## 🆕 Clean, Modular Hypothesis System
+The new `hypothesis/` folder contains all hypothesis-specific target generation logic, completely separated from general feature engineering for better organization and maintainability.
 
-### 🆕 Current Target Hypothesis Methods
-1. **session_based_tod_anomalies**: Session-specific volatility anomaly detection
-2. **spread_compression_patterns_v4**: ✅ **LATEST** - Forward-looking price movement prediction
-3. **spread_compression_patterns_v3**: Enhanced balanced class distribution (15-20% signals) ABOUT TO BE REMOVED
-4. **spread_compression_patterns_v2**: Quality-focused directional signals (outdated) ABOUT TO BE REMOVED
-5. **spread_compression_patterns**: Original version (outdated, contains lookahead bias) ABOUT TO BE REMOVED
+### New Architecture Benefits
+- **🆕 Dedicated Organization**: Hypothesis logic properly separated from general features
+- **🆕 Zero Backward Compatibility Cruft**: Clean, streamlined implementations without legacy complexity
+- **🆕 Automatic Feature Management**: Universal dependency resolution and cleanup
+- **🆕 Easy Extension**: Adding new hypotheses requires minimal code
 
-### 🆕 Spread Compression V4 Highlights - `spread_compression_patterns_v4()`
+### Core Components
+
+#### BaseTargetGenerator (`hypothesis/base_target_generator.py`)
+Universal base class that provides:
+- **🆕 Automatic Feature Generation**: Resolves dependencies and generates missing features
+- **🆕 Universal Cleanup**: Automatically removes temporary features after target generation
+- **🆕 Consistent Error Handling**: Robust error handling and logging patterns  
+- **🆕 Abstract Interface**: Forces consistent implementation patterns across all hypotheses
+
+#### TargetHypothesis (`hypothesis/target_generators.py`)
+Clean, streamlined hypothesis implementations:
+- **🆕 Simple Feature Requirements**: Just define `get_required_features()`
+- **🆕 Clean Implementation**: Focus only on hypothesis-specific target logic
+- **🆕 Automatic Management**: Base class handles all the complex dependency and cleanup logic
+
+### 🆕 Usage Examples
+
+#### Adding a New Hypothesis (Super Simple!)
+```python
+class TargetHypothesis(BaseTargetGenerator):
+    def get_required_features(self) -> List[str]:
+        if self.hypothesis == 'my_new_hypothesis':
+            return ['volume_ratio', 'depth_stability', 'london_session']
+    
+    def my_new_hypothesis(self):
+        # Step 1: Automatic feature generation
+        required_features = self.get_required_features()
+        self.generate_features_with_dependencies(required_features)
+        
+        # Step 2: Your hypothesis logic
+        self.df['target_my_hypothesis'] = (
+            self.df['volume_ratio'] > 1.5
+        ).astype(int)
+        
+        return True  # Done! Base class handles cleanup automatically
+```
+
+#### Running Hypothesis Pipeline
+```python
+# Same usage as before - completely backward compatible
+from data.hypothesis import TargetHypothesis
+
+target_gen = TargetHypothesis(processed_data, 'spread_compression_patterns_v4')
+result_data = target_gen.run()
+```
+
+### 🆕 Current Clean Hypothesis Methods
+1. **spread_compression_patterns_v4**: ✅ **LATEST** - Clean forward-looking price movement prediction
+2. **session_based_tod_anomalies**: Clean session-specific volatility anomaly detection
+
+### 🆕 Enhanced Features
+- **🆕 Universal Dependency Resolution**: All hypotheses use the same clean dependency system
+- **🆕 Global Feature Registry**: Centralized feature dependency mapping eliminates duplication
+- **🆕 Automatic Validation**: Built-in signal rate validation and balance checking
+- **🆕 Memory Efficient**: Automatic cleanup prevents memory leaks
+- **🆕 Error Resilient**: Comprehensive error handling with detailed logging
+
+### 🆕 Spread Compression V4 Highlights (Clean Version)
 - **Forward-Looking Predictions**: Predicts future price movements 5-15 minutes ahead
 - **No Lookahead Bias**: Uses only current market conditions for signal generation
 - **Dynamic Thresholds**: Pip-based thresholds adapted to current market volatility
@@ -317,9 +372,22 @@ For some more background and format, see the ```README.md``` documentation under
 - **Multi-Horizon**: Short-term (5min), medium-term (10min), long-term (15min) targets
 - **Signal Validation**: Automatic validation of signal rates and class balance
 - **Directional Targets**: Three-class system (BUY/SELL/HOLD) for trading signal generation
+- **🆕 Clean Implementation**: No backward compatibility code, pure focus on hypothesis logic
 
 > [!IMPORTANT]
-> When adding functionality for new hypotheses: Remember to add the prefix ```target_*``` for the _target column to the hypothesis_. This is because the normalization step after generation and target hypothesis will _not normalize_ columns that starts with ```target_```.
+> 🆕 **Adding New Hypotheses**: With the new clean system, adding hypotheses is much simpler:
+> 1. Add your hypothesis name to `get_required_features()` in `data/hypothesis/target_generators.py`
+> 2. Implement your hypothesis method - the base class handles all feature generation and cleanup automatically
+> 3. Remember to add the prefix `target_*` for your target columns so they won't be normalized
+> 4. See the clean examples like `spread_compression_patterns_v4()` for reference
+
+### 🆕 Deprecated Files Location
+Old hypothesis files have been moved to `trash/deprecated_features/` for reference:
+- `target_hypothesis_legacy.py` - Original implementation with backward compatibility
+- `target_hypothesis_v2.py` - Intermediate version 
+- `target_hypothesis_original.py` - Original backup
+
+The new system in `data/hypothesis/` is cleaner, more maintainable, and easier to extend!
 
 ## Feature Selection - selection.py
 The Selector file performs _very simple_ Feature Selection, by using different techniques/methods, to then select the features that two or more techniques agree about:

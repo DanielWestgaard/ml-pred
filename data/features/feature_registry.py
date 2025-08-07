@@ -9,11 +9,9 @@ This module provides a robust, model-aware feature generation system that:
 - Provides clear error handling and validation
 """
 
-import inspect
 from dataclasses import dataclass, field
-from typing import Dict, List, Set, Callable, Optional, Any, Tuple
+from typing import Dict, List, Set, Callable, Optional, Tuple
 from collections import defaultdict, deque
-import pandas as pd
 from utils.logging_utils import get_logger
 
 logger = get_logger()
@@ -42,6 +40,7 @@ class FeatureRegistry:
         self._generators: Dict[str, FeatureDefinition] = {}
         self._feature_to_generators: Dict[str, Set[str]] = defaultdict(set)
         self._category_index: Dict[str, Set[str]] = defaultdict(set)
+        self._global_dependencies = self._init_global_dependencies()
         
     def register(self, definition: FeatureDefinition) -> None:
         """Register a feature generator"""
@@ -179,6 +178,96 @@ class FeatureRegistry:
     def get_category_generators(self, category: str) -> List[str]:
         """Get all generators in a specific category"""
         return list(self._category_index.get(category, set()))
+    
+    def _init_global_dependencies(self) -> Dict[str, Tuple[str, List[str]]]:
+        """
+        Initialize global feature dependency mapping.
+        
+        This centralizes the dependency mapping that was previously duplicated
+        across multiple hypothesis methods in target_hypothesis.py.
+        
+        Returns:
+            Dict mapping feature_name -> (generator_method, [dependencies])
+        """
+        return {
+            # Basic volume features
+            'volume_ma_20': ('volume_ma_20_feature', []),
+            'volume_ratio': ('volume_ratio_feature', ['volume_ma_20']),
+            
+            # Market depth features
+            'depth_stability': ('enhanced_market_depth_features', []),
+            'liquidity_stress': ('enhanced_market_depth_features', []),
+            
+            # Advanced features with dependencies
+            'institutional_footprint': ('institutional_footprint_detection', ['volume_ratio']),
+            'microstructure_health': ('enhanced_microstructure_health', []),
+            'signal_conviction': ('enhanced_predictive_signals', []),
+            
+            # Session features
+            'london_session': ('fx_trading_sessions', []),
+            'primary_session': ('fx_trading_sessions', []),
+            
+            # Spread and compression features
+            'spread_compression_rate': ('spread_compression_features', []),
+            'microstructure_momentum_fusion': ('microstructure_momentum_fusion', []),
+            
+            # Technical indicators that may have dependencies
+            'expected_atr': ('expected_atr_feature', ['atr']),
+            'atr': ('atr_feature', [])
+        }
+    
+    def get_global_dependencies(self) -> Dict[str, Tuple[str, List[str]]]:
+        """Get the global feature dependency mapping"""
+        return self._global_dependencies.copy()
+    
+    def add_global_dependency(self, feature_name: str, generator_method: str, dependencies: List[str] = None):
+        """
+        Add or update a global feature dependency.
+        
+        Args:
+            feature_name: Name of the feature
+            generator_method: Method name that generates this feature
+            dependencies: List of features this one depends on
+        """
+        self._global_dependencies[feature_name] = (generator_method, dependencies or [])
+    
+    def get_dependency_chain(self, feature_names: List[str]) -> Tuple[List[str], List[str]]:
+        """
+        Get the complete dependency chain for a list of features using global dependencies.
+        
+        Args:
+            feature_names: List of feature names
+            
+        Returns:
+            (required_generators, missing_features)
+        """
+        required_features = set(feature_names)
+        missing_features = []
+        
+        # Build complete dependency graph
+        def add_dependencies_recursively(feature_name):
+            if feature_name in self._global_dependencies:
+                generator_method, dependencies = self._global_dependencies[feature_name]
+                if dependencies:
+                    for dep in dependencies:
+                        if dep not in required_features:
+                            required_features.add(dep)
+                            add_dependencies_recursively(dep)
+            elif feature_name not in ['open', 'high', 'low', 'close', 'volume', 'date']:  # Skip basic OHLCV columns
+                missing_features.append(feature_name)
+        
+        for feature in feature_names:
+            add_dependencies_recursively(feature)
+        
+        # Convert features to generators
+        required_generators = []
+        for feature in required_features:
+            if feature in self._global_dependencies:
+                generator_method, _ = self._global_dependencies[feature]
+                if generator_method not in required_generators:
+                    required_generators.append(generator_method)
+        
+        return required_generators, missing_features
 
 
 # Decorator for easy feature registration
@@ -202,7 +291,7 @@ def feature_generator(output_features: List[str],
 
 class AutoRegisterMeta(type):
     """Metaclass that automatically registers decorated methods"""
-    def __new__(cls, name, bases, namespace, **kwargs):
+    def __new__(cls, name, bases, namespace, **_kwargs):
         new_class = super().__new__(cls, name, bases, namespace)
         
         # Auto-register methods with feature definitions

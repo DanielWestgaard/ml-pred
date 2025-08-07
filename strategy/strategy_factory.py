@@ -1,5 +1,6 @@
 from strategy.hypothesis_specific.session_anomaly_strategy import SessionAnomalyStrategy
 from strategy.hypothesis_specific.price_prediction_strategy import PricePredictionStrategy
+from strategy.hypothesis_specific.spread_compression_strategy import SpreadCompressionStrategy
 
 class StrategyFactory:
     """
@@ -9,6 +10,7 @@ class StrategyFactory:
     STRATEGIES = {
         'session_based_tod_anomalies': SessionAnomalyStrategy,
         'price_prediction': PricePredictionStrategy,
+        'spread_compression_patterns': SpreadCompressionStrategy,
         # Add more hypothesis strategy types here as you develop them
         # Format: 'hypothesis_name_from_config': HypothesisStrategyClass,
         # Example: 'momentum_breakout': MomentumBreakoutStrategy,

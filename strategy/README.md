@@ -109,7 +109,8 @@ strategy/
 ├── hypothesis_specific/                 # Hypothesis-specific strategy implementations
 │   ├── base_strategy.py                 # BaseStrategy - Abstract base class with shared functionality
 │   ├── session_anomaly_strategy.py      # SessionAnomalyStrategy - Session-based anomaly detection
-│   └── price_prediction_strategy.py     # PricePredictionStrategy - Price prediction strategy
+│   ├── price_prediction_strategy.py     # PricePredictionStrategy - Price prediction strategy
+│   └── spread_compression_strategy.py   # SpreadCompressionStrategy - Spread compression
 │
 ├── components/                          # Modular strategy components
 │   ├── signal_processor.py              # SignalProcessor - Convert predictions → actionable signals
@@ -299,8 +300,8 @@ python main.py -hyp "hypothesis/spread_compression_patterns/config_complete.yml"
 # Run backtesting with trained model
 python main.py -hyp "hypothesis/spread_compression_patterns/config_backtest.yml"
 
-# Run with specific trained model
-python main.py -strat --model-dir "storage/models/2025-07-27_12:53:02"
+# Run strategy with spread compression config
+python main.py -strat "hypothesis/spread_compression_patterns/config_complete.yml"
 ```
 
 #### Other Strategies
