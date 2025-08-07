@@ -1,15 +1,35 @@
+"""
+MODERNIZED Target Hypothesis with Backward Compatibility
+========================================================
+
+This file has been modernized to use the new BaseTargetGenerator while maintaining
+full backward compatibility with existing code. The old methods are preserved,
+but new hypotheses should use the modular approach.
+
+Usage:
+- Existing code continues to work unchanged
+- New hypotheses can use the improved modular patterns
+- Automatic feature dependency resolution
+- Better error handling and cleanup
+"""
+
 import numpy as np
 import pandas as pd
-from data.processing.base_processor import BaseProcessor
-from utils import data_utils
+from data.features.base_target_generator import BaseTargetGenerator
 from utils import shared_utils
 from utils.logging_utils import get_logger
 
 logger = get_logger()
 
-class TargetHypothesis(BaseProcessor):
-    """Change target of dataset according to the hypothesis."""
-    def __init__(self, dataset, hypothesis:str):
+class TargetHypothesis(BaseTargetGenerator):
+    """
+    Modernized target hypothesis generator with backward compatibility.
+    
+    Now inherits from BaseTargetGenerator for improved modularity and feature management.
+    All existing hypothesis methods are preserved for backward compatibility.
+    """
+    
+    def __init__(self, dataset, hypothesis: str):
         """
         Initialize hypothesis to change target column.
         
@@ -17,37 +37,84 @@ class TargetHypothesis(BaseProcessor):
             dataset: Processed data with specific features generated.
             hypothesis: The hypothesis you intend to test. Must match the name of the function you want to target!
         """
-        try:
-            # Load dataset based on format
-            self.df, self.original_df = data_utils.check_and_return_df(dataset)
-            
-            self.hypothesis = hypothesis
-        except Exception as e:
-            logger.error(f"Unable to initialize Target Hypothesis: {e}")
+        # Call the base class constructor which handles dataset loading
+        super().__init__(dataset, hypothesis)
+    
+    def get_required_features(self) -> list[str]:
+        """
+        Get required features based on the hypothesis being tested.
+        
+        This provides centralized feature requirements for all hypotheses.
+        """
+        if self.hypothesis == 'spread_compression_patterns_v4':
+            return [
+                'depth_stability',
+                'institutional_footprint', 
+                'liquidity_stress',
+                'microstructure_health',
+                'volume_ratio',
+                'london_session'
+            ]
+        elif self.hypothesis == 'spread_compression_patterns_v3':
+            return [
+                'depth_stability',
+                'institutional_footprint', 
+                'liquidity_stress',
+                'microstructure_health',
+                'volume_ratio',
+                'london_session',
+                'signal_conviction'
+            ]
+        elif self.hypothesis == 'spread_compression_patterns_v2':
+            return [
+                'depth_stability',
+                'institutional_footprint', 
+                'liquidity_stress',
+                'microstructure_health',
+                'volume_ratio',
+                'london_session',
+                'signal_conviction'
+            ]
+        elif self.hypothesis == 'spread_compression_patterns':
+            return [
+                'depth_stability', 
+                'liquidity_stress', 
+                'microstructure_health',
+                'volume_ratio', 
+                'london_session', 
+                'signal_conviction'
+            ]
+        elif self.hypothesis == 'session_based_tod_anomalies':
+            return [
+                'atr',
+                'primary_session',
+                'expected_atr'
+            ]
+        else:
+            logger.warning(f"No specific requirements defined for hypothesis: {self.hypothesis}")
+            return []
+    
+    def get_feature_dependencies(self) -> dict[str, tuple[str, list[str]]] | None:
+        """
+        Get custom feature dependencies if needed.
+        
+        Returns None to use the global dependency registry by default.
+        """
+        return None  # Use global registry from FeatureRegistry
     
     def run(self):
         """
-        Change target.
+        Change target using the new base class functionality.
         
-        returns:
+        Returns:
             dataset: with added new target.
         """
-        logger.info("---------- Running Hypothesis Targeting ----------")
-        
-        # Making a list of existing methods in this class
-        functions = shared_utils.list_of_functions_in_class(path_to_class='data.features.target_hypothesis.TargetHypothesis')
-        
-        try:
-            successfull = False
-            for hypotehesis in functions:
-                if hypotehesis == self.hypothesis:  # The one hypothesis user wants to target
-                    successfull = shared_utils.safely_execute(self, hypotehesis)
-            if not successfull:
-                logger.error(f"Could not find {self.hypothesis} in the list of functions: {functions}. Make sure your name matches the function you want to target!")
-        except Exception as e:
-            logger.error(f"Error trying to find and execute hypothesis method: {e}")
-        
-        return self.df
+        # Use the base class run method which provides:
+        # - Better error handling
+        # - Automatic feature dependency resolution  
+        # - Consistent cleanup patterns
+        # - Improved logging
+        return super().run()
     
     def _generate_features_with_dependencies(self, required_features, feature_dependency_map):
         """
@@ -160,10 +227,19 @@ class TargetHypothesis(BaseProcessor):
     
     def session_based_tod_anomalies(self):
         """
-        This target captures when future volatility is abnormally high relative to that specific session's
-        typical behavior - directly testing the hypothesis that sessions behave differently.
+        MODERNIZED: Session-based time-of-day anomaly detection.
+        
+        Now uses the new modular base class for automatic feature generation.
+        Captures when future volatility is abnormally high relative to session behavior.
         """
         try:
+            # Step 1: Use base class for automatic feature generation
+            required_features = self.get_required_features()
+            successfully_generated, all_added_features = self.generate_features_with_dependencies(
+                required_features
+            )
+            
+            # Step 2: Validate that we have the required features
             if 'atr' in self.df.columns and 'primary_session' in self.df.columns:
                 # Calculate session-specific ATR norms using primary_session feature
                 self.df['session_atr_mean'] = self.df.groupby('primary_session')['atr'].transform(
@@ -173,18 +249,24 @@ class TargetHypothesis(BaseProcessor):
                     lambda x: x.rolling(window=100, min_periods=20).std()
                 )
                 
-                # Expected volatility based on current patterns (NO LOOKAHEAD)
-                # This will be handled by the expected_atr feature generator
                 # Target: Future volatility > session mean + 1.5 * session std
-                self.df['target_session_vol_anomaly'] = (
-                    (self.df['expected_atr'] > self.df['session_atr_mean'] + 1.5 * self.df['session_atr_std'])
-                ).astype(int)
-                
-                logger.debug(f"Target column, target_session_vol_anomaly, for hypothesis session_based_tod_anomalies created.")
+                if 'expected_atr' in self.df.columns:
+                    self.df['target_session_vol_anomaly'] = (
+                        (self.df['expected_atr'] > self.df['session_atr_mean'] + 1.5 * self.df['session_atr_std'])
+                    ).astype(int)
+                    
+                    logger.info("✅ MODERNIZED session-based anomaly target created successfully!")
+                    return True
+                else:
+                    logger.error("Missing 'expected_atr' feature for target calculation")
+                    return False
             else:
-                logger.error(f"Target hypothesis column is not possible to calculate based on missing needed features: 'atr' and 'primary_session'")
+                logger.error("Missing required features: 'atr' and 'primary_session'")
+                return False
+                
         except Exception as e:
-            logger.error(f"Unable to calculate the target hypothesis column: {e}")
+            logger.error(f"Unable to calculate modernized session anomaly target: {e}")
+            return False
     
     def spread_compression_patterns(self):
         """
@@ -359,45 +441,21 @@ class TargetHypothesis(BaseProcessor):
 
     def spread_compression_patterns_v4(self):
         """
-        FIXED VERSION 4: Forward-looking target with proper temporal logic.
+        MODERNIZED VERSION 4: Forward-looking target with proper temporal logic.
         
-        CRITICAL FIXES:
-        - Uses FUTURE price movements (no lookahead bias)
-        - Temporal momentum features (direction, not just magnitude)
-        - Multi-horizon targets for different time frames
-        - Proper signal quality filtering
+        Now uses the new modular base class for:
+        - Automatic feature dependency resolution
+        - Consistent error handling and cleanup
+        - Centralized feature requirements
         
         TARGET: Predict future price movements 5-15 minutes ahead
         """
         try:
-            # Required features for enhanced prediction
-            required_features = [
-                'depth_stability',        # Market depth quality
-                'institutional_footprint', # Institutional activity
-                'liquidity_stress',       # Liquidity conditions
-                'microstructure_health',  # Overall market health
-                'volume_ratio',           # Volume patterns
-                'london_session'          # Session timing
-            ]
-            
-            # Feature dependency mapping
-            feature_dependency_map = {
-                'volume_ma_20': ('volume_ma_20_feature', []),
-                'volume_ratio': ('volume_ratio_feature', ['volume_ma_20']),
-                'depth_stability': ('enhanced_market_depth_features', []),
-                'liquidity_stress': ('enhanced_market_depth_features', []),
-                'institutional_footprint': ('institutional_footprint_detection', ['volume_ratio']),
-                'microstructure_health': ('enhanced_microstructure_health', []),
-                'london_session': ('fx_trading_sessions', [])
-            }
-            
-            # Generate missing features
-            successfully_generated, all_added_features, updated_df = self._generate_features_with_dependencies(
-                required_features, feature_dependency_map
+            # Step 1: Use base class for feature generation (no more hardcoded dependencies!)
+            required_features = self.get_required_features()
+            successfully_generated, all_added_features = self.generate_features_with_dependencies(
+                required_features
             )
-            
-            self.df = updated_df
-            temp_generated_features = all_added_features
             
             # Check critical features availability
             critical_features = ['depth_stability', 'institutional_footprint', 'volume_ratio']
@@ -597,16 +655,9 @@ class TargetHypothesis(BaseProcessor):
                 else:
                     logger.warning(f"⚠️ Imbalanced: {('BUY' if buy_pct > sell_pct else 'SELL')} signals dominate")
             
-            # Clean up temporary features
-            cleanup_features = temp_generated_features
-            cleanup_features = [f for f in cleanup_features if f in self.df.columns]
-            
-            if cleanup_features:
-                logger.info(f"Cleaning up temporary features: {cleanup_features}")
-                self.df = self.df.drop(columns=cleanup_features)
-            
-            logger.info("✅ FORWARD-LOOKING TARGET V4 generation completed successfully!")
-            logger.info("🎯 Model will now predict FUTURE price movements, not past patterns!")
+            # Note: Temporary feature cleanup is now handled automatically by the base class
+            logger.info("✅ MODERNIZED V4 target generation completed successfully!")
+            logger.info("🎯 Uses new modular architecture with automatic feature management!")
             
             return True
             
