@@ -1,12 +1,27 @@
 
 
+# Perhaps getting some inspiration from how strategy/strategy.py and strategy_factory.py is designed
 class DataSourceOrchestrator:
-    def __init__(self):
+    """
+    Place to get features from 
+    """
+    
+    def __init__(self, path_to_config:str):
         """
         This 'Orchestrator' is meant to serve as an easy place to use singel or multiple data sources implemented.
-        ...
+        
+        Args: 
+            - path_to_config: Path to configuration file specifying what data sources you want, and "from how far back".
+        
+        Returns:
+            - bool: true if all went well, false if fail
         """
-        pass
+        # Read the config
+        
+        # Extract variables (list of data source/-s and time)
+        
+        # Loop through provided data source components to create appropriate instances and (late) run them one by one
+        
     
     # TBC..
     
