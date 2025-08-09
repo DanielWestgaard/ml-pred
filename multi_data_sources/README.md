@@ -40,7 +40,9 @@ The real alpha is in the **intersections and combinations** that institutions st
     ├── calendar_events/            # Calendar/Event Data
     │   ├── README.md               # Detailed info regarding this data source implementation
     │   ├── cross_calendar.py       # main class?
-    │   └── complexities/           # Individual "things" that will make up the calendar (eg. earnings, holidays, etc.)
+    │   └── complexities/           # Individual "things" that will make up the calendar (eg. earnings, holidays, etc.) that is too "complex" for a single method
+    │       ├── earnings.py         # ...
+    │       └── options_expiration.py # ...
     └── ...
 ```
 
