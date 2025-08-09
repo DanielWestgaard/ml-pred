@@ -60,4 +60,4 @@ The usage for this data pipaline is after a set of combinations/inefficiency are
 
 3. **Training** and **Backtesting**: I think that these two components will continue to be the same, as the new data type combinations will be turned into faetures and data handled appropriately. 
 
-5. Live: 
+5. **Live**: This might need some work, but not directly in the live part of the `strategy/` component. The "selected/sed data types" in training (as well as any potential features made off them) must be recreated as live data come in. There might be need for another orchestration component that will use these data parts for "live usage". Either the data type actually gets data in pace with new live price candles (in which all "columns" must be processed and delivered together), eg. a lot of tweets are coming in giving something to "report" (being data), or it doesn't (waiting for weather report), which means there might need to be a "basic value" for no updates/no changes. The logic/handling for new events and no events/changes must also be implemented as part of the processing of the data, but its the handling here that matters.
