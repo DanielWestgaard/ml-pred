@@ -50,6 +50,12 @@ This folder is used for storage of different purposes.
 │   │
 │   └── ...
 │
+├── multi_data_sources/         # TODO: Storing data from different sources (sentiment analysis, weather, news, etc.)
+│   ├── calender_events/        # TODO: Calendar/Events
+│   │   ├── ?
+│   │   └── ?
+│   └── ...
+│
 └── README.md                   # Documentation related to storage/
 ```
 
