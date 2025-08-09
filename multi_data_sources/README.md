@@ -56,6 +56,7 @@ For storing the "historical data" of different data types, this should be done i
 
 2. **Data processing**: Creating a new data pipeline (eg. `data/pipelines/hybrid_data`) that can improve/expand the existing one (`data/pipelines/engineer_pipeline.py`) by also processing/engineering combinations of these data types/components (maybe even create features off of them again).<br>
 The usage for this data pipaline is after a set of combinations/inefficiency are "found", and preparing the data for training a ML model.
+    - Build on the current "configuration driven" flow, by adding the ability to specify/configure which data types/sources I want included.
     - I'll also need to create a new data transformation step (`data/features/transformation.py`) to translate the different data formats (eg. sentiment/text, binary, degrees, size, etc.) into a correct/suiting format for data processing. There could also be need for creating individual handling, but this can be considered when getting there.
 
 3. **Training** and **Backtesting**: I think that these two components will continue to be the same, as the new data type combinations will be turned into faetures and data handled appropriately. 
