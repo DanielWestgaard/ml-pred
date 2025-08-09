@@ -2,23 +2,23 @@
 This folder aims to _create dynamic and modular components_ that are each **responsible for a specific data type**. Wether it being "sentiment analysing SOME (Instagram, Twitter/X, etc.) or news (websites, forums, etc.)", weather reports, new laws/regulations, rumors, etc. At one point, the more and weirder data types I have at my disposal, the better. The reason is that I intend to systematically test combinations of data sources with price data, to find real inefficiencies (in a separate component/system/folder).
 
 ## Background
-**Pure price analysis alone is mostly a dead end**, as institutions have been running the most sophisticated pattern recognition algorithms on this for decades. This project aims not to compete directly with them, as that would be a losing battle, but rather use the knowledge to our advantage.<br>
-Furthermore, **the markets are not made up of pure prices, but all kinds of data** (some/news sentiment, emotions/fear, weather, earnings, politics, law, etc.) which gives investors and system their reason to buy or sell. This being, my feeling (also based on research) is that the markets cannot be fully efficient, since we live in a day and age where there are almost infinetly ways to get data and sources that can affect prices/markets.<br>
+**Pure price analysis alone is mostly a dead end**, as institutions have been running the most sophisticated pattern recognition algorithms on this for decades. This project aims not to compete directly with them, as that would be a losing battle, but rather use the knowledge to our advantage and exploit small inefficiencies.<br>
+Furthermore, **the markets are not made up of pure prices, but all kinds of data** (some/news sentiment, emotions/fear, weather, earnings, politics, law, etc.) which gives investors and system their reasons to buy or sell. This being, my feeling (also based on research) is that the markets cannot be fully efficient, since we live in a day and age where there are almost infinetly ways to get data and sources that can affect prices/markets.<br>
 The real alpha is in the **intersections and combinations** that institutions struggle with due to organizational silos, data integartion challenges, and their focus on large-scale opportunities.
 
 ## Focus and purpose on "multi-data"
 > Because of this Background, I really think that my competetive moat is an agile approach to multi-data.
-1. **Data Integration Agility** - I can quickly combine:
+1. **Data Integration Agility** - I can quickly combine (eg.):
     - Earnings surprises × social media sentiment × calendar timing
     - News sentiment × analyst revisions × option flow
     - Economic calendar × sector rotation × retail trading flows
-2. **Weird Combination Testing** - Institutions often have teams that specialize in one data type. You can test bizarre combinations like:
+2. **Weird Combination Testing** - Institutions often have teams that specialize in one data type. I can test bizarre combinations, like:
     - Weather data × retail stock performance × social media mentions
     - Congressional trading disclosures × small-cap momentum × earnings calendar
     - Supply chain disruption news × inventory levels × stock reactions
-3. **Speed to New Data Sources** - When new alternative data becomes available, you can integrate and test it much faster than institutions with their compliance and approval processes.
+3. **Speed to New Data Sources** - When new alternative data becomes available, I can integrate and test it much faster than institutions with their compliance and approval processes.
 
-**The key insight**: Inefficiencies live in the GAPS between data types, not within pure price patterns.
+**The key insight**: _Inefficiencies live in the GAPS between data types, not within pure price patterns_.
 
 # Structure
 ```
