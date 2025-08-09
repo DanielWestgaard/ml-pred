@@ -1,3 +1,4 @@
+from multi_data_sources.ds_factory import DataSourceFactory
 
 
 # Perhaps getting some inspiration from how strategy/strategy.py and strategy_factory.py is designed
@@ -20,8 +21,20 @@ class DataSourceOrchestrator:
         
         # Extract variables (list of data source/-s and time)
         
+        # Determine hypothesis type
+        self.data_sources = self._determine_hypothesis_type()
         # Loop through provided data source components to create appropriate instances and (late) run them one by one
         
+    
+    def _determine_hypothesis_type(self):  # TODO: Might be made into a utils method to avoid duplication with evaluation/evaluation.py and strategy/strategy.py ?
+        """
+        Determine data source/-s wanted to run
+        """
+        pass
+    
+    def run(self):
+        """Run the data orchestrator with your provided configurations"""
+        pass
     
     # TBC..
     
