@@ -38,6 +38,8 @@ The real alpha is in the **intersections and combinations** that institutions st
 └── sources/                    # All different data source implementations
     ├── ds_base.py              # Base class all individual data source components implements
     ├── calendar_events/        # Calendar/Event Data
+    │   ├── README.md           # Detailed info regarding this data source implementation
+    │   └── ...
     └── ...
 ```
 
