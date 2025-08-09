@@ -1,6 +1,6 @@
 # List of Data Types to start implementing
 > Historical price data/volume/spreads are already implemented through `broker/` (Capital.com)
-
+This document is meant to serve as a "light plan" for what data types/sources to implement and why.
 
 ---
 
