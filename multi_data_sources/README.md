@@ -33,7 +33,7 @@ The real alpha is in the **intersections and combinations** that institutions st
 ├── README.md                   # This documentation
 ├── data_types_todo.md          # Light plan for sources to implement and why
 │
-├── ?                           # Potentially future need for an orchestrator or something?
+├── ds_orchestrator             # An "orchestrator" to easily use singular or multiple data source components
 │
 └── sources/                    # All different data source implementations
     ├── ds_base.py              # Base class all individual data source components implements
