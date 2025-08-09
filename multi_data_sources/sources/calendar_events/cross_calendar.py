@@ -1,4 +1,7 @@
 from multi_data_sources.sources.ds_base import DataSourceBase
+from multi_data_sources.sources.calendar_events.complexities.earnings import Earnings
+from multi_data_sources.sources.calendar_events.complexities.options_expiration import OptionsExpiration
+
 
 class CrossCalendar(DataSourceBase):
     """..."""
@@ -13,16 +16,18 @@ class CrossCalendar(DataSourceBase):
         # Other suggestions: ..? Perhaps only starting off simple
     ]
     
-    def __init__(self):
+    def __init__(self, path_to_config:str = None):
         """
         ...
         """
-        pass
+        # Read configuration
+        
+        # Set variables
     
     
     def get_historical_data(self):
         """Fetch historical to store in storage/"""
-        pass
+        
         
     def subscribe_live_data(self):
         """
