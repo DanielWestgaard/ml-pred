@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class DataSourceBase(ABC):
+    @abstractmethod
     def __init__(self):
         """
         This class is meant to serve as a base for future implementations/additions of

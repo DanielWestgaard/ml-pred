@@ -1,4 +1,7 @@
 # Introduction 
+I think this can really be effective if made correctly. If I made it dynamic, so that the user can provide eg. symbol name, stock or no (bool, determine wether to include stuff like earnings as not relevant for forex and crypto), from date and to date, etc?
+
+# General
 **Why institutions struggle**:
 - Too many small, dispersed opportunities across thousands of stocks
 - Infrastructure costs exceed profit potential for individual patterns
