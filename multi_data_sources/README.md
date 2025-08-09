@@ -34,8 +34,10 @@ My initial thought is that each component should have ways to get
 
 ## Future implementations and work
 > Once some of the data-type/components are working, I need to start thinking/working on usage and incorporating this into my existing system.
+
 ### Storage
-I'll proabably also need to create a new data transformation step (`data/features/transformation.py`) to translate the different data formats (eg. sentiment/text, binary, degrees, size, etc.) into a correct/suiting format for data processing. Keeping in mind logic, organization and separation of concerns, It would be fitting to have it in the existing transformation step OR easily reusable "translators" under the data-type-component's location? Seeing as the logic for getting it might change, it will be easier to maintain it "close by" rather than in a transformation step in another folder.
+For storing the "historical data" of different data types, this should be done in `storage/` (continuing with a centralized storage). Each data type could follow the same strucure used for historical data, being organized by folders after (eg.) type, timeframe (?), etc.<br>
+
 ### Potential usage
 1. Testing combinations of data sources to find actual inefficiencies are the very first step. This could be to add a new folder/component (in root) that systematically tests a symbol's historical data (eg. GBP/USD 1 minute timeframe) together with combinations of "historical data" from different data sources, as well with statistical analysis. Once it's done, we could get a report/results on what had the most statistical potential or predictive power. 
 2. Data processing I'm thinking of creating a new data pipeline (eg. `data/pipelines/hybrid_data`) that can improve/expand the existing one (`data/pipelines/engineer_pipeline.py`) by using combinations of these data types/components, or perhaps first using `main.py` to get historical data from components here (storing them in the existing `storage/`) and then the data pipeline will use that data location.<br>
