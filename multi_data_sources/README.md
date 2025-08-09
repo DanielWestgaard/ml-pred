@@ -33,5 +33,12 @@ My initial thought is that each component should have ways to get
 - **Live data**: Almost to monitor features/data and get it when something changes. Similar to connecting to a Broker`s websocket and getting market prices every new candle. Some components might be able to get "new data" every minute (in pace with live market data), but others might not get new data as quickly (like waiting for new tweets or news reports) - as long as this is "reported" once new/fresh data is available.
 
 ## Future implementations and work
-Later, I'm thinking of creating a new data pipeline (eg. `data/pipelines/hybrid_data`) that can improve/expand the existing one (`data/pipelines/engineer_pipeline.py`) by using combinations of these data types/components, or perhaps first using `main.py` to get historical data from components here (storing them in the existing `storage/`) and then the data pipeline will use that data location.<br>
+> Once some of the data-type/components are working, I need to start thinking/working on usage and incorporating this into my existing system.
+### Storage
 I'll proabably also need to create a new data transformation step (`data/features/transformation.py`) to translate the different data formats (eg. sentiment/text, binary, degrees, size, etc.) into a correct/suiting format for data processing. Keeping in mind logic, organization and separation of concerns, It would be fitting to have it in the existing transformation step OR easily reusable "translators" under the data-type-component's location? Seeing as the logic for getting it might change, it will be easier to maintain it "close by" rather than in a transformation step in another folder.
+### Potential usage
+1. Testing combinations of data sources to find actual inefficiencies are the very first step. This could be to add a new folder/component (in root) that systematically tests a symbol's historical data (eg. GBP/USD 1 minute timeframe) together with combinations of "historical data" from different data sources, as well with statistical analysis. Once it's done, we could get a report/results on what had the most statistical potential or predictive power. 
+2. Data processing I'm thinking of creating a new data pipeline (eg. `data/pipelines/hybrid_data`) that can improve/expand the existing one (`data/pipelines/engineer_pipeline.py`) by using combinations of these data types/components, or perhaps first using `main.py` to get historical data from components here (storing them in the existing `storage/`) and then the data pipeline will use that data location.<br>
+    - Backtesting: ?
+3. Training: ...
+4. Live: ...
