@@ -1,5 +1,6 @@
 # Introduction
-This folder aims to _create dynamic and modular components_ that are each **responsible for a specific data type**. Wether it being "sentiment analysing SOME (Instagram, Twitter/X, etc.) or news (websites, forums, etc.)", weather reports, new laws/regulations, rumors, etc. At one point, the more and weirder data types I have at my disposal, the better. The reason is that I intend to systematically test combinations of data sources with price data, to find real inefficiencies (in a separate component/system/folder).
+This folder aims to _create dynamic and modular components_ that are each **responsible for a specific data type**. Wether it being "sentiment analysing SOME (Instagram, Twitter/X, etc.) or news (websites, forums, etc.)", weather reports, new laws/regulations, rumors, etc. At one point, the more and weirder data types I have at my disposal, the better. The reason is that I intend to systematically test combinations of data sources with price data, to find real inefficiencies (in a separate component/system/folder).<br>
+**The goal isn't to beat institutions at their own game, but to find the games they're not playing**.
 
 
 ## Background
