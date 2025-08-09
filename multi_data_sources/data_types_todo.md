@@ -12,10 +12,12 @@
 - Too many small, dispersed opportunities across thousands of stocks
 - Infrastructure costs exceed profit potential for individual patterns
 - Cross-calendar complexity (earnings + options expiration + holidays + fiscal year-ends)
+
 **My advantages**:
 - Cheap/free data sources available
 - Can focus on tiny patterns across small universes
 - Quick to implement and test
+
 **Specific focus areas**:
 - Earnings announcement timing interactions (Friday vs Tuesday announcements)
 - Option expiration proximity effects on small caps
@@ -27,10 +29,12 @@
 - Small caps don't justify dedicated sentiment analysis resources
 - Information processing lag between large and small caps
 - Sentiment tools optimized for large-cap coverage
+
 **Your advantages**:
 - Can use free/cheap sentiment APIs (NewsAPI, social media APIs)
 - Focus on <$2B market cap where institutions have less coverage
 - Rapid implementation of new sentiment sources
+
 **Specific focus areas**:
 - Large-cap earnings impact on similar small caps (2-3 day lag)
 - Sector sentiment spillovers to neglected stocks
@@ -43,10 +47,12 @@
 - They focus on direct earnings plays, miss interaction effects
 - Compliance restrictions on rapid strategy changes
 - Too much data for humans, too complex for simple algorithms
+
 **Your advantages**:
 - Can quickly test weird combinations
 - Focus on secondary and tertiary effects
 - Rapid hypothesis iteration
+
 **Specific focus areas**:
 - Earnings surprise spillovers to suppliers/customers
 - Guidance change timing vs. peer earnings calendar
@@ -57,10 +63,12 @@
 - Separate options and equity trading desks
 - Focus on large-scale flow, miss small anomalies
 - Regulatory separation between market making and proprietary trading
+
 **Your advantages**:
 - Can combine equity and options signals seamlessly
 - Focus on small patterns institutions ignore
 - Retail options flow data becoming more accessible
+
 **Specific focus areas**:
 - Unusual options activity in small caps before earnings
 - Put/call ratio anomalies in specific sectors
