@@ -42,7 +42,7 @@ class StrategyOrchestrator:
             hypothesis_config=hypothesis_config
         )
     
-    def _determine_hypothesis_type(self):  # TODO: Might be made into a utils method to avoid duplication with evaluation/evaluation.py ?
+    def _determine_hypothesis_type(self):  # TODO: Might be made into a utils method to avoid duplication with evaluation/evaluation.py and multi_data_sources/ds_orchestrator.py ?
         """
         Determine hypothesis type from config or model metadata
         """
