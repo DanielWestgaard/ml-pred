@@ -32,6 +32,7 @@ Rather than competing directly with institutional players, this system leverages
 | **[`evaluation/`](evaluation/README.md)** | Performance analysis | Model evaluation, trading metrics, visualization |
 | **[`broker/`](broker/README.md)** | Market connectivity | Capital.com API, order management, account switching |
 | **[`hyp_val_framework/`](hyp_val_framework/README.md)** | Validate new hypotheses | Statistical, systematic, validation |
+| **[`multi_data_sources/`](multi_data_sources/README.md)** | Getting various data sources. WIP | Historical data, live monitoring of the speific source |
 
 > [!TIP]
 > Each component has detailed documentation in its respective README.md file. Start with `hypothesis/README.md` to understand the system's approach.
