@@ -29,10 +29,14 @@ class CalendarEventsDataSource(DataSourceBase):
         self.stock = stock
         self.from_date = from_date
         self.to_date = to_date
+        self.purpose = purpose
+        
+        # Initialization
+        self.earnings = Earnings(self.symbol, self.stock, self.from_date, self.to_date, self.purpose)
     
     def get_historical_data(self):
         """Fetch historical to store in storage/"""
-        
+        self.earnings.get_historical_data()
         
     def subscribe_live_data(self):
         """
