@@ -1,0 +1,38 @@
+{
+  "symbol": "CLOV",
+  "analysis_timestamp": "2025-08-10T14:54:15.300416",
+  "date_range": {
+    "from": "2022-01-01",
+    "to": "2025-01-01"
+  },
+  "proximity_effects": {
+    "individual_expirations": [],
+    "aggregate_statistics": {},
+    "analysis_period": {
+      "start": "2024-08-10",
+      "end": "2025-08-10",
+      "total_expirations_analyzed": 0
+    }
+  },
+  "small_cap_analysis": {
+    "market_cap_category": "small",
+    "is_institutional_blind_spot": true,
+    "options_availability": true,
+    "inefficiency_potential": "high",
+    "reasons": [
+      "Small market cap limits institutional position sizes",
+      "Options activity may create temporary distortions",
+      "Lower analyst coverage means delayed price discovery",
+      "Market makers may have looser risk controls for small positions"
+    ],
+    "float_percentage": 0.9534963547434054,
+    "avg_volume": 9309637,
+    "beta": 1.92,
+    "short_ratio": 2.92
+  },
+  "summary": {
+    "has_options": true,
+    "total_expirations": 10,
+    "market_cap_category": "small"
+  }
+}
