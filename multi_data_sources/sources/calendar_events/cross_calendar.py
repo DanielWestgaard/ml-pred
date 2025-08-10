@@ -52,6 +52,8 @@ class CalendarEventsDataSource(DataSourceBase):
             'earnings_data': self.earnings.get_historical_data(),
             'options_expiration_data': self.options_expiration.get_historical_data(),
             'cross_calendar_analysis': self._analyze_cross_calendar_effects(),
+            'holidays_vacations': self.holiday_vacation(),
+            'fiscal_quarters': self.fiscal_quarter(),
             'metadata': {
                 'symbol': self.symbol,
                 'complexities_analyzed': ['earnings', 'options_expiration'],
@@ -172,12 +174,19 @@ class CalendarEventsDataSource(DataSourceBase):
     def holiday_vacation(self):
         """
         Holiday/vacation period patterns in specific sectors.
+        I suppose one big thing to note is to currently only focus on american stocks (to 
+        keep it simple in the beginning)
         
         Note: I suppose this only needs its own method, and not a class as its not
         so complex as eg. earnings and options expiration?
         """
         # TODO
         # Suggestion: Combine exchange_calendars and python-holidays for better "coverage"?
+        
+        import exchange_calendars as xcals
+        
+        return None
+        
     
     def fiscal_quarter(self):
         """
@@ -187,3 +196,5 @@ class CalendarEventsDataSource(DataSourceBase):
         so complex as eg. earnings and options expiration?
         """
         # TODO
+        
+        return None
