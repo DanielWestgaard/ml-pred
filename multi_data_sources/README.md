@@ -64,6 +64,24 @@ My initial thought is that each component should have ways to get
 ## Future implementations and work
 > Once some of the data-type/components are working, I need to start thinking/working on usage and incorporating this into my existing system.
 
+# Suggestion to configuration
+```yml
+multi_data:
+    # Historical or "live" data
+    purpose: "historical"       # or "live"
+
+    # General details
+    symbol: "APPL"
+    stock: true                 # bool
+    from_date: "2022-01-01"       # YYYY-MM-DD
+    to_date: "2025-01-01"         # YYYY-MM-DD
+
+    # Data sources wanted
+    sources: [  
+        calendar_events         # TODO: In the future, able to specify what we want to add?
+    ]
+```
+
 ### Storage
 For storing the "historical data" of different data types, this should be done in `storage/` (continuing with a centralized storage). Each data type could follow the same strucure used for historical data, being organized by folders after (eg.) type, timeframe (?), etc.<br>
 
