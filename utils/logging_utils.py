@@ -133,6 +133,8 @@ def setup_logging(
         'matplotlib',
         'plotly',
         'selenium',
+        'yfinance',
+        'peewee',
         'browser_proc'
         #'root'  # optional: this avoids logs from libraries using root logger
     ]
