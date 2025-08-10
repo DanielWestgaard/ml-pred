@@ -177,6 +177,7 @@ class CalendarEventsDataSource(DataSourceBase):
         so complex as eg. earnings and options expiration?
         """
         # TODO
+        # Suggestion: Combine exchange_calendars and python-holidays for better "coverage"?
     
     def fiscal_quarter(self):
         """
