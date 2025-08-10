@@ -168,3 +168,21 @@ class CalendarEventsDataSource(DataSourceBase):
         except Exception as e:
             logger.warning(f"Error detecting conflicting forces: {e}")
             return {'has_conflicts': False, 'error': str(e)}
+        
+    def holiday_vacation(self):
+        """
+        Holiday/vacation period patterns in specific sectors.
+        
+        Note: I suppose this only needs its own method, and not a class as its not
+        so complex as eg. earnings and options expiration?
+        """
+        # TODO
+    
+    def fiscal_quarter(self):
+        """
+        Fiscal quarter-end (effects combined with company size)
+        
+        Note: I suppose this only needs its own method, and not a class as its not
+        so complex as eg. earnings and options expiration?
+        """
+        # TODO
