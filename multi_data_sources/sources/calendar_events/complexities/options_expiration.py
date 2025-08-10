@@ -202,13 +202,23 @@ class OptionsExpiration:
         """
         Analyze stock price behavior around historical options expiration dates.
         This is the core analysis for finding small-cap inefficiencies.
+        
+        Since yfinance doesn't provide historical expiration dates, we use 
+        algorithmic reconstruction based on standard options expiration patterns.
         """
         try:
-            # Get historical price data
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=365)  # Look back 1 year
+            # Determine date range for analysis
+            if self.from_date and self.to_date:
+                start_date = pd.to_datetime(self.from_date)
+                end_date = pd.to_datetime(self.to_date)
+            else:
+                end_date = datetime.now()
+                start_date = end_date - timedelta(days=365)  # Look back 1 year
             
-            price_data = yf.download(self.symbol, start=start_date, end=end_date)
+            # Get historical price data with extra buffer for volatility calculations
+            buffer_days = 30
+            price_start = start_date - timedelta(days=buffer_days)
+            price_data = yf.download(self.symbol, start=price_start, end=end_date + timedelta(days=1))
             
             if price_data.empty:
                 logger.warning(f"No price data available for {self.symbol}")
@@ -219,25 +229,33 @@ class OptionsExpiration:
             price_data['volume_ratio'] = price_data['Volume'] / price_data['Volume'].rolling(20).mean()
             price_data['volatility_5d'] = price_data['daily_return'].rolling(5).std()
             
-            # Find historical expiration dates within price data range
-            historical_effects = []
-            expirations = self.ticker.options
+            # Generate historical expiration dates using algorithmic approach
+            historical_expirations = self._get_historical_monthly_expirations(start_date, end_date)
             
-            for exp_str in expirations[-12:]:  # Look at past expirations
-                exp_date = pd.to_datetime(exp_str).date()
-                
-                # Skip future dates
-                if exp_date >= datetime.now().date():
-                    continue
+            logger.info(f"Generated {len(historical_expirations)} historical expiration dates for analysis")
+            
+            # Analyze effects around each historical expiration
+            historical_effects = []
+            
+            for exp_info in historical_expirations:
+                exp_date = pd.to_datetime(exp_info['expiration_date']).date()
                 
                 # Find effect around this expiration
                 effect = self._analyze_single_expiration_effect(exp_date, price_data)
                 if effect:
+                    # Add calculated expiration metadata
+                    effect.update({
+                        'expiration_type': exp_info.get('type', 'monthly'),
+                        'is_quarterly': exp_info.get('is_quarterly', False),
+                        'calculation_method': 'algorithmic_third_friday'
+                    })
                     historical_effects.append(effect)
             
             # Calculate aggregate statistics
             if historical_effects:
                 aggregate_stats = self._calculate_aggregate_expiration_stats(historical_effects)
+                # Add pattern strength analysis
+                aggregate_stats.update(self._analyze_pattern_strength(historical_effects))
             else:
                 aggregate_stats = {}
             
@@ -247,7 +265,8 @@ class OptionsExpiration:
                 'analysis_period': {
                     'start': start_date.strftime('%Y-%m-%d'),
                     'end': end_date.strftime('%Y-%m-%d'),
-                    'total_expirations_analyzed': len(historical_effects)
+                    'total_expirations_analyzed': len(historical_effects),
+                    'expiration_calculation_method': 'algorithmic_monthly_third_friday'
                 }
             }
             
@@ -529,6 +548,151 @@ class OptionsExpiration:
         else:
             return 'weekly'
     
+    def _get_historical_monthly_expirations(self, start_date, end_date) -> List[Dict[str, Any]]:
+        """
+        Generate historical monthly options expiration dates using algorithmic approach.
+        Monthly options expire on the 3rd Friday of each month.
+        """
+        try:
+            expirations = []
+            
+            # Ensure we're working with datetime objects, not dates
+            if hasattr(start_date, 'date'):
+                start_dt = start_date
+            else:
+                start_dt = pd.to_datetime(start_date)
+                
+            if hasattr(end_date, 'date'):
+                end_dt = end_date
+            else:
+                end_dt = pd.to_datetime(end_date)
+            
+            # Start from first day of start month
+            current_date = pd.to_datetime(f"{start_dt.year}-{start_dt.month}-01")
+            
+            while current_date <= end_dt:
+                # Calculate 3rd Friday of the month
+                third_friday = self._calculate_third_friday(current_date.year, current_date.month)
+                
+                if start_dt.date() <= third_friday <= end_dt.date():
+                    expirations.append({
+                        'expiration_date': third_friday.strftime('%Y-%m-%d'),
+                        'year': third_friday.year,
+                        'month': third_friday.month,
+                        'type': 'monthly',
+                        'is_quarterly': third_friday.month in [3, 6, 9, 12],
+                        'day_of_week': third_friday.strftime('%A'),
+                        'calculation_method': 'third_friday_algorithm'
+                    })
+                
+                # Move to next month
+                if current_date.month == 12:
+                    current_date = pd.to_datetime(f"{current_date.year + 1}-01-01")
+                else:
+                    current_date = pd.to_datetime(f"{current_date.year}-{current_date.month + 1:02d}-01")
+            
+            logger.info(f"Generated {len(expirations)} historical expiration dates")
+            return expirations
+            
+        except Exception as e:
+            logger.error(f"Error generating historical expiration dates: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return []
+    
+    def _calculate_third_friday(self, year: int, month: int):
+        """
+        Calculate the 3rd Friday of a given month and year.
+        This is the standard monthly options expiration date.
+        """
+        from datetime import date
+        
+        # Find the first day of the month
+        first_day = date(year, month, 1)
+        
+        # Find the first Friday (weekday 4 = Friday)
+        days_until_friday = (4 - first_day.weekday()) % 7
+        first_friday = first_day + timedelta(days=days_until_friday)
+        
+        # Add 14 days to get the third Friday
+        third_friday = first_friday + timedelta(days=14)
+        
+        # Handle edge case where third Friday might be in the next month
+        if third_friday.month != month:
+            # This can happen for February in some years, use second Friday instead
+            third_friday = first_friday + timedelta(days=7)
+        
+        return third_friday
+    
+    def _analyze_pattern_strength(self, effects: List[Dict]) -> Dict[str, Any]:
+        """
+        Analyze the strength and consistency of expiration patterns.
+        This is crucial for identifying reliable small-cap inefficiencies.
+        """
+        if not effects:
+            return {}
+        
+        df = pd.DataFrame(effects)
+        
+        # Pattern consistency metrics
+        pre_returns = df['pre_expiration_return']
+        post_returns = df['post_expiration_return']
+        
+        pattern_analysis = {}
+        
+        # Directional consistency
+        positive_pre = (pre_returns > 0).sum()
+        negative_pre = (pre_returns < 0).sum()
+        total_observations = len(pre_returns)
+        
+        pattern_analysis.update({
+            'directional_consistency_pre': max(positive_pre, negative_pre) / total_observations if total_observations > 0 else 0,
+            'dominant_pre_direction': 'positive' if positive_pre > negative_pre else 'negative',
+            'pre_expiration_win_rate': positive_pre / total_observations if total_observations > 0 else 0
+        })
+        
+        # Statistical significance (basic)
+        from scipy import stats
+        try:
+            # Test if pre-expiration returns are significantly different from zero
+            _, p_value_pre = stats.ttest_1samp(pre_returns.dropna(), 0)
+            _, p_value_post = stats.ttest_1samp(post_returns.dropna(), 0)
+            
+            pattern_analysis.update({
+                'pre_expiration_significance': p_value_pre,
+                'post_expiration_significance': p_value_post,
+                'pre_statistically_significant': p_value_pre < 0.05
+            })
+        except:
+            # If scipy not available, skip statistical tests
+            pattern_analysis.update({
+                'pre_expiration_significance': None,
+                'statistical_test_available': False
+            })
+        
+        # Pattern strength score (0-100)
+        consistency_score = pattern_analysis['directional_consistency_pre'] * 50  # 0-50
+        magnitude_score = min(abs(pre_returns.mean()) * 1000, 25)  # 0-25 (scaled)
+        sample_score = min(total_observations * 2, 25)  # 0-25 (more observations = higher score)
+        
+        pattern_analysis['pattern_strength_score'] = consistency_score + magnitude_score + sample_score
+        pattern_analysis['strength_rating'] = self._rate_pattern_strength(pattern_analysis['pattern_strength_score'])
+        
+        return pattern_analysis
+    
+    def _rate_pattern_strength(self, score: float) -> str:
+        """Rate pattern strength based on score."""
+        if score >= 80:
+            return 'very_strong'
+        elif score >= 60:
+            return 'strong'
+        elif score >= 40:
+            return 'moderate'
+        elif score >= 20:
+            return 'weak'
+        else:
+            return 'very_weak'
+    
     def _calculate_aggregate_expiration_stats(self, effects: List[Dict]) -> Dict[str, Any]:
         """
         Calculate aggregate statistics across multiple expiration effects.
@@ -542,9 +706,33 @@ class OptionsExpiration:
             'average_pre_expiration_return': df['pre_expiration_return'].mean(),
             'average_post_expiration_return': df['post_expiration_return'].mean(),
             'pre_vs_post_return_difference': df['pre_expiration_return'].mean() - df['post_expiration_return'].mean(),
-            'volatility_increase_pre_expiration': (df['pre_expiration_volatility'].mean() / df['post_expiration_volatility'].mean()) - 1,
+            'volatility_increase_pre_expiration': (df['pre_expiration_volatility'].mean() / df['post_expiration_volatility'].mean()) - 1 if df['post_expiration_volatility'].mean() > 0 else 0,
             'volume_spike_frequency': (df['volume_spike_pre'] > 1.5).mean(),
-            'consistent_pattern_strength': abs(df['pre_expiration_return'].mean()) / df['pre_expiration_return'].std() if df['pre_expiration_return'].std() > 0 else 0
+            'consistent_pattern_strength': abs(df['pre_expiration_return'].mean()) / df['pre_expiration_return'].std() if df['pre_expiration_return'].std() > 0 else 0,
+            'median_pre_return': df['pre_expiration_return'].median(),
+            'median_post_return': df['post_expiration_return'].median(),
+            'max_pre_spike': df['volume_spike_pre'].max(),
+            'quarterly_vs_monthly_effect': self._compare_quarterly_monthly(df) if 'is_quarterly' in df.columns else {}
+        }
+    
+    def _compare_quarterly_monthly(self, df) -> Dict[str, Any]:
+        """Compare quarterly vs monthly expiration effects."""
+        if 'is_quarterly' not in df.columns:
+            return {}
+        
+        quarterly = df[df['is_quarterly'] == True]
+        monthly = df[df['is_quarterly'] == False]
+        
+        if quarterly.empty or monthly.empty:
+            return {'comparison_available': False}
+        
+        return {
+            'comparison_available': True,
+            'quarterly_avg_pre_return': quarterly['pre_expiration_return'].mean(),
+            'monthly_avg_pre_return': monthly['pre_expiration_return'].mean(),
+            'quarterly_stronger': quarterly['pre_expiration_return'].mean() > monthly['pre_expiration_return'].mean(),
+            'quarterly_sample_size': len(quarterly),
+            'monthly_sample_size': len(monthly)
         }
     
     def _save_options_data(self, data: Dict[str, Any]) -> Dict[str, str]:

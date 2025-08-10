@@ -3,22 +3,10 @@
     "symbol": "CLOV",
     "from_date": "2022-01-01",
     "to_date": "2025-01-01",
-    "collection_timestamp": "2025-08-10T14:54:13.396700",
+    "collection_timestamp": "2025-08-10T15:19:03.144754",
     "purpose": "historical"
   },
-  "earnings_calendar": [
-    {
-      "Earnings Date": "2025-11-05",
-      "Earnings High": 0.03,
-      "Earnings Low": 0.03,
-      "Earnings Average": 0.03,
-      "Revenue High": 469922000,
-      "Revenue Low": 455430000,
-      "Revenue Average": 464300170,
-      "announcement_day_of_week": "Wednesday",
-      "is_tuesday_friday": false
-    }
-  ],
+  "earnings_calendar": [],
   "historical_earnings_dates": [
     {
       "Earnings Date": "2022-11-07 16:05:00-05:00",
