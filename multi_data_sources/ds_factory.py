@@ -1,28 +1,36 @@
 
 
-# Perhaps getting some inspiration from how strategy/strategy.py and strategy_factory.py is designed
+from multi_data_sources.sources.ds_base import DataSourceBase
+
 class DataSourceFactory:
     """
     Factory to create the appropriate data source component based on configuration
     """
     
     DATA_SOURCE_COMPONENTS = {  # Maps configuration named data source to actual class implementation
-        
+        # 'calendar_events': CalendarEventsDataSource,  # TODO: Implement first data source
         # Add more data source "types" here as you develop them
         # Format: 'data_source_name_from_config': DataSourceClass,
-        # Example: 'momentum_breakout': MomentumBreakoutStrategy,
     }
     
     @classmethod
-    def create_strategy(cls, hypothesis_type: str, **kwargs):
+    def create_data_source(cls, data_source_type: str, **kwargs) -> DataSourceBase:
         """
         Create the appropriate data source component based on configuration
         
         Args:
-            data_source_type: The type of data source being executed
+            data_source_type: The type of data source being executed (e.g., 'calendar_events')
             **kwargs: Arguments to pass to the data source constructor
         
         Returns:
             Appropriate data source instance
+            
+        Raises:
+            ValueError: If data source type is not recognized
         """
-        # Look at 'strategy/strategy_factory.py'
+        if data_source_type not in cls.DATA_SOURCE_COMPONENTS:
+            raise ValueError(f"Unknown data source type: {data_source_type}. "
+                           f"Available types: {list(cls.DATA_SOURCE_COMPONENTS.keys())}")
+        
+        data_source_class = cls.DATA_SOURCE_COMPONENTS[data_source_type]
+        return data_source_class(**kwargs)
