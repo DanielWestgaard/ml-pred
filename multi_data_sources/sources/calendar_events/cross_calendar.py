@@ -46,7 +46,7 @@ class CalendarEventsDataSource(DataSourceBase):
             Dictionary containing data from all complexity components:
             - earnings_data: Historical earnings analysis
             - options_expiration_data: Options expiration proximity analysis
-            - cross_calendar_analysis: Combined calendar effects analysis
+            - cross_calendar_analysis: Combined calendar effects analysis  TODO: perhaps this will be moved out later to "separate concerns"?
         """
         result = {
             'earnings_data': self.earnings.get_historical_data(),

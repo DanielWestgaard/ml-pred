@@ -48,7 +48,7 @@ class OptionsExpiration:
         self.ticker = yf.Ticker(self.symbol)
         
         # Storage configuration
-        self.storage_base = Path("storage/multi_data_sources/calendar_events/options_expiration")
+        self.storage_base = Path("storage/multi_data_sources/calendar_events/options_expiration")  # TODO: add hard coded path to config/config.py
         
         logger.info(f"Initialized OptionsExpiration component for {self.symbol} ({self.purpose} mode)")
     

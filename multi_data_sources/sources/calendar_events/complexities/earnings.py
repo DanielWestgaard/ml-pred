@@ -429,7 +429,7 @@ class Earnings:
         """
         try:
             # Create base directory structure
-            base_dir = Path("storage/multi_data_sources/calendar_events/earnings")
+            base_dir = Path("storage/multi_data_sources/calendar_events/earnings")  # TODO: Add these "hard coded" storage paths to config/config.py instead
             symbol_dir = base_dir / self.symbol
             
             # Create subdirectories
