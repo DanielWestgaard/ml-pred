@@ -1,6 +1,6 @@
 {
   "symbol": "URBN",
-  "analysis_timestamp": "2025-08-10T14:23:59.698792",
+  "analysis_timestamp": "2025-08-10T14:27:36.719572",
   "date_range": {
     "from": "2022-01-01",
     "to": "2025-01-01"
@@ -21,8 +21,8 @@
       "3": 2,
       "4": 3
     },
-    "avg_days_between_earnings": 91.75,
-    "earnings_timing_consistency": 0.06812767569376156
+    "avg_days_between_earnings": 81.55555555555556,
+    "earnings_timing_consistency": 0.38179178351375737
   },
   "summary": {
     "total_earnings_events": 9,

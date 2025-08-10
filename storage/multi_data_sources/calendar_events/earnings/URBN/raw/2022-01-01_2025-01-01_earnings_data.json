@@ -3,21 +3,19 @@
     "symbol": "URBN",
     "from_date": "2022-01-01",
     "to_date": "2025-01-01",
-    "collection_timestamp": "2025-08-10T14:23:59.691116",
+    "collection_timestamp": "2025-08-10T14:27:36.710502",
     "purpose": "historical"
   },
   "earnings_calendar": [
     {
-      "Earnings Date": [
-        "2025-08-27"
-      ],
+      "Earnings Date": "2025-08-27",
       "Earnings High": 1.56028,
       "Earnings Low": 1.38,
       "Earnings Average": 1.47699,
       "Revenue High": 1487143000,
       "Revenue Low": 1468844590,
       "Revenue Average": 1476256510,
-      "announcement_day_of_week": NaN,
+      "announcement_day_of_week": "Wednesday",
       "is_tuesday_friday": false
     }
   ],
@@ -36,7 +34,7 @@
       "large_surprise": false,
       "quarter": 4,
       "year": 2022,
-      "days_since_last_earnings": NaN
+      "days_since_last_earnings": 0.0
     },
     {
       "Earnings Date": "2023-02-28 16:05:00-05:00",
@@ -178,10 +176,10 @@
     }
   ],
   "earnings_features": {
-    "days_to_next_earnings": "Index([16], dtype='int64')",
-    "next_earnings_date": "Index(['2025-08-27'], dtype='object')",
+    "days_to_next_earnings": "16",
+    "next_earnings_date": "2025-08-27",
     "earnings_proximity_zone": "mid_term_pre_earnings",
-    "next_earnings_day_of_week": "Index(['Wednesday'], dtype='object')",
+    "next_earnings_day_of_week": "Wednesday",
     "is_tuesday_friday_announcement": "False",
     "in_post_earnings_drift": "False",
     "earnings_season": "False",
@@ -203,7 +201,7 @@
       "3": 2,
       "4": 3
     },
-    "avg_days_between_earnings": 91.75,
-    "earnings_timing_consistency": 0.06812767569376156
+    "avg_days_between_earnings": 81.55555555555556,
+    "earnings_timing_consistency": 0.38179178351375737
   }
 }
