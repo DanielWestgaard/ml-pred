@@ -87,7 +87,6 @@ class Earnings:
             result['saved_paths'] = saved_paths
             
             logger.info(f"Successfully collected earnings data for {self.symbol}")
-            print(result)
             return result
             
         except Exception as e:
