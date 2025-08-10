@@ -70,6 +70,7 @@ class DataSourceOrchestrator:
                 data_source = DataSourceFactory.create_data_source(
                     data_source_type=source_name,
                     symbol=self.multi_data_config.get('symbol'),
+                    stock=self.multi_data_config.get('stock'),
                     from_date=self.multi_data_config.get('from_date'),
                     to_date=self.multi_data_config.get('to_date'),
                     purpose=self.multi_data_config.get('purpose')

@@ -15,7 +15,7 @@ multi_data:
 
   # Data sources wanted
   sources: [  
-    # calendar_events         # TODO: Implement first data source
+    calendar_events         # TODO: Implement first data source
     # Add more sources as they're implemented
   ]
 

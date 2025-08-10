@@ -6,7 +6,7 @@ from datetime import datetime
 class DataSourceBase(ABC):
     """Base class for all data source implementations."""
     
-    def __init__(self, symbol: str, from_date: Optional[str] = None, 
+    def __init__(self, symbol: str, stock: bool = False, from_date: Optional[str] = None,
                  to_date: Optional[str] = None, purpose: str = "historical"):
         """
         Initialize base data source.

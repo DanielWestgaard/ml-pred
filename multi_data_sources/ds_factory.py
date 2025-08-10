@@ -1,6 +1,5 @@
-
-
 from multi_data_sources.sources.ds_base import DataSourceBase
+from multi_data_sources.sources.calendar_events.cross_calendar import CalendarEventsDataSource
 
 class DataSourceFactory:
     """
@@ -8,7 +7,7 @@ class DataSourceFactory:
     """
     
     DATA_SOURCE_COMPONENTS = {  # Maps configuration named data source to actual class implementation
-        # 'calendar_events': CalendarEventsDataSource,  # TODO: Implement first data source
+        'calendar_events': CalendarEventsDataSource  # TODO: Implement first data source
         # Add more data source "types" here as you develop them
         # Format: 'data_source_name_from_config': DataSourceClass,
     }

@@ -1,9 +1,10 @@
+from typing import Optional
 from multi_data_sources.sources.ds_base import DataSourceBase
 from multi_data_sources.sources.calendar_events.complexities.earnings import Earnings
 from multi_data_sources.sources.calendar_events.complexities.options_expiration import OptionsExpiration
 
 
-class CrossCalendar(DataSourceBase):
+class CalendarEventsDataSource(DataSourceBase):
     """..."""
     
     # Overview of what calendar related has "implemented"
@@ -16,14 +17,18 @@ class CrossCalendar(DataSourceBase):
         # Other suggestions: ..? Perhaps only starting off simple
     ]
     
-    def __init__(self, path_to_config:str = None):
+    def __init__(self, symbol: str, stock: bool = False, from_date: Optional[str] = None, 
+                 to_date: Optional[str] = None, purpose: str = "historical"):
         """
         ...
         """
         # Read configuration
         
         # Set variables
-    
+        self.symbol = symbol
+        self.stock = stock
+        self.from_date = from_date
+        self.to_date = to_date
     
     def get_historical_data(self):
         """Fetch historical to store in storage/"""
