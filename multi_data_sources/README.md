@@ -64,22 +64,79 @@ My initial thought is that each component should have ways to get
 ## Future implementations and work
 > Once some of the data-type/components are working, I need to start thinking/working on usage and incorporating this into my existing system.
 
-# Suggestion to configuration
+# Usage Examples
+
+## Quick Start
+Run the multi-data sources orchestrator with your configuration:
+
+```bash
+# Standalone execution
+python main.py --multi-data "multi_data_sources/example_config.yml"
+
+# As part of hypothesis flow  
+python main.py --hypothesis "multi_data_sources/example_config.yml"
+```
+
+## Configuration Structure
 ```yml
+hypothesis:
+  name: "multi_data_test"
+  description: "Testing multi-data source integration"
+
 multi_data:
     # Historical or "live" data
     purpose: "historical"       # or "live"
 
     # General details
-    symbol: "APPL"
+    symbol: "AAPL"
     stock: true                 # bool
-    from_date: "2022-01-01"       # YYYY-MM-DD
-    to_date: "2025-01-01"         # YYYY-MM-DD
+    from_date: "2022-01-01"     # YYYY-MM-DD
+    to_date: "2025-01-01"       # YYYY-MM-DD
 
     # Data sources wanted
     sources: [  
-        calendar_events         # TODO: In the future, able to specify what we want to add?
+        test_data               # Available: test_data
+        # calendar_events       # TODO: Implement first data source
     ]
+
+# Optional: Include other sections for full pipeline
+# data_pipeline:
+#   raw_source: "path/to/market/data.csv"
+```
+
+## Available Data Sources
+- `test_data`: Demo data source generating dummy time series data
+- `calendar_events`: 🚧 **Coming Soon** - Earnings, options expiry, holidays
+
+## Integration with Main Pipeline
+
+The orchestrator integrates seamlessly with your existing hypothesis-driven workflow:
+
+1. **Standalone Mode**: `python main.py --multi-data config.yml`
+2. **Hypothesis Flow**: Include `multi_data:` section in hypothesis config
+3. **Pipeline Integration**: Results can feed into data processing and ML training
+
+## Output Format
+
+The orchestrator returns structured results:
+```python
+{
+    'config': {...},           # Configuration used
+    'sources': {               # Results from each data source
+        'test_data': {
+            'data': DataFrame,     # Historical data or subscription info
+            'status': 'success',   # success/failed/subscribed  
+            'timestamp': '...'     # Execution timestamp
+        }
+    },
+    'summary': {
+        'total_sources': 1,
+        'successful_sources': 1,
+        'failed_sources': 0,
+        'successful_source_names': ['test_data'],
+        'failed_source_names': []
+    }
+}
 ```
 
 ### Storage
