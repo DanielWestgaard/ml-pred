@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class Earnings:
     """..."""
     
@@ -7,4 +10,11 @@ class Earnings:
         """
         # Set variables
     
-    # TODO..
+    def get_historical_data(self) -> Any:
+        """
+        Fetch historical data to store in storage/.
+        
+        Returns:
+            Historical data in appropriate format (DataFrame, dict, etc.)
+        """
+        
