@@ -25,9 +25,9 @@ The Calendar Events data source identifies and analyzes **institutional blind sp
 ### **1. Options Expiration Proximity Effects** ✅
 - **Target**: Small-cap options expiration patterns institutions miss
 - **Method**: Hybrid approach combining algorithmic + live data
-  - **Historical**: Algorithmic 3rd Friday calculation (36 expirations analyzed for CLOV)  
+  - **Historical**: Algorithmic 3rd Friday calculation
   - **Live**: Real yfinance options chains with strike prices, volumes, OI
-- **Key Results**: Moderate pattern strength detected (+0.37% pre vs -0.21% post-expiration)
+- **Key Results**: Moderate pattern strength detected
 - **Blind Spot**: Small market caps limit institutional position sizes around expiration
 
 ### **2. Earnings Announcement Timing** ✅  
