@@ -5,6 +5,7 @@ import yfinance as yf
 from datetime import datetime
 import numpy as np
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,9 @@ class Earnings:
         # Initialize yfinance ticker
         self.ticker = yf.Ticker(self.symbol)
         
+        # Storage configuration
+        self.storage_base = Path("storage/multi_data_sources/calendar_events/earnings")
+        
         logger.info(f"Initialized Earnings component for {self.symbol} ({self.purpose} mode)")
     
     def get_historical_data(self) -> Dict[str, Any]:
@@ -77,6 +81,10 @@ class Earnings:
                     'purpose': self.purpose
                 }
             }
+            
+            # Save the data to centralized storage
+            saved_paths = self._save_earnings_data(result)
+            result['saved_paths'] = saved_paths
             
             logger.info(f"Successfully collected earnings data for {self.symbol}")
             print(result)
@@ -394,6 +402,157 @@ class Earnings:
         except Exception as e:
             logger.error(f"Error getting price data: {e}")
             return pd.DataFrame()
+    
+    def _save_earnings_data(self, data: Dict[str, Any]) -> Dict[str, str]:
+        """
+        Save earnings data to centralized storage following the project's structure pattern.
+        
+        Structure: storage/multi_data_sources/calendar_events/earnings/{symbol}/
+        - raw/ : Raw earnings data (JSON format)
+        - processed/ : Processed features (CSV format) 
+        - analysis/ : Pattern analysis results (JSON format)
+        
+        Returns:
+            Dictionary with paths to saved files
+        """
+        try:
+            # Create base directory structure
+            base_dir = Path("storage/multi_data_sources/calendar_events/earnings")
+            symbol_dir = base_dir / self.symbol
+            
+            # Create subdirectories
+            raw_dir = symbol_dir / "raw"
+            processed_dir = symbol_dir / "processed"
+            analysis_dir = symbol_dir / "analysis"
+            
+            for directory in [raw_dir, processed_dir, analysis_dir]:
+                directory.mkdir(parents=True, exist_ok=True)
+            
+            # Generate filename with date range
+            date_suffix = f"{self.from_date}_{self.to_date}" if self.from_date and self.to_date else datetime.now().strftime("%Y-%m-%d")
+            
+            saved_paths = {}
+            
+            # Save raw data (complete earnings data as JSON)
+            raw_filename = f"{date_suffix}_earnings_data.json"
+            raw_path = raw_dir / raw_filename
+            
+            # Prepare data for JSON serialization (handle pandas timestamps)
+            def convert_timestamps(df):
+                """Convert pandas timestamps to strings for JSON serialization"""
+                if df.empty:
+                    return []
+                # Reset index to convert timestamps to regular columns
+                df_copy = df.copy()
+                if isinstance(df_copy.index, pd.DatetimeIndex):
+                    df_copy = df_copy.reset_index()
+                    df_copy.columns = [str(col) for col in df_copy.columns]
+                return df_copy.to_dict('records')
+            
+            json_data = {
+                'metadata': data['metadata'],
+                'earnings_calendar': convert_timestamps(data['earnings_calendar']),
+                'historical_earnings_dates': convert_timestamps(data['historical_earnings_dates']),
+                'earnings_history': convert_timestamps(data['earnings_history']),
+                'analyst_targets': convert_timestamps(data['analyst_targets']),
+                'earnings_features': {str(k): str(v) for k, v in data['earnings_features'].items()},
+                'historical_analysis': data['historical_analysis']
+            }
+            
+            with open(raw_path, 'w') as f:
+                json.dump(json_data, f, indent=2, default=str)
+            saved_paths['raw_data'] = str(raw_path)
+            
+            # Save processed features (CSV for easy ML usage)
+            if not data['historical_earnings_dates'].empty:
+                processed_filename = f"{date_suffix}_earnings_features.csv"
+                processed_path = processed_dir / processed_filename
+                data['historical_earnings_dates'].to_csv(processed_path)
+                saved_paths['processed_features'] = str(processed_path)
+            
+            # Save analysis patterns (JSON for easy consumption)
+            if data['historical_analysis']:
+                analysis_filename = f"{date_suffix}_patterns.json"
+                analysis_path = analysis_dir / analysis_filename
+                
+                # Include additional analysis metadata
+                analysis_data = {
+                    'symbol': self.symbol,
+                    'analysis_timestamp': datetime.now().isoformat(),
+                    'date_range': {'from': self.from_date, 'to': self.to_date},
+                    'patterns': data['historical_analysis'],
+                    'summary': {
+                        'total_earnings_events': len(data['historical_earnings_dates']) if not data['historical_earnings_dates'].empty else 0,
+                        'data_quality': 'high' if data['historical_analysis'] else 'limited'
+                    }
+                }
+                
+                with open(analysis_path, 'w') as f:
+                    json.dump(analysis_data, f, indent=2, default=str)
+                saved_paths['analysis'] = str(analysis_path)
+            
+            logger.info(f"Earnings data saved for {self.symbol}: {len(saved_paths)} files")
+            return saved_paths
+            
+        except Exception as e:
+            logger.error(f"Error saving earnings data for {self.symbol}: {e}")
+            return {}
+    
+    def load_saved_earnings_data(self, date_range: str = None) -> Dict[str, Any]:
+        """
+        Load previously saved earnings data from storage.
+        
+        Args:
+            date_range: Specific date range to load (e.g., "2022-01-01_2025-01-01")
+                       If None, loads the most recent data
+        
+        Returns:
+            Dictionary with loaded earnings data
+        """
+        try:
+            base_dir = Path("storage/multi_data_sources/calendar_events/earnings")
+            symbol_dir = base_dir / self.symbol / "raw"
+            
+            if not symbol_dir.exists():
+                logger.warning(f"No saved earnings data found for {self.symbol}")
+                return {}
+            
+            # Find the appropriate file
+            if date_range:
+                filename = f"{date_range}_earnings_data.json"
+                file_path = symbol_dir / filename
+            else:
+                # Get the most recent file
+                json_files = list(symbol_dir.glob("*_earnings_data.json"))
+                if not json_files:
+                    logger.warning(f"No earnings data files found for {self.symbol}")
+                    return {}
+                file_path = max(json_files, key=lambda x: x.stat().st_mtime)
+            
+            if file_path.exists():
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+                
+                # Convert back to DataFrames
+                result = {
+                    'metadata': data['metadata'],
+                    'earnings_calendar': pd.DataFrame(data['earnings_calendar']),
+                    'historical_earnings_dates': pd.DataFrame.from_dict(data['historical_earnings_dates'], orient='index'),
+                    'earnings_history': pd.DataFrame(data['earnings_history']),
+                    'analyst_targets': pd.DataFrame(data['analyst_targets']),
+                    'earnings_features': data['earnings_features'],
+                    'historical_analysis': data['historical_analysis']
+                }
+                
+                logger.info(f"Successfully loaded saved earnings data for {self.symbol}")
+                return result
+            else:
+                logger.warning(f"Earnings data file not found: {file_path}")
+                return {}
+                
+        except Exception as e:
+            logger.error(f"Error loading saved earnings data for {self.symbol}: {e}")
+            return {}
     
     def _classify_earnings_proximity(self, days_to_earnings: int) -> str:
         """
