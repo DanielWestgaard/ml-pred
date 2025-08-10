@@ -72,6 +72,10 @@ class CalendarEventsDataSource(DataSourceBase):
             }
         }
         
+        # Save cross-calendar data to centralized storage
+        saved_paths = self._save_cross_calendar_data(result)
+        result['saved_paths'] = saved_paths
+        
         return result
         
     def subscribe_live_data(self):
@@ -203,8 +207,43 @@ class CalendarEventsDataSource(DataSourceBase):
                 start_date = end_date - timedelta(days=365)
             
             # Get market holidays in the date range
-            holidays = nyse.holidays_all()
-            relevant_holidays = holidays[(holidays >= start_date) & (holidays <= end_date)]
+            # Try different methods to get holidays from exchange_calendars
+            try:
+                # Method 1: Try sessions and find gaps
+                sessions = nyse.sessions_in_range(start_date, end_date)
+                all_weekdays = pd.bdate_range(start=start_date, end=end_date)
+                holidays_mask = ~all_weekdays.isin(sessions)
+                relevant_holidays = all_weekdays[holidays_mask]
+                
+            except Exception as e:
+                logger.debug(f"Sessions method failed: {e}")
+                try:
+                    # Method 2: Use regular_holidays and adhoc_holidays
+                    regular_holidays = nyse.regular_holidays
+                    adhoc_holidays = nyse.adhoc_holidays
+                    
+                    # Combine and filter by date range
+                    all_holidays = []
+                    for year in range(start_date.year, end_date.year + 1):
+                        for holiday in regular_holidays:
+                            try:
+                                holiday_date = holiday.dates(start_date=f'{year}-01-01', end_date=f'{year}-12-31', return_name=False)
+                                if len(holiday_date) > 0:
+                                    all_holidays.extend(holiday_date)
+                            except:
+                                continue
+                    
+                    # Add adhoc holidays
+                    for holiday_date in adhoc_holidays.keys():
+                        if start_date <= holiday_date <= end_date:
+                            all_holidays.append(holiday_date)
+                    
+                    relevant_holidays = pd.DatetimeIndex(all_holidays).unique()
+                    
+                except Exception as e2:
+                    logger.warning(f"Could not get NYSE holidays: {e2}")
+                    # Fallback to basic holidays
+                    relevant_holidays = self._get_basic_holidays(start_date, end_date)
             
             # Define vacation periods (institutional blind spots)
             vacation_periods = self._get_vacation_periods(start_date, end_date)
@@ -350,6 +389,26 @@ class CalendarEventsDataSource(DataSourceBase):
             'conflicts': conflicts,
             'analysis': 'Holiday-expiry conflicts create unique arbitrage opportunities'
         }
+    
+    def _get_basic_holidays(self, start_date, end_date):
+        """Generate basic US market holidays for date range."""
+        holidays = []
+        
+        for year in range(start_date.year, end_date.year + 1):
+            # Major US market holidays
+            year_holidays = [
+                f'{year}-01-01',  # New Year's Day
+                f'{year}-07-04',  # Independence Day  
+                f'{year}-12-25',  # Christmas Day
+                f'{year}-11-28',  # Thanksgiving (approximate)
+            ]
+            
+            for holiday_str in year_holidays:
+                holiday_date = pd.to_datetime(holiday_str)
+                if start_date <= holiday_date <= end_date:
+                    holidays.append(holiday_date)
+        
+        return pd.DatetimeIndex(holidays)
     
     def _basic_holiday_analysis(self):
         """Fallback holiday analysis without exchange_calendars."""
@@ -600,3 +659,88 @@ class CalendarEventsDataSource(DataSourceBase):
             'conflicts': conflicts,
             'analysis': 'Quarter-end + earnings creates complex institutional decision-making'
         }
+    
+    def _save_cross_calendar_data(self, data):
+        """Save cross-calendar analysis data to centralized storage."""
+        try:
+            from pathlib import Path
+            import json
+            
+            # Create directory structure
+            base_dir = Path("storage/multi_data_sources/calendar_events/cross_calendar")
+            symbol_dir = base_dir / self.symbol
+            
+            raw_dir = symbol_dir / "raw"
+            analysis_dir = symbol_dir / "analysis"
+            
+            for directory in [raw_dir, analysis_dir]:
+                directory.mkdir(parents=True, exist_ok=True)
+            
+            # Generate filename
+            date_suffix = f"{self.from_date}_{self.to_date}" if self.from_date and self.to_date else datetime.now().strftime("%Y-%m-%d")
+            saved_paths = {}
+            
+            # Save complete cross-calendar data
+            raw_filename = f"{date_suffix}_cross_calendar_complete.json"
+            raw_path = raw_dir / raw_filename
+            
+            # Prepare JSON-serializable data
+            json_data = {
+                'holidays_vacations': data['holidays_vacations'],
+                'fiscal_quarters': data['fiscal_quarters'],
+                'cross_calendar_analysis': data['cross_calendar_analysis'],
+                'metadata': data['metadata']
+            }
+            
+            with open(raw_path, 'w') as f:
+                json.dump(json_data, f, indent=2, default=str)
+            saved_paths['cross_calendar_complete'] = str(raw_path)
+            
+            # Save holiday-specific analysis
+            if data['holidays_vacations']:
+                holiday_filename = f"{date_suffix}_holiday_analysis.json"
+                holiday_path = analysis_dir / holiday_filename
+                
+                holiday_data = {
+                    'symbol': self.symbol,
+                    'analysis_timestamp': datetime.now().isoformat(),
+                    'date_range': {'from': self.from_date, 'to': self.to_date},
+                    'holiday_analysis': data['holidays_vacations'],
+                    'summary': {
+                        'total_holidays': data['holidays_vacations'].get('total_holidays_analyzed', 0),
+                        'vacation_periods': data['holidays_vacations'].get('total_vacation_periods', 0),
+                        'institutional_impact': 'high' if data['holidays_vacations'].get('total_vacation_periods', 0) > 0 else 'low'
+                    }
+                }
+                
+                with open(holiday_path, 'w') as f:
+                    json.dump(holiday_data, f, indent=2, default=str)
+                saved_paths['holiday_analysis'] = str(holiday_path)
+            
+            # Save fiscal quarter analysis
+            if data['fiscal_quarters']:
+                quarter_filename = f"{date_suffix}_fiscal_quarter_analysis.json"
+                quarter_path = analysis_dir / quarter_filename
+                
+                quarter_data = {
+                    'symbol': self.symbol,
+                    'analysis_timestamp': datetime.now().isoformat(),
+                    'date_range': {'from': self.from_date, 'to': self.to_date},
+                    'fiscal_quarter_analysis': data['fiscal_quarters'],
+                    'summary': {
+                        'total_quarters': data['fiscal_quarters'].get('total_quarters_analyzed', 0),
+                        'fiscal_calendar_type': data['fiscal_quarters'].get('company_fiscal_info', {}).get('fiscal_calendar_type', 'unknown'),
+                        'window_dressing_potential': 'high'
+                    }
+                }
+                
+                with open(quarter_path, 'w') as f:
+                    json.dump(quarter_data, f, indent=2, default=str)
+                saved_paths['fiscal_quarter_analysis'] = str(quarter_path)
+            
+            logger.info(f"Cross-calendar data saved for {self.symbol}: {len(saved_paths)} files")
+            return saved_paths
+            
+        except Exception as e:
+            logger.error(f"Error saving cross-calendar data for {self.symbol}: {e}")
+            return {}

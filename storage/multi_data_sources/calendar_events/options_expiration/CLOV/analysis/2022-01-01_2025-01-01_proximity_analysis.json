@@ -1,6 +1,6 @@
 {
   "symbol": "CLOV",
-  "analysis_timestamp": "2025-08-10T19:02:56.621564",
+  "analysis_timestamp": "2025-08-10T20:00:33.509558",
   "date_range": {
     "from": "2022-01-01",
     "to": "2025-01-01"
@@ -564,7 +564,7 @@
   },
   "summary": {
     "has_options": true,
-    "total_expirations": 10,
+    "total_expirations": 11,
     "market_cap_category": "small"
   }
 }
