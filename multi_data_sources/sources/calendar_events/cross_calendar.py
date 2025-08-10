@@ -665,13 +665,11 @@ class CalendarEventsDataSource(DataSourceBase):
         try:
             from pathlib import Path
             import json
+            from config.config import get_calendar_events_raw_dir, get_calendar_events_analysis_dir
             
-            # Create directory structure
-            base_dir = Path("storage/multi_data_sources/calendar_events/cross_calendar")
-            symbol_dir = base_dir / self.symbol
-            
-            raw_dir = symbol_dir / "raw"
-            analysis_dir = symbol_dir / "analysis"
+            # Create directory structure using centralized config
+            raw_dir = Path(get_calendar_events_raw_dir(self.symbol, 'cross_calendar'))
+            analysis_dir = Path(get_calendar_events_analysis_dir(self.symbol, 'cross_calendar'))
             
             for directory in [raw_dir, analysis_dir]:
                 directory.mkdir(parents=True, exist_ok=True)

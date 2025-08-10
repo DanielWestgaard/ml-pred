@@ -46,8 +46,9 @@ class Earnings:
         # Initialize yfinance ticker
         self.ticker = yf.Ticker(self.symbol)
         
-        # Storage configuration
-        self.storage_base = Path("storage/multi_data_sources/calendar_events/earnings")
+        # Storage configuration - using centralized config
+        from config.config import get_calendar_events_component_dir
+        self.storage_base = Path(get_calendar_events_component_dir(self.symbol, 'earnings'))
         
         logger.info(f"Initialized Earnings component for {self.symbol} ({self.purpose} mode)")
     
@@ -428,14 +429,14 @@ class Earnings:
             Dictionary with paths to saved files
         """
         try:
-            # Create base directory structure
-            base_dir = Path("storage/multi_data_sources/calendar_events/earnings")  # TODO: Add these "hard coded" storage paths to config/config.py instead
-            symbol_dir = base_dir / self.symbol
+            # Create directory structure using centralized config
+            from config.config import (get_calendar_events_raw_dir, get_calendar_events_processed_dir, 
+                                     get_calendar_events_analysis_dir)
             
             # Create subdirectories
-            raw_dir = symbol_dir / "raw"
-            processed_dir = symbol_dir / "processed"
-            analysis_dir = symbol_dir / "analysis"
+            raw_dir = Path(get_calendar_events_raw_dir(self.symbol, 'earnings'))
+            processed_dir = Path(get_calendar_events_processed_dir(self.symbol, 'earnings'))
+            analysis_dir = Path(get_calendar_events_analysis_dir(self.symbol, 'earnings'))
             
             for directory in [raw_dir, processed_dir, analysis_dir]:
                 directory.mkdir(parents=True, exist_ok=True)
@@ -522,8 +523,8 @@ class Earnings:
             Dictionary with loaded earnings data
         """
         try:
-            base_dir = Path("storage/multi_data_sources/calendar_events/earnings")
-            symbol_dir = base_dir / self.symbol / "raw"
+            from config.config import get_calendar_events_raw_dir
+            symbol_dir = Path(get_calendar_events_raw_dir(self.symbol, 'earnings'))
             
             if not symbol_dir.exists():
                 logger.warning(f"No saved earnings data found for {self.symbol}")

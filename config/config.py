@@ -42,6 +42,27 @@ def get_capcom_processed_data_dir(symbol: str, timeframe: str = None) -> str:
     if timeframe:
         return os.path.join(base_path, timeframe)
     return base_path
+
+# Multi-Data Sources storage helper functions
+def get_calendar_events_symbol_dir(symbol: str) -> str:
+    """Get calendar events directory for a specific symbol."""
+    return os.path.join(CALENDAR_EVENTS_BASE_DIR, symbol)
+
+def get_calendar_events_component_dir(symbol: str, component: str) -> str:
+    """Get specific calendar component directory for a symbol (earnings, options_expiration, cross_calendar)."""
+    return os.path.join(get_calendar_events_symbol_dir(symbol), component)
+
+def get_calendar_events_raw_dir(symbol: str, component: str) -> str:
+    """Get raw data directory for a calendar component and symbol."""
+    return os.path.join(get_calendar_events_component_dir(symbol, component), 'raw')
+
+def get_calendar_events_analysis_dir(symbol: str, component: str) -> str:
+    """Get analysis directory for a calendar component and symbol."""
+    return os.path.join(get_calendar_events_component_dir(symbol, component), 'analysis')
+
+def get_calendar_events_processed_dir(symbol: str, component: str) -> str:
+    """Get processed directory for a calendar component and symbol."""
+    return os.path.join(get_calendar_events_component_dir(symbol, component), 'processed')
 # Alpha Vantage API
 ALPVAN_BASE_STORAGE_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'alpha_vantage')
 ALPVAN_RAW_DATA_DIR = os.path.join(ALPVAN_BASE_STORAGE_DIR, 'raw')
@@ -52,6 +73,10 @@ CLEANED_DATA_BASE_DIR = os.path.join(DATA_ENGINEERING_STATS_DIR, 'cleaned_data')
 FE_SEL_BASE_DIR = os.path.join(DATA_ENGINEERING_STATS_DIR, 'fe_selection')
 # ML Model
 TRAINED_MODEL_STORAGE = os.path.join(BASE_STORAGE_DIR, 'models')
+
+# Multi-Data Sources
+MULTI_DATA_SOURCES_BASE_DIR = os.path.join(BASE_STORAGE_DIR, 'multi_data_sources')
+CALENDAR_EVENTS_BASE_DIR = os.path.join(MULTI_DATA_SOURCES_BASE_DIR, 'calendar_events')
 
 # LOGGING
 DEFAULT_LOG_FORMAT = '%(asctime)s - %(name)-40.40s:%(lineno)-4d - %(levelname)-8s - %(message)s'
