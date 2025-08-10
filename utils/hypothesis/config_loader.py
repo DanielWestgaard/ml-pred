@@ -191,6 +191,7 @@ class LoadHypothesisConfigMetadata:
         # Extract all sections using helper method
         sections_to_extract = [
             ('data_pipeline', ['raw_source']),  # raw_source is required if section exists
+            ('multi_data', None),               # Multi-data sources configuration
             ('model_training', ['type']),       # type is required if section exists  
             ('evaluate_model', None),           # No required fields
             ('strategy', None),                 # No required fields

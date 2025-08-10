@@ -1,0 +1,27 @@
+# Example configuration for multi-data sources
+hypothesis:
+  name: "multi_data_test"
+  description: "Testing multi-data source integration"
+
+multi_data:
+  # Historical or "live" data
+  purpose: "historical"       # or "live"
+
+  # General details
+  symbol: "AAPL"
+  stock: true                 # bool
+  from_date: "2022-01-01"     # YYYY-MM-DD
+  to_date: "2025-01-01"       # YYYY-MM-DD
+
+  # Data sources wanted
+  sources: [  
+    # calendar_events         # TODO: Implement first data source
+    # Add more sources as they're implemented
+  ]
+
+# Optional: Can include other sections for full pipeline
+# data_pipeline:
+#   raw_source: "path/to/market/data.csv"
+#   
+# model_training:
+#   type: "random_forest"
