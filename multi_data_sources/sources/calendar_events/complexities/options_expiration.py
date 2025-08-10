@@ -47,8 +47,9 @@ class OptionsExpiration:
         # Initialize yfinance ticker
         self.ticker = yf.Ticker(self.symbol)
         
-        # Storage configuration
-        self.storage_base = Path("storage/multi_data_sources/calendar_events/options_expiration")  # TODO: add hard coded path to config/config.py
+        # Storage configuration - using centralized config
+        from config.config import get_calendar_events_component_dir
+        self.storage_base = Path(get_calendar_events_component_dir(self.symbol, 'options_expiration'))
         
         logger.info(f"Initialized OptionsExpiration component for {self.symbol} ({self.purpose} mode)")
     
@@ -745,13 +746,13 @@ class OptionsExpiration:
         - analysis/ : Proximity effects analysis (JSON)
         """
         try:
-            # Create directory structure
-            base_dir = self.storage_base
-            symbol_dir = base_dir / self.symbol
+            # Create directory structure - storage_base now points to symbol/component directory
+            from config.config import (get_calendar_events_raw_dir, get_calendar_events_processed_dir, 
+                                     get_calendar_events_analysis_dir)
             
-            raw_dir = symbol_dir / "raw"
-            processed_dir = symbol_dir / "processed"
-            analysis_dir = symbol_dir / "analysis"
+            raw_dir = Path(get_calendar_events_raw_dir(self.symbol, 'options_expiration'))
+            processed_dir = Path(get_calendar_events_processed_dir(self.symbol, 'options_expiration'))
+            analysis_dir = Path(get_calendar_events_analysis_dir(self.symbol, 'options_expiration'))
             
             for directory in [raw_dir, processed_dir, analysis_dir]:
                 directory.mkdir(parents=True, exist_ok=True)
@@ -819,7 +820,8 @@ class OptionsExpiration:
             Dictionary with loaded options expiration data
         """
         try:
-            base_dir = self.storage_base / self.symbol / "raw"
+            from config.config import get_calendar_events_raw_dir
+            base_dir = Path(get_calendar_events_raw_dir(self.symbol, 'options_expiration'))
             
             if not base_dir.exists():
                 logger.warning(f"No saved options data found for {self.symbol}")
