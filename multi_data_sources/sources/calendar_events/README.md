@@ -13,7 +13,7 @@ I think this can really be effective if made correctly. If I made it dynamic, so
 - Quick to implement and test
 
 **Specific focus areas**:
-- Earnings announcement timing interactions (Friday vs Tuesday announcements)
-- Option expiration proximity effects on small caps
-- Holiday/vacation period patterns in specific sectors
-- Fiscal quarter-end effects combined with company size
+- **Earnings announcement** timing interactions (Friday vs Tuesday announcements)
+- **Option expiration** proximity effects on small caps
+- **Holiday/vacation** period patterns in specific sectors
+- **Fiscal quarter-end** effects combined with company size
