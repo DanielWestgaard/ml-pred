@@ -140,7 +140,15 @@ The orchestrator returns structured results:
 ```
 
 ### Storage
-For storing the "historical data" of different data types, this should be done in `storage/` (continuing with a centralized storage). Each data type could follow the same strucure used for historical data, being organized by folders after (eg.) type, timeframe (?), etc.<br>
+For storing the "historical data" of different data types, this should be done in `storage/` (continuing with a centralized storage). The storage structure follows a **symbol-first** approach:
+
+```
+storage/multi_data_sources/SOURCE_TYPE/SYMBOL/COMPONENT/
+```
+
+**Example**: `storage/multi_data_sources/calendar_events/CLOV/earnings/raw/`
+
+All storage paths are centrally managed via helper functions in `config/config.py` to avoid hardcoding paths across components.<br>
 
 ### Potential usage
 1. First using `main.py` to get historical data from components and storing them in storage maybe as "raw", since they will be un-processed?

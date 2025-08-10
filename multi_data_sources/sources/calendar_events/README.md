@@ -73,23 +73,29 @@ current_options = self._get_current_options_data()
 
 ### **Production Storage Structure**
 ```
-storage/multi_data_sources/calendar_events/
-├── earnings/SYMBOL/
+storage/multi_data_sources/calendar_events/SYMBOL/
+├── earnings/
 │   ├── raw/ - Complete earnings analysis (JSON)
 │   ├── processed/ - Engineered features (CSV)
 │   └── analysis/ - Pattern insights (JSON)
-├── options_expiration/SYMBOL/
+├── options_expiration/
 │   ├── raw/ - Full options analysis (JSON)
+│   ├── processed/ - Processed features (CSV)
 │   └── analysis/ - Proximity effects (JSON)
-└── cross_calendar/SYMBOL/
+└── cross_calendar/
     ├── raw/ - Complete cross-calendar analysis (JSON)
     └── analysis/ - Holiday-specific, quarter-specific files (JSON)
 ```
 
 **Real Example (CLOV)**:
-- `earnings/CLOV/` - 3 files with timing analysis
-- `options_expiration/CLOV/` - 2 files with 36 expiration effects  
-- `cross_calendar/CLOV/` - 3 files with holidays, quarters, conflicts
+- `CLOV/earnings/` - 3 files with timing analysis
+- `CLOV/options_expiration/` - 2 files with 36 expiration effects  
+- `CLOV/cross_calendar/` - 3 files with holidays, quarters, conflicts
+
+**Key Advantages of Symbol-First Structure**:
+- **Intuitive Navigation**: All CLOV data under `CLOV/` directory
+- **Scalable**: Easy to add new symbols or new calendar event types
+- **Centralized Config**: Storage paths managed via `config/config.py` helper functions
 
 ---
 
