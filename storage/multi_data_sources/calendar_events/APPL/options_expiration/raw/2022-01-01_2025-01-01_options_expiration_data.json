@@ -1,0 +1,27 @@
+{
+  "metadata": {
+    "symbol": "APPL",
+    "from_date": "2022-01-01",
+    "to_date": "2025-01-01",
+    "collection_timestamp": "2025-08-10T20:52:49.404957",
+    "purpose": "historical"
+  },
+  "current_options_data": {
+    "has_options": false,
+    "expirations": [],
+    "chains": {}
+  },
+  "expiration_calendar": [],
+  "historical_proximity_analysis": {},
+  "options_activity_metrics": {
+    "has_activity": false
+  },
+  "proximity_features": {
+    "has_options": false
+  },
+  "small_cap_analysis": {
+    "market_cap_category": "unknown",
+    "is_institutional_blind_spot": false,
+    "options_availability": false
+  }
+}

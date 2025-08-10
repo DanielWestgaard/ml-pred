@@ -1,0 +1,480 @@
+{
+  "holidays_vacations": {
+    "market_holidays": [
+      "2022-01-17",
+      "2022-02-21",
+      "2022-04-15",
+      "2022-05-30",
+      "2022-06-20",
+      "2022-07-04",
+      "2022-09-05",
+      "2022-11-24",
+      "2022-12-26",
+      "2023-01-02",
+      "2023-01-16",
+      "2023-02-20",
+      "2023-04-07",
+      "2023-05-29",
+      "2023-06-19",
+      "2023-07-04",
+      "2023-09-04",
+      "2023-11-23",
+      "2023-12-25",
+      "2024-01-01",
+      "2024-01-15",
+      "2024-02-19",
+      "2024-03-29",
+      "2024-05-27",
+      "2024-06-19",
+      "2024-07-04",
+      "2024-09-02",
+      "2024-11-28",
+      "2024-12-25",
+      "2025-01-01"
+    ],
+    "vacation_periods": [
+      {
+        "name": "Summer Vacation 2022",
+        "start": "2022-06-28",
+        "end": "2022-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2022",
+        "start": "2022-12-24",
+        "end": "2023-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2022",
+        "start": "2022-11-22",
+        "end": "2022-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2023",
+        "start": "2023-06-28",
+        "end": "2023-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2023",
+        "start": "2023-12-24",
+        "end": "2024-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2023",
+        "start": "2023-11-22",
+        "end": "2023-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2024",
+        "start": "2024-06-28",
+        "end": "2024-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2024",
+        "start": "2024-12-24",
+        "end": "2025-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2024",
+        "start": "2024-11-22",
+        "end": "2024-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      }
+    ],
+    "pre_holiday_effects": {
+      "pattern_description": "Pre-holiday effects often show reduced volume and altered price patterns",
+      "analysis_method": "Would analyze 1-3 days before each holiday for volume/return anomalies",
+      "expected_small_cap_effect": "Small caps may show larger moves due to reduced institutional oversight",
+      "holidays_count": 30
+    },
+    "vacation_period_effects": {
+      "pattern_description": "Vacation periods create institutional blind spots",
+      "key_insights": [
+        "Reduced institutional trading volume",
+        "Increased retail trader influence",
+        "Higher probability of gap moves in small caps",
+        "Delayed reaction to news and earnings"
+      ],
+      "periods_analyzed": 9,
+      "highest_impact_periods": [
+        "Summer Vacation 2022",
+        "Year-end Vacation 2022",
+        "Summer Vacation 2023",
+        "Year-end Vacation 2023",
+        "Summer Vacation 2024",
+        "Year-end Vacation 2024"
+      ]
+    },
+    "institutional_blind_spots": {
+      "december_effect": {
+        "effect_name": "December Small-Cap Effect",
+        "description": "Small caps often outperform in December due to tax loss selling reversal and window dressing",
+        "institutional_blind_spot": "Large institutions avoid small caps during year-end due to liquidity concerns",
+        "analysis_period": "2022 to 2025"
+      },
+      "summer_doldrums": {
+        "effect_name": "Summer Doldrums",
+        "description": "Reduced institutional activity in June-August creates opportunities",
+        "key_factors": [
+          "Vacation schedules reduce institutional oversight",
+          "Lower volume can amplify small-cap price moves",
+          "Earnings surprises may have delayed reactions"
+        ]
+      },
+      "options_expiry_holiday_conflict": {
+        "conflicts_found": 0,
+        "conflicts": [],
+        "analysis": "Holiday-expiry conflicts create unique arbitrage opportunities"
+      }
+    },
+    "total_holidays_analyzed": 30,
+    "total_vacation_periods": 9
+  },
+  "fiscal_quarters": {
+    "company_fiscal_info": {
+      "fiscal_year_end_month": 12,
+      "fiscal_calendar_type": "calendar_year",
+      "last_fiscal_year_end": null
+    },
+    "quarterly_dates": [
+      {
+        "quarter_end_date": "2022-03-31",
+        "quarter": "Q1",
+        "fiscal_year": 2022,
+        "is_fiscal_year_end": false,
+        "month": 3
+      },
+      {
+        "quarter_end_date": "2022-06-30",
+        "quarter": "Q2",
+        "fiscal_year": 2022,
+        "is_fiscal_year_end": false,
+        "month": 6
+      },
+      {
+        "quarter_end_date": "2022-09-30",
+        "quarter": "Q3",
+        "fiscal_year": 2022,
+        "is_fiscal_year_end": false,
+        "month": 9
+      },
+      {
+        "quarter_end_date": "2022-12-31",
+        "quarter": "Q4",
+        "fiscal_year": 2022,
+        "is_fiscal_year_end": true,
+        "month": 12
+      },
+      {
+        "quarter_end_date": "2023-03-31",
+        "quarter": "Q1",
+        "fiscal_year": 2023,
+        "is_fiscal_year_end": false,
+        "month": 3
+      },
+      {
+        "quarter_end_date": "2023-06-30",
+        "quarter": "Q2",
+        "fiscal_year": 2023,
+        "is_fiscal_year_end": false,
+        "month": 6
+      },
+      {
+        "quarter_end_date": "2023-09-30",
+        "quarter": "Q3",
+        "fiscal_year": 2023,
+        "is_fiscal_year_end": false,
+        "month": 9
+      },
+      {
+        "quarter_end_date": "2023-12-31",
+        "quarter": "Q4",
+        "fiscal_year": 2023,
+        "is_fiscal_year_end": true,
+        "month": 12
+      },
+      {
+        "quarter_end_date": "2024-03-31",
+        "quarter": "Q1",
+        "fiscal_year": 2024,
+        "is_fiscal_year_end": false,
+        "month": 3
+      },
+      {
+        "quarter_end_date": "2024-06-30",
+        "quarter": "Q2",
+        "fiscal_year": 2024,
+        "is_fiscal_year_end": false,
+        "month": 6
+      },
+      {
+        "quarter_end_date": "2024-09-30",
+        "quarter": "Q3",
+        "fiscal_year": 2024,
+        "is_fiscal_year_end": false,
+        "month": 9
+      },
+      {
+        "quarter_end_date": "2024-12-31",
+        "quarter": "Q4",
+        "fiscal_year": 2024,
+        "is_fiscal_year_end": true,
+        "month": 12
+      }
+    ],
+    "institutional_effects": {
+      "window_dressing": {
+        "description": "Institutions buy/sell stocks to improve portfolio appearance",
+        "timing": "Last 2-3 trading days of quarter",
+        "small_cap_impact": "Higher volatility due to lower liquidity"
+      },
+      "portfolio_rebalancing": {
+        "description": "Systematic rebalancing creates predictable flows",
+        "timing": "Quarter-end and first few days of new quarter",
+        "opportunity": "Small caps may be overlooked in large rebalancing"
+      },
+      "reporting_requirements": {
+        "description": "13F filings and portfolio disclosures affect behavior",
+        "impact": "Some institutions avoid small positions to stay off radar",
+        "blind_spot": "Creates opportunities in sub-$100M market cap stocks"
+      }
+    },
+    "small_cap_specific_effects": {
+      "liquidity_constraints": {
+        "issue": "Large institutions cannot easily trade small caps at quarter-end",
+        "opportunity": "Creates temporary price dislocations",
+        "timing": "3-5 days around quarter-end"
+      },
+      "index_rebalancing": {
+        "russell_reconstitution": "Major annual event in June affecting small caps",
+        "quarterly_adjustments": "Smaller but regular rebalancing events",
+        "flow_predictability": "Known dates create arbitrage opportunities"
+      },
+      "earnings_calendar_conflict": {
+        "issue": "Some companies report earnings near quarter-end",
+        "complexity": "Creates multiple overlapping effects",
+        "institution_response": "Often delayed due to competing priorities"
+      }
+    },
+    "window_dressing_periods": [
+      {
+        "quarter": "Q1",
+        "fiscal_year": 2022,
+        "window_start": "2022-03-24",
+        "quarter_end": "2022-03-31",
+        "intensity": "high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q2",
+        "fiscal_year": 2022,
+        "window_start": "2022-06-23",
+        "quarter_end": "2022-06-30",
+        "intensity": "high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q3",
+        "fiscal_year": 2022,
+        "window_start": "2022-09-23",
+        "quarter_end": "2022-09-30",
+        "intensity": "high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q4",
+        "fiscal_year": 2022,
+        "window_start": "2022-12-24",
+        "quarter_end": "2022-12-31",
+        "intensity": "very_high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q1",
+        "fiscal_year": 2023,
+        "window_start": "2023-03-24",
+        "quarter_end": "2023-03-31",
+        "intensity": "high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q2",
+        "fiscal_year": 2023,
+        "window_start": "2023-06-23",
+        "quarter_end": "2023-06-30",
+        "intensity": "high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q3",
+        "fiscal_year": 2023,
+        "window_start": "2023-09-23",
+        "quarter_end": "2023-09-30",
+        "intensity": "high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q4",
+        "fiscal_year": 2023,
+        "window_start": "2023-12-24",
+        "quarter_end": "2023-12-31",
+        "intensity": "very_high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q1",
+        "fiscal_year": 2024,
+        "window_start": "2024-03-24",
+        "quarter_end": "2024-03-31",
+        "intensity": "high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q2",
+        "fiscal_year": 2024,
+        "window_start": "2024-06-23",
+        "quarter_end": "2024-06-30",
+        "intensity": "high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q3",
+        "fiscal_year": 2024,
+        "window_start": "2024-09-23",
+        "quarter_end": "2024-09-30",
+        "intensity": "high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      },
+      {
+        "quarter": "Q4",
+        "fiscal_year": 2024,
+        "window_start": "2024-12-24",
+        "quarter_end": "2024-12-31",
+        "intensity": "very_high",
+        "expected_effects": [
+          "Increased volume in large caps",
+          "Potential selling pressure in small caps",
+          "Portfolio \"beautification\" trades",
+          "Increased volatility in illiquid names"
+        ]
+      }
+    ],
+    "rebalancing_effects": {
+      "systematic_rebalancing": {
+        "description": "ETFs and index funds rebalance on quarter-ends",
+        "small_cap_impact": "May create temporary supply/demand imbalances",
+        "timing": "Typically after market close on quarter-end date"
+      },
+      "pension_fund_rebalancing": {
+        "description": "Large pension funds rebalance quarterly",
+        "blind_spot": "Often ignore small caps due to liquidity constraints",
+        "opportunity_window": "1-3 days after quarter-end"
+      },
+      "mutual_fund_flows": {
+        "description": "Month-end and quarter-end flows from retail investors",
+        "pattern": "Often favors large caps, creating small cap opportunities"
+      }
+    },
+    "quarter_end_conflicts": {
+      "conflicts_found": 0,
+      "conflicts": [],
+      "analysis": "Quarter-end + earnings creates complex institutional decision-making"
+    },
+    "total_quarters_analyzed": 12
+  },
+  "cross_calendar_analysis": {
+    "has_both_events": false,
+    "event_proximity_analysis": {},
+    "institutional_blind_spot_score": 0
+  },
+  "metadata": {
+    "symbol": "APPL",
+    "complexities_analyzed": [
+      "earnings",
+      "options_expiration",
+      "holidays_vacations",
+      "fiscal_quarters"
+    ],
+    "from_date": "2022-01-01",
+    "to_date": "2025-01-01",
+    "purpose": "historical",
+    "phase_1_complete": true,
+    "institutional_blind_spots_targeted": [
+      "small_cap_options_expiration",
+      "holiday_vacation_periods",
+      "fiscal_quarter_window_dressing",
+      "earnings_timing_interactions"
+    ]
+  }
+}
