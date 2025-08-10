@@ -149,12 +149,22 @@ class Earnings:
                     date_columns = [col for col in df.columns if 'date' in col.lower() or 'earnings' in col.lower()]
                     if date_columns:
                         date_col = date_columns[0]
-                        df['announcement_day_of_week'] = pd.to_datetime(
-                            df[date_col], errors='coerce'
-                        ).dt.day_name()
-                        
-                        # Flag Tuesday/Friday pattern (common for earnings)
-                        df['is_tuesday_friday'] = df['announcement_day_of_week'].isin(['Tuesday', 'Friday'])
+                        # Handle different date formats in earnings calendar
+                        if date_col in df.columns:
+                            # Extract dates from lists if they're stored as lists
+                            if df[date_col].apply(lambda x: isinstance(x, list)).any():
+                                df[date_col] = df[date_col].apply(lambda x: x[0] if isinstance(x, list) and len(x) > 0 else x)
+                            
+                            df['announcement_day_of_week'] = pd.to_datetime(
+                                df[date_col], errors='coerce'
+                            ).dt.day_name()
+                            
+                            # Flag Tuesday/Friday pattern (common for earnings)
+                            df['is_tuesday_friday'] = df['announcement_day_of_week'].isin(['Tuesday', 'Friday'])
+                    else:
+                        # If no date columns found, set default values
+                        df['announcement_day_of_week'] = 'Unknown'
+                        df['is_tuesday_friday'] = False
                 
                 return df
             else:
@@ -227,7 +237,10 @@ class Earnings:
             
             # Days between earnings (for consistency analysis)
             df_sorted = df.sort_index()
-            df_sorted['days_since_last_earnings'] = df_sorted.index.to_series().diff().dt.days
+            # Calculate days since last earnings, handling NaN for the first record
+            date_diffs = df_sorted.index.to_series().diff().dt.days
+            # Fill NaN with 0 for the first record or use a reasonable default
+            df_sorted['days_since_last_earnings'] = date_diffs.fillna(0)
             
             return df_sorted
             
