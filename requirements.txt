@@ -21,3 +21,5 @@ torch
 tensorflow
 timeout
 imblearn
+yfinance
+exchange_calendars

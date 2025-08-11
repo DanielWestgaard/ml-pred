@@ -66,6 +66,7 @@ import utils.hypothesis.config_loader as config_loader
 import utils.logging_utils as log_utils
 from utils.logging_utils import get_logger
 from hyp_val_framework.validate_hypothesis import HypothesisValidator
+from multi_data_sources.ds_orchestrator import DataSourceOrchestrator
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -112,6 +113,9 @@ def parse_arguments():
     parser.add_argument('--validate-hypothesis', '-vh', default=False, help='Run validation on your new hypothesis.')
     # parser.add_argument('--validate-hypothesis-specific', '-vhs', default=False, help='')
 
+    # Multi-data sources
+    parser.add_argument('--multi-data', '-md', default=False, help='Run multi-data sources orchestrator with hypothesis config file.')
+
     return parser.parse_args()
 
 
@@ -154,6 +158,20 @@ def main():
         # Getting all the configurations
         conf = config_loader.load_hypothesis_config(args.hypothesis).handle_hypothesis_source()
         conf_keys = conf.keys()
+        
+        # Check for multi-data sources first
+        if 'multi_data' in conf_keys:
+            logger.info("Multi-data sources configuration detected. Running data source orchestrator...")
+            multi_data_orchestrator = DataSourceOrchestrator(args.hypothesis)
+            multi_data_results = multi_data_orchestrator.run()
+            
+            # Log summary of results
+            summary = multi_data_results.get('summary', {})
+            logger.info(f"Multi-data orchestrator completed: {summary.get('successful_sources', 0)}/{summary.get('total_sources', 0)} sources successful")
+            
+            if summary.get('failed_sources', 0) > 0:
+                failed_sources = summary.get('failed_source_names', [])
+                logger.warning(f"Failed data sources: {failed_sources}")
         
         if 'data_pipeline_raw_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
             data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis, analyze_feature_importance=True)
@@ -345,6 +363,43 @@ def main():
             my_signal_logic,
             my_parameter_logic
         )
+
+    # Multi-data sources standalone execution
+    if args.multi_data:
+        logger.info(f"Starting multi-data sources orchestrator with config: {args.multi_data}")
+        try:
+            multi_data_orchestrator = DataSourceOrchestrator(args.multi_data)
+            results = multi_data_orchestrator.run()
+            
+            # Display results summary
+            summary = results.get('summary', {})
+            config_info = results.get('config', {})
+            
+            print("\n" + "="*60)
+            print("MULTI-DATA SOURCES EXECUTION SUMMARY")
+            print("="*60)
+            print(f"Symbol: {config_info.get('symbol', 'N/A')}")
+            print(f"Purpose: {config_info.get('purpose', 'N/A')}")
+            print(f"Date Range: {config_info.get('from_date', 'N/A')} to {config_info.get('to_date', 'N/A')}")
+            print(f"Total Sources: {summary.get('total_sources', 0)}")
+            print(f"Successful: {summary.get('successful_sources', 0)}")
+            print(f"Failed: {summary.get('failed_sources', 0)}")
+            
+            if summary.get('successful_source_names'):
+                print(f"Successful Sources: {', '.join(summary.get('successful_source_names', []))}")
+            
+            if summary.get('failed_source_names'):
+                print(f"Failed Sources: {', '.join(summary.get('failed_source_names', []))}")
+            
+            print(f"Execution Time: {results.get('timestamp', 'N/A')}")
+            print("="*60)
+            
+            logger.info("Multi-data sources orchestrator completed successfully")
+            
+        except Exception as e:
+            logger.error(f"Multi-data sources orchestrator failed: {e}")
+            import traceback
+            logger.error(f"Stack trace: {traceback.format_exc()}")
 
 def _strategy_flow(hypothesis_config: str):
     """

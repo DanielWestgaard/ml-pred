@@ -30,7 +30,24 @@ The real alpha is in the **intersections and combinations** that institutions st
 
 # Structure
 ```
-...
+├── README.md                       # This documentation
+├── data_types_todo.md              # Light plan for sources to implement and why
+│
+├── ds_orchestrator.py              # An "orchestrator" to easily use singular or multiple data source components
+│
+└── sources/                        # All different data source implementations
+    ├── ds_base.py                  # Base class all individual data source components implements
+    │
+    ├── calendar_events/            # Calendar/Event Data
+    │   ├── README.md               # Detailed info regarding this data source implementation
+    │   ├── cross_calendar.py       # main class?
+    │   └── complexities/           # Individual "things" that will make up the calendar (eg. earnings, holidays, etc.) that is too "complex" for a single method
+    │       ├── earnings.py         # ...
+    │       └── options_expiration.py # ...
+    │
+    ├── .../
+    │
+    └── ...
 ```
 
 ---
@@ -47,8 +64,91 @@ My initial thought is that each component should have ways to get
 ## Future implementations and work
 > Once some of the data-type/components are working, I need to start thinking/working on usage and incorporating this into my existing system.
 
+# Usage Examples
+
+## Quick Start
+Run the multi-data sources orchestrator with your configuration:
+
+```bash
+# Standalone execution
+python main.py --multi-data "multi_data_sources/example_config.yml"
+
+# As part of hypothesis flow  
+python main.py --hypothesis "multi_data_sources/example_config.yml"
+```
+
+## Configuration Structure
+```yml
+hypothesis:
+  name: "multi_data_test"
+  description: "Testing multi-data source integration"
+
+multi_data:
+    # Historical or "live" data
+    purpose: "historical"       # or "live"
+
+    # General details
+    symbol: "AAPL"
+    stock: true                 # bool
+    from_date: "2022-01-01"     # YYYY-MM-DD
+    to_date: "2025-01-01"       # YYYY-MM-DD
+
+    # Data sources wanted
+    sources: [  
+        test_data               # Available: test_data
+        # calendar_events       # TODO: Implement first data source
+    ]
+
+# Optional: Include other sections for full pipeline
+# data_pipeline:
+#   raw_source: "path/to/market/data.csv"
+```
+
+## Available Data Sources
+- `test_data`: Demo data source generating dummy time series data
+- `calendar_events`: 🚧 **Coming Soon** - Earnings, options expiry, holidays
+
+## Integration with Main Pipeline
+
+The orchestrator integrates seamlessly with your existing hypothesis-driven workflow:
+
+1. **Standalone Mode**: `python main.py --multi-data config.yml`
+2. **Hypothesis Flow**: Include `multi_data:` section in hypothesis config
+3. **Pipeline Integration**: Results can feed into data processing and ML training
+
+## Output Format
+
+The orchestrator returns structured results:
+```python
+{
+    'config': {...},           # Configuration used
+    'sources': {               # Results from each data source
+        'test_data': {
+            'data': DataFrame,     # Historical data or subscription info
+            'status': 'success',   # success/failed/subscribed  
+            'timestamp': '...'     # Execution timestamp
+        }
+    },
+    'summary': {
+        'total_sources': 1,
+        'successful_sources': 1,
+        'failed_sources': 0,
+        'successful_source_names': ['test_data'],
+        'failed_source_names': []
+    }
+}
+```
+
 ### Storage
-For storing the "historical data" of different data types, this should be done in `storage/` (continuing with a centralized storage). Each data type could follow the same strucure used for historical data, being organized by folders after (eg.) type, timeframe (?), etc.<br>
+For storing the "historical data" of different data types, this should be done in `storage/` (continuing with a centralized storage). The storage structure follows a **symbol-first** approach:
+
+```
+storage/multi_data_sources/SOURCE_TYPE/SYMBOL/COMPONENT/
+```
+
+**Example**: `storage/multi_data_sources/calendar_events/CLOV/earnings/raw/`
+
+All storage paths are centrally managed via helper functions in `config/config.py` to avoid hardcoding paths across components.<br>
 
 ### Potential usage
 1. First using `main.py` to get historical data from components and storing them in storage maybe as "raw", since they will be un-processed?

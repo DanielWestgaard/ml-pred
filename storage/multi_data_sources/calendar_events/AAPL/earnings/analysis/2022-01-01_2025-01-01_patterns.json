@@ -1,0 +1,29 @@
+{
+  "symbol": "AAPL",
+  "analysis_timestamp": "2025-08-10T21:09:47.454386",
+  "date_range": {
+    "from": "2022-01-01",
+    "to": "2025-01-01"
+  },
+  "patterns": {
+    "day_of_week_distribution": {
+      "Thursday": 9
+    },
+    "tuesday_friday_ratio": 0.0,
+    "historical_beat_rate": 0.8888888888888888,
+    "avg_surprise_pct": 3.078586401731502,
+    "surprise_volatility": 2.8460450771354644,
+    "quarterly_distribution": {
+      "1": 2,
+      "2": 2,
+      "3": 2,
+      "4": 3
+    },
+    "avg_days_between_earnings": 81.33333333333333,
+    "earnings_timing_consistency": 0.37625763314998417
+  },
+  "summary": {
+    "total_earnings_events": 9,
+    "data_quality": "high"
+  }
+}
