@@ -173,7 +173,7 @@ for features in test_combinations:
 ### Data Loading Pipeline
 ```python
 def combine_data(self, symbol, timeframe, date_range, data_sources):
-    # 1. Load base market data (CSV)
+    # 1. Load base market data (CSV) - handles both 'Date' and 'date' columns
     market_df = self._load_market_data(symbol, timeframe, date_range)
     
     # 2. Load calendar events (JSON) 
@@ -189,6 +189,20 @@ def combine_data(self, symbol, timeframe, date_range, data_sources):
     combined_df = self._fill_missing_values(combined_df)
     
     return combined_df
+```
+
+### Flexible Date Column Handling
+The combiner automatically handles both date column formats:
+- **'Date'** (uppercase) - Raw market data files  
+- **'date'** (lowercase) - Processed dataset files
+
+```python
+# Automatic fallback logic
+if 'Date' in df.columns:
+    date_column = 'Date'
+elif 'date' in df.columns:
+    date_column = 'date'
+    df.rename(columns={'date': 'Date'}, inplace=True)  # Standardize
 ```
 
 ### Feature Engineering Methods

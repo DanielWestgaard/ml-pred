@@ -140,7 +140,23 @@ class BaseCombiner(ABC):
         for file_path in csv_files:
             try:
                 df = pd.read_csv(file_path)
-                df['Date'] = pd.to_datetime(df['Date'])
+                
+                # Handle both 'Date' (raw datasets) and 'date' (processed datasets)
+                date_column = None
+                if 'Date' in df.columns:
+                    date_column = 'Date'
+                elif 'date' in df.columns:
+                    date_column = 'date'
+                else:
+                    self.logger.warning(f"No 'Date' or 'date' column found in {file_path}")
+                    continue
+                
+                df[date_column] = pd.to_datetime(df[date_column])
+                
+                # Standardize column name to 'Date' for consistency
+                if date_column == 'date':
+                    df.rename(columns={'date': 'Date'}, inplace=True)
+                
                 dfs.append(df)
             except Exception as e:
                 self.logger.warning(f"Error loading {file_path}: {e}")
