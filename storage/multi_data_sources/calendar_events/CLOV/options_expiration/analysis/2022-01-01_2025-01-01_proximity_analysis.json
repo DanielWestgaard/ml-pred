@@ -1,6 +1,6 @@
 {
   "symbol": "CLOV",
-  "analysis_timestamp": "2025-08-10T20:00:33.509558",
+  "analysis_timestamp": "2025-08-14T17:40:24.751892",
   "date_range": {
     "from": "2022-01-01",
     "to": "2025-01-01"
@@ -557,10 +557,10 @@
       "Lower analyst coverage means delayed price discovery",
       "Market makers may have looser risk controls for small positions"
     ],
-    "float_percentage": 0.9534963547434054,
-    "avg_volume": 9309637,
+    "float_percentage": 0.9526285785870185,
+    "avg_volume": 9401730,
     "beta": 1.92,
-    "short_ratio": 2.92
+    "short_ratio": 4.25
   },
   "summary": {
     "has_options": true,
