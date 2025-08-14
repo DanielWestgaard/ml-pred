@@ -73,8 +73,8 @@ timestamp            | days_to_earnings | earnings_proximity_zone | earnings_imm
 
 | Event Type | Features Created | Purpose |
 |------------|------------------|---------|
-| **Earnings** | `days_to_next_earnings`, `earnings_proximity_zone`, `earnings_immediate_flag` | Track announcement timing effects |
-| **Options Expiration** | `days_to_options_expiration`, `options_expiry_week`, `options_expiry_immediate` | Capture expiration proximity patterns |
+| **Earnings** | `days_since_last_earnings`, `earnings_proximity_zone`, `earnings_immediate_zone` | Track historical earnings patterns (no lookahead bias) |
+| **Options Expiration** | `days_since_last_expiration`, `options_proximity_zone`, `is_post_expiration_week` | Capture post-expiration patterns (temporal integrity) |
 | **Holidays/Vacations** | `is_holiday_period`, `is_vacation_period`, `pre_holiday_effect` | Identify institutional blind spot windows |
 | **Fiscal Quarters** | `days_to_quarter_end`, `is_quarter_end_period`, `quarter_number` | Track window dressing periods |
 | **Cross-Calendar** | `earnings_options_same_week`, `institutional_blind_spot_score` | Multi-event interaction effects |
