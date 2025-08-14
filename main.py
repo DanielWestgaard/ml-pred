@@ -258,7 +258,7 @@ def main():
         # (use include_spreads=False for backward compatibility with existing pipelines)
         provider.fetch_and_save_historical_data(symbol="CLOV", timeframe="HOUR_4",
                                                   from_date="2022-01-02T00:00:00", to_date="2025-07-31T01:00:00",
-                                                  print_answer=False, include_spreads=True)
+                                                  print_answer=False, include_spreads=False)
         provider.end_session()
     
     if args.broker_func:
