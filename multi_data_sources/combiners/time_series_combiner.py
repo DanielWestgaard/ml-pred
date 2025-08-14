@@ -392,36 +392,8 @@ class TimeSeriesDataCombiner(BaseCombiner):
         
         return interaction_df
     
-    def _calculate_days_to_next_event(self, time_index: pd.DatetimeIndex, event_dates: List[pd.Timestamp]) -> pd.Series:
-        """Calculate days until next event for each timestamp."""
-        days_to_event = pd.Series(index=time_index, dtype=float)
-        
-        # Normalize timezones - convert everything to UTC or remove timezone info
-        normalized_events = []
-        for event in event_dates:
-            if event.tz is not None:
-                # Convert to UTC then make timezone naive
-                normalized_events.append(event.tz_convert('UTC').tz_localize(None))
-            else:
-                normalized_events.append(event)
-        
-        # Ensure time_index is also timezone naive
-        if time_index.tz is not None:
-            time_index_normalized = time_index.tz_convert('UTC').tz_localize(None)
-        else:
-            time_index_normalized = time_index
-        
-        for i, timestamp in enumerate(time_index_normalized):
-            future_events = [event for event in normalized_events if event >= timestamp]
-            
-            if future_events:
-                next_event = min(future_events)
-                days_diff = (next_event - timestamp).days
-                days_to_event.iloc[i] = days_diff
-            else:
-                days_to_event.iloc[i] = 999  # No upcoming events
-        
-        return days_to_event
+    # REMOVED: _calculate_days_to_next_event - caused lookahead bias
+    # Use _calculate_days_since_last_event_safe instead
     
     def _calculate_days_since_last_event(self, time_index: pd.DatetimeIndex, event_dates: List[pd.Timestamp]) -> pd.Series:
         """Calculate days since last event for each timestamp."""
@@ -454,18 +426,18 @@ class TimeSeriesDataCombiner(BaseCombiner):
         
         return days_since_event
     
-    def _categorize_proximity(self, days_series: pd.Series) -> pd.Series:
-        """Categorize proximity to events into zones."""
-        proximity_zones = pd.Series(index=days_series.index, dtype=str)
+    def _categorize_proximity_safe(self, days_since_event: pd.Series) -> pd.Series:
+        """Categorize proximity using days SINCE last event (no lookahead)."""
+        proximity = pd.Series(index=days_since_event.index, dtype=str)
         
-        proximity_zones.loc[days_series <= self.proximity_zones['immediate']] = 'immediate'
-        proximity_zones.loc[(days_series > self.proximity_zones['immediate']) & 
-                           (days_series <= self.proximity_zones['near_term'])] = 'near_term'
-        proximity_zones.loc[(days_series > self.proximity_zones['near_term']) & 
-                           (days_series <= self.proximity_zones['medium_term'])] = 'medium_term'
-        proximity_zones.loc[days_series > self.proximity_zones['medium_term']] = 'long_term'
+        # Categories based on days SINCE last event
+        proximity[days_since_event <= 7] = 'recent_post'
+        proximity[(days_since_event > 7) & (days_since_event <= 30)] = 'medium_post' 
+        proximity[(days_since_event > 30) & (days_since_event <= 90)] = 'long_post'
+        proximity[days_since_event > 90] = 'long_term'
+        proximity[days_since_event >= 999] = 'unknown'
         
-        return proximity_zones
+        return proximity
     
     def _fill_missing_values(self, df: pd.DataFrame) -> pd.DataFrame:
         """Fill NaN values with appropriate defaults for different feature types."""

@@ -293,47 +293,85 @@ class Earnings:
             logger.error(f"Error fetching analyst targets: {e}")
             return pd.DataFrame()
     
-    def _engineer_earnings_features(self) -> Dict[str, Any]:
+    def _engineer_earnings_features(self, as_of_date: str = None) -> Dict[str, Any]:
         """
         Engineer timing-based features around earnings events.
         
+        CRITICAL: This method now uses ONLY historical information available
+        at the specified as_of_date to prevent lookahead bias.
+        
+        Args:
+            as_of_date: The reference date for feature calculation (YYYY-MM-DD)
+                       If None, uses current date (for live trading only)
+        
         These features capture the market inefficiencies around earnings timing
-        that your strategy aims to exploit.
+        that your strategy aims to exploit WITHOUT using future information.
         """
         features = {}
         
         try:
-            # Get next earnings date
-            calendar = self._get_earnings_calendar()
-            if not calendar.empty and 'Earnings Date' in calendar.columns:
-                next_earnings = calendar['Earnings Date'].iloc[0] if len(calendar) > 0 else None
+            # Determine reference date - critical for temporal integrity
+            if as_of_date:
+                reference_date = pd.to_datetime(as_of_date)
+            else:
+                # Only use current date for live trading, not historical analysis
+                reference_date = pd.to_datetime(datetime.now())
+                logger.warning("Using current date - ensure this is for live trading only!")
+            
+            # Get historical earnings dates that occurred BEFORE reference_date
+            historical_dates = self._get_historical_earnings_dates()
+            
+            if not historical_dates.empty:
+                # Filter to only earnings dates before reference_date (no lookahead)
+                past_earnings = historical_dates[historical_dates.index < reference_date]
                 
-                if next_earnings:
-                    next_date = pd.to_datetime(next_earnings)
-                    current_date = datetime.now()
+                if not past_earnings.empty:
+                    # TEMPORAL INTEGRITY: Only use PAST earnings information
                     
-                    # Days to next earnings (key timing feature)
-                    days_to_earnings = (next_date - current_date).days
-                    features['days_to_next_earnings'] = days_to_earnings
-                    features['next_earnings_date'] = next_date.strftime('%Y-%m-%d')
+                    # Days since LAST earnings (always available historically)
+                    last_earnings_date = past_earnings.index.max()
+                    days_since_last = (reference_date - last_earnings_date).days
+                    features['days_since_last_earnings'] = days_since_last
+                    features['last_earnings_date'] = last_earnings_date.strftime('%Y-%m-%d')
                     
-                    # Earnings proximity zones (institutions often have blackout periods)
-                    features['earnings_proximity_zone'] = self._classify_earnings_proximity(days_to_earnings)
+                    # Historical earnings patterns (no future knowledge)
+                    if len(past_earnings) >= 2:
+                        # Average days between earnings (for rough estimation)
+                        earning_intervals = past_earnings.index.to_series().diff().dt.days.dropna()
+                        avg_interval = earning_intervals.mean()
+                        features['avg_earnings_interval_days'] = avg_interval
+                        
+                        # Estimated next earnings window (rough approximation only)
+                        if pd.notna(avg_interval) and avg_interval > 0:
+                            estimated_next = last_earnings_date + pd.Timedelta(days=avg_interval)
+                            days_to_estimated = (estimated_next - reference_date).days
+                            
+                            # Only include if reasonable (30-120 days typical)
+                            if 30 <= days_to_estimated <= 120:
+                                features['estimated_days_to_next_earnings'] = days_to_estimated
+                                features['earnings_proximity_zone'] = self._classify_earnings_proximity_safe(days_since_last, avg_interval)
+                            else:
+                                features['earnings_proximity_zone'] = 'uncertain'
                     
-                    # Day of week for next earnings (Tuesday/Friday analysis)
-                    features['next_earnings_day_of_week'] = next_date.strftime('%A')
-                    features['is_tuesday_friday_announcement'] = features['next_earnings_day_of_week'] in ['Tuesday', 'Friday']
+                    # Earnings timing patterns from historical data
+                    if 'announcement_day_of_week' in past_earnings.columns:
+                        recent_pattern = past_earnings['announcement_day_of_week'].iloc[-3:].mode()
+                        if len(recent_pattern) > 0:
+                            features['typical_announcement_day'] = recent_pattern.iloc[0]
+                            features['typically_tuesday_friday'] = recent_pattern.iloc[0] in ['Tuesday', 'Friday']
                     
-                    # Post-earnings drift period indicator
-                    features['in_post_earnings_drift'] = self._is_post_earnings_drift_period()
+                    # Post-earnings drift analysis (using past data only)
+                    features['in_post_earnings_drift'] = self._is_post_earnings_drift_period_safe(days_since_last)
+                    
+                else:
+                    # No past earnings data available
+                    features['days_since_last_earnings'] = 999  # Unknown/very long
+                    features['earnings_proximity_zone'] = 'unknown'
             
-            # Earnings season indicator
-            features['earnings_season'] = self._is_earnings_season()
+            # Earnings season indicator (based on reference date, not current date)
+            features['earnings_season'] = self._is_earnings_season_at_date(reference_date)
             
-            # Recent analyst activity
-            features['recent_analyst_revisions'] = self._count_recent_revisions()
-            
-            logger.debug(f"Engineered {len(features)} earnings features for {self.symbol}")
+            logger.debug(f"Engineered {len(features)} temporally-safe earnings features for {self.symbol}")
             return features
             
         except Exception as e:
@@ -567,39 +605,47 @@ class Earnings:
             logger.error(f"Error loading saved earnings data for {self.symbol}: {e}")
             return {}
     
-    def _classify_earnings_proximity(self, days_to_earnings: int) -> str:
+    def _classify_earnings_proximity_safe(self, days_since_last: int, avg_interval: float) -> str:
         """
-        Classify proximity to earnings for institutional blackout analysis.
+        Classify earnings proximity using ONLY historical information.
+        Uses days since last earnings and typical interval patterns.
         """
-        if days_to_earnings < 0:
-            return 'post_earnings'
-        elif days_to_earnings <= 2:
-            return 'immediate_pre_earnings'
-        elif days_to_earnings <= 7:
-            return 'near_term_pre_earnings'
-        elif days_to_earnings <= 21:
-            return 'mid_term_pre_earnings'
+        # Use historical patterns, not future knowledge
+        if days_since_last <= 7:
+            return 'immediate_post_earnings'
+        elif days_since_last <= 30:
+            return 'recent_post_earnings'
+        elif avg_interval and days_since_last >= (avg_interval * 0.8):
+            return 'approaching_next_earnings'
+        elif avg_interval and days_since_last >= (avg_interval * 0.6):
+            return 'mid_cycle'
         else:
-            return 'distant_from_earnings'
+            return 'early_cycle'
     
-    def _is_post_earnings_drift_period(self) -> bool:
+    # REMOVED: _classify_earnings_proximity - caused lookahead bias
+    # Use _classify_earnings_proximity_safe instead
+    
+    def _is_post_earnings_drift_period_safe(self, days_since_last: int) -> bool:
         """
-        Check if we're in a post-earnings drift period (typically 1-60 days after earnings).
+        Check if we're in a post-earnings drift period using only historical data.
         """
         try:
-            # This would need historical earnings dates to determine
-            # For now, return False - can be enhanced with more data
-            return False
+            # Post-earnings drift typically lasts 1-60 days after announcement
+            return 1 <= days_since_last <= 60
         except:
             return False
     
-    def _is_earnings_season(self) -> bool:
+    # REMOVED: _is_post_earnings_drift_period - use safe version
+    
+    def _is_earnings_season_at_date(self, reference_date: pd.Timestamp) -> bool:
         """
-        Determine if we're in earnings season (typically Jan, Apr, Jul, Oct).
+        Determine if reference_date is in earnings season (typically Jan, Apr, Jul, Oct).
         """
-        current_month = datetime.now().month
+        reference_month = reference_date.month
         earnings_months = [1, 4, 7, 10]  # Typical earnings season months
-        return current_month in earnings_months
+        return reference_month in earnings_months
+    
+    # REMOVED: _is_earnings_season - use _is_earnings_season_at_date instead
     
     def _count_recent_revisions(self) -> int:
         """
