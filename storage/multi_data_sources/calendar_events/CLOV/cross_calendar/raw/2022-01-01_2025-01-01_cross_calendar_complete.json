@@ -454,23 +454,9 @@
     "total_quarters_analyzed": 12
   },
   "cross_calendar_analysis": {
-    "has_both_events": true,
-    "event_proximity_analysis": {
-      "days_between_events": 81,
-      "events_same_week": false,
-      "earnings_before_options": false,
-      "options_before_earnings": true,
-      "conflicting_market_forces": {
-        "has_conflicts": false,
-        "conflict_signals": [],
-        "conflict_severity": 0
-      }
-    },
-    "institutional_blind_spot_score": 2,
-    "blind_spot_factors": [
-      "small_market_cap",
-      "options_earnings_interaction"
-    ]
+    "has_both_events": false,
+    "event_proximity_analysis": {},
+    "institutional_blind_spot_score": 0
   },
   "metadata": {
     "symbol": "CLOV",
