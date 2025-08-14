@@ -6,7 +6,7 @@ hypothesis:
 # Existing multi_data section (reused)
 multi_data:
   purpose: "historical"
-  symbol: "GBPUSD"  # Use GBPUSD since we have market data for it
+  symbol: "CLOV"  # Use GBPUSD since we have market data for it
   from_date: "2024-01-01" 
   to_date: "2025-01-01"
   sources: []  # No calendar events for FX, just test with market data combinations
