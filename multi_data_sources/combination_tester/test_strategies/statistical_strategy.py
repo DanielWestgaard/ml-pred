@@ -137,10 +137,12 @@ class StatisticalTestStrategy:
             validator = DataValidator(data)
             validation_result = validator.run()
             
-            # Create summary for combination testing context
+            # Create summary for combination testing context - be more permissive
             issues = validation_result.get('issues', [])
+            # Only treat truly critical issues as blocking for combination testing
             critical_issues = [issue for issue in issues 
-                             if issue.get('type') in ['Invalid Prices', 'Infinite Values', 'Missing Required Columns']]
+                             if issue.get('type') in ['Invalid Prices', 'Infinite Values', 'Missing Required Columns', 'Insufficient Data']]
+            # Time series gaps are normal for FX data during weekends/holidays
             
             return {
                 'is_valid': len(critical_issues) == 0,  # Only fail on critical issues
