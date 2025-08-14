@@ -133,7 +133,10 @@ class CombinationTestOrchestrator:
         """Load combined data using existing combiner infrastructure."""
         # Extract multi-data configuration
         symbol = self.config.get('multi_data_symbol')
-        timeframe = '1m'  # Use 1m data since that's what we have available
+        # Get timeframe from combination_testing config, fallback to multi_data, then default
+        timeframe = (self.combination_config.get('timeframe') or 
+                    self.config.get('multi_data_timeframe') or 
+                    '1m')  # Default to 1m if not specified
         date_range = {
             'start': self.config.get('multi_data_from_date'),
             'end': self.config.get('multi_data_to_date')

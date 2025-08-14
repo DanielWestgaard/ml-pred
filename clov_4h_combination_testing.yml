@@ -1,0 +1,39 @@
+# CLOV 4-hour combination testing with calendar events
+hypothesis:
+  name: "clov_institutional_blind_spots"
+  description: "Test CLOV 4h market data + calendar events to find institutional inefficiencies"
+
+# Multi-data section for CLOV with calendar events
+multi_data:
+  purpose: "historical"
+  symbol: "CLOV"
+  from_date: "2022-01-01" 
+  to_date: "2025-01-01"
+  sources: [calendar_events]  # Include earnings, options expiry, holidays
+
+# Combination testing section
+combination_testing:
+  enabled: true
+  
+  # Use 4-hour timeframe to match available CLOV data
+  timeframe: "4h"
+  
+  # Testing strategy
+  strategy: "statistical"
+  
+  # Test matrix configuration 
+  test_matrix:
+    base_features: ["Close", "Volume", "spread_avg"]
+    # Calendar features will be auto-detected from combined data
+  
+  # Validation criteria (more permissive for 4h data)
+  validation:
+    min_correlation_threshold: 0.03  # Lower threshold for 4h data
+    significance_level: 0.05         # 5% significance level
+    min_data_points: 50             # Lower minimum for 4h data (less frequent)
+    
+  # Output preferences
+  results:
+    save_detailed: true
+    generate_visualizations: false
+    rank_combinations: true
