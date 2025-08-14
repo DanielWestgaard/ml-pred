@@ -140,18 +140,24 @@ class CombinationTestOrchestrator:
         }
         data_sources = self.config.get('multi_data_sources', [])
         
-        if not symbol or not data_sources:
-            raise ValueError("Missing required multi_data configuration (symbol, sources)")
+        if not symbol:
+            raise ValueError("Missing required multi_data configuration (symbol)")
         
         logger.info(f"Loading combined data for {symbol} with sources: {data_sources}")
         
         # Use existing combiner to load data
-        combined_df = self.combiner.combine_data(
-            symbol=symbol,
-            timeframe=timeframe,
-            date_range=date_range,
-            data_sources=data_sources
-        )
+        if data_sources:
+            # Has additional data sources to combine
+            combined_df = self.combiner.combine_data(
+                symbol=symbol,
+                timeframe=timeframe,
+                date_range=date_range,
+                data_sources=data_sources
+            )
+        else:
+            # Just load market data for basic market-only combination testing
+            logger.info("No additional data sources specified, loading market data only")
+            combined_df = self.combiner._load_market_data(symbol, timeframe, date_range)
         
         return combined_df
     
