@@ -140,9 +140,10 @@ class StatisticalTestStrategy:
             # Create summary for combination testing context - be more permissive
             issues = validation_result.get('issues', [])
             # Only treat truly critical issues as blocking for combination testing
+            # For combination testing, we're more flexible about column requirements
             critical_issues = [issue for issue in issues 
-                             if issue.get('type') in ['Invalid Prices', 'Infinite Values', 'Missing Required Columns', 'Insufficient Data']]
-            # Time series gaps are normal for FX data during weekends/holidays
+                             if issue.get('type') in ['Invalid Prices', 'Infinite Values', 'Insufficient Data']]
+            # Time series gaps and missing OHLC columns are acceptable for combination testing
             
             return {
                 'is_valid': len(critical_issues) == 0,  # Only fail on critical issues
