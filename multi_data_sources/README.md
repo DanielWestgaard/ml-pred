@@ -35,11 +35,18 @@ The real alpha is in the **intersections and combinations** that institutions st
 │
 ├── ds_orchestrator.py              # An "orchestrator" to easily use singular or multiple data source components
 │
-├── combiners/                      # ✨ NEW: Data format combination system
+├── combiners/                      # ✨ Data format combination system
 │   ├── README.md                   # Detailed combiner documentation
 │   ├── base_combiner.py            # Abstract base class for combiners
 │   ├── time_series_combiner.py     # Main implementation: CSV + JSON → unified datasets
 │   └── specialized_combiners/      # Future specialized combiners
+│
+├── combination_tester/             # 🎯 Systematic inefficiency discovery
+│   ├── README.md                   # Detailed combination testing documentation
+│   ├── combination_orchestrator.py # Main orchestrator for testing combinations
+│   └── test_strategies/            # Different testing approaches
+│       ├── statistical_strategy.py # Correlation + significance testing
+│       └── future strategies...    # ML, custom strategies
 │
 └── sources/                        # All different data source implementations
     ├── ds_base.py                  # Base class all individual data source components implements
@@ -139,6 +146,41 @@ combined_df = combiner.combine_data(
 - ✅ **Live trading ready** - Same logic works for real-time data
 - ✅ **Reusable architecture** - Extensible for future data sources
 
+## 🎯 Combination Testing System
+**Problem**: How to systematically find market inefficiencies in data combinations?
+
+**Solution**: Use `combination_tester/` to automatically test feature combinations and identify institutional blind spots:
+
+```python
+# Configuration-driven testing
+python main.py --hypothesis "clov_combination_testing.yml"
+
+# Results: Ranked combinations with statistical significance
+# Example output:
+# 🏆 Top combination results:
+#   #1: market_plus_earnings_proximity (score: 0.8745, correlation: 0.6234)
+#   #2: market_plus_multiple_calendar (score: 0.8234, correlation: 0.5891)
+#   🎯 Identified 5 potential institutional blind spot combinations
+```
+
+**Configuration Example**:
+```yml
+combination_testing:
+  enabled: true
+  timeframe: "4h"                    # Dynamic timeframe support
+  strategy: "statistical"            # or "ml_based", "custom"
+  validation:
+    min_correlation_threshold: 0.03
+    significance_level: 0.05
+```
+
+**Features**:
+- ✅ **Dynamic timeframes** - Works with 1m, 4h, 1d, etc.
+- ✅ **Real calendar events** - Earnings, options expiry, holidays
+- ✅ **Statistical validation** - Correlation + significance testing
+- ✅ **Institutional blind spot scoring** - Cross-data-type combination ranking
+- ✅ **Comprehensive results** - Storage, analysis, and ranked recommendations
+
 ## Integration with Main Pipeline
 
 The orchestrator integrates seamlessly with your existing hypothesis-driven workflow:
@@ -192,17 +234,16 @@ All storage paths are centrally managed via helper functions in `config/config.p
 - Time-indexed feature engineering operational
 - Multiple combination testing framework ready
 
-### **Phase 3: Systematic Testing** 🚀 Ready to Start
+### **Phase 3: Systematic Testing** ✅ Complete
 ```bash
 # Test different combinations to find real inefficiencies
-python example_usage.py  # Demonstrates combination testing
+python main.py --hypothesis "clov_4h_combination_testing.yml"
 
-# Output: storage/combination_tests/ with different feature combinations
-# - Market only
-# - Market + Earnings proximity  
-# - Market + Options expiration
-# - Market + Holiday effects
-# - Market + Multiple calendar events
+# Output: storage/combination_testing/SYMBOL/TIMESTAMP_STRATEGY/ with:
+# - Ranked combinations with statistical significance
+# - Top institutional blind spot opportunities
+# - Raw combination datasets for further analysis
+# - Comprehensive validation results
 ```
 
 ### **Phase 4: Pipeline Integration** 🔄 Next
