@@ -171,13 +171,16 @@ class CombinationTestOrchestrator:
                            if any(keyword in col.lower() for keyword in 
                                  ['earnings', 'options', 'holiday', 'vacation', 'quarter'])]
         
-        if not calendar_features:
-            logger.warning("No calendar features found in combined data")
-            return []
+        # Get available technical features (beyond base features)
+        technical_features = [col for col in data.columns 
+                            if col not in base_features and 
+                            any(keyword in col.lower() for keyword in 
+                               ['spread', 'sma', 'ema', 'rsi', 'macd', 'volume_sma'])]
         
         logger.info(f"Available calendar features: {calendar_features}")
+        logger.info(f"Available technical features: {technical_features}")
         
-        # Generate combinations: base features + different calendar feature combinations
+        # Generate combinations: base features + different feature combinations
         combinations = []
         
         # Base only
@@ -187,7 +190,7 @@ class CombinationTestOrchestrator:
             'description': 'Market data only (baseline)'
         })
         
-        # Single calendar features
+        # Single calendar features (if available)
         for feature in calendar_features[:5]:  # Limit to first 5 to keep it simple
             combinations.append({
                 'name': f'market_plus_{feature.lower().replace(" ", "_")}',
@@ -195,12 +198,28 @@ class CombinationTestOrchestrator:
                 'description': f'Market data + {feature}'
             })
         
-        # Multiple calendar features (2-3 combinations)
+        # Single technical features (if available)
+        for feature in technical_features[:3]:  # Limit to first 3 to keep it simple
+            combinations.append({
+                'name': f'market_plus_{feature.lower().replace(" ", "_")}',
+                'features': base_features + [feature],
+                'description': f'Market data + {feature}'
+            })
+        
+        # Multiple calendar features (if available)
         if len(calendar_features) >= 2:
             combinations.append({
                 'name': 'market_plus_multiple_calendar',
                 'features': base_features + calendar_features[:3],  # First 3 calendar features
                 'description': 'Market data + multiple calendar events'
+            })
+        
+        # Multiple technical features (if available)
+        if len(technical_features) >= 2:
+            combinations.append({
+                'name': 'market_plus_multiple_technical',
+                'features': base_features + technical_features[:2],  # First 2 technical features
+                'description': 'Market data + multiple technical indicators'
             })
         
         logger.info(f"Generated {len(combinations)} test combinations")
