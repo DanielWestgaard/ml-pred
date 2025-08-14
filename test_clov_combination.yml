@@ -1,0 +1,30 @@
+# Test configuration for CLOV combination testing with calendar events
+hypothesis:
+  name: "clov_calendar_combination_test"
+  description: "Testing CLOV 4h data with calendar events for institutional blind spots"
+
+multi_data:
+  purpose: "historical"
+  symbol: "CLOV"
+  from_date: "2022-01-01"
+  to_date: "2024-12-31"
+  sources: [calendar_events]
+
+combination_testing:
+  enabled: true
+  timeframe: "4h"
+  strategy: "statistical"
+  
+  test_matrix:
+    base_features: ["Close", "Volume", "spread_avg"]
+    # Calendar features will be auto-detected from combined data
+  
+  validation:
+    min_correlation_threshold: 0.03  # Lower for 4h data
+    significance_level: 0.05
+    min_data_points: 50  # Lower for 4h timeframe
+    
+  results:
+    save_detailed: true
+    generate_visualizations: false
+    rank_combinations: true
