@@ -101,29 +101,30 @@ class CalendarEventsDataSource(DataSourceBase):
         This is where we find the real inefficiencies - when multiple events align.
         """
         try:
-            # Get proximity data from both components
-            earnings_features = self.earnings._engineer_earnings_features()
-            options_features = self.options_expiration._engineer_proximity_features()
+            # Get proximity data from both components (using historical data only)
+            earnings_features = self.earnings._engineer_earnings_features(self.to_date)
+            options_features = self.options_expiration._engineer_proximity_features(self.to_date)
             
             cross_effects = {
                 'has_both_events': (
-                    earnings_features.get('days_to_next_earnings') is not None and 
-                    options_features.get('days_to_next_expiration') is not None
+                    earnings_features.get('days_since_last_earnings') is not None and 
+                    options_features.get('days_since_last_expiration') is not None
                 ),
                 'event_proximity_analysis': {},
                 'institutional_blind_spot_score': 0
             }
             
             if cross_effects['has_both_events']:
-                days_to_earnings = earnings_features.get('days_to_next_earnings', 999)
-                days_to_options = options_features.get('days_to_next_expiration', 999)
+                days_since_earnings = earnings_features.get('days_since_last_earnings', 999)
+                days_since_options = options_features.get('days_since_last_expiration', 999)
                 
-                # Analyze event proximity
+                # Analyze event proximity (using historical data only)
                 cross_effects['event_proximity_analysis'] = {
-                    'days_between_events': abs(days_to_earnings - days_to_options),
-                    'events_same_week': abs(days_to_earnings - days_to_options) <= 7,
-                    'earnings_before_options': days_to_earnings < days_to_options,
-                    'options_before_earnings': days_to_options < days_to_earnings,
+                    'days_since_earnings': days_since_earnings,
+                    'days_since_options': days_since_options,
+                    'both_events_recent': (days_since_earnings <= 30 and days_since_options <= 30),
+                    'earnings_more_recent': days_since_earnings < days_since_options,
+                    'options_more_recent': days_since_options < days_since_earnings,
                     'conflicting_market_forces': self._detect_conflicting_forces(earnings_features, options_features)
                 }
                 
@@ -162,17 +163,17 @@ class CalendarEventsDataSource(DataSourceBase):
                 options_features.get('expiration_proximity_zone') in ['expiration_week', 'near_term']):
                 conflicting_signals.append('earnings_announcement_during_options_week')
             
-            # Check for high options activity before earnings
+            # Check for high options activity after recent earnings
             if (options_features.get('atm_call_volume', 0) + options_features.get('atm_put_volume', 0) > 1000 and
-                earnings_features.get('days_to_next_earnings', 999) <= 7):
-                conflicting_signals.append('high_options_activity_pre_earnings')
+                earnings_features.get('days_since_last_earnings', 999) <= 7):
+                conflicting_signals.append('high_options_activity_post_earnings')
             
-            # Check for put/call ratio extremes near earnings
+            # Check for put/call ratio extremes after recent earnings
             put_call_ratio = options_features.get('atm_put_call_ratio')
             if (put_call_ratio is not None and 
                 (put_call_ratio > 2.0 or put_call_ratio < 0.5) and
-                earnings_features.get('days_to_next_earnings', 999) <= 14):
-                conflicting_signals.append('extreme_put_call_ratio_near_earnings')
+                earnings_features.get('days_since_last_earnings', 999) <= 14):
+                conflicting_signals.append('extreme_put_call_ratio_post_earnings')
             
             return {
                 'has_conflicts': len(conflicting_signals) > 0,
