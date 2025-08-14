@@ -1,0 +1,16 @@
+combination_testing:
+  enabled: true
+  results:
+    generate_visualizations: false
+    rank_combinations: true
+    save_detailed: true
+  strategy: statistical
+  test_matrix:
+    base_features:
+    - Close
+    - Volume
+    - spread_avg
+  validation:
+    min_correlation_threshold: 0.05
+    min_data_points: 100
+    significance_level: 0.05

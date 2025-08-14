@@ -16,7 +16,8 @@
       "Bash(git push:*)",
       "Bash(touch:*)",
       "Bash(timeout 180 python main.py --hyp hypothesis/spread_compression_patterns/config_backtest_v3_ultra_risk_optimized.yml)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(pip3 install:*)"
     ],
     "deny": []
   }

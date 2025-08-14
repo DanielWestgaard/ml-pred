@@ -3,7 +3,7 @@
     "symbol": "CLOV",
     "from_date": "2022-01-01",
     "to_date": "2025-01-01",
-    "collection_timestamp": "2025-08-10T20:00:31.587003",
+    "collection_timestamp": "2025-08-14T21:34:07.239899",
     "purpose": "historical"
   },
   "earnings_calendar": [
@@ -168,23 +168,14 @@
   "earnings_history": [],
   "analyst_targets": [
     {
-      "current": 2.18,
+      "current": 2.55,
       "high": 5.0,
       "low": 2.5,
-      "mean": 3.75,
-      "median": 3.75
+      "mean": 3.65,
+      "median": 3.55
     }
   ],
-  "earnings_features": {
-    "days_to_next_earnings": "86",
-    "next_earnings_date": "2025-11-05",
-    "earnings_proximity_zone": "distant_from_earnings",
-    "next_earnings_day_of_week": "Wednesday",
-    "is_tuesday_friday_announcement": "False",
-    "in_post_earnings_drift": "False",
-    "earnings_season": "False",
-    "recent_analyst_revisions": "0"
-  },
+  "earnings_features": {},
   "historical_analysis": {
     "day_of_week_distribution": {
       "Tuesday": 5,

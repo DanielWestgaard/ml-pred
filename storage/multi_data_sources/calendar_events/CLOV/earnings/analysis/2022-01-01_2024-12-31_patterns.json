@@ -1,0 +1,31 @@
+{
+  "symbol": "CLOV",
+  "analysis_timestamp": "2025-08-14T19:53:04.054488",
+  "date_range": {
+    "from": "2022-01-01",
+    "to": "2024-12-31"
+  },
+  "patterns": {
+    "day_of_week_distribution": {
+      "Tuesday": 5,
+      "Monday": 3,
+      "Wednesday": 1
+    },
+    "tuesday_friday_ratio": 0.5555555555555556,
+    "historical_beat_rate": 0.8888888888888888,
+    "avg_surprise_pct": 41.73937173937174,
+    "surprise_volatility": 34.59561129763601,
+    "quarterly_distribution": {
+      "1": 2,
+      "2": 2,
+      "3": 2,
+      "4": 3
+    },
+    "avg_days_between_earnings": 80.77777777777777,
+    "earnings_timing_consistency": 0.45231365060238266
+  },
+  "summary": {
+    "total_earnings_events": 9,
+    "data_quality": "high"
+  }
+}

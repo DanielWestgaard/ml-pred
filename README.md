@@ -89,16 +89,6 @@ python main.py -backtest --hypothesis 'hypothesis/config.yml'
 python main.py -strat 'hypothesis/config.yml'
 ```
 
-### 3. Production-Ready Example
-The spread compression strategy is tested and working-ish:
-```bash
-# Backtest with trained model
-python main.py -hyp 'hypothesis/spread_compression_patterns/config_backtest.yml'
-
-# Live trading (simulation mode)
-python main.py -strat 'hypothesis/spread_compression_patterns/config_complete.yml'
-```
-
 > [!NOTE]  
 > See component-specific README files for detailed configuration options and advanced usage.
 
@@ -108,7 +98,7 @@ python main.py -strat 'hypothesis/spread_compression_patterns/config_complete.ym
 - **🏗️ Unified Architecture**: Complete integration between backtesting and live trading systems
 - **🚀 GPU Acceleration**: Automatic hardware optimization for ML training (CUDA/Metal/CPU)
 - **📊 Advanced Backtesting**: 90% component reuse ensures identical behavior with live trading
-- **🧠 Production Models**: Random Forest classifier with perfect OOB accuracy for spread compression
+- **🧠 ML Models**: 
 - **📡 Real-time Integration**: WebSocket streaming with Capital.com API for live market data
 
 ### Key Achievements

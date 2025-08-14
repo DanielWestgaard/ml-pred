@@ -1,24 +1,41 @@
 {
   "symbol": "CLOV",
-  "analysis_timestamp": "2025-08-10T20:00:34.072040",
+  "analysis_timestamp": "2025-08-14T21:34:09.831673",
   "date_range": {
     "from": "2022-01-01",
     "to": "2025-01-01"
   },
   "holiday_analysis": {
     "market_holidays": [
-      "2022-01-01",
+      "2022-01-17",
+      "2022-02-21",
+      "2022-04-15",
+      "2022-05-30",
+      "2022-06-20",
       "2022-07-04",
-      "2022-12-25",
-      "2022-11-28",
-      "2023-01-01",
+      "2022-09-05",
+      "2022-11-24",
+      "2022-12-26",
+      "2023-01-02",
+      "2023-01-16",
+      "2023-02-20",
+      "2023-04-07",
+      "2023-05-29",
+      "2023-06-19",
       "2023-07-04",
+      "2023-09-04",
+      "2023-11-23",
       "2023-12-25",
-      "2023-11-28",
       "2024-01-01",
+      "2024-01-15",
+      "2024-02-19",
+      "2024-03-29",
+      "2024-05-27",
+      "2024-06-19",
       "2024-07-04",
-      "2024-12-25",
+      "2024-09-02",
       "2024-11-28",
+      "2024-12-25",
       "2025-01-01"
     ],
     "vacation_periods": [
@@ -90,7 +107,7 @@
       "pattern_description": "Pre-holiday effects often show reduced volume and altered price patterns",
       "analysis_method": "Would analyze 1-3 days before each holiday for volume/return anomalies",
       "expected_small_cap_effect": "Small caps may show larger moves due to reduced institutional oversight",
-      "holidays_count": 13
+      "holidays_count": 30
     },
     "vacation_period_effects": {
       "pattern_description": "Vacation periods create institutional blind spots",
@@ -132,11 +149,11 @@
         "analysis": "Holiday-expiry conflicts create unique arbitrage opportunities"
       }
     },
-    "total_holidays_analyzed": 13,
+    "total_holidays_analyzed": 30,
     "total_vacation_periods": 9
   },
   "summary": {
-    "total_holidays": 13,
+    "total_holidays": 30,
     "vacation_periods": 9,
     "institutional_impact": "high"
   }

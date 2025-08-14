@@ -74,7 +74,7 @@ class OptionsExpiration:
                 'expiration_calendar': self._get_expiration_calendar(),
                 'historical_proximity_analysis': self._analyze_historical_proximity_effects(),
                 'options_activity_metrics': self._calculate_activity_metrics(),
-                'proximity_features': self._engineer_proximity_features(),
+                'proximity_features': self._engineer_proximity_features(self.to_date),
                 'small_cap_analysis': self._analyze_small_cap_effects(),
                 'metadata': {
                     'symbol': self.symbol,
@@ -112,11 +112,11 @@ class OptionsExpiration:
             return {
                 'subscription_type': 'options_expiration_monitor',
                 'symbol': self.symbol,
-                'days_to_next_expiration': current_features.get('days_to_next_expiration'),
+                'days_since_last_expiration': current_features.get('days_since_last_expiration'),
                 'next_expiration_date': current_features.get('next_expiration_date'),
                 'current_options_activity': current_features.get('options_volume_ratio'),
                 'monitoring_features': [
-                    'days_to_next_expiration',
+                    'days_since_last_expiration',
                     'pre_expiration_drift',
                     'options_volume_spike',
                     'put_call_ratio_anomaly',
@@ -379,9 +379,16 @@ class OptionsExpiration:
             logger.error(f"Error calculating activity metrics: {e}")
             return {'has_activity': False, 'error': str(e)}
     
-    def _engineer_proximity_features(self) -> Dict[str, Any]:
+    def _engineer_proximity_features(self, as_of_date: str = None) -> Dict[str, Any]:
         """
         Engineer features related to options expiration proximity for ML models.
+        
+        CRITICAL: Uses only historical information available at the specified as_of_date
+        to prevent lookahead bias in backtesting.
+        
+        Args:
+            as_of_date: Reference date for feature calculation (YYYY-MM-DD)
+                       If None, uses current date (for live trading only)
         """
         try:
             features = {}
@@ -390,18 +397,36 @@ class OptionsExpiration:
             if not expirations:
                 return {'has_options': False}
             
-            # Next expiration timing features
-            next_exp = pd.to_datetime(expirations[0])
-            days_to_next = (next_exp.date() - datetime.now().date()).days
+            # Get reference date for temporal integrity
+            if as_of_date:
+                reference_date = pd.to_datetime(as_of_date)
+            else:
+                reference_date = pd.to_datetime(datetime.now())
+                logger.warning("Using current date - ensure this is for live trading only!")
+            
+            # Find expiration dates that occurred BEFORE reference_date (historical)
+            historical_expirations = [exp for exp in expirations if pd.to_datetime(exp) < reference_date]
+            
+            if not historical_expirations:
+                # No historical expiration data available
+                return {
+                    'has_options': True,
+                    'days_since_last_expiration': 999,  # Unknown/very long ago
+                    'expiration_proximity_zone': 'unknown'
+                }
+            
+            # Use most recent PAST expiration
+            last_exp = pd.to_datetime(max(historical_expirations))
+            days_since_last = (reference_date - last_exp).days
             
             features.update({
                 'has_options': True,
-                'days_to_next_expiration': days_to_next,
-                'next_expiration_date': expirations[0],
-                'expiration_proximity_zone': self._classify_proximity_zone(days_to_next),
-                'is_expiration_week': days_to_next <= 7,
-                'is_pre_expiration_period': days_to_next <= 3,
-                'weekly_vs_monthly': self._is_monthly_expiration(next_exp)
+                'days_since_last_expiration': days_since_last,
+                'last_expiration_date': last_exp.strftime('%Y-%m-%d'),
+                'expiration_proximity_zone': self._classify_proximity_zone_safe(days_since_last),
+                'is_post_expiration_week': days_since_last <= 7,
+                'is_post_expiration_period': days_since_last <= 3,
+                'weekly_vs_monthly': self._is_monthly_expiration(last_exp)
             })
             
             # Options activity features (if available)
@@ -523,6 +548,21 @@ class OptionsExpiration:
             return 'near_term'
         else:
             return 'distant'
+    
+    def _classify_proximity_zone_safe(self, days_since_expiration: int) -> str:
+        """
+        Classify proximity using days SINCE last expiration (no lookahead bias).
+        """
+        if days_since_expiration <= 1:
+            return 'immediate_post_expiration'
+        elif days_since_expiration <= 7:
+            return 'recent_post_expiration'
+        elif days_since_expiration <= 21:
+            return 'medium_post_expiration'
+        elif days_since_expiration <= 90:
+            return 'long_post_expiration'
+        else:
+            return 'very_long_post_expiration'
     
     def _is_monthly_expiration(self, exp_date) -> bool:
         """

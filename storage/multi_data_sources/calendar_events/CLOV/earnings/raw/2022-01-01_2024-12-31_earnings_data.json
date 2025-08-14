@@ -1,0 +1,198 @@
+{
+  "metadata": {
+    "symbol": "CLOV",
+    "from_date": "2022-01-01",
+    "to_date": "2024-12-31",
+    "collection_timestamp": "2025-08-14T19:53:04.049769",
+    "purpose": "historical"
+  },
+  "earnings_calendar": [
+    {
+      "Earnings Date": "2025-11-05",
+      "Earnings High": 0.02,
+      "Earnings Low": 0.02,
+      "Earnings Average": 0.02,
+      "Revenue High": 475400000,
+      "Revenue Low": 455430000,
+      "Revenue Average": 467175170,
+      "announcement_day_of_week": "Wednesday",
+      "is_tuesday_friday": false
+    }
+  ],
+  "historical_earnings_dates": [
+    {
+      "Earnings Date": "2022-11-07 16:05:00-05:00",
+      "EPS Estimate": -0.24,
+      "Reported EPS": -0.16,
+      "Surprise(%)": 33.05,
+      "Event Type": "Earnings",
+      "announcement_day_of_week": "Monday",
+      "is_tuesday_friday": false,
+      "surprise_amount": 0.07999999999999999,
+      "surprise_pct": 33.33333333333333,
+      "beat_expectations": true,
+      "large_surprise": true,
+      "quarter": 4,
+      "year": 2022,
+      "days_since_last_earnings": 0.0
+    },
+    {
+      "Earnings Date": "2023-02-28 06:30:00-05:00",
+      "EPS Estimate": -0.26,
+      "Reported EPS": -0.17,
+      "Surprise(%)": 31.43,
+      "Event Type": "Earnings",
+      "announcement_day_of_week": "Tuesday",
+      "is_tuesday_friday": true,
+      "surprise_amount": 0.09,
+      "surprise_pct": 34.61538461538461,
+      "beat_expectations": true,
+      "large_surprise": true,
+      "quarter": 1,
+      "year": 2023,
+      "days_since_last_earnings": 112.0
+    },
+    {
+      "Earnings Date": "2023-05-09 17:40:00-04:00",
+      "EPS Estimate": -0.18,
+      "Reported EPS": -0.15,
+      "Surprise(%)": 14.68,
+      "Event Type": "Earnings",
+      "announcement_day_of_week": "Tuesday",
+      "is_tuesday_friday": true,
+      "surprise_amount": 0.03,
+      "surprise_pct": 16.666666666666664,
+      "beat_expectations": true,
+      "large_surprise": true,
+      "quarter": 2,
+      "year": 2023,
+      "days_since_last_earnings": 70.0
+    },
+    {
+      "Earnings Date": "2023-08-08 16:05:00-04:00",
+      "EPS Estimate": -0.15,
+      "Reported EPS": -0.06,
+      "Surprise(%)": 60.11,
+      "Event Type": "Earnings",
+      "announcement_day_of_week": "Tuesday",
+      "is_tuesday_friday": true,
+      "surprise_amount": 0.09,
+      "surprise_pct": 60.0,
+      "beat_expectations": true,
+      "large_surprise": true,
+      "quarter": 3,
+      "year": 2023,
+      "days_since_last_earnings": 90.0
+    },
+    {
+      "Earnings Date": "2023-11-06 16:15:00-05:00",
+      "EPS Estimate": -0.11,
+      "Reported EPS": -0.09,
+      "Surprise(%)": 14.83,
+      "Event Type": "Earnings",
+      "announcement_day_of_week": "Monday",
+      "is_tuesday_friday": false,
+      "surprise_amount": 0.020000000000000004,
+      "surprise_pct": 18.181818181818183,
+      "beat_expectations": true,
+      "large_surprise": true,
+      "quarter": 4,
+      "year": 2023,
+      "days_since_last_earnings": 90.0
+    },
+    {
+      "Earnings Date": "2024-03-12 16:05:00-04:00",
+      "EPS Estimate": -0.14,
+      "Reported EPS": -0.14,
+      "Surprise(%)": -0.48,
+      "Event Type": "Earnings",
+      "announcement_day_of_week": "Tuesday",
+      "is_tuesday_friday": true,
+      "surprise_amount": 0.0,
+      "surprise_pct": 0.0,
+      "beat_expectations": false,
+      "large_surprise": false,
+      "quarter": 1,
+      "year": 2024,
+      "days_since_last_earnings": 126.0
+    },
+    {
+      "Earnings Date": "2024-05-07 16:05:00-04:00",
+      "EPS Estimate": -0.07,
+      "Reported EPS": -0.04,
+      "Surprise(%)": 44.7,
+      "Event Type": "Earnings",
+      "announcement_day_of_week": "Tuesday",
+      "is_tuesday_friday": true,
+      "surprise_amount": 0.030000000000000006,
+      "surprise_pct": 42.85714285714286,
+      "beat_expectations": true,
+      "large_surprise": true,
+      "quarter": 2,
+      "year": 2024,
+      "days_since_last_earnings": 56.0
+    },
+    {
+      "Earnings Date": "2024-08-05 16:05:00-04:00",
+      "EPS Estimate": -0.05,
+      "Reported EPS": 0.01,
+      "Surprise(%)": 120.55,
+      "Event Type": "Earnings",
+      "announcement_day_of_week": "Monday",
+      "is_tuesday_friday": false,
+      "surprise_amount": 0.060000000000000005,
+      "surprise_pct": 120.0,
+      "beat_expectations": true,
+      "large_surprise": true,
+      "quarter": 3,
+      "year": 2024,
+      "days_since_last_earnings": 90.0
+    },
+    {
+      "Earnings Date": "2024-11-06 16:05:00-05:00",
+      "EPS Estimate": -0.04,
+      "Reported EPS": -0.02,
+      "Surprise(%)": 50.0,
+      "Event Type": "Earnings",
+      "announcement_day_of_week": "Wednesday",
+      "is_tuesday_friday": false,
+      "surprise_amount": 0.02,
+      "surprise_pct": 50.0,
+      "beat_expectations": true,
+      "large_surprise": true,
+      "quarter": 4,
+      "year": 2024,
+      "days_since_last_earnings": 93.0
+    }
+  ],
+  "earnings_history": [],
+  "analyst_targets": [
+    {
+      "current": 2.555,
+      "high": 5.0,
+      "low": 2.5,
+      "mean": 3.65,
+      "median": 3.55
+    }
+  ],
+  "earnings_features": {},
+  "historical_analysis": {
+    "day_of_week_distribution": {
+      "Tuesday": 5,
+      "Monday": 3,
+      "Wednesday": 1
+    },
+    "tuesday_friday_ratio": 0.5555555555555556,
+    "historical_beat_rate": 0.8888888888888888,
+    "avg_surprise_pct": 41.73937173937174,
+    "surprise_volatility": 34.59561129763601,
+    "quarterly_distribution": {
+      "1": 2,
+      "2": 2,
+      "3": 2,
+      "4": 3
+    },
+    "avg_days_between_earnings": 80.77777777777777,
+    "earnings_timing_consistency": 0.45231365060238266
+  }
+}

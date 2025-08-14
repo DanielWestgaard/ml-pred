@@ -1,0 +1,36 @@
+# Example configuration for combination testing
+hypothesis:
+  name: "systematic_combination_discovery"
+  description: "Test market + calendar event combinations using GBPUSD market data for validation"
+
+# Existing multi_data section (reused)
+multi_data:
+  purpose: "historical"
+  symbol: "CLOV"  # Use GBPUSD since we have market data for it
+  from_date: "2024-01-01" 
+  to_date: "2025-01-01"
+  sources: []  # No calendar events for FX, just test with market data combinations
+
+# 🆕 NEW: Combination testing section
+combination_testing:
+  enabled: true
+  
+  # Testing strategy
+  strategy: "statistical"  # Simple statistical analysis for Phase 1
+  
+  # Test matrix configuration 
+  test_matrix:
+    base_features: ["Close", "Volume", "spread_avg"]  # Core market features
+    # Calendar features will be auto-detected from combined data
+  
+  # Validation criteria (all optional with sensible defaults)
+  validation:
+    min_correlation_threshold: 0.05  # Lower threshold for initial discovery
+    significance_level: 0.05         # 5% significance level
+    min_data_points: 100            # Minimum sample size
+    
+  # Output preferences (all optional)
+  results:
+    save_detailed: true
+    generate_visualizations: false  # Keep simple for Phase 1
+    rank_combinations: true

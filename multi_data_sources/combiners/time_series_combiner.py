@@ -229,16 +229,18 @@ class TimeSeriesDataCombiner(BaseCombiner):
                         continue
         
         if earnings_dates:
-            # Calculate days to next earnings
-            features_df['days_to_next_earnings'] = self._calculate_days_to_next_event(time_index, earnings_dates)
+            # TEMPORAL INTEGRITY: Only use earnings dates that occurred BEFORE each timestamp
             features_df['days_since_last_earnings'] = self._calculate_days_since_last_event(time_index, earnings_dates)
             
-            # Create proximity zones
-            features_df['earnings_proximity_zone'] = self._categorize_proximity(features_df['days_to_next_earnings'])
+            # Create proximity zones based on HISTORICAL patterns only
+            features_df['earnings_proximity_zone'] = self._categorize_proximity_safe(features_df['days_since_last_earnings'])
             
-            # Binary flags for key periods
-            features_df['earnings_immediate_zone'] = (features_df['days_to_next_earnings'] <= self.proximity_zones['immediate']).astype(int)
-            features_df['earnings_near_term_zone'] = (features_df['days_to_next_earnings'] <= self.proximity_zones['near_term']).astype(int)
+            # Binary flags for key periods (based on days SINCE, not TO)
+            features_df['earnings_immediate_zone'] = (features_df['days_since_last_earnings'] <= 7).astype(int)
+            features_df['earnings_near_term_zone'] = (features_df['days_since_last_earnings'] <= 30).astype(int)
+            
+            # Fill NaN values with safe defaults
+            features_df['days_since_last_earnings'] = features_df['days_since_last_earnings'].fillna(999)
         
         return features_df
     
@@ -258,16 +260,18 @@ class TimeSeriesDataCombiner(BaseCombiner):
                         continue
         
         if expiration_dates:
-            # Calculate days to next expiration
-            features_df['days_to_options_expiration'] = self._calculate_days_to_next_event(time_index, expiration_dates)
+            # TEMPORAL INTEGRITY: Only use expiration dates that occurred BEFORE each timestamp
             features_df['days_since_options_expiration'] = self._calculate_days_since_last_event(time_index, expiration_dates)
             
-            # Create proximity zones
-            features_df['options_proximity_zone'] = self._categorize_proximity(features_df['days_to_options_expiration'])
+            # Create proximity zones based on HISTORICAL patterns only
+            features_df['options_proximity_zone'] = self._categorize_proximity_safe(features_df['days_since_options_expiration'])
             
-            # Binary flags for key periods
-            features_df['options_expiry_week'] = (features_df['days_to_options_expiration'] <= 7).astype(int)
-            features_df['options_expiry_immediate'] = (features_df['days_to_options_expiration'] <= 2).astype(int)
+            # Binary flags for key periods (based on days SINCE, not TO)
+            features_df['options_expiry_week'] = (features_df['days_since_options_expiration'] <= 7).astype(int)
+            features_df['options_expiry_immediate'] = (features_df['days_since_options_expiration'] <= 2).astype(int)
+            
+            # Fill NaN values with safe defaults  
+            features_df['days_since_options_expiration'] = features_df['days_since_options_expiration'].fillna(999)
         
         return features_df
     
@@ -334,12 +338,15 @@ class TimeSeriesDataCombiner(BaseCombiner):
                     continue
             
             if quarter_ends:
-                # Calculate days to next quarter end
+                # TEMPORAL INTEGRITY: Calculate days since last quarter end (no lookahead)
                 quarter_end_dates = [qe[0] for qe in quarter_ends]
-                features_df['days_to_quarter_end'] = self._calculate_days_to_next_event(time_index, quarter_end_dates)
+                features_df['days_since_quarter_end'] = self._calculate_days_since_last_event(time_index, quarter_end_dates)
                 
-                # Quarter-end period flag (5 days before quarter end)
-                features_df['is_quarter_end_period'] = (features_df['days_to_quarter_end'] <= 5).astype(int)
+                # Recent quarter-end period flag (within 30 days of last quarter end)
+                features_df['is_quarter_end_period'] = (features_df['days_since_quarter_end'] <= 30).astype(int)
+                
+                # Fill NaN values with safe defaults
+                features_df['days_since_quarter_end'] = features_df['days_since_quarter_end'].fillna(999)
                 
                 # Assign quarter numbers
                 for timestamp in time_index:
@@ -355,17 +362,18 @@ class TimeSeriesDataCombiner(BaseCombiner):
         """Create interaction features between different calendar events."""
         interaction_df = pd.DataFrame(index=existing_features.index)
         
-        # Earnings + Options interactions
-        if 'days_to_next_earnings' in existing_features.columns and 'days_to_options_expiration' in existing_features.columns:
-            # Events in same week
+        # Earnings + Options interactions (using SINCE-based features)
+        if 'days_since_last_earnings' in existing_features.columns and 'days_since_options_expiration' in existing_features.columns:
+            # Recent events (both within same period)
             interaction_df['earnings_options_same_week'] = (
-                (abs(existing_features['days_to_next_earnings'] - existing_features['days_to_options_expiration']) <= 7)
+                (existing_features['days_since_last_earnings'] <= 7) & 
+                (existing_features['days_since_options_expiration'] <= 7)
             ).astype(int)
             
-            # Conflicting events (both within 3 days)
+            # Recent overlapping events (both very recent)
             interaction_df['earnings_options_conflict'] = (
-                (existing_features['days_to_next_earnings'] <= 3) & 
-                (existing_features['days_to_options_expiration'] <= 3)
+                (existing_features['days_since_last_earnings'] <= 3) & 
+                (existing_features['days_since_options_expiration'] <= 3)
             ).astype(int)
         
         # Holiday + Quarter-end interactions
@@ -392,36 +400,8 @@ class TimeSeriesDataCombiner(BaseCombiner):
         
         return interaction_df
     
-    def _calculate_days_to_next_event(self, time_index: pd.DatetimeIndex, event_dates: List[pd.Timestamp]) -> pd.Series:
-        """Calculate days until next event for each timestamp."""
-        days_to_event = pd.Series(index=time_index, dtype=float)
-        
-        # Normalize timezones - convert everything to UTC or remove timezone info
-        normalized_events = []
-        for event in event_dates:
-            if event.tz is not None:
-                # Convert to UTC then make timezone naive
-                normalized_events.append(event.tz_convert('UTC').tz_localize(None))
-            else:
-                normalized_events.append(event)
-        
-        # Ensure time_index is also timezone naive
-        if time_index.tz is not None:
-            time_index_normalized = time_index.tz_convert('UTC').tz_localize(None)
-        else:
-            time_index_normalized = time_index
-        
-        for i, timestamp in enumerate(time_index_normalized):
-            future_events = [event for event in normalized_events if event >= timestamp]
-            
-            if future_events:
-                next_event = min(future_events)
-                days_diff = (next_event - timestamp).days
-                days_to_event.iloc[i] = days_diff
-            else:
-                days_to_event.iloc[i] = 999  # No upcoming events
-        
-        return days_to_event
+    # REMOVED: _calculate_days_to_next_event - caused lookahead bias
+    # Use _calculate_days_since_last_event_safe instead
     
     def _calculate_days_since_last_event(self, time_index: pd.DatetimeIndex, event_dates: List[pd.Timestamp]) -> pd.Series:
         """Calculate days since last event for each timestamp."""
@@ -454,18 +434,18 @@ class TimeSeriesDataCombiner(BaseCombiner):
         
         return days_since_event
     
-    def _categorize_proximity(self, days_series: pd.Series) -> pd.Series:
-        """Categorize proximity to events into zones."""
-        proximity_zones = pd.Series(index=days_series.index, dtype=str)
+    def _categorize_proximity_safe(self, days_since_event: pd.Series) -> pd.Series:
+        """Categorize proximity using days SINCE last event (no lookahead)."""
+        proximity = pd.Series(index=days_since_event.index, dtype=str)
         
-        proximity_zones.loc[days_series <= self.proximity_zones['immediate']] = 'immediate'
-        proximity_zones.loc[(days_series > self.proximity_zones['immediate']) & 
-                           (days_series <= self.proximity_zones['near_term'])] = 'near_term'
-        proximity_zones.loc[(days_series > self.proximity_zones['near_term']) & 
-                           (days_series <= self.proximity_zones['medium_term'])] = 'medium_term'
-        proximity_zones.loc[days_series > self.proximity_zones['medium_term']] = 'long_term'
+        # Categories based on days SINCE last event
+        proximity[days_since_event <= 7] = 'recent_post'
+        proximity[(days_since_event > 7) & (days_since_event <= 30)] = 'medium_post' 
+        proximity[(days_since_event > 30) & (days_since_event <= 90)] = 'long_post'
+        proximity[days_since_event > 90] = 'long_term'
+        proximity[days_since_event >= 999] = 'unknown'
         
-        return proximity_zones
+        return proximity
     
     def _fill_missing_values(self, df: pd.DataFrame) -> pd.DataFrame:
         """Fill NaN values with appropriate defaults for different feature types."""
