@@ -173,6 +173,34 @@ def main():
                 failed_sources = summary.get('failed_source_names', [])
                 logger.warning(f"Failed data sources: {failed_sources}")
         
+        # Check for combination testing
+        if 'combination_testing' in conf_keys:
+            logger.info("Combination testing configuration detected. Running systematic testing...")
+            from multi_data_sources.combination_tester import CombinationTestOrchestrator
+            
+            tester = CombinationTestOrchestrator(args.hypothesis)
+            test_results = tester.run()
+            
+            # Log summary of results
+            summary = test_results.get('summary', {})
+            logger.info(f"Combination testing completed: {summary.get('total_combinations', 0)} combinations tested, "
+                       f"{summary.get('valid_combinations', 0)} valid (execution time: {summary.get('execution_time_seconds', 0)}s)")
+            
+            # Highlight top combinations
+            analysis = test_results.get('analysis', {})
+            top_combinations = analysis.get('top_combinations', [])[:3]
+            
+            if top_combinations:
+                logger.info("🏆 Top combination results:")
+                for i, combo in enumerate(top_combinations, 1):
+                    logger.info(f"  #{i}: {combo.get('combination_name', 'unknown')} "
+                               f"(score: {combo.get('score', 0):.4f}, correlation: {combo.get('correlation', 0):.4f})")
+            
+            # Check for institutional blind spots identified
+            blind_spots = analysis.get('institutional_blind_spots', 0)
+            if blind_spots > 0:
+                logger.info(f"🎯 Identified {blind_spots} potential institutional blind spot combinations")
+        
         if 'data_pipeline_raw_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
             data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis, analyze_feature_importance=True)
             data_pipeline.run()
