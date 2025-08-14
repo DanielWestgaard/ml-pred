@@ -11,7 +11,7 @@ Keeps it simple but effective - the foundation for systematic inefficiency disco
 
 import numpy as np
 import pandas as pd
-from typing import Dict, Any
+from typing import Dict, Any, List
 from scipy import stats
 from utils.logging_utils import get_logger
 
