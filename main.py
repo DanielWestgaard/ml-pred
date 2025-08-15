@@ -253,13 +253,28 @@ def main():
                                                   month="2025-04", print_answer=False, store_answer=True)
     
     if args.fetch_data_capcom:
-        provider = ProviderCapitalCom()
+        # provider = ProviderCapitalCom()
         # Enable spread data collection for spread-focused analysis 
         # (use include_spreads=False for backward compatibility with existing pipelines)
-        provider.fetch_and_save_historical_data(symbol="CLOV", timeframe="DAY",
-                                                  from_date="2020-01-02T00:00:00", to_date="2025-07-31T01:00:00",
-                                                  print_answer=False, include_spreads=False)
-        provider.end_session()
+        
+        # provider.fetch_and_save_historical_data(symbol="TLRY", timeframe="DAY",
+        #                                        from_date="2020-01-02T00:00:00", to_date="2025-07-31T01:00:00",
+        #                                        print_answer=False, include_spreads=False)
+        # provider.end_session()
+        
+        timeframes = ["HOUR", "HOUR_4", "DAY"]
+        symbols = ["TLRY", "SPCE"]
+        
+        for symbol in symbols:
+            for timeframe in timeframes:
+                provider = ProviderCapitalCom()
+                provider.fetch_and_save_historical_data(symbol=symbol, timeframe=timeframe,
+                                            from_date="2020-01-02T00:00:00", to_date="2025-07-31T01:00:00",
+                                            print_answer=False, include_spreads=False)
+                provider.end_session()
+                logger.info("Sleeping for 5 seconds until next one.")
+                time.sleep(5)
+            
     
     if args.broker_func:
         broker = CapitalCom()

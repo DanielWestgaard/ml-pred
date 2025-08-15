@@ -1,0 +1,14 @@
+{
+  "symbol": "TLRY",
+  "timeframe": "1d",
+  "date_range": {
+    "start": "2022-01-01",
+    "end": "2025-01-01"
+  },
+  "data_sources": [
+    "calendar_events"
+  ],
+  "total_rows": 756,
+  "date_created": "2025-08-15T12:24:03.529884",
+  "filepath": "storage/combined_features/TLRY/1d/20220101_20250101_calendar_events_20250815_122403.csv"
+}

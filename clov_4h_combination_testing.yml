@@ -6,7 +6,7 @@ hypothesis:
 # Multi-data section for CLOV with calendar events
 multi_data:
   purpose: "historical"
-  symbol: "CLOV"
+  symbol: "TLRY"
   from_date: "2022-01-01" 
   to_date: "2025-01-01"
   sources: [calendar_events]  # Include earnings, options expiry, holidays
