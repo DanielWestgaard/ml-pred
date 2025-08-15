@@ -1,6 +1,6 @@
 {
   "symbol": "CLOV",
-  "analysis_timestamp": "2025-08-14T21:34:09.274033",
+  "analysis_timestamp": "2025-08-15T08:22:00.721021",
   "date_range": {
     "from": "2022-01-01",
     "to": "2025-01-01"
@@ -558,7 +558,7 @@
       "Market makers may have looser risk controls for small positions"
     ],
     "float_percentage": 0.9526285785870185,
-    "avg_volume": 9401730,
+    "avg_volume": 9373014,
     "beta": 1.92,
     "short_ratio": 4.25
   },

@@ -1,0 +1,5 @@
+combination_name,features,score,correlation,significance,description
+market_plus_multiple_calendar,"['Close', 'Volume', 'days_since_last_earnings', 'earnings_proximity_zone', 'earnings_immediate_zone']",0.7948,0.5115,0.0,Market data + multiple calendar events
+market_plus_days_since_last_earnings,"['Close', 'Volume', 'days_since_last_earnings']",0.7788,0.5115,0.0,Market data + days_since_last_earnings
+market_plus_earnings_near_term_zone,"['Close', 'Volume', 'earnings_near_term_zone']",0.6844,0.1967,0.0,Market data + earnings_near_term_zone
+market_plus_earnings_immediate_zone,"['Close', 'Volume', 'earnings_immediate_zone']",0.6383,0.1073,0.003212,Market data + earnings_immediate_zone

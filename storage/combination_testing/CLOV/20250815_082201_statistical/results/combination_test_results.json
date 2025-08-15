@@ -1,0 +1,603 @@
+{
+  "summary": {
+    "total_combinations": 7,
+    "valid_combinations": 4,
+    "execution_time_seconds": 0.15,
+    "top_score": 0.7948,
+    "symbol": "CLOV",
+    "strategy_used": "statistical"
+  },
+  "test_results": [
+    {
+      "combination": {
+        "name": "market_only",
+        "features": [
+          "Close",
+          "Volume",
+          "spread_avg"
+        ],
+        "description": "Market data only (baseline)"
+      },
+      "features_tested": [
+        "Close",
+        "Volume"
+      ],
+      "test_result": {
+        "valid": "False",
+        "data_points": 753,
+        "data_quality": {
+          "is_valid": true,
+          "total_issues": 1,
+          "critical_issues": 0,
+          "summary": "0 critical issues, 1 total issues",
+          "issues": [
+            {
+              "type": "Missing Required Columns",
+              "description": "Missing columns: open, high, low, close"
+            }
+          ]
+        },
+        "correlation_analysis": {
+          "max_correlation": 0.014,
+          "average_correlation": 0.014,
+          "correlation_matrix_size": 2,
+          "strong_correlations": 0
+        },
+        "significance_analysis": {
+          "min_p_value": 0.70174,
+          "significant_features": [],
+          "total_significant": 0,
+          "significance_ratio": 0.0
+        },
+        "pattern_analysis": {
+          "pattern_consistency": 0,
+          "stability_score": 0.102,
+          "quarters_analyzed": 4
+        },
+        "blind_spot_score": {
+          "overall_score": 0.3733,
+          "complexity_score": 0.6,
+          "cross_type_score": 0.3333,
+          "data_types_identified": [
+            "market"
+          ],
+          "institutional_challenge": false
+        },
+        "composite_score": 0.0789,
+        "max_correlation": 0.014,
+        "min_p_value": 0.70174
+      },
+      "valid": "False"
+    },
+    {
+      "combination": {
+        "name": "market_plus_days_since_last_earnings",
+        "features": [
+          "Close",
+          "Volume",
+          "spread_avg",
+          "days_since_last_earnings"
+        ],
+        "description": "Market data + days_since_last_earnings"
+      },
+      "features_tested": [
+        "Close",
+        "Volume",
+        "days_since_last_earnings"
+      ],
+      "test_result": {
+        "valid": true,
+        "data_points": 753,
+        "data_quality": {
+          "is_valid": true,
+          "total_issues": 1,
+          "critical_issues": 0,
+          "summary": "0 critical issues, 1 total issues",
+          "issues": [
+            {
+              "type": "Missing Required Columns",
+              "description": "Missing columns: open, high, low, close"
+            }
+          ]
+        },
+        "correlation_analysis": {
+          "max_correlation": 0.5115,
+          "average_correlation": 0.3139,
+          "correlation_matrix_size": 3,
+          "strong_correlations": 2
+        },
+        "significance_analysis": {
+          "min_p_value": 0.0,
+          "significant_features": [
+            "days_since_last_earnings"
+          ],
+          "total_significant": 1,
+          "significance_ratio": 0.5
+        },
+        "pattern_analysis": {
+          "pattern_consistency": 1,
+          "stability_score": NaN,
+          "quarters_analyzed": 4
+        },
+        "blind_spot_score": {
+          "overall_score": 0.6267,
+          "complexity_score": 0.8,
+          "cross_type_score": 0.6667,
+          "data_types_identified": [
+            "calendar",
+            "market"
+          ],
+          "institutional_challenge": true
+        },
+        "composite_score": 0.7788,
+        "max_correlation": 0.5115,
+        "min_p_value": 0.0
+      },
+      "valid": true
+    },
+    {
+      "combination": {
+        "name": "market_plus_earnings_proximity_zone",
+        "features": [
+          "Close",
+          "Volume",
+          "spread_avg",
+          "earnings_proximity_zone"
+        ],
+        "description": "Market data + earnings_proximity_zone"
+      },
+      "features_tested": [
+        "Close",
+        "Volume",
+        "earnings_proximity_zone"
+      ],
+      "test_result": {
+        "valid": "False",
+        "data_points": 753,
+        "data_quality": {
+          "is_valid": true,
+          "total_issues": 1,
+          "critical_issues": 0,
+          "summary": "0 critical issues, 1 total issues",
+          "issues": [
+            {
+              "type": "Missing Required Columns",
+              "description": "Missing columns: open, high, low, close"
+            }
+          ]
+        },
+        "correlation_analysis": {
+          "max_correlation": 0.014,
+          "average_correlation": 0.014,
+          "correlation_matrix_size": 2,
+          "strong_correlations": 0
+        },
+        "significance_analysis": {
+          "min_p_value": 0.70174,
+          "significant_features": [],
+          "total_significant": 0,
+          "significance_ratio": 0.0
+        },
+        "pattern_analysis": {
+          "pattern_consistency": 0,
+          "stability_score": 0.102,
+          "quarters_analyzed": 4
+        },
+        "blind_spot_score": {
+          "overall_score": 0.6267,
+          "complexity_score": 0.8,
+          "cross_type_score": 0.6667,
+          "data_types_identified": [
+            "calendar",
+            "market"
+          ],
+          "institutional_challenge": true
+        },
+        "composite_score": 0.1295,
+        "max_correlation": 0.014,
+        "min_p_value": 0.70174
+      },
+      "valid": "False"
+    },
+    {
+      "combination": {
+        "name": "market_plus_earnings_immediate_zone",
+        "features": [
+          "Close",
+          "Volume",
+          "spread_avg",
+          "earnings_immediate_zone"
+        ],
+        "description": "Market data + earnings_immediate_zone"
+      },
+      "features_tested": [
+        "Close",
+        "Volume",
+        "earnings_immediate_zone"
+      ],
+      "test_result": {
+        "valid": true,
+        "data_points": 753,
+        "data_quality": {
+          "is_valid": true,
+          "total_issues": 1,
+          "critical_issues": 0,
+          "summary": "0 critical issues, 1 total issues",
+          "issues": [
+            {
+              "type": "Missing Required Columns",
+              "description": "Missing columns: open, high, low, close"
+            }
+          ]
+        },
+        "correlation_analysis": {
+          "max_correlation": 0.1073,
+          "average_correlation": 0.0446,
+          "correlation_matrix_size": 3,
+          "strong_correlations": 0
+        },
+        "significance_analysis": {
+          "min_p_value": 0.003212,
+          "significant_features": [
+            "earnings_immediate_zone"
+          ],
+          "total_significant": 1,
+          "significance_ratio": 0.5
+        },
+        "pattern_analysis": {
+          "pattern_consistency": 1,
+          "stability_score": NaN,
+          "quarters_analyzed": 4
+        },
+        "blind_spot_score": {
+          "overall_score": 0.6267,
+          "complexity_score": 0.8,
+          "cross_type_score": 0.6667,
+          "data_types_identified": [
+            "calendar",
+            "market"
+          ],
+          "institutional_challenge": true
+        },
+        "composite_score": 0.6383,
+        "max_correlation": 0.1073,
+        "min_p_value": 0.003212
+      },
+      "valid": true
+    },
+    {
+      "combination": {
+        "name": "market_plus_earnings_near_term_zone",
+        "features": [
+          "Close",
+          "Volume",
+          "spread_avg",
+          "earnings_near_term_zone"
+        ],
+        "description": "Market data + earnings_near_term_zone"
+      },
+      "features_tested": [
+        "Close",
+        "Volume",
+        "earnings_near_term_zone"
+      ],
+      "test_result": {
+        "valid": true,
+        "data_points": 753,
+        "data_quality": {
+          "is_valid": true,
+          "total_issues": 1,
+          "critical_issues": 0,
+          "summary": "0 critical issues, 1 total issues",
+          "issues": [
+            {
+              "type": "Missing Required Columns",
+              "description": "Missing columns: open, high, low, close"
+            }
+          ]
+        },
+        "correlation_analysis": {
+          "max_correlation": 0.1967,
+          "average_correlation": 0.1346,
+          "correlation_matrix_size": 3,
+          "strong_correlations": 0
+        },
+        "significance_analysis": {
+          "min_p_value": 0.0,
+          "significant_features": [
+            "earnings_near_term_zone"
+          ],
+          "total_significant": 1,
+          "significance_ratio": 0.5
+        },
+        "pattern_analysis": {
+          "pattern_consistency": 1,
+          "stability_score": NaN,
+          "quarters_analyzed": 4
+        },
+        "blind_spot_score": {
+          "overall_score": 0.6267,
+          "complexity_score": 0.8,
+          "cross_type_score": 0.6667,
+          "data_types_identified": [
+            "calendar",
+            "market"
+          ],
+          "institutional_challenge": true
+        },
+        "composite_score": 0.6844,
+        "max_correlation": 0.1967,
+        "min_p_value": 0.0
+      },
+      "valid": true
+    },
+    {
+      "combination": {
+        "name": "market_plus_days_since_options_expiration",
+        "features": [
+          "Close",
+          "Volume",
+          "spread_avg",
+          "days_since_options_expiration"
+        ],
+        "description": "Market data + days_since_options_expiration"
+      },
+      "features_tested": [
+        "Close",
+        "Volume",
+        "days_since_options_expiration"
+      ],
+      "test_result": {
+        "valid": "False",
+        "data_points": 753,
+        "data_quality": {
+          "is_valid": true,
+          "total_issues": 1,
+          "critical_issues": 0,
+          "summary": "0 critical issues, 1 total issues",
+          "issues": [
+            {
+              "type": "Missing Required Columns",
+              "description": "Missing columns: open, high, low, close"
+            }
+          ]
+        },
+        "correlation_analysis": {
+          "max_correlation": NaN,
+          "average_correlation": 0.014,
+          "correlation_matrix_size": 3,
+          "strong_correlations": 0
+        },
+        "significance_analysis": {
+          "min_p_value": 0.70174,
+          "significant_features": [],
+          "total_significant": 0,
+          "significance_ratio": 0.0
+        },
+        "pattern_analysis": {
+          "pattern_consistency": 1,
+          "stability_score": NaN,
+          "quarters_analyzed": 4
+        },
+        "blind_spot_score": {
+          "overall_score": 0.6267,
+          "complexity_score": 0.8,
+          "cross_type_score": 0.6667,
+          "data_types_identified": [
+            "calendar",
+            "market"
+          ],
+          "institutional_challenge": true
+        },
+        "composite_score": NaN,
+        "max_correlation": NaN,
+        "min_p_value": 0.70174
+      },
+      "valid": "False"
+    },
+    {
+      "combination": {
+        "name": "market_plus_multiple_calendar",
+        "features": [
+          "Close",
+          "Volume",
+          "spread_avg",
+          "days_since_last_earnings",
+          "earnings_proximity_zone",
+          "earnings_immediate_zone"
+        ],
+        "description": "Market data + multiple calendar events"
+      },
+      "features_tested": [
+        "Close",
+        "Volume",
+        "days_since_last_earnings",
+        "earnings_proximity_zone",
+        "earnings_immediate_zone"
+      ],
+      "test_result": {
+        "valid": true,
+        "data_points": 753,
+        "data_quality": {
+          "is_valid": true,
+          "total_issues": 1,
+          "critical_issues": 0,
+          "summary": "0 critical issues, 1 total issues",
+          "issues": [
+            {
+              "type": "Missing Required Columns",
+              "description": "Missing columns: open, high, low, close"
+            }
+          ]
+        },
+        "correlation_analysis": {
+          "max_correlation": 0.5115,
+          "average_correlation": 0.2106,
+          "correlation_matrix_size": 4,
+          "strong_correlations": 2
+        },
+        "significance_analysis": {
+          "min_p_value": 0.0,
+          "significant_features": [
+            "days_since_last_earnings",
+            "earnings_immediate_zone"
+          ],
+          "total_significant": 2,
+          "significance_ratio": 0.667
+        },
+        "pattern_analysis": {
+          "pattern_consistency": 1,
+          "stability_score": NaN,
+          "quarters_analyzed": 4
+        },
+        "blind_spot_score": {
+          "overall_score": 0.7067,
+          "complexity_score": 1.0,
+          "cross_type_score": 0.6667,
+          "data_types_identified": [
+            "calendar",
+            "market"
+          ],
+          "institutional_challenge": true
+        },
+        "composite_score": 0.7948,
+        "max_correlation": 0.5115,
+        "min_p_value": 0.0
+      },
+      "valid": true
+    }
+  ],
+  "analysis": {
+    "total_combinations": 7,
+    "valid_combinations": 4,
+    "ranked_combinations": [
+      {
+        "combination_name": "market_plus_multiple_calendar",
+        "features": [
+          "Close",
+          "Volume",
+          "days_since_last_earnings",
+          "earnings_proximity_zone",
+          "earnings_immediate_zone"
+        ],
+        "score": 0.7948,
+        "correlation": 0.5115,
+        "significance": 0.0,
+        "description": "Market data + multiple calendar events"
+      },
+      {
+        "combination_name": "market_plus_days_since_last_earnings",
+        "features": [
+          "Close",
+          "Volume",
+          "days_since_last_earnings"
+        ],
+        "score": 0.7788,
+        "correlation": 0.5115,
+        "significance": 0.0,
+        "description": "Market data + days_since_last_earnings"
+      },
+      {
+        "combination_name": "market_plus_earnings_near_term_zone",
+        "features": [
+          "Close",
+          "Volume",
+          "earnings_near_term_zone"
+        ],
+        "score": 0.6844,
+        "correlation": 0.1967,
+        "significance": 0.0,
+        "description": "Market data + earnings_near_term_zone"
+      },
+      {
+        "combination_name": "market_plus_earnings_immediate_zone",
+        "features": [
+          "Close",
+          "Volume",
+          "earnings_immediate_zone"
+        ],
+        "score": 0.6383,
+        "correlation": 0.1073,
+        "significance": 0.003212,
+        "description": "Market data + earnings_immediate_zone"
+      }
+    ],
+    "top_combinations": [
+      {
+        "combination_name": "market_plus_multiple_calendar",
+        "features": [
+          "Close",
+          "Volume",
+          "days_since_last_earnings",
+          "earnings_proximity_zone",
+          "earnings_immediate_zone"
+        ],
+        "score": 0.7948,
+        "correlation": 0.5115,
+        "significance": 0.0,
+        "description": "Market data + multiple calendar events"
+      },
+      {
+        "combination_name": "market_plus_days_since_last_earnings",
+        "features": [
+          "Close",
+          "Volume",
+          "days_since_last_earnings"
+        ],
+        "score": 0.7788,
+        "correlation": 0.5115,
+        "significance": 0.0,
+        "description": "Market data + days_since_last_earnings"
+      },
+      {
+        "combination_name": "market_plus_earnings_near_term_zone",
+        "features": [
+          "Close",
+          "Volume",
+          "earnings_near_term_zone"
+        ],
+        "score": 0.6844,
+        "correlation": 0.1967,
+        "significance": 0.0,
+        "description": "Market data + earnings_near_term_zone"
+      },
+      {
+        "combination_name": "market_plus_earnings_immediate_zone",
+        "features": [
+          "Close",
+          "Volume",
+          "earnings_immediate_zone"
+        ],
+        "score": 0.6383,
+        "correlation": 0.1073,
+        "significance": 0.003212,
+        "description": "Market data + earnings_immediate_zone"
+      }
+    ],
+    "institutional_blind_spots": 4
+  },
+  "config_used": {
+    "enabled": true,
+    "timeframe": "1d",
+    "strategy": "statistical",
+    "test_matrix": {
+      "base_features": [
+        "Close",
+        "Volume",
+        "spread_avg"
+      ]
+    },
+    "validation": {
+      "min_correlation_threshold": 0.03,
+      "significance_level": 0.05,
+      "min_data_points": 50
+    },
+    "results": {
+      "save_detailed": true,
+      "generate_visualizations": false,
+      "rank_combinations": true
+    }
+  },
+  "symbol": "CLOV",
+  "timestamp": "2025-08-15T08:22:01.440083"
+}

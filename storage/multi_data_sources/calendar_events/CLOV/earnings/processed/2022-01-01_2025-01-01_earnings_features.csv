@@ -1,3 +1,10 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:c888fad25747b8e0517a1aa299c6a647aba65ba630f1f6e099a67a04c7cd7ea5
-size 1221
+Earnings Date,EPS Estimate,Reported EPS,Surprise(%),Event Type,announcement_day_of_week,is_tuesday_friday,surprise_amount,surprise_pct,beat_expectations,large_surprise,quarter,year,days_since_last_earnings
+2022-11-07 16:05:00-05:00,-0.24,-0.16,33.05,Earnings,Monday,False,0.07999999999999999,33.33333333333333,True,True,4,2022,0.0
+2023-02-28 06:30:00-05:00,-0.26,-0.17,31.43,Earnings,Tuesday,True,0.09,34.61538461538461,True,True,1,2023,112.0
+2023-05-09 17:40:00-04:00,-0.18,-0.15,14.68,Earnings,Tuesday,True,0.03,16.666666666666664,True,True,2,2023,70.0
+2023-08-08 16:05:00-04:00,-0.15,-0.06,60.11,Earnings,Tuesday,True,0.09,60.0,True,True,3,2023,90.0
+2023-11-06 16:15:00-05:00,-0.11,-0.09,14.83,Earnings,Monday,False,0.020000000000000004,18.181818181818183,True,True,4,2023,90.0
+2024-03-12 16:05:00-04:00,-0.14,-0.14,-0.48,Earnings,Tuesday,True,0.0,0.0,False,False,1,2024,126.0
+2024-05-07 16:05:00-04:00,-0.07,-0.04,44.7,Earnings,Tuesday,True,0.030000000000000006,42.85714285714286,True,True,2,2024,56.0
+2024-08-05 16:05:00-04:00,-0.05,0.01,120.55,Earnings,Monday,False,0.060000000000000005,120.0,True,True,3,2024,90.0
+2024-11-06 16:05:00-05:00,-0.04,-0.02,50.0,Earnings,Wednesday,False,0.02,50.0,True,True,4,2024,93.0

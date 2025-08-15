@@ -16,7 +16,7 @@ combination_testing:
   enabled: true
   
   # Use 4-hour timeframe to match available CLOV data
-  timeframe: "4h"
+  timeframe: "1d"
   
   # Testing strategy
   strategy: "statistical"
