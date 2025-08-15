@@ -1,0 +1,33 @@
+{
+  "symbol": "TLRY",
+  "analysis_timestamp": "2025-08-15T12:23:59.926258",
+  "date_range": {
+    "from": "2022-01-01",
+    "to": "2025-01-01"
+  },
+  "patterns": {
+    "day_of_week_distribution": {
+      "Monday": 3,
+      "Wednesday": 3,
+      "Tuesday": 2,
+      "Friday": 1,
+      "Thursday": 1
+    },
+    "tuesday_friday_ratio": 0.3,
+    "historical_beat_rate": 0.0,
+    "avg_surprise_pct": -471.96428571428567,
+    "surprise_volatility": 1049.9206454194548,
+    "quarterly_distribution": {
+      "1": 2,
+      "2": 2,
+      "3": 2,
+      "4": 4
+    },
+    "avg_days_between_earnings": 77.1,
+    "earnings_timing_consistency": 0.43900822264132217
+  },
+  "summary": {
+    "total_earnings_events": 10,
+    "data_quality": "high"
+  }
+}
