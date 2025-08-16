@@ -202,7 +202,22 @@ def main():
                 logger.info(f"🎯 Identified {blind_spots} potential institutional blind spot combinations")
         
         if 'data_pipeline_raw_source' in conf_keys:  # Found raw data path config, meaning user intends to run Data Pipeline?
-            data_pipeline = EngineeringPipeline(save_cleaned_data=save_cleaned_data, hypothesis_source=args.hypothesis, analyze_feature_importance=True)
+            # Check if multi-data sources are configured
+            if 'multi_data' in conf_keys and conf.get('multi_data'):
+                logger.info("🚀 Multi-data sources detected, using Enhanced Multi-Data Pipeline...")
+                from data.pipelines.multi_data_engineer_pipeline import MultiDataEngineeringPipeline
+                data_pipeline = MultiDataEngineeringPipeline(
+                    save_cleaned_data=save_cleaned_data, 
+                    hypothesis_source=args.hypothesis, 
+                    analyze_feature_importance=True
+                )
+            else:
+                logger.info("📊 Using standard Engineering Pipeline...")
+                data_pipeline = EngineeringPipeline(
+                    save_cleaned_data=save_cleaned_data, 
+                    hypothesis_source=args.hypothesis, 
+                    analyze_feature_importance=True
+                )
             data_pipeline.run()
         
         # Model Training

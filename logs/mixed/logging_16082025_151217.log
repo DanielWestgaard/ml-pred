@@ -1,0 +1,111 @@
+16-08-2025 15:12:17 - mixed                                   :151  - INFO     - Logging system initialized. Environment: development, Log category: mixed (Mixed workflow with multiple components)
+16-08-2025 15:12:20 - __main__                                :150  - INFO     - User using pure hypothesis flow!
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from clov_enhanced_pipeline_example.yml
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :189  - INFO     - Loaded hypothesis: clov_enhanced_calendar_inefficiencies
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.raw_source: storage/data/capital_com/CLOV/raw/1h/2023-01-02_2025-07-31.csv
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.save_cleaned_data: True
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.analyze_feature_importance: True
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.purpose: historical
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.symbol: CLOV
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.timeframe: 1h
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.from_date: 2022-01-01
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.to_date: 2025-01-01
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.sources: ['calendar_events']
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'combination_testing' not found in configuration
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :161  - WARNING  - Missing required fields in 'model_training': ['type']
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted model_training.enabled: False
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted model_training.model_type: random_forest
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'evaluate_model' not found in configuration
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'strategy' not found in configuration
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted backtesting.enabled: False
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'walk_forward' not found in configuration
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :218  - DEBUG    - No spread_focused setting found, defaulting to False
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :223  - INFO     - Successfully loaded config sections: ['data_pipeline', 'multi_data', 'model_training', 'backtesting']
+16-08-2025 15:12:20 - __main__                                :164  - INFO     - Multi-data sources configuration detected. Running data source orchestrator...
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from clov_enhanced_pipeline_example.yml
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :189  - INFO     - Loaded hypothesis: clov_enhanced_calendar_inefficiencies
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.raw_source: storage/data/capital_com/CLOV/raw/1h/2023-01-02_2025-07-31.csv
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.save_cleaned_data: True
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.analyze_feature_importance: True
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.purpose: historical
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.symbol: CLOV
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.timeframe: 1h
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.from_date: 2022-01-01
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.to_date: 2025-01-01
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.sources: ['calendar_events']
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'combination_testing' not found in configuration
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :161  - WARNING  - Missing required fields in 'model_training': ['type']
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted model_training.enabled: False
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted model_training.model_type: random_forest
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'evaluate_model' not found in configuration
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'strategy' not found in configuration
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted backtesting.enabled: False
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'walk_forward' not found in configuration
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :218  - DEBUG    - No spread_focused setting found, defaulting to False
+16-08-2025 15:12:20 - utils.hypothesis.config_loader          :223  - INFO     - Successfully loaded config sections: ['data_pipeline', 'multi_data', 'model_training', 'backtesting']
+16-08-2025 15:12:20 - multi_data_sources.ds_orchestrator      :60   - INFO     - Multi-data config loaded for CLOV with purpose: historical
+16-08-2025 15:12:20 - multi_data_sources.sources.calendar_even:53   - INFO     - Initialized Earnings component for CLOV (historical mode)
+16-08-2025 15:12:20 - multi_data_sources.sources.calendar_even:54   - INFO     - Initialized OptionsExpiration component for CLOV (historical mode)
+16-08-2025 15:12:20 - multi_data_sources.ds_orchestrator      :80   - INFO     - Initialized data source: calendar_events
+16-08-2025 15:12:20 - multi_data_sources.ds_orchestrator      :36   - INFO     - DataSourceOrchestrator initialized with 1 data sources
+16-08-2025 15:12:20 - multi_data_sources.ds_orchestrator      :89   - INFO     - Running DataSourceOrchestrator with 1 data sources
+16-08-2025 15:12:20 - multi_data_sources.ds_orchestrator      :102  - INFO     - Running historical data collection
+16-08-2025 15:12:20 - multi_data_sources.ds_orchestrator      :107  - INFO     - Collecting historical data from calendar_events
+16-08-2025 15:12:20 - multi_data_sources.sources.calendar_even:67   - INFO     - Fetching historical earnings data for CLOV
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:208  - INFO     - Found 9 historical earnings dates for CLOV
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:267  - WARNING  - No earnings history available for CLOV
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:319  - WARNING  - Using current date - ensure this is for live trading only!
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:208  - INFO     - Found 9 historical earnings dates for CLOV
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:385  - ERROR    - Error engineering earnings features: Cannot subtract tz-naive and tz-aware datetime-like objects.
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:208  - INFO     - Found 9 historical earnings dates for CLOV
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:424  - INFO     - Analyzed 8 historical patterns for CLOV
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:552  - INFO     - Earnings data saved for CLOV: 3 files
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:90   - INFO     - Successfully collected earnings data for CLOV
+16-08-2025 15:12:21 - multi_data_sources.sources.calendar_even:69   - INFO     - Analyzing options expiration effects for CLOV
+16-08-2025 15:12:23 - multi_data_sources.sources.calendar_even:166  - INFO     - Retrieved 10 expiration dates for CLOV
+16-08-2025 15:12:23 - multi_data_sources.sources.calendar_even:635  - INFO     - Generated 36 historical expiration dates
+16-08-2025 15:12:23 - multi_data_sources.sources.calendar_even:236  - INFO     - Generated 36 historical expiration dates for analysis
+16-08-2025 15:12:24 - multi_data_sources.sources.calendar_even:845  - INFO     - Options expiration data saved for CLOV: 2 files
+16-08-2025 15:12:24 - multi_data_sources.sources.calendar_even:92   - INFO     - Successfully collected options expiration data for CLOV
+16-08-2025 15:12:24 - multi_data_sources.sources.calendar_even:208  - INFO     - Found 9 historical earnings dates for CLOV
+16-08-2025 15:12:24 - multi_data_sources.sources.calendar_even:385  - ERROR    - Error engineering earnings features: Cannot subtract tz-naive and tz-aware datetime-like objects.
+16-08-2025 15:12:24 - multi_data_sources.sources.calendar_even:266  - INFO     - Analyzed 30 holidays and 9 vacation periods for CLOV
+16-08-2025 15:12:25 - multi_data_sources.sources.calendar_even:461  - INFO     - Analyzed 12 fiscal quarters for CLOV
+16-08-2025 15:12:25 - multi_data_sources.sources.calendar_even:740  - INFO     - Cross-calendar data saved for CLOV: 3 files
+16-08-2025 15:12:25 - multi_data_sources.ds_orchestrator      :114  - INFO     - Successfully collected historical data from calendar_events
+16-08-2025 15:12:25 - multi_data_sources.ds_orchestrator      :174  - INFO     - DataSourceOrchestrator completed: 1/1 sources successful
+16-08-2025 15:12:25 - __main__                                :170  - INFO     - Multi-data orchestrator completed: 1/1 sources successful
+16-08-2025 15:12:25 - __main__                                :207  - INFO     - 🚀 Multi-data sources detected, using Enhanced Multi-Data Pipeline...
+16-08-2025 15:12:25 - data.pipelines.multi_data_engineer_pipel:66   - INFO     - 🚀 Initializing Enhanced Multi-Data Engineering Pipeline
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :46   - DEBUG    - Successfully loaded config from clov_enhanced_pipeline_example.yml
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :189  - INFO     - Loaded hypothesis: clov_enhanced_calendar_inefficiencies
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.raw_source: storage/data/capital_com/CLOV/raw/1h/2023-01-02_2025-07-31.csv
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.save_cleaned_data: True
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted data_pipeline.analyze_feature_importance: True
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.purpose: historical
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.symbol: CLOV
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.timeframe: 1h
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.from_date: 2022-01-01
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.to_date: 2025-01-01
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted multi_data.sources: ['calendar_events']
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'combination_testing' not found in configuration
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :161  - WARNING  - Missing required fields in 'model_training': ['type']
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted model_training.enabled: False
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted model_training.model_type: random_forest
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'evaluate_model' not found in configuration
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'strategy' not found in configuration
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :166  - DEBUG    - Extracted backtesting.enabled: False
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :150  - DEBUG    - Section 'walk_forward' not found in configuration
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :218  - DEBUG    - No spread_focused setting found, defaulting to False
+16-08-2025 15:12:25 - utils.hypothesis.config_loader          :223  - INFO     - Successfully loaded config sections: ['data_pipeline', 'multi_data', 'model_training', 'backtesting']
+16-08-2025 15:12:25 - uncaught_exception                      :166  - CRITICAL - Uncaught exception
+Traceback (most recent call last):
+  File "/Users/dmartinsen/pers-prog/ml-pred/main.py", line 555, in <module>
+    main()
+  File "/Users/dmartinsen/pers-prog/ml-pred/main.py", line 209, in main
+    data_pipeline = MultiDataEngineeringPipeline(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dmartinsen/pers-prog/ml-pred/data/pipelines/multi_data_engineer_pipeline.py", line 98, in __init__
+    self.data_source_orchestrator = DataSourceOrchestrator()
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: DataSourceOrchestrator.__init__() missing 1 required positional argument: 'path_to_config'

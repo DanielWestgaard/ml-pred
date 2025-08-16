@@ -17,7 +17,7 @@ multi_data:
 # Data pipeline configuration (enhanced)
 data_pipeline:
   # Market data source (existing structure)
-  raw_source: "storage/data/capital_com/CLOV/raw/1h/2020-01-02_2025-07-31.csv"
+  raw_source: "storage/data/capital_com/CLOV/raw/1h/2023-01-02_2025-07-31.csv"
   
   # Enhanced pipeline settings
   save_cleaned_data: true

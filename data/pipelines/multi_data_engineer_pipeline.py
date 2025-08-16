@@ -95,7 +95,7 @@ class MultiDataEngineeringPipeline:
         
         # Initialize components
         self.combiner = TimeSeriesDataCombiner()
-        self.data_source_orchestrator = DataSourceOrchestrator()
+        # Note: DataSourceOrchestrator will be initialized when needed with config
         
         logger.info(f"📊 Symbol: {self.symbol}")
         logger.info(f"🔗 Data sources configured: {self.data_sources}")

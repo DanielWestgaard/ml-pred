@@ -1,0 +1,64 @@
+================================================================================
+FEATURE IMPORTANCE ANALYSIS REPORT
+================================================================================
+Dataset: 3452 rows, 203 features
+Target: close (regression)
+Analysis Date: 2025-08-16 15:19:35
+
+CONSENSUS TOP FEATURES:
+----------------------------------------
+ 1. vwap                           1.0000
+ 2. mid_price                      0.3889
+ 3. ema_5                          0.3522
+ 4. sma_5                          0.3427
+ 5. ema_10                         0.3317
+ 6. sma_10                         0.3223
+ 7. ema_20                         0.3174
+ 8. upper_band                     0.3120
+ 9. vol_va_high                    0.3097
+10. sma_20                         0.3095
+11. vol_poc                        0.3081
+12. stl_trend                      0.3074
+13. seasonal_trend                 0.3052
+14. vol_va_low                     0.3044
+15. ema_50                         0.3021
+
+CORRELATION - TOP 5:
+------------------------------
+1. mid_price                 0.9991
+2. vwap                      0.9990
+3. sma_5                     0.9955
+4. ema_5                     0.9951
+5. ema_10                    0.9906
+
+MUTUAL INFORMATION - TOP 5:
+------------------------------
+1. vwap                      3.4163
+2. mid_price                 3.0937
+3. ema_5                     2.6058
+4. sma_5                     2.4459
+5. ema_10                    2.2714
+
+RANDOM FOREST - TOP 5:
+------------------------------
+1. vwap                      0.9507
+2. mid_price                 0.0284
+3. obv                       0.0025
+4. seasonal_trend            0.0022
+5. sma_200                   0.0020
+
+LASSO - TOP 5:
+------------------------------
+1. vwap                      0.5978
+2. vol_poc                   0.0045
+3. mid_price                 0.0037
+4. intrabar_pressure         0.0024
+5. vol_va_high               0.0010
+
+PERMUTATION - TOP 5:
+------------------------------
+1. vwap                      1.3133
+2. mid_price                 0.0036
+3. upper_band                0.0026
+4. ema_20                    0.0014
+5. vol_va_high               0.0012
