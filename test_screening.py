@@ -10,7 +10,7 @@ def screen_microcaps():
     
     # Set filters using correct filter names
     screener.set_filter(filters_dict={
-        'Market Cap.': 'Small ($300mln to $2bln)',  # Small cap filter
+        'Market Cap.': 'Micro ($50mln to $300mln)', # Micro cap filter    # 'Small ($300mln to $2bln)',  # Small cap filter
         'P/E': 'Under 15',                          # P/E under 15
         'P/B': 'Under 1',                           # P/B under 1
         'Debt/Equity': 'Under 0.5',                 # Low debt
@@ -63,12 +63,10 @@ def change_market_cap_format(df: pd.DataFrame, column_name: str):
     return df_copy
 
 def main():
-    print("Hello!")
-    
     me = screen_microcaps()
-    print("Original data:")
-    print(me)
-    print("\n" + "="*50 + "\n")
+    # print("Original data:")
+    # print(me)
+    # print("\n" + "="*50 + "\n")
     
     me_formatted = change_market_cap_format(me, "Market Cap")
     
