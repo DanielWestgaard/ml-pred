@@ -1,0 +1,14 @@
+{
+  "symbol": "CLOV",
+  "timeframe": "1h",
+  "date_range": {
+    "start": "2022-01-01",
+    "end": "2025-01-01"
+  },
+  "data_sources": [
+    "calendar_events"
+  ],
+  "total_rows": 3452,
+  "date_created": "2025-08-16T15:13:59.661339",
+  "filepath": "storage/combined_features/CLOV/1h/20220101_20250101_calendar_events_20250816_151359.csv"
+}

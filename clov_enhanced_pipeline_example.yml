@@ -1,0 +1,55 @@
+# Enhanced Pipeline Example - CLOV with Validated Calendar Events
+# Uses proven calendar event inefficiencies (0.47-0.51 correlations)
+
+hypothesis:
+  name: "clov_enhanced_calendar_inefficiencies"
+  description: "CLOV with validated calendar events for systematic inefficiency exploitation"
+
+# Multi-data configuration (validated calendar patterns)
+multi_data:
+  purpose: "historical"
+  symbol: "CLOV"                    # Validated symbol (0.47-0.51 correlations)
+  timeframe: "1h"                   # Proven timeframe for intraday trading
+  from_date: "2022-01-01" 
+  to_date: "2025-01-01"
+  sources: [calendar_events]        # Validated calendar event source
+
+# Data pipeline configuration (enhanced)
+data_pipeline:
+  # Market data source (existing structure)
+  raw_source: "storage/data/capital_com/CLOV/raw/1h/2023-01-02_2025-07-31.csv"
+  
+  # Enhanced pipeline settings
+  save_cleaned_data: true
+  analyze_feature_importance: true
+
+# Validated feature selection based on combination testing results
+features: [
+  # Market data (baseline)
+  "Close", "Volume",
+  
+  # Validated calendar features (0.47-0.51 correlations)
+  "days_since_last_earnings",       # Most consistent predictor
+  "earnings_proximity_zone",        # Secondary signal 
+  "earnings_immediate_zone",        # Short-term signal
+  
+  # Technical features (for comparison)
+  "sma_20", "volume_sma_20"
+]
+
+# Target generation
+target_hypothesis: "price_prediction"  # Or your preferred hypothesis
+
+# Training configuration (optional - for full pipeline)
+model_training:
+  enabled: false  # Set to true for full model training
+  model_type: "random_forest"
+  
+# Backtesting configuration (optional)
+backtesting:
+  enabled: false  # Set to true for backtesting
+  
+# Output preferences
+results:
+  save_enhanced_data: true
+  output_path: "storage/enhanced_data/clov_1h_calendar_enhanced.csv"

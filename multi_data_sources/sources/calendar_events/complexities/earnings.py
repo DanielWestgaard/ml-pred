@@ -312,25 +312,47 @@ class Earnings:
         try:
             # Determine reference date - critical for temporal integrity
             if as_of_date:
-                reference_date = pd.to_datetime(as_of_date)
+                reference_date = pd.to_datetime(as_of_date).tz_localize(None)  # Remove timezone for comparison
             else:
                 # Only use current date for live trading, not historical analysis
-                reference_date = pd.to_datetime(datetime.now())
+                reference_date = pd.to_datetime(datetime.now()).tz_localize(None)
                 logger.warning("Using current date - ensure this is for live trading only!")
             
             # Get historical earnings dates that occurred BEFORE reference_date
             historical_dates = self._get_historical_earnings_dates()
             
             if not historical_dates.empty:
+                # Ensure timezone-naive comparison
+                if historical_dates.index.tz is not None:
+                    comparison_index = historical_dates.index.tz_localize(None)
+                else:
+                    comparison_index = historical_dates.index
+                    
                 # Filter to only earnings dates before reference_date (no lookahead)
-                past_earnings = historical_dates[historical_dates.index < reference_date]
+                mask = comparison_index < reference_date
+                past_earnings = historical_dates[mask]
                 
                 if not past_earnings.empty:
                     # TEMPORAL INTEGRITY: Only use PAST earnings information
                     
                     # Days since LAST earnings (always available historically)
                     last_earnings_date = past_earnings.index.max()
-                    days_since_last = (reference_date - last_earnings_date).days
+                    # Ensure timezone-naive calculation for both dates
+                    try:
+                        if hasattr(last_earnings_date, 'tz') and last_earnings_date.tz is not None:
+                            last_earnings_date = last_earnings_date.tz_localize(None)
+                        if hasattr(reference_date, 'tz') and reference_date.tz is not None:
+                            reference_date = reference_date.tz_localize(None)
+                        
+                        days_since_last = (reference_date - last_earnings_date).days
+                    except Exception as e:
+                        logger.warning(f"Timezone handling error: {e}, using fallback calculation")
+                        # Fallback: convert both to string and back to ensure timezone-naive
+                        last_earnings_str = str(last_earnings_date)[:10]  # Get YYYY-MM-DD part
+                        reference_str = str(reference_date)[:10]
+                        last_earnings_naive = pd.to_datetime(last_earnings_str)
+                        reference_naive = pd.to_datetime(reference_str)
+                        days_since_last = (reference_naive - last_earnings_naive).days
                     features['days_since_last_earnings'] = days_since_last
                     features['last_earnings_date'] = last_earnings_date.strftime('%Y-%m-%d')
                     

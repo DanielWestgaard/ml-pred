@@ -454,9 +454,7 @@
     "total_quarters_analyzed": 12
   },
   "cross_calendar_analysis": {
-    "has_both_events": false,
-    "event_proximity_analysis": {},
-    "institutional_blind_spot_score": 0
+    "error": "'events_same_week'"
   },
   "metadata": {
     "symbol": "CLOV",
