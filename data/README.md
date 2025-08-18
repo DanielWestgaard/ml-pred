@@ -36,6 +36,7 @@ data/
 │   └── target_generators.py            # Clean, modular hypothesis implementations
 │
 ├── pipelines/                          # Data pipeline orchestration
+│   ├── multi_data_engineer_pipeline.py # Work in progress! New pipeline for running the data component with with multi data source
 │   └── engineer_pipeline.py            # Main historical data processing pipeline
 │
 ├── live/                               # Real-time data management
@@ -113,6 +114,11 @@ When this is done, you can:
 > 2. 🆕 Create a method in the new (`data/hypothesis/`)`target_generators.py` to calculate your `target` (the hypothesis).
 > 3. 🆕 The old `data/features/target_hypothesis.py` has been moved to `trash/deprecated_features/` - use the new clean system instead!
 > 4. 🆕 See the existing clean implementations like `spread_compression_patterns_v4` as examples.
+
+
+## Multi Data Source Pipeline
+Path: `data/pipelines/multi_data_engineer_pipeline.py`
+This is a work in progress. File is made, and some logic might be working, but is not completely done.
 
 
 # About processing/
