@@ -1,4 +1,5 @@
 from finvizfinance.screener import Overview
+import pandas as pd
 
 
 def screen_microcaps():
@@ -18,10 +19,61 @@ def screen_microcaps():
     
     return screener.screener_view()
 
+def change_market_cap_format(df: pd.DataFrame, column_name: str):
+    """Format market cap column to readable format (K, M, B, T)"""
+    
+    def format_number(num):
+        """Convert large numbers to readable format"""
+        if pd.isna(num):
+            return num
+        
+        # Handle string inputs (sometimes finviz returns strings)
+        if isinstance(num, str):
+            # Remove any existing formatting like commas, B, M, etc.
+            num = num.replace(',', '').replace('B', '').replace('M', '').replace('K', '')
+            try:
+                num = float(num)
+            except:
+                return num
+        
+        num = float(num)
+        abs_num = abs(num)
+        
+        if abs_num >= 1e12:
+            return f"{num/1e12:.2f}T"
+        elif abs_num >= 1e9:
+            return f"{num/1e9:.2f}B"
+        elif abs_num >= 1e6:
+            return f"{num/1e6:.1f}M"
+        elif abs_num >= 1e3:
+            return f"{num/1e3:.1f}K"
+        else:
+            return f"{num:.0f}"
+    
+    # Create a copy to avoid modifying original
+    df_copy = df.copy()
+    
+    # Check if column exists
+    if column_name in df_copy.columns:
+        df_copy[column_name] = df_copy[column_name].apply(format_number)
+    else:
+        print(f"Warning: Column '{column_name}' not found in DataFrame")
+        print(f"Available columns: {list(df_copy.columns)}")
+    
+    return df_copy
+
 def main():
     print("Hello!")
     
-    print(screen_microcaps())
+    me = screen_microcaps()
+    print("Original data:")
+    print(me)
+    print("\n" + "="*50 + "\n")
+    
+    me_formatted = change_market_cap_format(me, "Market Cap")
+    
+    print("Formatted data:")
+    print(me_formatted)
 
 if __name__=="__main__":
     main()
