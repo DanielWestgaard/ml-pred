@@ -489,6 +489,52 @@ class TradingAPI:
             logger.error(f"Failed to decode response: {str(e)}")
             return {"error": f"Invalid JSON response: {str(e)}"}
 
+    def close_all_positions(self) -> dict:
+        """
+        Close all open positions for the account.
+        
+        Returns:
+            Dictionary containing liquidation results
+            
+        Documentation: https://docs.alpaca.markets/reference/deleteallpositions
+        """
+        try:
+            response = requests.delete(
+                url=f"{self.endpoint}/positions",
+                headers=self.headers
+            )
+            
+            if self.print_responses:
+                logger.debug(f"Close all positions response status: {response.status_code}")
+                logger.debug(f"Close all positions response: {json.dumps(response.json(), indent=4)}")
+            
+            if response.status_code == 207:  # Multi-status response
+                result = response.json()
+                successful_closures = [pos for pos in result if pos.get('status') == 200]
+                failed_closures = [pos for pos in result if pos.get('status') != 200]
+                
+                logger.info(f"Successfully closed {len(successful_closures)} positions")
+                if failed_closures:
+                    logger.warning(f"Failed to close {len(failed_closures)} positions")
+                
+                return {
+                    "success": True,
+                    "closed_positions": successful_closures,
+                    "failed_positions": failed_closures,
+                    "total_closed": len(successful_closures),
+                    "total_failed": len(failed_closures)
+                }
+            else:
+                logger.error(f"Failed to close all positions: {response.status_code} - {response.text}")
+                return {"error": response.text, "status_code": response.status_code}
+                
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request failed: {str(e)}")
+            return {"error": str(e)}
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to decode response: {str(e)}")
+            return {"error": f"Invalid JSON response: {str(e)}"}
+
     # PORTFOLIO HISTORY
     
     # WATCHLISTS

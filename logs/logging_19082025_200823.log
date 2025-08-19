@@ -1,0 +1,144 @@
+19-08-2025 20:08:23 - mixed                                   :151  - INFO     - Logging system initialized. Environment: development
+19-08-2025 20:08:25 - utils.shared_utils                      :32   - INFO     - Loaded credentials. Length: 2
+19-08-2025 20:08:25 - broker.alpaca.tradin_api.trading_api    :33   - INFO     - Alpaca Trading API initialized successfully
+19-08-2025 20:08:26 - broker.alpaca.tradin_api.trading_api    :396  - DEBUG    - Get positions response status: 200
+19-08-2025 20:08:26 - broker.alpaca.tradin_api.trading_api    :397  - DEBUG    - Get positions response: [
+    {
+        "asset_id": "9083e8c7-4f7f-4a91-8bd5-94f9d00f1a96",
+        "symbol": "ATLO",
+        "exchange": "NASDAQ",
+        "asset_class": "us_equity",
+        "asset_marginable": true,
+        "qty": "1",
+        "avg_entry_price": "19.24",
+        "side": "long",
+        "market_value": "19.0903",
+        "cost_basis": "19.24",
+        "unrealized_pl": "-0.1497",
+        "unrealized_plpc": "-0.0077806652806653",
+        "unrealized_intraday_pl": "-0.1497",
+        "unrealized_intraday_plpc": "-0.0077806652806653",
+        "current_price": "19.0903",
+        "lastday_price": "19.08",
+        "change_today": "0.0005398322851153",
+        "qty_available": "1"
+    }
+]
+19-08-2025 20:08:26 - broker.alpaca.tradin_api.trading_api    :248  - DEBUG    - Get orders response status: 200
+19-08-2025 20:08:26 - broker.alpaca.tradin_api.trading_api    :249  - DEBUG    - Get orders response: []
+19-08-2025 20:08:26 - broker.alpaca.tradin_api.trading_api    :179  - DEBUG    - Order request payload: {
+    "symbol": "ATLO",
+    "qty": "1",
+    "side": "buy",
+    "type": "market",
+    "time_in_force": "day"
+}
+19-08-2025 20:08:26 - broker.alpaca.tradin_api.trading_api    :180  - DEBUG    - Order response status: 200
+19-08-2025 20:08:26 - broker.alpaca.tradin_api.trading_api    :181  - DEBUG    - Order response: {
+    "id": "20acb717-93c3-4400-8d9b-1ed0f8439533",
+    "client_order_id": "b19b9f51-98d3-412b-b551-6d581d5f6ad3",
+    "created_at": "2025-08-19T18:08:26.780063524Z",
+    "updated_at": "2025-08-19T18:08:26.781450654Z",
+    "submitted_at": "2025-08-19T18:08:26.780063524Z",
+    "filled_at": null,
+    "expired_at": null,
+    "canceled_at": null,
+    "failed_at": null,
+    "replaced_at": null,
+    "replaced_by": null,
+    "replaces": null,
+    "asset_id": "9083e8c7-4f7f-4a91-8bd5-94f9d00f1a96",
+    "symbol": "ATLO",
+    "asset_class": "us_equity",
+    "notional": null,
+    "qty": "1",
+    "filled_qty": "0",
+    "filled_avg_price": null,
+    "order_class": "",
+    "order_type": "market",
+    "type": "market",
+    "side": "buy",
+    "position_intent": "buy_to_open",
+    "time_in_force": "day",
+    "limit_price": null,
+    "stop_price": null,
+    "status": "pending_new",
+    "extended_hours": false,
+    "legs": null,
+    "trail_percent": null,
+    "trail_price": null,
+    "hwm": null,
+    "subtag": null,
+    "source": null,
+    "expires_at": "2025-08-19T20:00:00Z"
+}
+19-08-2025 20:08:26 - broker.alpaca.tradin_api.trading_api    :188  - ERROR    - Order failed with status 200: "{\"id\":\"20acb717-93c3-4400-8d9b-1ed0f8439533\",\"client_order_id\":\"b19b9f51-98d3-412b-b551-6d581d5f6ad3\",\"created_at\":\"2025-08-19T18:08:26.780063524Z\",\"updated_at\":\"2025-08-19T18:08:26.781450654Z\",\"submitted_at\":\"2025-08-19T18:08:26.780063524Z\",\"filled_at\":null,\"expired_at\":null,\"canceled_at\":null,\"failed_at\":null,\"replaced_at\":null,\"replaced_by\":null,\"replaces\":null,\"asset_id\":\"9083e8c7-4f7f-4a91-8bd5-94f9d00f1a96\",\"symbol\":\"ATLO\",\"asset_class\":\"us_equity\",\"notional\":null,\"qty\":\"1\",\"filled_qty\":\"0\",\"filled_avg_price\":null,\"order_class\":\"\",\"order_type\":\"market\",\"type\":\"market\",\"side\":\"buy\",\"position_intent\":\"buy_to_open\",\"time_in_force\":\"day\",\"limit_price\":null,\"stop_price\":null,\"status\":\"pending_new\",\"extended_hours\":false,\"legs\":null,\"trail_percent\":null,\"trail_price\":null,\"hwm\":null,\"subtag\":null,\"source\":null,\"expires_at\":\"2025-08-19T20:00:00Z\"}"
+19-08-2025 20:08:27 - broker.alpaca.tradin_api.trading_api    :396  - DEBUG    - Get positions response status: 200
+19-08-2025 20:08:27 - broker.alpaca.tradin_api.trading_api    :397  - DEBUG    - Get positions response: [
+    {
+        "asset_id": "9083e8c7-4f7f-4a91-8bd5-94f9d00f1a96",
+        "symbol": "ATLO",
+        "exchange": "NASDAQ",
+        "asset_class": "us_equity",
+        "asset_marginable": true,
+        "qty": "2",
+        "avg_entry_price": "19.24",
+        "side": "long",
+        "market_value": "38.1806",
+        "cost_basis": "38.48",
+        "unrealized_pl": "-0.2994",
+        "unrealized_plpc": "-0.0077806652806653",
+        "unrealized_intraday_pl": "-0.2994",
+        "unrealized_intraday_plpc": "-0.0077806652806653",
+        "current_price": "19.0903",
+        "lastday_price": "19.08",
+        "change_today": "0.0005398322851153",
+        "qty_available": "2"
+    }
+]
+19-08-2025 20:08:37 - broker.alpaca.tradin_api.trading_api    :508  - DEBUG    - Close all positions response status: 207
+19-08-2025 20:08:37 - broker.alpaca.tradin_api.trading_api    :509  - DEBUG    - Close all positions response: [
+    {
+        "symbol": "ATLO",
+        "status": 200,
+        "body": {
+            "id": "d20bdc07-6b96-435f-a1ea-bcc84b0d81ce",
+            "client_order_id": "9bf66234-2959-4351-8fc4-8d573d16c23c",
+            "created_at": "2025-08-19T18:08:37.472257762Z",
+            "updated_at": "2025-08-19T18:08:37.472679032Z",
+            "submitted_at": "2025-08-19T18:08:37.472257762Z",
+            "filled_at": null,
+            "expired_at": null,
+            "canceled_at": null,
+            "failed_at": null,
+            "replaced_at": null,
+            "replaced_by": null,
+            "replaces": null,
+            "asset_id": "9083e8c7-4f7f-4a91-8bd5-94f9d00f1a96",
+            "symbol": "ATLO",
+            "asset_class": "us_equity",
+            "notional": null,
+            "qty": "2",
+            "filled_qty": "0",
+            "filled_avg_price": null,
+            "order_class": "",
+            "order_type": "market",
+            "type": "market",
+            "side": "sell",
+            "position_intent": "sell_to_close",
+            "time_in_force": "day",
+            "limit_price": null,
+            "stop_price": null,
+            "status": "pending_new",
+            "extended_hours": false,
+            "legs": null,
+            "trail_percent": null,
+            "trail_price": null,
+            "hwm": null,
+            "subtag": null,
+            "source": null,
+            "expires_at": "2025-08-19T20:00:00Z"
+        }
+    }
+]
+19-08-2025 20:08:37 - broker.alpaca.tradin_api.trading_api    :516  - INFO     - Successfully closed 1 positions

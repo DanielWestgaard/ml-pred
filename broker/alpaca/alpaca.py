@@ -218,6 +218,14 @@ class Alpaca(BaseBroker):
         """
         return self.trading_api.cancel_all_orders()
     
+    def close_all_positions(self) -> Dict:
+        """Close all open positions.
+        
+        Returns:
+            Dictionary containing closure results with counts
+        """
+        return self.trading_api.close_all_positions()
+    
     
     def modify_position(self,
                        position_id: str,
