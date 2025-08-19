@@ -132,7 +132,12 @@ def main():
     if args.alpaca_api:
         alpaca = Alpaca(print_responses = True)
         
-        # alpaca.get_account_balance()
+        alpaca.get_positions()
+        alpaca.get_orders()
+        alpaca.place_market_order(symbol="ATLO", side="buy", quantity=1)
+        alpaca.get_positions()
+        time.sleep(10)
+
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True

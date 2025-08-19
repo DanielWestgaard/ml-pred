@@ -38,16 +38,19 @@ class Alpaca(BaseBroker):
         except Exception as e:
             logger.warning(f"Could not initiate Alpaca with secrets. Error: {e}")
         
-        # TEMPORARY PLACEMENT WHILE DEVELOPING THE TRADING API LOGIC
-        TradingAPI(key_id = self.key_id, secret_key = self.secret_key, print_responses = self.print_responses)
+        # Initialize the trading API
+        self.trading_api = TradingAPI(
+            key_id=self.key_id, 
+            secret_key=self.secret_key, 
+            print_responses=self.print_responses
+        )
 
     # =================== SESSION METHODS ==================
     
     
     def start_session(email, password, api_key, use_encryption=True, print_answer=False):
         """Start a new session with the broker."""
-        print("HELL")
-    
+        pass
     
     def end_session(X_SECURITY_TOKEN, CST):
         """End current session with the broker."""
@@ -82,7 +85,7 @@ class Alpaca(BaseBroker):
         Returns:
             Dictionary with balance information
         """
-        pass    
+        return self.trading_api.get_account()    
     
     def get_positions(self) -> List[Dict]:
         """Get current open positions.
@@ -90,8 +93,14 @@ class Alpaca(BaseBroker):
         Returns:
             List of position dictionaries
         """
-        pass
-    
+        result = self.trading_api.get_all_positions()
+        if isinstance(result, list):
+            return result
+        elif isinstance(result, dict) and "error" not in result:
+            return result if isinstance(result, list) else []
+        else:
+            logger.error(f"Error getting positions: {result}")
+            return []
     
     def get_orders(self) -> List[Dict]:
         """Get current pending orders.
@@ -99,7 +108,14 @@ class Alpaca(BaseBroker):
         Returns:
             List of order dictionaries
         """
-        pass
+        result = self.trading_api.get_all_orders(status="open")
+        if isinstance(result, list):
+            return result
+        elif isinstance(result, dict) and "error" not in result:
+            return result if isinstance(result, list) else []
+        else:
+            logger.error(f"Error getting orders: {result}")
+            return []
     
     # ==================== TRADING METHODS ====================
     
@@ -122,7 +138,20 @@ class Alpaca(BaseBroker):
         Returns:
             Order information dictionary
         """
-        pass
+        if take_profit or stop_loss:
+            return self.trading_api.place_bracket_order(
+                symbol=symbol,
+                side=side,
+                qty=quantity,
+                take_profit_price=take_profit,
+                stop_loss_price=stop_loss
+            )
+        else:
+            return self.trading_api.place_market_order(
+                symbol=symbol,
+                side=side,
+                qty=quantity
+            )
     
     
     def place_limit_order(self,
@@ -145,7 +174,28 @@ class Alpaca(BaseBroker):
         Returns:
             Order information dictionary
         """
-        pass
+        if take_profit or stop_loss:
+            # For bracket orders with limit entry, we need to use create_an_order directly
+            take_profit_dict = {"limit_price": str(take_profit)} if take_profit else None
+            stop_loss_dict = {"stop_price": str(stop_loss)} if stop_loss else None
+            
+            return self.trading_api.create_an_order(
+                symbol=symbol,
+                side=side,
+                qty=quantity,
+                order_type="limit",
+                limit_price=price,
+                order_class="bracket",
+                take_profit=take_profit_dict,
+                stop_loss=stop_loss_dict
+            )
+        else:
+            return self.trading_api.place_limit_order(
+                symbol=symbol,
+                side=side,
+                qty=quantity,
+                limit_price=price
+            )
     
     
     def close_order(self, order_id: str) -> bool:
@@ -157,7 +207,8 @@ class Alpaca(BaseBroker):
         Returns:
             True if successful, False otherwise
         """
-        pass
+        result = self.trading_api.cancel_order(order_id)
+        return "success" in result and result["success"]
     
     
     def modify_position(self,
