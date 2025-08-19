@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from datetime import datetime
+import json
 from typing import Dict, List, Optional
 
 import pandas as pd
@@ -20,8 +21,13 @@ class Alpaca(BaseBroker):
     
     # Global defined url variable
     
-    def __init__(self):
-        """Initialize the Alpaca API's."""
+    def __init__(self, print_responses:bool = False):
+        """
+        Initialize the Alpaca API's.
+        
+        Args:
+            - print_responses: True will print out the responses in the terminal. 
+        """
         
         self.endpoint = "https://paper-api.alpaca.markets/v2"
         # self.url = "https://paper-api.alpaca.markets/v2/account"
@@ -85,6 +91,9 @@ class Alpaca(BaseBroker):
         response = requests.get(url = f"{self.endpoint}/account", headers = headers)
 
         print(response.text)
+        
+        parsed_data = json.loads(response.text)
+        logger.debug(f"Session response: {json.dumps(parsed_data, indent=4)}")
     
     
     def get_positions(self) -> List[Dict]:
