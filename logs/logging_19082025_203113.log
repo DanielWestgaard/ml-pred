@@ -1,0 +1,85 @@
+19-08-2025 20:31:13 - logging_utils                           :151  - INFO     - Logging system initialized. Environment: development
+19-08-2025 20:31:13 - utils.shared_utils                      :32   - INFO     - Loaded credentials. Length: 2
+19-08-2025 20:31:13 - broker.alpaca.tradin_api.trading_api    :33   - INFO     - Alpaca Trading API initialized successfully
+19-08-2025 20:31:13 - broker.alpaca.market_data_api.historical:41   - INFO     - Alpaca Historical Data API initialized successfully
+19-08-2025 20:31:13 - broker.alpaca.market_data_api.live_data :65   - INFO     - Alpaca Live Data API initialized successfully
+19-08-2025 20:31:14 - broker.alpaca.market_data_api.historical:103  - DEBUG    - Stock bars request: https://data.alpaca.markets/v2/stocks/bars?symbols=AAPL&timeframe=1Day&adjustment=raw&sort=asc&start=2025-08-02T00%3A00%3A00Z&end=2025-08-12T23%3A59%3A59Z&feed=iex
+19-08-2025 20:31:14 - broker.alpaca.market_data_api.historical:104  - DEBUG    - Stock bars response status: 200
+19-08-2025 20:31:14 - broker.alpaca.market_data_api.historical:106  - DEBUG    - Stock bars response: {
+  "bars": {
+    "AAPL": [
+      {
+        "c": 203.35,
+        "h": 207.85,
+        "l": 201.68,
+        "n": 19418,
+        "o": 204.505,
+        "t": "2025-08-04T04:00:00Z",
+        "v": 1875434,
+        "vw": 204.493141
+      },
+      {
+        "c": 202.93,
+        "h": 205.32,
+        "l": 202.165,
+        "n": 12539,
+        "o": 203.43,
+        "t": "2025-08-05T04:00:00Z",
+        "v": 968620,
+        "vw": 203.742942
+      },
+      {
+        "c": 213.275,
+        "h": 215.38,
+        "l": 205.61,
+        "n": 25261,
+        "o": 205.63,
+        "t": "2025-08-06T04:00:00Z",
+        "v": 2182167,
+        "vw": 212.895701
+      },
+      {
+        "c": 220.17,
+        "h": 220.84,
+        "l": 216.62,
+        "n": 30254,
+        "o": 218.92,
+        "t": "2025-08-07T04:00:00Z",
+        "v": 2508756,
+        "vw": 219.230711
+      },
+      {
+        "c": 229.365,
+        "h": 230.99,
+        "l": 219.3,
+        "n": 30531,
+        "o": 220.89,
+        "t": "2025-08-08T04:00:00Z",
+        "v": 2830643,
+        "vw": 226.828352
+      },
+      {
+        "c": 227.22,
+        "h": 229.53,
+        "l": 224.78,
+        "n": 19063,
+        "o": 227.92,
+        "t": "2025-08-11T04:00:00Z",
+        "v": 1715351,
+        "vw": 227.635045
+      },
+      {
+        "c": 229.63,
+        "h": 230.78,
+        "l": 227.155,
+        "n": 14198,
+        "o": 228.03,
+        "t": "2025-08-12T04:00:00Z",
+        "v": 1250550,
+        "vw": 229.362139
+      }
+    ]
+  },
+  "next_page_token": null
+}
+19-08-2025 20:31:14 - broker.alpaca.market_data_api.historical:465  - INFO     - Created DataFrame with 7 bars

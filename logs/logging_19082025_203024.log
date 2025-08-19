@@ -1,0 +1,15 @@
+19-08-2025 20:30:24 - logging_utils                           :151  - INFO     - Logging system initialized. Environment: development
+19-08-2025 20:30:25 - utils.shared_utils                      :32   - INFO     - Loaded credentials. Length: 2
+19-08-2025 20:30:25 - broker.alpaca.tradin_api.trading_api    :33   - INFO     - Alpaca Trading API initialized successfully
+19-08-2025 20:30:25 - broker.alpaca.market_data_api.historical:41   - INFO     - Alpaca Historical Data API initialized successfully
+19-08-2025 20:30:25 - broker.alpaca.market_data_api.live_data :65   - INFO     - Alpaca Live Data API initialized successfully
+19-08-2025 20:30:26 - broker.alpaca.market_data_api.historical:103  - DEBUG    - Stock bars request: https://data.alpaca.markets/v2/stocks/bars?symbols=AAPL&timeframe=1Day&adjustment=raw&sort=asc&start=2025-08-14T00%3A00%3A00Z&end=2025-08-19T23%3A59%3A59Z
+19-08-2025 20:30:26 - broker.alpaca.market_data_api.historical:104  - DEBUG    - Stock bars response status: 403
+19-08-2025 20:30:26 - broker.alpaca.market_data_api.historical:111  - ERROR    - Failed to get stock bars: 403 - {"message":"subscription does not permit querying recent SIP data"}
+
+19-08-2025 20:30:26 - broker.alpaca.market_data_api.historical:103  - DEBUG    - Stock bars request: https://data.alpaca.markets/v2/stocks/bars?symbols=AAPL&timeframe=1Day&adjustment=raw&sort=asc&start=2025-08-12T20%3A30%3A26Z&end=2025-08-19T20%3A30%3A26Z
+19-08-2025 20:30:26 - broker.alpaca.market_data_api.historical:104  - DEBUG    - Stock bars response status: 403
+19-08-2025 20:30:26 - broker.alpaca.market_data_api.historical:111  - ERROR    - Failed to get stock bars: 403 - {"message":"subscription does not permit querying recent SIP data"}
+
+19-08-2025 20:30:26 - broker.alpaca.market_data_api.historical:416  - ERROR    - Cannot convert error response to DataFrame: {"message":"subscription does not permit querying recent SIP data"}
+

@@ -1,8 +1,10 @@
 from abc import abstractmethod
 from datetime import datetime
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from broker.alpaca.tradin_api.trading_api import TradingAPI
+from broker.alpaca.market_data_api.historical_data import HistoricalDataAPI
+from broker.alpaca.market_data_api.live_data import LiveDataAPI
 import pandas as pd
 from broker.base_interface import BaseBroker
 from utils import shared_utils
@@ -38,10 +40,22 @@ class Alpaca(BaseBroker):
         except Exception as e:
             logger.warning(f"Could not initiate Alpaca with secrets. Error: {e}")
         
-        # Initialize the trading API
+        # Initialize the APIs
         self.trading_api = TradingAPI(
             key_id=self.key_id, 
             secret_key=self.secret_key, 
+            print_responses=self.print_responses
+        )
+        
+        self.historical_data_api = HistoricalDataAPI(
+            key_id=self.key_id,
+            secret_key=self.secret_key,
+            print_responses=self.print_responses
+        )
+        
+        self.live_data_api = LiveDataAPI(
+            key_id=self.key_id,
+            secret_key=self.secret_key,
             print_responses=self.print_responses
         )
 
@@ -62,20 +76,52 @@ class Alpaca(BaseBroker):
     def get_historical_data(self, 
                            epic: str, 
                            timeframe: str, 
-                           start_date: datetime, 
-                           end_date: Optional[datetime] = None) -> pd.DataFrame:
+                           start_date: Union[datetime, str], 
+                           end_date: Optional[Union[datetime, str]] = None) -> pd.DataFrame:
         """Fetch historical OHLCV data.
         
         Args:
-            symbol: The market symbol
-            timeframe: Timeframe (e.g., "1m", "5m", "1h", "1d")
-            start_date: Start date for historical data
-            end_date: End date for historical data (optional)
+            epic: The market symbol (e.g., "AAPL", "SPY")
+            timeframe: Timeframe (e.g., "1Min", "5Min", "1Hour", "1Day")
+            start_date: Start date for historical data (datetime object or ISO string)
+            end_date: End date for historical data (datetime object or ISO string, optional)
             
         Returns:
             DataFrame with historical data
         """
-        pass
+        # Convert timeframe to Alpaca format if needed
+        timeframe_mapping = {
+            "1m": "1Min", "5m": "5Min", "15m": "15Min", "30m": "30Min",
+            "1h": "1Hour", "1d": "1Day", "1w": "1Week", "1M": "1Month"
+        }
+        alpaca_timeframe = timeframe_mapping.get(timeframe, timeframe)
+        
+        # Handle both datetime objects and string inputs
+        if isinstance(start_date, str):
+            # If string doesn't end with 'Z', add it for UTC timezone
+            start_str = start_date if start_date.endswith('Z') else f"{start_date}Z"
+        else:
+            start_str = start_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+        
+        if end_date:
+            if isinstance(end_date, str):
+                end_str = end_date if end_date.endswith('Z') else f"{end_date}Z"
+            else:
+                end_str = end_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+        else:
+            end_str = None
+        
+        # Get bars data
+        bars_response = self.historical_data_api.get_stock_bars(
+            symbols=epic,
+            timeframe=alpaca_timeframe,
+            start=start_str,
+            end=end_str
+        )
+        
+        # Convert to DataFrame
+        df = self.historical_data_api.bars_to_dataframe(bars_response, symbol=epic)
+        return df if df is not None else pd.DataFrame()
     
     # ==================== ACCOUNT METHODS ====================
     
@@ -246,13 +292,65 @@ class Alpaca(BaseBroker):
     
     def sub_live_market_data(self,
                              symbol: str,
-                             timeframe: str) -> bool:
+                             timeframe: str = None) -> bool:
         """Subscribe to live market data.
         
         Args:
-            symbol: The symbol, or epic, you want to recieve data about. Eg. GOLD, GBPUSD, US100, etc.
-            timeframe: The timeframe (/candles) of the symbol. Eg. 1M, 5M, 1H, 4H, etc.
+            symbol: The symbol you want to receive data about (e.g., "AAPL", "SPY")
+            timeframe: The timeframe (optional, Alpaca provides real-time bars automatically)
+            
         Returns:
-            ...
+            True if subscription successful, False otherwise
         """
-        pass
+        try:
+            if not self.live_data_api.is_connected:
+                self.live_data_api.connect()
+            
+            # Subscribe to all data types for comprehensive coverage
+            self.live_data_api.subscribe_all_data([symbol])
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to subscribe to live data for {symbol}: {e}")
+            return False
+    
+    def start_live_stream(self, 
+                         symbols: List[str], 
+                         data_types: List[str] = None,
+                         trade_handler=None,
+                         quote_handler=None,
+                         bar_handler=None):
+        """
+        Start live data streaming for multiple symbols.
+        
+        Args:
+            symbols: List of symbols to stream
+            data_types: Types of data to stream (["trades", "quotes", "bars"])
+            trade_handler: Custom trade message handler
+            quote_handler: Custom quote message handler  
+            bar_handler: Custom bar message handler
+        """
+        self.live_data_api.start_simple_stream(
+            symbols=symbols,
+            data_types=data_types,
+            trade_handler=trade_handler,
+            quote_handler=quote_handler,
+            bar_handler=bar_handler
+        )
+    
+    def stop_live_stream(self):
+        """Stop live data streaming and disconnect."""
+        if self.live_data_api.is_connected:
+            self.live_data_api.unsubscribe_all()
+            self.live_data_api.disconnect()
+            logger.info("Live data stream stopped")
+    
+    def add_live_data_handler(self, message_type: str, handler):
+        """
+        Add a custom handler for live data messages.
+        
+        Args:
+            message_type: Type of message ("trades", "quotes", "bars", "status", "error")
+            handler: Callback function
+        """
+        self.live_data_api.add_handler(message_type, handler)

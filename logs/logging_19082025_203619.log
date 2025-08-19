@@ -1,0 +1,15 @@
+19-08-2025 20:36:19 - mixed                                   :151  - INFO     - Logging system initialized. Environment: development
+19-08-2025 20:36:22 - utils.shared_utils                      :32   - INFO     - Loaded credentials. Length: 2
+19-08-2025 20:36:22 - broker.alpaca.tradin_api.trading_api    :33   - INFO     - Alpaca Trading API initialized successfully
+19-08-2025 20:36:22 - broker.alpaca.market_data_api.historical:41   - INFO     - Alpaca Historical Data API initialized successfully
+19-08-2025 20:36:22 - broker.alpaca.market_data_api.live_data :65   - INFO     - Alpaca Live Data API initialized successfully
+19-08-2025 20:36:22 - uncaught_exception                      :166  - CRITICAL - Uncaught exception
+Traceback (most recent call last):
+  File "/Users/dmartinsen/pers-prog/ml-pred/main.py", line 569, in <module>
+    main()
+  File "/Users/dmartinsen/pers-prog/ml-pred/main.py", line 141, in main
+    alpaca.get_historical_data(epic="ATLO", timeframe="1Hour", start_date="2024-01-01", end_date="2025-01-01")
+  File "/Users/dmartinsen/pers-prog/ml-pred/broker/alpaca/alpaca.py", line 100, in get_historical_data
+    start_str = start_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+                ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'strftime'
