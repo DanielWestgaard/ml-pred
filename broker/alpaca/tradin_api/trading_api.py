@@ -29,14 +29,14 @@ class TradingAPI:
         }
         
         # TEMPORARY CALLING ALL METHODS MANUALLY FOR TESTING PURPOSES
-        self.get_account()
+        self.get_all_orders()
     
     # ACCOUNTS
     
     def get_account(self) -> any:
         """
         Returns your account details.
-        Link/documentation: https://docs.alpaca.markets/reference/getaccount-1
+        Documentation: https://docs.alpaca.markets/reference/getaccount-1
         
         Returns: The json response object
         """
@@ -54,6 +54,40 @@ class TradingAPI:
     # COROPORATE ACTIONS
     
     # ORDERS
+    
+    def create_an_order(self, symbol, qty, notion, side, type, time_in_force, limit_price, stop_price, trail_price, trail_):
+        """
+        Places a new order for the given account. An order request may be rejected if the account
+        is not authorized for trading, or if the tradable balance is insufficient to fill the order.
+        
+        Documentation: https://docs.alpaca.markets/reference/postorder
+        """
+        payload = {
+            "type": "market",
+            "time_in_force": "day"
+        }
+        
+        response = requests.get(url = f"{self.endpoint}/orders", json = payload, headers = self.headers)
+        
+        if self.print_responses:
+            parsed_data = json.loads(response.text)
+            logger.debug(f"Account response: {json.dumps(parsed_data, indent=4)}")
+        
+        return json.loads(response.text)
+    
+    def get_all_orders(self):
+        """
+        Retrieves a list of orders for the account, filtered by the supplied query parameters.
+        
+        Documentation: https://docs.alpaca.markets/reference/getallorders-1
+        """
+        response = requests.get(url = f"{self.endpoint}/orders", headers = self.headers)
+        
+        if self.print_responses:
+            parsed_data = json.loads(response.text)
+            logger.debug(f"Account response: {json.dumps(parsed_data, indent=4)}")
+        
+        return json.loads(response.text)
     
     # POSITIONS
     
