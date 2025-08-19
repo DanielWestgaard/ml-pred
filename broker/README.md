@@ -45,10 +45,255 @@ broker/
 
 ```
 
-# Alpaca Integration
-Curently a work in progress.<br>
-Link to [Alpaca Market Docs](https://docs.alpaca.markets/).<br>
-Since Alpaca provides several different types of API's, I think I'll use the main `alpaca.py` class as "main method/orchestrator for running the other ones".
+# Alpaca Integration 🦙
+
+## Overview
+Alpaca integration provides commission-free stock trading with a comprehensive REST API. The implementation supports both paper and live trading environments.
+
+## Features ✨
+- **Paper & Live Trading**: Switch between environments
+- **Complete Order Management**: Market, limit, stop, and bracket orders
+- **Position Management**: Position tracking and closure capabilities
+- **Account Information**: Real-time account balance and buying power
+- **Bulk Operations**: Cancel all orders and close all positions
+- **Error Handling**: Comprehensive error handling and logging
+- **Type Safety**: Full type annotations for better development experience
+
+## Architecture
+```
+alpaca/
+├── alpaca.py                    # Main Alpaca broker orchestrator (BaseBroker interface)
+└── tradin_api/
+    └── trading_api.py           # Complete Trading API implementation
+```
+
+## Quick Start 🚀
+```python
+from broker.alpaca.alpaca import Alpaca
+
+# Initialize (uses paper trading by default)
+alpaca = Alpaca(print_responses=True)
+
+# Get account info
+account = alpaca.get_account_balance()
+print(f"Buying power: ${account['buying_power']}")
+
+# Place a market order
+order = alpaca.place_market_order(
+    symbol="AAPL",
+    side="buy", 
+    quantity=10
+)
+
+# Check positions
+positions = alpaca.get_positions()
+```
+
+## Order Types & Examples 📊
+
+### Market Orders
+```python
+# Simple market order
+order = alpaca.place_market_order("AAPL", "buy", 10)
+
+# Market order with bracket (stop loss + take profit)
+order = alpaca.place_market_order(
+    symbol="TSLA",
+    side="buy",
+    quantity=5,
+    take_profit=250.0,
+    stop_loss=200.0
+)
+```
+
+### Limit Orders
+```python
+# Simple limit order
+order = alpaca.place_limit_order("NVDA", "buy", 10, price=500.0)
+
+# Limit order with bracket
+order = alpaca.place_limit_order(
+    symbol="MSFT",
+    side="buy", 
+    quantity=20,
+    price=300.0,
+    take_profit=320.0,
+    stop_loss=280.0
+)
+```
+
+### Advanced Orders
+```python
+# Trailing stop order
+order = alpaca.trading_api.create_an_order(
+    symbol="SPY",
+    side="sell",
+    qty=100,
+    order_type="trailing_stop",
+    trail_percent=2.0  # 2% trailing stop
+)
+
+# Good-til-canceled limit order
+order = alpaca.trading_api.create_an_order(
+    symbol="QQQ",
+    side="buy",
+    qty=50,
+    order_type="limit",
+    limit_price=350.0,
+    time_in_force="gtc"
+)
+```
+
+## Portfolio Management 💼
+
+### Position Management
+```python
+# Get all positions
+positions = alpaca.get_positions()
+
+# Get specific position
+position = alpaca.trading_api.get_position("AAPL")
+
+# Close specific position (partial)
+result = alpaca.trading_api.close_position("AAPL", qty="5")
+
+# Close entire position
+result = alpaca.trading_api.close_position("AAPL")
+
+# Close all positions (emergency stop)
+result = alpaca.close_all_positions()
+print(f"Closed {result['total_closed']} positions")
+```
+
+### Order Management
+```python
+# Get all orders
+orders = alpaca.get_orders()
+
+# Get open orders only
+open_orders = alpaca.trading_api.get_all_orders(status="open")
+
+# Cancel specific order
+success = alpaca.close_order(order_id)
+
+# Cancel all orders (emergency stop)
+result = alpaca.cancel_all_orders()
+print(f"Cancelled {result['total_cancelled']} orders")
+```
+
+## Environment Management 🔄
+
+### Paper vs Live Trading
+```python
+# Initialize in paper mode (default)
+alpaca = Alpaca()
+
+# Switch to live trading (⚠️ USE WITH CAUTION)
+alpaca.trading_api.set_live_trading(live=True)
+
+# Switch back to paper trading
+alpaca.trading_api.set_live_trading(live=False)
+```
+
+### Configuration
+Ensure your secrets file contains:
+```json
+{
+    "alpaca_paper_account_key_id": "your_paper_key_id",
+    "alpaca_paper_account_secret_key": "your_paper_secret_key"
+}
+```
+
+## Strategy Integration Example 🎯
+```python
+from broker.alpaca.alpaca import Alpaca
+
+class AlpacaStrategy:
+    def __init__(self):
+        self.broker = Alpaca(print_responses=False)
+        
+    def execute_signal(self, signal):
+        """Execute trading signal with risk management"""
+        
+        # Calculate position size based on account balance
+        account = self.broker.get_account_balance()
+        buying_power = float(account['buying_power'])
+        position_size = min(signal['quantity'], buying_power // signal['price'])
+        
+        if signal['type'] == 'market':
+            order = self.broker.place_market_order(
+                symbol=signal['symbol'],
+                side=signal['side'],
+                quantity=position_size,
+                take_profit=signal.get('take_profit'),
+                stop_loss=signal.get('stop_loss')
+            )
+        
+        return order
+    
+    def emergency_stop(self):
+        """Emergency portfolio shutdown"""
+        # Cancel all pending orders
+        cancel_result = self.broker.cancel_all_orders()
+        
+        # Close all positions
+        close_result = self.broker.close_all_positions()
+        
+        return {
+            'orders_cancelled': cancel_result['total_cancelled'],
+            'positions_closed': close_result['total_closed']
+        }
+```
+
+## Error Handling 🛡️
+All methods return structured responses with error information:
+```python
+# Check for errors in responses
+order = alpaca.place_market_order("AAPL", "buy", 10)
+
+if "error" in order:
+    print(f"Order failed: {order['error']}")
+    print(f"Status code: {order.get('status_code', 'unknown')}")
+else:
+    print(f"Order placed successfully: {order['id']}")
+```
+
+## API Methods Reference 📖
+
+### Account Methods
+- `get_account_balance()` - Get account information
+- `get_positions()` - Get all positions  
+- `get_orders()` - Get all orders
+
+### Trading Methods
+- `place_market_order()` - Place market order
+- `place_limit_order()` - Place limit order
+- `close_order()` - Cancel order
+- `cancel_all_orders()` - Cancel all orders
+- `close_all_positions()` - Close all positions
+
+### Advanced Trading API
+- `create_an_order()` - Full order creation with all parameters
+- `get_all_orders()` - Get orders with filtering
+- `get_position()` - Get specific position
+- `close_position()` - Close specific position
+- `set_live_trading()` - Switch trading environment
+
+## Status & Roadmap 🗺️
+- ✅ **Complete Trading API**: All order types and position management
+- ✅ **Error Handling**: Comprehensive error handling and logging  
+- ✅ **Paper Trading**: Full paper trading support
+- ✅ **Live Trading**: Production-ready live trading
+- ⏳ **Market Data API**: Historical and real-time data (planned)
+- ⏳ **Options Trading**: Options trading support (planned)
+- ⏳ **Crypto Trading**: Cryptocurrency trading (planned)
+
+## Useful Links - Alpaca 🔗
+- [Alpaca API Documentation](https://docs.alpaca.markets/)
+- [Trading API Reference](https://docs.alpaca.markets/reference/postorder)
+- [Paper Trading Setup](https://docs.alpaca.markets/docs/trading/paper-trading)
+- [Account Dashboard](https://app.alpaca.markets/)
+- [API Authentication](https://docs.alpaca.markets/reference/authentication-2)
 
 # Capital.com Integration
 
