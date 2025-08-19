@@ -9,6 +9,9 @@ class TradingAPI:
     Actual implementation of the possibilities with trading API. Called from alpaca.py.
     These methods and logic will wollow the naming provided about the Trading API in
     the documentation: https://docs.alpaca.markets/reference/
+    
+    TODO: In the future, if this file get overly populated with methods, it could be an idea
+    to divide into files based on the "type". Eg. accounts.py, assets.py, etc.
     """
     
     def __init__(self, key_id, secret_key, print_responses):
