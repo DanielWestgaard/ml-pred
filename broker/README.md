@@ -19,17 +19,20 @@ broker/
 ├── base_interface.py               # Abstract broker interface for consistency
 ├── README.md                       # Documentation
 │
-└── capital_com/                    # Capital.com broker integration
-    ├── capitalcom.py               # Main CapitalCom broker orchestrator
-    │
-    ├── rest_api/                   # REST API implementation
-    │   ├── session.py              # Session management (login/logout with encryption)
-    │   ├── account.py              # Account operations and capital management
-    │   ├── markets_info.py         # Market data, historical prices, symbol info
-    │   └── trading.py              # Order placement, position management, trade execution
-    │
-    └── web_socket/                 # Real-time data streaming
-        └── web_socket.py           # WebSocket market data streaming with connection management
+├── capital_com/                    # Capital.com broker integration
+│   ├── capitalcom.py               # Main CapitalCom broker orchestrator
+│   │
+│   ├── rest_api/                   # REST API implementation
+│   │   ├── session.py              # Session management (login/logout with encryption)
+│   │   ├── account.py              # Account operations and capital management
+│   │   ├── markets_info.py         # Market data, historical prices, symbol info
+│   │   └── trading.py              # Order placement, position management, trade execution
+│   │
+│   └── web_socket/                 # Real-time data streaming
+│       └── web_socket.py           # WebSocket market data streaming with connection management
+│
+└── alpaca/                         # Alpaca broker integration
+
 ```
 
 # Capital.com Integration
