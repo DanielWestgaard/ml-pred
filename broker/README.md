@@ -32,6 +32,16 @@ broker/
 │       └── web_socket.py           # WebSocket market data streaming with connection management
 │
 └── alpaca/                         # Alpaca broker integration
+    ├── alpaca.py                   # Main Alpaca broker orchestrator
+    │
+    ├── trading_api/                # Trading API endpoint (stock trading for individuals)
+    │   └── ...
+    ├── market_data_api/            # Real-time Market pricing data and historical data. TODO: Not done yet
+    │   └── ...
+    ├── options_trading_api/        # Options trading API. TODO: Not done yet
+    │   └── ...
+    ├── broker_api/                 # For building trading apps and services for end users. TODO: Not done yet
+    │   └── ...
 
 ```
 
