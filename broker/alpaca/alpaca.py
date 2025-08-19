@@ -19,15 +19,19 @@ class Alpaca(BaseBroker):
     """
     
     # Global defined url variable
-    url = "https://paper-api.alpaca.markets/v2/account"
     
     def __init__(self):
         """Initialize the Alpaca API's."""
         
+        self.endpoint = "https://paper-api.alpaca.markets/v2"
+        # self.url = "https://paper-api.alpaca.markets/v2/account"
+        
         try: 
             # Getting secrets
-            self.secrets = shared_utils.load_secrets(desired_keys={'API_KEY_CAP', 'PASSWORD_CAP', 'EMAIL'})
-            print(self.secrets)
+            self.secrets = shared_utils.load_secrets(desired_keys={'alpaca_paper_account_key_id', 'alpaca_paper_account_secret_key'})
+            self.key_id = self.secrets.get('alpaca_paper_account_key_id')
+            self.secret_key = self.secrets.get('alpaca_paper_account_secret_key')
+            # print(self.secrets)
         except Exception as e:
             logger.warning(f"Could not initiate BaseBroker with secrets. Error: {e}")
 
@@ -72,7 +76,15 @@ class Alpaca(BaseBroker):
         Returns:
             Dictionary with balance information
         """
-        pass
+        headers = {
+            "accept": "application/json",
+            "APCA-API-KEY-ID": f"{self.key_id}",
+            "APCA-API-SECRET-KEY": f"{self.secret_key}"
+        }
+        
+        response = requests.get(url = f"{self.endpoint}/account", headers = headers)
+
+        print(response.text)
     
     
     def get_positions(self) -> List[Dict]:
