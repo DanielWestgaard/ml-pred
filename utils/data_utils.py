@@ -345,6 +345,11 @@ def get_data_file_path(symbol: str, timeframe: str, start_date: str, end_date: s
             directory = config.get_capcom_raw_data_dir(symbol, timeframe)
         else:
             directory = config.get_capcom_processed_data_dir(symbol, timeframe)
+    elif data_source == 'alpaca':
+        if is_raw:
+            directory = config.get_alpaca_raw_data_dir(symbol, timeframe)
+        else:
+            directory = config.get_alpaca_processed_data_dir(symbol, timeframe)
     else:
         # Handle other data sources if needed
         raise ValueError(f"Unsupported data source: {data_source}")

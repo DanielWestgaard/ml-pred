@@ -354,3 +354,90 @@ class Alpaca(BaseBroker):
             handler: Callback function
         """
         self.live_data_api.add_handler(message_type, handler)
+    
+    # ==================== DATA SAVING METHODS ====================
+    
+    def fetch_and_save_historical_data(self,
+                                      symbol: str,
+                                      timeframe: str = "1Day", 
+                                      start_date: Union[datetime, str] = None,
+                                      end_date: Union[datetime, str] = None,
+                                      output_file: str = None,
+                                      save_raw_data: bool = False) -> str:
+        """
+        Fetch historical data and save to CSV with proper directory structure.
+        
+        Args:
+            symbol: The market symbol (e.g., "AAPL", "SPY")
+            timeframe: Timeframe (e.g., "1Min", "5Min", "1Hour", "1Day")
+            start_date: Start date for historical data (datetime object or ISO string)
+            end_date: End date for historical data (datetime object or ISO string, optional)
+            output_file: Custom output file path (optional)
+            save_raw_data: Whether to save raw JSON response as well
+            
+        Returns:
+            Path to the saved CSV file
+        """
+        # Convert timeframe to Alpaca format if needed
+        timeframe_mapping = {
+            "1m": "1Min", "5m": "5Min", "15m": "15Min", "30m": "30Min",
+            "1h": "1Hour", "1d": "1Day", "1w": "1Week", "1M": "1Month"
+        }
+        alpaca_timeframe = timeframe_mapping.get(timeframe, timeframe)
+        
+        # Handle both datetime objects and string inputs
+        if start_date:
+            if isinstance(start_date, str):
+                start_str = start_date if start_date.endswith('Z') else f"{start_date}Z"
+            else:
+                start_str = start_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+        else:
+            start_str = None
+        
+        if end_date:
+            if isinstance(end_date, str):
+                end_str = end_date if end_date.endswith('Z') else f"{end_date}Z"
+            else:
+                end_str = end_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+        else:
+            end_str = None
+        
+        return self.historical_data_api.fetch_and_save_historical_bars(
+            symbols=symbol,
+            timeframe=alpaca_timeframe,
+            start=start_str,
+            end=end_str,
+            output_file=output_file,
+            save_raw_data=save_raw_data
+        )
+    
+    def fetch_and_save_basic_plan_data(self,
+                                      symbol: str,
+                                      timeframe: str = "1Day",
+                                      days_back: int = 30,
+                                      save_raw_data: bool = False) -> str:
+        """
+        Fetch and save data optimized for basic plan (avoids recent data restrictions).
+        
+        Args:
+            symbol: The market symbol (e.g., "AAPL", "SPY")
+            timeframe: Timeframe (e.g., "1Min", "5Min", "1Hour", "1Day")
+            days_back: Number of days to look back from a week ago
+            save_raw_data: Whether to save raw JSON response as well
+            
+        Returns:
+            Path to the saved CSV file
+        """
+        # Convert timeframe to Alpaca format if needed
+        timeframe_mapping = {
+            "1m": "1Min", "5m": "5Min", "15m": "15Min", "30m": "30Min",
+            "1h": "1Hour", "1d": "1Day", "1w": "1Week", "1M": "1Month"
+        }
+        alpaca_timeframe = timeframe_mapping.get(timeframe, timeframe)
+        
+        return self.historical_data_api.fetch_and_save_basic_plan_data(
+            symbols=symbol,
+            timeframe=alpaca_timeframe,
+            days_back=days_back,
+            save_raw_data=save_raw_data
+        )

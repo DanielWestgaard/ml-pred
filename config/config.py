@@ -63,6 +63,25 @@ def get_calendar_events_analysis_dir(symbol: str, component: str) -> str:
 def get_calendar_events_processed_dir(symbol: str, component: str) -> str:
     """Get processed directory for a calendar component and symbol."""
     return os.path.join(get_calendar_events_component_dir(symbol, component), 'processed')
+# Alpaca API
+ALPACA_BASE_STORAGE_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'alpaca')
+ALPACA_RESPONSE_JSON_DIR = os.path.join(ALPACA_BASE_STORAGE_DIR, 'saved_responses')
+
+# Helper functions for Alpaca symbol-based storage structure
+def get_alpaca_raw_data_dir(symbol: str, timeframe: str = None) -> str:
+    """Get raw data directory for a specific symbol and optional timeframe."""
+    base_path = os.path.join(ALPACA_BASE_STORAGE_DIR, symbol, 'raw')
+    if timeframe:
+        return os.path.join(base_path, timeframe)
+    return base_path
+
+def get_alpaca_processed_data_dir(symbol: str, timeframe: str = None) -> str:
+    """Get processed data directory for a specific symbol and optional timeframe."""
+    base_path = os.path.join(ALPACA_BASE_STORAGE_DIR, symbol, 'processed')
+    if timeframe:
+        return os.path.join(base_path, timeframe)
+    return base_path
+
 # Alpha Vantage API
 ALPVAN_BASE_STORAGE_DIR = os.path.join(BASE_DATA_STORAGE_DIR, 'alpha_vantage')
 ALPVAN_RAW_DATA_DIR = os.path.join(ALPVAN_BASE_STORAGE_DIR, 'raw')

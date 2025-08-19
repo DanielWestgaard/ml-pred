@@ -256,6 +256,67 @@ def extract_mid_price_ohlcv(price_data, symbol=None, source=None, as_floats=Fals
         
     return result
 
+def convert_alpaca_bars_to_ohlcv_csv(bars_data, output_file, symbol=None):
+    """
+    Converts Alpaca bars data to OHLCV format and saves it to a CSV file.
+    
+    Args:
+        bars_data (dict): The Alpaca bars API response containing bars data
+        output_file (str): Path to the output CSV file
+        symbol (str): Specific symbol to extract (if multiple symbols in response)
+    """
+    import csv
+    from datetime import datetime
+    
+    if "error" in bars_data:
+        raise ValueError(f"Cannot convert error response to CSV: {bars_data['error']}")
+    
+    if "bars" not in bars_data:
+        raise ValueError("No bars data found in response")
+    
+    bars = bars_data["bars"]
+    
+    # If specific symbol requested
+    if symbol and symbol in bars:
+        bars_list = bars[symbol]
+    elif len(bars) == 1:
+        # Single symbol in response
+        symbol_key = next(iter(bars))
+        bars_list = bars[symbol_key]
+    else:
+        raise ValueError("Multiple symbols found. Please specify symbol parameter")
+    
+    if not bars_list:
+        raise ValueError("No bars data found for symbol")
+    
+    # Open the CSV file for writing
+    with open(output_file, 'w', newline='') as csvfile:
+        fieldnames = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Trade_Count', 'VWAP']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        
+        # Write header
+        writer.writeheader()
+        
+        # Write data rows
+        for bar in bars_list:
+            # Parse timestamp and format as YYYY-MM-DD HH:MM:SS
+            timestamp = datetime.fromisoformat(bar['t'].replace('Z', '+00:00'))
+            date_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            
+            row = {
+                'Date': date_str,
+                'Open': bar['o'],
+                'High': bar['h'], 
+                'Low': bar['l'],
+                'Close': bar['c'],
+                'Volume': bar['v'],
+                'Trade_Count': bar['n'],
+                'VWAP': bar['vw']
+            }
+            writer.writerow(row)
+    
+    logger.info(f"Successfully converted {len(bars_list)} Alpaca bars to OHLCV CSV format")
+
 def convert_json_to_ohlcv_csv(json_data, output_file, include_spreads=False):
     """
     Converts the provided JSON price data to OHLCV format and saves it to a CSV file.
