@@ -74,7 +74,7 @@ def parse_arguments():
     
     # Full Broker functionality
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
-    parser.add_argument('--alpaca-api', '-alp', action='store_true', default=False, help='Alpaca API')
+    parser.add_argument('--alpaca-api', '-alp', default=False, help='Alpaca API')
     
     # Provider usage
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
