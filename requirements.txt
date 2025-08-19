@@ -24,3 +24,4 @@ imblearn
 yfinance
 exchange_calendars
 finvizfinance
+alpaca-py
