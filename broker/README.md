@@ -45,6 +45,11 @@ broker/
 
 ```
 
+# Alpaca Integration
+Curently a work in progress.<br>
+Link to [Alpaca Market Docs](https://docs.alpaca.markets/).<br>
+Since Alpaca provides several different types of API's, I think I'll use the main `alpaca.py` class as "main method/orchestrator for running the other ones".
+
 # Capital.com Integration
 
 ## Why Capital.com? 📈
