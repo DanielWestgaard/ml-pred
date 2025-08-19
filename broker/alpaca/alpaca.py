@@ -2,11 +2,10 @@ from abc import abstractmethod
 from datetime import datetime
 import json
 from typing import Dict, List, Optional
-
+from broker.alpaca.tradin_api.trading_api import TradingAPI
 import pandas as pd
 from broker.base_interface import BaseBroker
 from utils import shared_utils
-import requests
 from utils.logging_utils import get_logger
 
 logger = get_logger()
@@ -29,8 +28,7 @@ class Alpaca(BaseBroker):
             - print_responses: True will print out the responses in the terminal. 
         """
         
-        self.endpoint = "https://paper-api.alpaca.markets/v2"
-        # self.url = "https://paper-api.alpaca.markets/v2/account"
+        self.print_responses = print_responses
         
         try: 
             # Getting secrets
@@ -40,6 +38,9 @@ class Alpaca(BaseBroker):
             # print(self.secrets)
         except Exception as e:
             logger.warning(f"Could not initiate BaseBroker with secrets. Error: {e}")
+        
+        # TEMPORARY PLACEMENT WHILE DEVELOPING THE TRADING API LOGIC
+        TradingAPI(key_id = self.key_id, secret_key = self.secret_key, print_responses = self.print_responses)
 
     # =================== SESSION METHODS ==================
     
@@ -82,19 +83,7 @@ class Alpaca(BaseBroker):
         Returns:
             Dictionary with balance information
         """
-        headers = {
-            "accept": "application/json",
-            "APCA-API-KEY-ID": f"{self.key_id}",
-            "APCA-API-SECRET-KEY": f"{self.secret_key}"
-        }
-        
-        response = requests.get(url = f"{self.endpoint}/account", headers = headers)
-
-        print(response.text)
-        
-        parsed_data = json.loads(response.text)
-        logger.debug(f"Session response: {json.dumps(parsed_data, indent=4)}")
-    
+        pass    
     
     def get_positions(self) -> List[Dict]:
         """Get current open positions.
