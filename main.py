@@ -67,6 +67,7 @@ import utils.logging_utils as log_utils
 from utils.logging_utils import get_logger
 from hyp_val_framework.validate_hypothesis import HypothesisValidator
 from multi_data_sources.ds_orchestrator import DataSourceOrchestrator
+from broker.alpaca.alpaca import Alpaca
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -129,7 +130,7 @@ def main():
     logger = get_logger()
     
     if args.alpaca_api:
-        print(args.alpaca_api)
+        alpaca = Alpaca()
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True
