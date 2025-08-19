@@ -22,5 +22,6 @@ class Alpaca(BaseBroker):
         try: 
             # Getting secrets
             self.secrets = shared_utils.load_secrets(desired_keys={'API_KEY_CAP', 'PASSWORD_CAP', 'EMAIL'})
+            print(self.secrets)
         except Exception as e:
             logger.warning(f"Could not initiate BaseBroker with secrets. Error: {e}")

@@ -27,7 +27,7 @@ def setup_logging(
     log_format=config.DEFAULT_LOG_FORMAT,
     date_format=config.DEFAULT_DATE_FORMAT,
     log_to_console=True,
-    log_to_file = True,  # save log file or not 
+    log_to_file = False,  # save log file or not 
     log_dir=config.BASE_LOGS_DIR,
     max_file_size=90*1024*1024,  # 10 MB - remove?
     backup_count=5,

@@ -74,6 +74,7 @@ def parse_arguments():
     
     # Full Broker functionality
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
+    parser.add_argument('--alpaca-api', '-alp', action='store_true', default=False, help='Alpaca API')
     
     # Provider usage
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
@@ -126,6 +127,9 @@ def main():
     # Logger is already initialized by _initialize_dynamic_logging()
     # Just get the logger instance
     logger = get_logger()
+    
+    if args.alpaca_api:
+        print(args.alpaca_api)
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True
