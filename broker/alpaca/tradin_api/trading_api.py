@@ -23,6 +23,8 @@ class TradingAPI:
         # TEMPORARY CALLING ALL METHODS MANUALLY FOR TESTING PURPOSES
         self.get_account()
     
+    # ACCOUNTS
+    
     def get_account(self):
         """
         Returns your account details.
@@ -39,3 +41,25 @@ class TradingAPI:
         if self.print_responses:
             parsed_data = json.loads(response.text)
             logger.debug(f"Account response: {json.dumps(parsed_data, indent=4)}")
+    
+    # ASSETS
+    
+    # COROPORATE ACTIONS
+    
+    # ORDERS
+    
+    # POSITIONS
+    
+    # PORTFOLIO HISTORY
+    
+    # WATCHLISTS
+    
+    # ACCOUNT CONFIGURATIONS
+    
+    # ACCOUNT ACTIVITIES
+    
+    # CALENDAR
+    
+    # CLOCK
+    
+    # CRYPTO FUNDING
