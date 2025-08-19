@@ -263,6 +263,7 @@ class TradingAPI:
     
     def cancel_order(self, order_id: str) -> dict:
         """
+        NOT TESTED
         Cancel an existing order by its ID.
         
         Args:
@@ -319,6 +320,52 @@ class TradingAPI:
                 return response.json()
             else:
                 logger.error(f"Failed to get order {order_id}: {response.status_code} - {response.text}")
+                return {"error": response.text, "status_code": response.status_code}
+                
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request failed: {str(e)}")
+            return {"error": str(e)}
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to decode response: {str(e)}")
+            return {"error": f"Invalid JSON response: {str(e)}"}
+
+    def cancel_all_orders(self) -> dict:
+        """
+        Cancel all open orders for the account.
+        
+        Returns:
+            Dictionary containing cancellation results
+            
+        Documentation: https://docs.alpaca.markets/reference/deleteallorders
+        """
+        try:
+            response = requests.delete(
+                url=f"{self.endpoint}/orders",
+                headers=self.headers
+            )
+            
+            if self.print_responses:
+                logger.debug(f"Cancel all orders response status: {response.status_code}")
+                logger.debug(f"Cancel all orders response: {json.dumps(response.json(), indent=4)}")
+            
+            if response.status_code == 207:  # Multi-status response
+                result = response.json()
+                successful_cancellations = [order for order in result if order.get('status') == 200]
+                failed_cancellations = [order for order in result if order.get('status') != 200]
+                
+                logger.info(f"Successfully cancelled {len(successful_cancellations)} orders")
+                if failed_cancellations:
+                    logger.warning(f"Failed to cancel {len(failed_cancellations)} orders")
+                
+                return {
+                    "success": True,
+                    "cancelled_orders": successful_cancellations,
+                    "failed_orders": failed_cancellations,
+                    "total_cancelled": len(successful_cancellations),
+                    "total_failed": len(failed_cancellations)
+                }
+            else:
+                logger.error(f"Failed to cancel all orders: {response.status_code} - {response.text}")
                 return {"error": response.text, "status_code": response.status_code}
                 
         except requests.exceptions.RequestException as e:

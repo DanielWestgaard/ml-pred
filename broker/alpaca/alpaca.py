@@ -210,6 +210,14 @@ class Alpaca(BaseBroker):
         result = self.trading_api.cancel_order(order_id)
         return "success" in result and result["success"]
     
+    def cancel_all_orders(self) -> Dict:
+        """Cancel all open orders.
+        
+        Returns:
+            Dictionary containing cancellation results with counts
+        """
+        return self.trading_api.cancel_all_orders()
+    
     
     def modify_position(self,
                        position_id: str,

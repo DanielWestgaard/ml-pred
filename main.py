@@ -137,6 +137,7 @@ def main():
         alpaca.place_market_order(symbol="ATLO", side="buy", quantity=1)
         alpaca.get_positions()
         time.sleep(10)
+        alpaca.cancel_all_orders()
 
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
