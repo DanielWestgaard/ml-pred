@@ -17,33 +17,37 @@ class TradingAPI:
     def __init__(self, key_id, secret_key, print_responses):
         """Initialize the Alpaca Trading API."""
         
-        self.endpoint = "https://paper-api.alpaca.markets/v2"
-
         self.key_id = key_id
         self.secret_key = secret_key
         self.print_responses = print_responses
+
+        self.endpoint = "https://paper-api.alpaca.markets/v2"
+        self.headers = {
+            "accept": "application/json",
+            "APCA-API-KEY-ID": f"{self.key_id}",
+            "APCA-API-SECRET-KEY": f"{self.secret_key}"
+        }
         
         # TEMPORARY CALLING ALL METHODS MANUALLY FOR TESTING PURPOSES
         self.get_account()
     
     # ACCOUNTS
     
-    def get_account(self):
+    def get_account(self) -> any:
         """
         Returns your account details.
         Link/documentation: https://docs.alpaca.markets/reference/getaccount-1
-        """
-        headers = {
-            "accept": "application/json",
-            "APCA-API-KEY-ID": f"{self.key_id}",
-            "APCA-API-SECRET-KEY": f"{self.secret_key}"
-        }
         
-        response = requests.get(url = f"{self.endpoint}/account", headers = headers)
-
+        Returns: The json response object
+        """
+        
+        response = requests.get(url = f"{self.endpoint}/account", headers = self.headers)
+        
         if self.print_responses:
             parsed_data = json.loads(response.text)
             logger.debug(f"Account response: {json.dumps(parsed_data, indent=4)}")
+        
+        return json.loads(response.text)
     
     # ASSETS
     

@@ -35,9 +35,8 @@ class Alpaca(BaseBroker):
             self.secrets = shared_utils.load_secrets(desired_keys={'alpaca_paper_account_key_id', 'alpaca_paper_account_secret_key'})
             self.key_id = self.secrets.get('alpaca_paper_account_key_id')
             self.secret_key = self.secrets.get('alpaca_paper_account_secret_key')
-            # print(self.secrets)
         except Exception as e:
-            logger.warning(f"Could not initiate BaseBroker with secrets. Error: {e}")
+            logger.warning(f"Could not initiate Alpaca with secrets. Error: {e}")
         
         # TEMPORARY PLACEMENT WHILE DEVELOPING THE TRADING API LOGIC
         TradingAPI(key_id = self.key_id, secret_key = self.secret_key, print_responses = self.print_responses)
