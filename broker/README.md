@@ -56,6 +56,9 @@ Alpaca integration provides commission-free stock trading with a comprehensive R
 - **Position Management**: Position tracking and closure capabilities
 - **Account Information**: Real-time account balance and buying power
 - **Bulk Operations**: Cancel all orders and close all positions
+- **Historical Data**: Complete REST API for historical bars, quotes, and trades
+- **Live Data Streaming**: Real-time WebSocket streaming for trades, quotes, and bars
+- **Data Storage**: Automatic saving to organized CSV files with proper directory structure
 - **Error Handling**: Comprehensive error handling and logging
 - **Type Safety**: Full type annotations for better development experience
 
@@ -63,8 +66,11 @@ Alpaca integration provides commission-free stock trading with a comprehensive R
 ```
 alpaca/
 ├── alpaca.py                    # Main Alpaca broker orchestrator (BaseBroker interface)
-└── tradin_api/
-    └── trading_api.py           # Complete Trading API implementation
+├── tradin_api/
+│   └── trading_api.py           # Complete Trading API implementation
+└── market_data_api/
+    ├── historical_data.py       # Historical data REST API with saving capabilities
+    └── live_data.py             # Real-time WebSocket streaming API
 ```
 
 ## Quick Start 🚀
@@ -87,6 +93,12 @@ order = alpaca.place_market_order(
 
 # Check positions
 positions = alpaca.get_positions()
+
+# Get historical data
+df = alpaca.get_historical_data("AAPL", "1d", start_date="2024-01-01T00:00:00")
+
+# Save historical data to CSV
+saved_file = alpaca.fetch_and_save_basic_plan_data("AAPL", "1d", days_back=30)
 ```
 
 ## Order Types & Examples 📊
@@ -142,6 +154,125 @@ order = alpaca.trading_api.create_an_order(
     limit_price=350.0,
     time_in_force="gtc"
 )
+```
+
+## Historical Data & Data Storage 📊
+
+### Fetching Historical Data
+```python
+from datetime import datetime, timedelta
+
+# Get historical data as DataFrame
+df = alpaca.get_historical_data(
+    "AAPL", 
+    timeframe="1d", 
+    start_date="2024-01-01T00:00:00",
+    end_date="2024-12-31T00:00:00"
+)
+
+# Get data optimized for basic plan (avoids recent data restrictions)
+historical_data = alpaca.historical_data_api.get_historical_bars_basic_plan(
+    ["AAPL"], 
+    timeframe="1Day", 
+    days_back=30
+)
+
+# Convert to DataFrame
+df = alpaca.historical_data_api.bars_to_dataframe(historical_data, "AAPL")
+```
+
+### Saving Data to CSV Files
+```python
+# Basic plan optimized saving (recommended for free accounts)
+saved_file = alpaca.fetch_and_save_basic_plan_data(
+    symbol="AAPL",
+    timeframe="1d",
+    days_back=30,
+    save_raw_data=True  # Also saves raw JSON
+)
+# Result: storage/data/alpaca/AAPL/raw/1d/2025-08-04_2025-08-12.csv
+
+# Save specific date range
+saved_file = alpaca.fetch_and_save_historical_data(
+    symbol="TSLA",
+    timeframe="1h", 
+    start_date="2024-08-01T00:00:00",
+    end_date="2024-08-10T00:00:00"
+)
+# Result: storage/data/alpaca/TSLA/raw/1h/2024-08-01_2024-08-10.csv
+
+# Batch save multiple symbols
+saved_files = alpaca.historical_data_api.fetch_and_save_multiple_symbols(
+    symbols=["AAPL", "MSFT", "TSLA"],
+    timeframe="1Day",
+    start="2024-01-01T00:00:00Z",
+    end="2024-12-31T00:00:00Z"
+)
+```
+
+### Data Format
+Saved CSV files include all OHLCV data plus Alpaca-specific fields:
+```csv
+Date,Open,High,Low,Close,Volume,Trade_Count,VWAP
+2024-08-01 04:00:00,227.69,231.867,214.3328,216.86,83861898,1133352,221.946165
+```
+
+### Directory Structure
+Data is organized following the same pattern as Capital.com:
+```
+storage/data/alpaca/
+├── AAPL/raw/1d/2025-08-04_2025-08-12.csv
+├── MSFT/raw/1h/2025-08-07_2025-08-12.csv  
+└── TSLA/raw/1d/2024-08-01_2024-08-09.csv
+```
+
+## Live Data Streaming 📡
+
+### WebSocket Streaming
+```python
+# Simple streaming setup
+def on_trade(message):
+    symbol = message.get("S")
+    price = message.get("p")
+    print(f"Trade: {symbol} at ${price}")
+
+def on_quote(message):
+    symbol = message.get("S")
+    bid = message.get("bp")
+    ask = message.get("ap")
+    print(f"Quote: {symbol} Bid ${bid} Ask ${ask}")
+
+# Start streaming
+alpaca.start_live_stream(
+    symbols=["AAPL", "TSLA"], 
+    data_types=["trades", "quotes", "bars"],
+    trade_handler=on_trade,
+    quote_handler=on_quote
+)
+
+# Stop streaming
+alpaca.stop_live_stream()
+```
+
+### Advanced Streaming
+```python
+# Direct API access for custom handlers
+live_api = alpaca.live_data_api
+
+# Connect and authenticate
+live_api.connect()
+
+# Add custom handlers
+live_api.add_handler("trades", custom_trade_handler)
+live_api.add_handler("quotes", custom_quote_handler)
+
+# Subscribe to specific data
+live_api.subscribe_trades(["AAPL", "MSFT"])
+live_api.subscribe_quotes(["AAPL", "MSFT"]) 
+live_api.subscribe_bars(["AAPL", "MSFT"])
+
+# Switch to premium feed (requires subscription)
+live_api.set_premium_feed(premium=True)
 ```
 
 ## Portfolio Management 💼
@@ -272,21 +403,40 @@ else:
 - `cancel_all_orders()` - Cancel all orders
 - `close_all_positions()` - Close all positions
 
-### Advanced Trading API
-- `create_an_order()` - Full order creation with all parameters
-- `get_all_orders()` - Get orders with filtering
-- `get_position()` - Get specific position
-- `close_position()` - Close specific position
-- `set_live_trading()` - Switch trading environment
+### Historical Data Methods
+- `get_historical_data()` - Get historical data as DataFrame
+- `fetch_and_save_historical_data()` - Fetch and save specific date range
+- `fetch_and_save_basic_plan_data()` - Fetch and save (basic plan optimized)
+- `get_stock_bars()` - Raw historical bars API
+- `get_stock_quotes()` - Historical quotes data
+- `get_stock_trades()` - Historical trades data
+- `get_snapshots()` - Current market snapshots
+
+### Live Data Methods  
+- `start_live_stream()` - Start real-time data streaming
+- `stop_live_stream()` - Stop streaming and disconnect
+- `add_live_data_handler()` - Add custom message handlers
+- `sub_live_market_data()` - Subscribe to live data for symbol
+
+### Advanced APIs
+- `trading_api.create_an_order()` - Full order creation with all parameters
+- `trading_api.get_all_orders()` - Get orders with filtering
+- `trading_api.set_live_trading()` - Switch trading environment
+- `historical_data_api.*` - Direct access to all historical data methods
+- `live_data_api.*` - Direct access to all live streaming methods
 
 ## Status & Roadmap 🗺️
 - ✅ **Complete Trading API**: All order types and position management
 - ✅ **Error Handling**: Comprehensive error handling and logging  
 - ✅ **Paper Trading**: Full paper trading support
 - ✅ **Live Trading**: Production-ready live trading
-- ⏳ **Market Data API**: Historical and real-time data (planned)
+- ✅ **Historical Data API**: Complete REST API with CSV saving capabilities
+- ✅ **Live Data Streaming**: Real-time WebSocket streaming (trades, quotes, bars)
+- ✅ **Data Storage**: Organized CSV files with proper directory structure
+- ✅ **Basic Plan Support**: Optimized methods for free tier limitations
 - ⏳ **Options Trading**: Options trading support (planned)
 - ⏳ **Crypto Trading**: Cryptocurrency trading (planned)
+- ⏳ **Advanced Charting**: Integration with plotting libraries (planned)
 
 ## Useful Links - Alpaca 🔗
 - [Alpaca API Documentation](https://docs.alpaca.markets/)
