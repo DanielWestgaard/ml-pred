@@ -1,0 +1,12 @@
+20-08-2025 20:26:05 - mixed                                   :151  - INFO     - Logging system initialized. Environment: development
+20-08-2025 20:26:08 - utils.shared_utils                      :32   - INFO     - Loaded credentials. Length: 2
+20-08-2025 20:26:08 - broker.alpaca.tradin_api.trading_api    :33   - INFO     - Alpaca Trading API initialized successfully
+20-08-2025 20:26:08 - broker.alpaca.market_data_api.historical:44   - INFO     - Alpaca Historical Data API initialized successfully
+20-08-2025 20:26:08 - broker.alpaca.market_data_api.live_data :65   - INFO     - Alpaca Live Data API initialized successfully
+20-08-2025 20:26:08 - uncaught_exception                      :166  - CRITICAL - Uncaught exception
+Traceback (most recent call last):
+  File "/Users/dmartinsen/pers-prog/ml-pred/main.py", line 569, in <module>
+    main()
+  File "/Users/dmartinsen/pers-prog/ml-pred/main.py", line 141, in main
+    alpaca.fetch_and_save_historical_data(epic="ATLO", timeframe="1Hour", start_date="2016-01-01T00:00:00", end_date="2025-08-19T00:00:00")
+TypeError: Alpaca.fetch_and_save_historical_data() got an unexpected keyword argument 'epic'
