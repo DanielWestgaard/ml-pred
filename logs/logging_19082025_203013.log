@@ -1,0 +1,5 @@
+19-08-2025 20:30:13 - logging_utils                           :151  - INFO     - Logging system initialized. Environment: development
+19-08-2025 20:30:14 - utils.shared_utils                      :32   - INFO     - Loaded credentials. Length: 2
+19-08-2025 20:30:14 - broker.alpaca.tradin_api.trading_api    :33   - INFO     - Alpaca Trading API initialized successfully
+19-08-2025 20:30:14 - broker.alpaca.market_data_api.historical:41   - INFO     - Alpaca Historical Data API initialized successfully
+19-08-2025 20:30:14 - broker.alpaca.market_data_api.live_data :65   - INFO     - Alpaca Live Data API initialized successfully

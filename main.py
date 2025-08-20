@@ -67,6 +67,7 @@ import utils.logging_utils as log_utils
 from utils.logging_utils import get_logger
 from hyp_val_framework.validate_hypothesis import HypothesisValidator
 from multi_data_sources.ds_orchestrator import DataSourceOrchestrator
+from broker.alpaca.alpaca import Alpaca
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -74,6 +75,7 @@ def parse_arguments():
     
     # Full Broker functionality
     parser.add_argument('--broker-func', action='store_true', default=False, help='Test all broker functionality')
+    parser.add_argument('--alpaca-api', '-alp', default=False, help='Alpaca API')
     
     # Provider usage
     parser.add_argument('--fetch-data-capcom', action='store_true', default=False, help='Fetch historical data using Capital.com API.')
@@ -126,6 +128,18 @@ def main():
     # Logger is already initialized by _initialize_dynamic_logging()
     # Just get the logger instance
     logger = get_logger()
+    
+    if args.alpaca_api:
+        alpaca = Alpaca(print_responses = True)
+        
+        # alpaca.get_positions()
+        # alpaca.get_orders()
+        # alpaca.place_market_order(symbol="ATLO", side="buy", quantity=1)
+        # alpaca.get_positions()
+        # time.sleep(10)
+        # alpaca.close_all_positions()
+        alpaca.get_historical_data(epic="ATLO", timeframe="1Hour", start_date="2024-01-01T00:00:00", end_date="2025-01-01T00:00:00")
+
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
         save_cleaned_data = True

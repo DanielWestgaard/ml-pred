@@ -1,0 +1,7 @@
+19-08-2025 20:45:49 - logging_utils                           :151  - INFO     - Logging system initialized. Environment: development
+19-08-2025 20:45:50 - utils.shared_utils                      :32   - INFO     - Loaded credentials. Length: 2
+19-08-2025 20:45:50 - broker.alpaca.tradin_api.trading_api    :33   - INFO     - Alpaca Trading API initialized successfully
+19-08-2025 20:45:50 - broker.alpaca.market_data_api.historical:44   - INFO     - Alpaca Historical Data API initialized successfully
+19-08-2025 20:45:50 - broker.alpaca.market_data_api.live_data :65   - INFO     - Alpaca Live Data API initialized successfully
+19-08-2025 20:45:50 - utils.broker_utils                      :318  - INFO     - Successfully converted 7 Alpaca bars to OHLCV CSV format
+19-08-2025 20:45:50 - broker.alpaca.market_data_api.historical:697  - INFO     - Basic plan data saved to /Users/dmartinsen/pers-prog/ml-pred/storage/data/alpaca/AAPL/raw/1d/2025-08-04_2025-08-12.csv

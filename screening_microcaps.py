@@ -11,10 +11,13 @@ def screen_microcaps():
     # Set filters using correct filter names
     screener.set_filter(filters_dict={
         'Market Cap.': 'Micro ($50mln to $300mln)', # Micro cap filter    # 'Small ($300mln to $2bln)',  # Small cap filter
-        'P/E': 'Under 15',                          # P/E under 15
-        'P/B': 'Under 1',                           # P/B under 1
-        'Debt/Equity': 'Under 0.5',                 # Low debt
+        'P/E': 'Under 15',                          # P/E under 15 - meaning potentially undervalued 
+        'P/B': 'Under 1',                           # P/B under 1 - meaning potentially undervalued
+        'Debt/Equity': 'Under 0.5',                 # Low debt - financially stable companies less likely to face distress
         'InsiderTransactions': 'Positive (>0%)',    # Positive insider activity
+        'Average Volume': 'Over 50K',               # Daily volume filter for liquidity - or 100k ?
+        'EPS growththis year': 'Positive (>0%)',    # Positive earnings growth to avoid value traps
+        'Return on Equity': 'Positive (>0%)',       # Return on Equity threshold for quality
     })
     
     return screener.screener_view()
