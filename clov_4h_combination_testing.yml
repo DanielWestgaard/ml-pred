@@ -6,34 +6,34 @@ hypothesis:
 # Multi-data section for CLOV with calendar events
 multi_data:
   purpose: "historical"
-  symbol: "TLRY"
-  from_date: "2022-01-01" 
-  to_date: "2025-01-01"
+  symbol: "ATLO"
+  from_date: "2016-01-01" 
+  to_date: "2025-08-19"
   sources: [calendar_events]  # Include earnings, options expiry, holidays
 
 # Combination testing section
-combination_testing:
-  enabled: true
+# combination_testing:
+#   enabled: true
   
-  # Use 4-hour timeframe to match available CLOV data
-  timeframe: "1d"
+#   # Use 4-hour timeframe to match available CLOV data
+#   timeframe: "1d"
   
-  # Testing strategy
-  strategy: "statistical"
+#   # Testing strategy
+#   strategy: "statistical"
   
-  # Test matrix configuration 
-  test_matrix:
-    base_features: ["Close", "Volume", "spread_avg"]
-    # Calendar features will be auto-detected from combined data
+#   # Test matrix configuration 
+#   test_matrix:
+#     base_features: ["Close", "Volume", "spread_avg"]
+#     # Calendar features will be auto-detected from combined data
   
-  # Validation criteria (more permissive for 4h data)
-  validation:
-    min_correlation_threshold: 0.03  # Lower threshold for 4h data
-    significance_level: 0.05         # 5% significance level
-    min_data_points: 50             # Lower minimum for 4h data (less frequent)
+#   # Validation criteria (more permissive for 4h data)
+#   validation:
+#     min_correlation_threshold: 0.03  # Lower threshold for 4h data
+#     significance_level: 0.05         # 5% significance level
+#     min_data_points: 50             # Lower minimum for 4h data (less frequent)
     
-  # Output preferences
-  results:
-    save_detailed: true
-    generate_visualizations: false
-    rank_combinations: true
+#   # Output preferences
+#   results:
+#     save_detailed: true
+#     generate_visualizations: false
+#     rank_combinations: true

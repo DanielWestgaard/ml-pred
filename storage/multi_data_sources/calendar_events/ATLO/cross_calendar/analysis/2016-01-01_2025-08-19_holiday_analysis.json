@@ -1,0 +1,368 @@
+{
+  "symbol": "ATLO",
+  "analysis_timestamp": "2025-08-20T20:21:36.149061",
+  "date_range": {
+    "from": "2016-01-01",
+    "to": "2025-08-19"
+  },
+  "holiday_analysis": {
+    "market_holidays": [
+      "2016-01-01",
+      "2016-01-18",
+      "2016-02-15",
+      "2016-03-25",
+      "2016-05-30",
+      "2016-07-04",
+      "2016-09-05",
+      "2016-11-24",
+      "2016-12-26",
+      "2017-01-02",
+      "2017-01-16",
+      "2017-02-20",
+      "2017-04-14",
+      "2017-05-29",
+      "2017-07-04",
+      "2017-09-04",
+      "2017-11-23",
+      "2017-12-25",
+      "2018-01-01",
+      "2018-01-15",
+      "2018-02-19",
+      "2018-03-30",
+      "2018-05-28",
+      "2018-07-04",
+      "2018-09-03",
+      "2018-11-22",
+      "2018-12-05",
+      "2018-12-25",
+      "2019-01-01",
+      "2019-01-21",
+      "2019-02-18",
+      "2019-04-19",
+      "2019-05-27",
+      "2019-07-04",
+      "2019-09-02",
+      "2019-11-28",
+      "2019-12-25",
+      "2020-01-01",
+      "2020-01-20",
+      "2020-02-17",
+      "2020-04-10",
+      "2020-05-25",
+      "2020-07-03",
+      "2020-09-07",
+      "2020-11-26",
+      "2020-12-25",
+      "2021-01-01",
+      "2021-01-18",
+      "2021-02-15",
+      "2021-04-02",
+      "2021-05-31",
+      "2021-07-05",
+      "2021-09-06",
+      "2021-11-25",
+      "2021-12-24",
+      "2022-01-17",
+      "2022-02-21",
+      "2022-04-15",
+      "2022-05-30",
+      "2022-06-20",
+      "2022-07-04",
+      "2022-09-05",
+      "2022-11-24",
+      "2022-12-26",
+      "2023-01-02",
+      "2023-01-16",
+      "2023-02-20",
+      "2023-04-07",
+      "2023-05-29",
+      "2023-06-19",
+      "2023-07-04",
+      "2023-09-04",
+      "2023-11-23",
+      "2023-12-25",
+      "2024-01-01",
+      "2024-01-15",
+      "2024-02-19",
+      "2024-03-29",
+      "2024-05-27",
+      "2024-06-19",
+      "2024-07-04",
+      "2024-09-02",
+      "2024-11-28",
+      "2024-12-25",
+      "2025-01-01",
+      "2025-01-09",
+      "2025-01-20",
+      "2025-02-17",
+      "2025-04-18",
+      "2025-05-26",
+      "2025-06-19",
+      "2025-07-04"
+    ],
+    "vacation_periods": [
+      {
+        "name": "Summer Vacation 2016",
+        "start": "2016-06-28",
+        "end": "2016-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2016",
+        "start": "2016-12-24",
+        "end": "2017-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2016",
+        "start": "2016-11-22",
+        "end": "2016-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2017",
+        "start": "2017-06-28",
+        "end": "2017-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2017",
+        "start": "2017-12-24",
+        "end": "2018-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2017",
+        "start": "2017-11-22",
+        "end": "2017-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2018",
+        "start": "2018-06-28",
+        "end": "2018-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2018",
+        "start": "2018-12-24",
+        "end": "2019-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2018",
+        "start": "2018-11-22",
+        "end": "2018-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2019",
+        "start": "2019-06-28",
+        "end": "2019-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2019",
+        "start": "2019-12-24",
+        "end": "2020-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2019",
+        "start": "2019-11-22",
+        "end": "2019-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2020",
+        "start": "2020-06-28",
+        "end": "2020-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2020",
+        "start": "2020-12-24",
+        "end": "2021-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2020",
+        "start": "2020-11-22",
+        "end": "2020-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2021",
+        "start": "2021-06-28",
+        "end": "2021-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2021",
+        "start": "2021-12-24",
+        "end": "2022-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2021",
+        "start": "2021-11-22",
+        "end": "2021-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2022",
+        "start": "2022-06-28",
+        "end": "2022-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2022",
+        "start": "2022-12-24",
+        "end": "2023-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2022",
+        "start": "2022-11-22",
+        "end": "2022-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2023",
+        "start": "2023-06-28",
+        "end": "2023-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2023",
+        "start": "2023-12-24",
+        "end": "2024-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2023",
+        "start": "2023-11-22",
+        "end": "2023-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2024",
+        "start": "2024-06-28",
+        "end": "2024-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      },
+      {
+        "name": "Year-end Vacation 2024",
+        "start": "2024-12-24",
+        "end": "2025-01-02",
+        "type": "year_end",
+        "institutional_impact": "very_high"
+      },
+      {
+        "name": "Thanksgiving Week 2024",
+        "start": "2024-11-22",
+        "end": "2024-11-29",
+        "type": "thanksgiving",
+        "institutional_impact": "medium"
+      },
+      {
+        "name": "Summer Vacation 2025",
+        "start": "2025-06-28",
+        "end": "2025-07-11",
+        "type": "summer",
+        "institutional_impact": "high"
+      }
+    ],
+    "pre_holiday_effects": {
+      "pattern_description": "Pre-holiday effects often show reduced volume and altered price patterns",
+      "analysis_method": "Would analyze 1-3 days before each holiday for volume/return anomalies",
+      "expected_small_cap_effect": "Small caps may show larger moves due to reduced institutional oversight",
+      "holidays_count": 92
+    },
+    "vacation_period_effects": {
+      "pattern_description": "Vacation periods create institutional blind spots",
+      "key_insights": [
+        "Reduced institutional trading volume",
+        "Increased retail trader influence",
+        "Higher probability of gap moves in small caps",
+        "Delayed reaction to news and earnings"
+      ],
+      "periods_analyzed": 28,
+      "highest_impact_periods": [
+        "Summer Vacation 2016",
+        "Year-end Vacation 2016",
+        "Summer Vacation 2017",
+        "Year-end Vacation 2017",
+        "Summer Vacation 2018",
+        "Year-end Vacation 2018",
+        "Summer Vacation 2019",
+        "Year-end Vacation 2019",
+        "Summer Vacation 2020",
+        "Year-end Vacation 2020",
+        "Summer Vacation 2021",
+        "Year-end Vacation 2021",
+        "Summer Vacation 2022",
+        "Year-end Vacation 2022",
+        "Summer Vacation 2023",
+        "Year-end Vacation 2023",
+        "Summer Vacation 2024",
+        "Year-end Vacation 2024",
+        "Summer Vacation 2025"
+      ]
+    },
+    "institutional_blind_spots": {
+      "december_effect": {
+        "effect_name": "December Small-Cap Effect",
+        "description": "Small caps often outperform in December due to tax loss selling reversal and window dressing",
+        "institutional_blind_spot": "Large institutions avoid small caps during year-end due to liquidity concerns",
+        "analysis_period": "2016 to 2025"
+      },
+      "summer_doldrums": {
+        "effect_name": "Summer Doldrums",
+        "description": "Reduced institutional activity in June-August creates opportunities",
+        "key_factors": [
+          "Vacation schedules reduce institutional oversight",
+          "Lower volume can amplify small-cap price moves",
+          "Earnings surprises may have delayed reactions"
+        ]
+      },
+      "options_expiry_holiday_conflict": {
+        "conflicts_found": 0,
+        "conflicts": [],
+        "analysis": "Holiday-expiry conflicts create unique arbitrage opportunities"
+      }
+    },
+    "total_holidays_analyzed": 92,
+    "total_vacation_periods": 28
+  },
+  "summary": {
+    "total_holidays": 92,
+    "vacation_periods": 28,
+    "institutional_impact": "high"
+  }
+}
