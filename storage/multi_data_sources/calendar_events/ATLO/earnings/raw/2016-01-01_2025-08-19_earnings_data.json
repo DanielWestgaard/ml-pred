@@ -3,7 +3,7 @@
     "symbol": "ATLO",
     "from_date": "2016-01-01",
     "to_date": "2025-08-19",
-    "collection_timestamp": "2025-08-20T20:21:33.632153",
+    "collection_timestamp": "2025-08-22T15:08:55.500729",
     "purpose": "historical"
   },
   "earnings_calendar": [
@@ -220,14 +220,15 @@
   "earnings_history": [],
   "analyst_targets": [
     {
-      "current": 19.17
+      "current": 18.93
     }
   ],
   "earnings_features": {
-    "days_since_last_earnings": "118",
+    "days_since_last_earnings": "119",
     "last_earnings_date": "2025-04-24",
     "avg_earnings_interval_days": "240.72727272727272",
-    "earnings_proximity_zone": "uncertain",
+    "estimated_days_to_next_earnings": "120",
+    "earnings_proximity_zone": "early_cycle",
     "typical_announcement_day": "Friday",
     "typically_tuesday_friday": "True",
     "in_post_earnings_drift": "False",

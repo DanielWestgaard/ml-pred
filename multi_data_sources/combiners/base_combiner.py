@@ -124,7 +124,7 @@ class BaseCombiner(ABC):
         import glob
         
         # Construct path pattern for market data
-        data_dir = Path(f"storage/data/capital_com/{symbol}/raw/{timeframe}")
+        data_dir = Path(f"storage/data/alpaca/{symbol}/raw/{timeframe}")
         
         if not data_dir.exists():
             raise FileNotFoundError(f"Market data directory not found: {data_dir}")
