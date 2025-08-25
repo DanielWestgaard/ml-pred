@@ -6,9 +6,9 @@ hypothesis:
 # Multi-data section for CLOV with calendar events
 multi_data:
   purpose: "historical"
-  symbol: "TLRY"
-  from_date: "2022-01-01" 
-  to_date: "2025-01-01"
+  symbol: "ATLO"
+  from_date: "2016-01-01" 
+  to_date: "2025-08-19"
   sources: [calendar_events]  # Include earnings, options expiry, holidays
 
 # Combination testing section
@@ -16,7 +16,7 @@ combination_testing:
   enabled: true
   
   # Use 4-hour timeframe to match available CLOV data
-  timeframe: "1d"
+  timeframe: "1h"
   
   # Testing strategy
   strategy: "statistical"

@@ -1,0 +1,33 @@
+{
+  "symbol": "ATLO",
+  "analysis_timestamp": "2025-08-22T15:08:55.508776",
+  "date_range": {
+    "from": "2016-01-01",
+    "to": "2025-08-19"
+  },
+  "patterns": {
+    "day_of_week_distribution": {
+      "Friday": 8,
+      "Wednesday": 1,
+      "Monday": 1,
+      "Saturday": 1,
+      "Thursday": 1
+    },
+    "tuesday_friday_ratio": 0.6666666666666666,
+    "historical_beat_rate": 0.0,
+    "avg_surprise_pct": NaN,
+    "surprise_volatility": NaN,
+    "quarterly_distribution": {
+      "1": 4,
+      "2": 3,
+      "3": 3,
+      "4": 2
+    },
+    "avg_days_between_earnings": 220.66666666666666,
+    "earnings_timing_consistency": 1.9140361724331003
+  },
+  "summary": {
+    "total_earnings_events": 12,
+    "data_quality": "high"
+  }
+}

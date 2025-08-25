@@ -11,13 +11,14 @@ def screen_microcaps():
     # Set filters using correct filter names
     screener.set_filter(filters_dict={
         'Market Cap.': 'Micro ($50mln to $300mln)', # Micro cap filter    # 'Small ($300mln to $2bln)',  # Small cap filter
-        'P/E': 'Under 15',                          # P/E under 15 - meaning potentially undervalued 
-        'P/B': 'Under 1',                           # P/B under 1 - meaning potentially undervalued
+        # 'P/E': 'Under 20',                          # P/E under 15 - meaning potentially undervalued 
+        # 'P/B': 'Under 2',                           # P/B under 1 - meaning potentially undervalued
         'Debt/Equity': 'Under 0.5',                 # Low debt - financially stable companies less likely to face distress
-        'InsiderTransactions': 'Positive (>0%)',    # Positive insider activity
-        'Average Volume': 'Over 50K',               # Daily volume filter for liquidity - or 100k ?
+        'Current Ratio': 'Over 1.5',                # Add liquidity check
+        # 'InsiderTransactions': 'Positive (>0%)',    # Positive insider activity
+        'Average Volume': 'Over 100K',               # Daily volume filter for liquidity - or 100k ?
         'EPS growththis year': 'Positive (>0%)',    # Positive earnings growth to avoid value traps
-        'Return on Equity': 'Positive (>0%)',       # Return on Equity threshold for quality
+        'Return on Equity': 'Over +10%',       # Return on Equity threshold for quality
     })
     
     return screener.screener_view()
@@ -26,7 +27,8 @@ def change_market_cap_format(df: pd.DataFrame, column_name: str):
     """Format market cap column to readable format (K, M, B, T)"""
     
     def format_number(num):
-        """Convert large numbers to readable format"""
+        """Convert large numbers to a more readable format"""
+        # Checking if values are nan
         if pd.isna(num):
             return num
         
@@ -39,9 +41,11 @@ def change_market_cap_format(df: pd.DataFrame, column_name: str):
             except:
                 return num
         
+        # Converting to float and then absolute values
         num = float(num)
         abs_num = abs(num)
         
+        # Actually converting number sizes to readable format
         if abs_num >= 1e12:
             return f"{num/1e12:.2f}T"
         elif abs_num >= 1e9:
@@ -67,9 +71,6 @@ def change_market_cap_format(df: pd.DataFrame, column_name: str):
 
 def main():
     me = screen_microcaps()
-    # print("Original data:")
-    # print(me)
-    # print("\n" + "="*50 + "\n")
     
     me_formatted = change_market_cap_format(me, "Market Cap")
     

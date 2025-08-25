@@ -513,6 +513,7 @@ class HistoricalDataAPI:
                                       **kwargs) -> str:
         """
         Fetch historical bars and save to CSV file with proper directory structure.
+        Now includes pagination support for large date ranges.
         
         Args:
             symbols: Single symbol string or list of symbols
@@ -534,26 +535,77 @@ class HistoricalDataAPI:
         else:
             symbol = symbols
         
-        # Get the bars data
-        bars_data = self.get_stock_bars(
-            symbols=symbol,
-            timeframe=timeframe,
-            start=start,
-            end=end,
-            **kwargs
-        )
+        # Initialize collection for all bars
+        all_bars = []
+        page_token = None
+        total_requests = 0
         
-        if "error" in bars_data:
-            raise Exception(f"Failed to fetch data: {bars_data['error']}")
+        logger.info(f"Fetching historical data for {symbol} from {start} to {end}")
+        
+        while True:
+            total_requests += 1
+            
+            # Add page_token to kwargs if we have one
+            current_kwargs = kwargs.copy()
+            if page_token:
+                current_kwargs['page_token'] = page_token
+            
+            logger.info(f"Making request {total_requests} for {symbol} (page_token: {'Yes' if page_token else 'None'})")
+            
+            # Get the bars data for this page
+            bars_data = self.get_stock_bars(
+                symbols=symbol,
+                timeframe=timeframe,
+                start=start,
+                end=end,
+                **current_kwargs
+            )
+            
+            if "error" in bars_data:
+                raise Exception(f"Failed to fetch data: {bars_data['error']}")
+            
+            # Check if we got bars data
+            if "bars" not in bars_data or symbol not in bars_data["bars"]:
+                logger.warning(f"No bars data found in response for {symbol}")
+                break
+            
+            current_bars = bars_data["bars"][symbol]
+            if not current_bars:
+                logger.info(f"No more bars data available for {symbol}")
+                break
+                
+            # Add current bars to our collection
+            all_bars.extend(current_bars)
+            logger.info(f"✓ Fetched {len(current_bars)} bars (total so far: {len(all_bars)})")
+            
+            # Check for next page token
+            page_token = bars_data.get("next_page_token")
+            if not page_token:
+                logger.info(f"No more pages available for {symbol}")
+                break
+            
+            # Safety check to avoid infinite loops
+            if total_requests > 1000:
+                logger.warning(f"Reached maximum request limit (1000) for {symbol}")
+                break
+        
+        logger.info(f"Completed fetching: {len(all_bars)} total bars from {total_requests} requests")
+        
+        if not all_bars:
+            raise ValueError("No data found to save")
+        
+        # Create combined response structure
+        combined_bars_data = {
+            "bars": {symbol: all_bars},
+            "symbol": symbol,
+            "next_page_token": None
+        }
         
         # Extract date range for filename
-        if "bars" in bars_data and symbol in bars_data["bars"] and bars_data["bars"][symbol]:
-            first_bar = bars_data["bars"][symbol][0]
-            last_bar = bars_data["bars"][symbol][-1]
-            start_date = first_bar['t'][:10]  # Extract YYYY-MM-DD
-            end_date = last_bar['t'][:10]
-        else:
-            raise ValueError("No data found to save")
+        first_bar = all_bars[0]
+        last_bar = all_bars[-1]
+        start_date = first_bar['t'][:10]  # Extract YYYY-MM-DD
+        end_date = last_bar['t'][:10]
         
         # Generate output file path if not provided
         if output_file is None:
@@ -577,26 +629,22 @@ class HistoricalDataAPI:
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         
         # Save the data to OHLCV CSV format
-        if bars_data["bars"][symbol]:
-            logger.info(f"Converting {len(bars_data['bars'][symbol])} Alpaca bars to OHLCV format")
-            convert_alpaca_bars_to_ohlcv_csv(bars_data, output_file, symbol=symbol)
-            logger.info(f"OHLCV data saved to {output_file}")
-            
-            # Print summary
-            first_timestamp = bars_data["bars"][symbol][0]['t'] if bars_data["bars"][symbol] else "N/A"
-            last_timestamp = bars_data["bars"][symbol][-1]['t'] if bars_data["bars"][symbol] else "N/A"
-            logger.info(f"Data range: {first_timestamp} to {last_timestamp}")
-            
-            # Save raw JSON if requested
-            if save_raw_data:
-                raw_file = output_file.replace('.csv', '_raw.json')
-                with open(raw_file, 'w') as f:
-                    json.dump(bars_data, f, indent=2)
-                logger.info(f"Raw JSON data saved to {raw_file}")
-                
-        else:
-            logger.error("No data to save.")
-            raise ValueError("No data to save")
+        logger.info(f"Converting {len(all_bars)} Alpaca bars to OHLCV format")
+        convert_alpaca_bars_to_ohlcv_csv(combined_bars_data, output_file, symbol=symbol)
+        logger.info(f"OHLCV data saved to {output_file}")
+        
+        # Print summary
+        first_timestamp = all_bars[0]['t']
+        last_timestamp = all_bars[-1]['t']
+        logger.info(f"Data range: {first_timestamp} to {last_timestamp}")
+        logger.info(f"Total records: {len(all_bars)}")
+        
+        # Save raw JSON if requested
+        if save_raw_data:
+            raw_file = output_file.replace('.csv', '_raw.json')
+            with open(raw_file, 'w') as f:
+                json.dump(combined_bars_data, f, indent=2)
+            logger.info(f"Raw JSON data saved to {raw_file}")
         
         return output_file
     

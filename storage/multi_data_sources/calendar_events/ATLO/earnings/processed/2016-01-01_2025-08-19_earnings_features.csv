@@ -1,0 +1,13 @@
+Earnings Date,EPS Estimate,Reported EPS,Surprise(%),Event Type,announcement_day_of_week,is_tuesday_friday,surprise_amount,surprise_pct,beat_expectations,large_surprise,quarter,year,days_since_last_earnings
+2018-01-19 17:00:00-05:00,,,,Earnings,Friday,True,,,False,False,1,2018,0.0
+2018-07-13 17:05:00-04:00,,,,Earnings,Friday,True,,,False,False,3,2018,174.0
+2018-10-19 17:05:00-04:00,,,,Earnings,Friday,True,,,False,False,4,2018,98.0
+2019-02-13 17:05:00-05:00,,,,Earnings,Wednesday,False,,,False,False,1,2019,117.0
+2019-04-15 17:05:00-04:00,,,,Earnings,Monday,False,,,False,False,2,2019,60.0
+2019-07-19 17:05:00-04:00,,,,Earnings,Friday,True,,,False,False,3,2019,95.0
+2019-10-18 17:05:00-04:00,,,,Earnings,Friday,True,,,False,False,4,2019,91.0
+2020-01-25 17:05:00-05:00,,,,Earnings,Saturday,False,,,False,False,1,2020,99.0
+2020-04-17 17:05:00-04:00,,,,Earnings,Friday,True,,,False,False,2,2020,82.0
+2020-07-17 16:32:00-04:00,,,,Earnings,Friday,True,,,False,False,3,2020,90.0
+2021-01-22 16:23:00-05:00,,,,Earnings,Friday,True,,,False,False,1,2021,189.0
+2025-04-24 17:30:00-04:00,,,,Meeting,Thursday,False,,,False,False,2,2025,1553.0
