@@ -1,0 +1,14 @@
+{
+  "symbol": "BDTX",
+  "timeframe": "5m",
+  "date_range": {
+    "start": "2016-01-01",
+    "end": "2025-08-25"
+  },
+  "data_sources": [
+    "sec_filings"
+  ],
+  "total_rows": 108829,
+  "date_created": "2025-08-25T19:29:12.932477",
+  "filepath": "storage/combined_features/BDTX/5m/20160101_20250825_sec_filings_20250825_192912.csv"
+}
