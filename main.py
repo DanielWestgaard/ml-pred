@@ -291,14 +291,14 @@ def main():
         #                                        print_answer=False, include_spreads=False)
         # provider.end_session()
         
-        timeframes = ["HOUR", "HOUR_4", "DAY"]
-        symbols = ["TLRY", "SPCE"]
+        timeframes = ["MINUTE_15"]
+        symbols = ["BDTX"]
         
         for symbol in symbols:
             for timeframe in timeframes:
                 provider = ProviderCapitalCom()
                 provider.fetch_and_save_historical_data(symbol=symbol, timeframe=timeframe,
-                                            from_date="2020-01-02T00:00:00", to_date="2025-07-31T01:00:00",
+                                            from_date="2020-01-01T00:00:00", to_date="2025-08-22T01:00:00",
                                             print_answer=False, include_spreads=False)
                 provider.end_session()
                 logger.info("Sleeping for 5 seconds until next one.")
