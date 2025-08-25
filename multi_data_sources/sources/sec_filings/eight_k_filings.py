@@ -1,6 +1,6 @@
 from multi_data_sources.sources.ds_base import DataSourceBase
 
-class eight_k_filings(DataSourceBase):
+class Eight_k_filings(DataSourceBase):
     """
     Fetch 8-K filings from the SEC EDGAR.
     """
