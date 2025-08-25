@@ -96,6 +96,8 @@ TRAINED_MODEL_STORAGE = os.path.join(BASE_STORAGE_DIR, 'models')
 # Multi-Data Sources
 MULTI_DATA_SOURCES_BASE_DIR = os.path.join(BASE_STORAGE_DIR, 'multi_data_sources')
 CALENDAR_EVENTS_BASE_DIR = os.path.join(MULTI_DATA_SOURCES_BASE_DIR, 'calendar_events')
+# SEC EDGAR Filings
+SEC_EDGAR_filings_storage_dir = os.path.join(BASE_DATA_STORAGE_DIR, 'sec_edgar')
 
 # LOGGING
 DEFAULT_LOG_FORMAT = '%(asctime)s - %(name)-40.40s:%(lineno)-4d - %(levelname)-8s - %(message)s'
