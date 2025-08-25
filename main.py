@@ -138,7 +138,7 @@ def main():
         # alpaca.get_positions()
         # time.sleep(10)
         # alpaca.close_all_positions()
-        alpaca.fetch_and_save_historical_data(symbol="ATLO", timeframe="1Hour", start_date="2016-01-01T00:00:00", end_date="2025-08-19T00:00:00")
+        alpaca.fetch_and_save_historical_data(symbol="BDTX", timeframe="5min", start_date="2016-01-01T00:00:00", end_date="2025-08-22T00:00:00")
 
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
