@@ -130,7 +130,7 @@ def main():
     logger = get_logger()
     
     if args.alpaca_api:
-        alpaca = Alpaca(print_responses = True)
+        # alpaca = Alpaca(print_responses = True)
         
         # alpaca.get_positions()
         # alpaca.get_orders()
@@ -138,7 +138,18 @@ def main():
         # alpaca.get_positions()
         # time.sleep(10)
         # alpaca.close_all_positions()
-        alpaca.fetch_and_save_historical_data(symbol="BDTX", timeframe="5min", start_date="2016-01-01T00:00:00", end_date="2025-08-22T00:00:00")
+        # alpaca.fetch_and_save_historical_data(symbol="BDTX", timeframe="5min", start_date="2016-01-01T00:00:00", end_date="2025-08-22T00:00:00")
+        
+        timeframes = ["1h", "5m", "15m"]
+        symbols = ["ISSC", "CCLD", "PLX", "LFVN"]
+        
+        for symbol in symbols:
+            for timeframe in timeframes:
+                alpaca = Alpaca(print_responses = False)
+                alpaca.fetch_and_save_historical_data(symbol=symbol, timeframe=timeframe, start_date="2015-01-01T00:00:00", end_date="2025-08-22T00:00:00")
+                
+                logger.info("Sleeping for 3 seconds until next one.")
+                time.sleep(3)
 
     
     if args.engineer_data:  # python main.py --engineer-data 'storage/data/capital_com/GBPUSD/raw/1m/2025-01-01_2025-05-23.csv' --hypothesis "hypothesis/1_session_based_tod_anomalies/config.yml"
@@ -291,8 +302,8 @@ def main():
         #                                        print_answer=False, include_spreads=False)
         # provider.end_session()
         
-        timeframes = ["MINUTE_15"]
-        symbols = ["BDTX"]
+        timeframes = ["HOUR", "MINUTE_5", "MINUTE_15"]
+        symbols = ["ISSC", "CCLD", "PLX"]
         
         for symbol in symbols:
             for timeframe in timeframes:
