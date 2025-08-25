@@ -1,0 +1,10 @@
+hypothesis:
+  name: "clov_institutional_blind_spots"
+  description: "Test CLOV 4h market data + calendar events to find institutional inefficiencies"
+
+multi_data:
+  purpose: "historical"
+  symbol: "ATLO"
+  from_date: "2016-01-01" 
+  to_date: "2025-08-19"
+  sources: [calendar_events]  # Include earnings, options expiry, holidays
