@@ -23,7 +23,7 @@ class Eight_k_filings(DataSourceBase):
         # Get company filing history from SEC EDGAR API
         self.url = f'https://data.sec.gov/submissions/CIK{str(STOCK_CIK.get(symbol)).zfill(10)}.json'
         
-        self.output_path = os.path.join(config.SEC_EDGAR_filings_storage_dir, symbol, 'eight_k')
+        self.output_path = os.path.join(config.SEC_EDGAR_filings_storage_dir, symbol, f'{symbol}_8K_filings.csv')
     
     def get_historical_data(self):
         """Get historical 8-K filings. """
@@ -52,7 +52,7 @@ class Eight_k_filings(DataSourceBase):
             eightk_filings.sort(key=lambda x: x['filing_date'])
             
             # Save to CSV
-            shared_utils.ensure_path_exists(self.output_path)
+            shared_utils.ensure_path_exists(os.path.dirname(self.output_path))
             with open(self.output_path, 'w', newline='') as csvfile:
                 fieldnames = ['filing_date', 'form', 'accession_number', 'act', 'items']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
